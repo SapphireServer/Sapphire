@@ -107,9 +107,9 @@ private:
   float m_zoomLevel = 1.0f;
 
   bool m_showBnpcWindow = true;
-  char m_bnpcSearchBuffer[256] = "";
+  char m_bnpcSearchBuffer[ 256 ] = "";
   std::string m_lastBnpcSearchTerm = "N/A";
-  std::vector<CachedBnpc*> m_filteredBnpcs;
+  std::vector< CachedBnpc * > m_filteredBnpcs;
   int m_selectedBnpcIndex = -1;
   std::shared_ptr< Sapphire::Common::Navi::NaviProvider > m_pNaviProvider;
 
@@ -131,32 +131,44 @@ private:
 
 
   // Camera/view controls for navmesh
-  glm::vec3 m_navCameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
-  glm::vec3 m_navCameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 m_navCameraPos = glm::vec3( 0.0f, 10.0f, 0.0f );
+  glm::vec3 m_navCameraTarget = glm::vec3( 0.0f, 0.0f, 0.0f );
   float m_navCameraDistance = 50.0f;
   float m_navCameraYaw = 0.0f;
   float m_navCameraPitch = -30.0f;
   // Mouse interaction state
   bool m_navMouseDragging = false;
   bool m_navMousePanning = false;
-  ImVec2 m_navLastMousePos = ImVec2(0, 0);
+  ImVec2 m_navLastMousePos = ImVec2( 0, 0 );
 
   uint32_t m_currentNavmeshZoneId = 0;
+
   // Add these methods
   void cleanupNavmeshGeometry(); // Separate from full cleanup
 
   // Add these methods
   void showBnpcWindow();
+
   void updateBnpcSearchFilter();
+
   void showNavmeshWindow();
+
   void initializeNavmeshRendering();
+
   void buildNavmeshGeometry();
+
   void buildSimpleNavmeshTest();
+
   void updateNavmeshCamera();
+
   void renderNavmesh();
+
   void cleanupNavmeshRendering();
+
   void createNavmeshFramebuffer();
+
   void renderNavmeshToTexture();
+
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
 
 public:
@@ -204,14 +216,15 @@ public:
 
   bool m_showBnpcIcons = true;
   float m_bnpcIconSize = 8.0f;
-  ImU32 m_bnpcIconColor = IM_COL32(255, 255, 0, 255); // Yellow
-  ImU32 m_selectedBnpcIconColor = IM_COL32(255, 0, 0, 255); // Red for selected
+  ImU32 m_bnpcIconColor = IM_COL32( 255, 255, 0, 255 ); // Yellow
+  ImU32 m_selectedBnpcIconColor = IM_COL32( 255, 0, 0, 255 ); // Red for selected
   float m_mapScale = 100.0f; // You'll need to get this from the map data
-  ImVec2 m_mapOffset = ImVec2(1024.0f, 1024.0f); // Default offset
+  ImVec2 m_mapOffset = ImVec2( 1024.0f, 1024.0f ); // Default offset
 
   // Helper methods
   void drawBnpcIcons();
-  ImVec2 worldToScreenPos(float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize);
+
+  ImVec2 worldToScreenPos( float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize );
 
 
   // Add these new members for BNPC rendering
@@ -223,12 +236,16 @@ public:
 
   // Add these methods
   void initializeBnpcMarkerRendering();
-  void buildBnpcMarkerGeometry();
-  void renderBnpcMarkers();
-  void cleanupBnpcMarkerRendering();
-  void drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize);
-  glm::vec2 worldToNavmeshScreen(float worldX, float worldY, float worldZ, ImVec2 imageSize);
 
+  void buildBnpcMarkerGeometry();
+
+  void renderBnpcMarkers();
+
+  void cleanupBnpcMarkerRendering();
+
+  void drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize );
+
+  glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
 
 private:
   void initializeCache();

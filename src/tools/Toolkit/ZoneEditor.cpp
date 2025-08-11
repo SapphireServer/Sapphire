@@ -499,25 +499,28 @@ void ZoneEditor::loadBnpcs()
 // Add a separate method to clean up just the geometry, not the whole rendering system
 void ZoneEditor::cleanupNavmeshGeometry()
 {
-  if (m_navmeshVAO) {
-    glDeleteVertexArrays(1, &m_navmeshVAO);
+  if( m_navmeshVAO )
+  {
+    glDeleteVertexArrays( 1, &m_navmeshVAO );
     m_navmeshVAO = 0;
   }
 
-  if (m_navmeshVBO) {
-    glDeleteBuffers(1, &m_navmeshVBO);
+  if( m_navmeshVBO )
+  {
+    glDeleteBuffers( 1, &m_navmeshVBO );
     m_navmeshVBO = 0;
   }
 
-  if (m_navmeshEBO) {
-    glDeleteBuffers(1, &m_navmeshEBO);
+  if( m_navmeshEBO )
+  {
+    glDeleteBuffers( 1, &m_navmeshEBO );
     m_navmeshEBO = 0;
   }
 
   m_navmeshIndexCount = 0;
   m_currentNavmeshZoneId = 0;
 
-  printf("Cleaned up navmesh geometry\n");
+  printf( "Cleaned up navmesh geometry\n" );
 }
 
 void ZoneEditor::cleanupNavmeshRendering()
@@ -527,28 +530,32 @@ void ZoneEditor::cleanupNavmeshRendering()
   cleanupBnpcMarkerRendering();
 
   // Clean up shader
-  if (m_navmeshShader) {
-    glDeleteProgram(m_navmeshShader);
+  if( m_navmeshShader )
+  {
+    glDeleteProgram( m_navmeshShader );
     m_navmeshShader = 0;
   }
 
   // Clean up framebuffer resources
-  if (m_navmeshFBO) {
-    glDeleteFramebuffers(1, &m_navmeshFBO);
+  if( m_navmeshFBO )
+  {
+    glDeleteFramebuffers( 1, &m_navmeshFBO );
     m_navmeshFBO = 0;
   }
 
-  if (m_navmeshTexture) {
-    glDeleteTextures(1, &m_navmeshTexture);
+  if( m_navmeshTexture )
+  {
+    glDeleteTextures( 1, &m_navmeshTexture );
     m_navmeshTexture = 0;
   }
 
-  if (m_navmeshDepthBuffer) {
-    glDeleteRenderbuffers(1, &m_navmeshDepthBuffer);
+  if( m_navmeshDepthBuffer )
+  {
+    glDeleteRenderbuffers( 1, &m_navmeshDepthBuffer );
     m_navmeshDepthBuffer = 0;
   }
 
-  printf("Cleaned up all navmesh rendering resources\n");
+  printf( "Cleaned up all navmesh rendering resources\n" );
 }
 
 
@@ -586,8 +593,6 @@ void ZoneEditor::onSelectionChanged()
         m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_selectedZone->id );
         m_needsNavmeshRebuild = true;
         buildNavmeshGeometry();
-
-
       }
       else
         m_pNaviProvider = nullptr;
@@ -648,177 +653,201 @@ void ZoneEditor::show()
 
 void ZoneEditor::buildNavmeshGeometry()
 {
-    if (!m_pNaviProvider || !m_selectedZone) {
-        return;
-    }
+  if( !m_pNaviProvider || !m_selectedZone )
+  {
+    return;
+  }
 
-    // Get navmesh from provider
-    const dtNavMesh* navMesh = m_pNaviProvider->getNavMesh();
-    if (!navMesh) {
-        return;
-    }
+  // Get navmesh from provider
+  const dtNavMesh *navMesh = m_pNaviProvider->getNavMesh();
+  if( !navMesh )
+  {
+    return;
+  }
 
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+  std::vector< float > vertices;
+  std::vector< unsigned int > indices;
 
-    printf("Processing navmesh for zone %u...\n", m_selectedZone->id);
-    printf("Max tiles in navmesh: %d\n", navMesh->getMaxTiles());
+  printf( "Processing navmesh for zone %u...\n", m_selectedZone->id );
+  printf( "Max tiles in navmesh: %d\n", navMesh->getMaxTiles() );
 
-    int totalPolygons = 0;
-    int totalTriangles = 0;
+  int totalPolygons = 0;
+  int totalTriangles = 0;
 
-    // Process ALL tiles, not just a limited number
-    for (int i = 0; i < navMesh->getMaxTiles(); ++i) {
-        const dtMeshTile* tile = navMesh->getTile(i);
-        if (!tile || !tile->header || !tile->dataSize) continue;
+  // Process ALL tiles, not just a limited number
+  for( int i = 0; i < navMesh->getMaxTiles(); ++i )
+  {
+    const dtMeshTile *tile = navMesh->getTile( i );
+    if( !tile || !tile->header || !tile->dataSize ) continue;
 
-        printf("Processing tile %d: %d polygons\n", i, tile->header->polyCount);
-        totalPolygons += tile->header->polyCount;
+    printf( "Processing tile %d: %d polygons\n", i, tile->header->polyCount );
+    totalPolygons += tile->header->polyCount;
 
-        for (int j = 0; j < tile->header->polyCount; ++j) {
-            const dtPoly* poly = &tile->polys[j];
+    for( int j = 0; j < tile->header->polyCount; ++j )
+    {
+      const dtPoly *poly = &tile->polys[ j ];
 
-            // Process all polygon types, not just GROUND
-            if (poly->vertCount < 3) continue; // Skip invalid polygons
+      // Process all polygon types, not just GROUND
+      if( poly->vertCount < 3 ) continue; // Skip invalid polygons
 
-            // Fan triangulation from vertex 0
-            for (int k = 1; k < poly->vertCount - 1; ++k) {
-                // Triangle: 0, k, k+1
-                for (int l = 0; l < 3; ++l) {
-                    int vertIndex;
-                    if (l == 0) vertIndex = 0;
-                    else if (l == 1) vertIndex = k;
-                    else vertIndex = k + 1;
+      // Fan triangulation from vertex 0
+      for( int k = 1; k < poly->vertCount - 1; ++k )
+      {
+        // Triangle: 0, k, k+1
+        for( int l = 0; l < 3; ++l )
+        {
+          int vertIndex;
+          if( l == 0 ) vertIndex = 0;
+          else if( l == 1 ) vertIndex = k;
+          else vertIndex = k + 1;
 
-                    if (vertIndex >= poly->vertCount) {
-                        printf("Invalid vertex index: %d >= %d\n", vertIndex, poly->vertCount);
-                        continue;
-                    }
-
-                    const float* v = &tile->verts[poly->verts[vertIndex] * 3];
-
-                    // Position
-                    vertices.push_back(v[0]);
-                    vertices.push_back(v[1]);
-                    vertices.push_back(v[2]);
-
-                    // Normal (will be calculated later)
-                    vertices.push_back(0.0f);
-                    vertices.push_back(1.0f);
-                    vertices.push_back(0.0f);
-                }
-
-                // Add indices for this triangle
-                unsigned int baseIndex = (vertices.size() / 6) - 3;
-                indices.push_back(baseIndex);
-                indices.push_back(baseIndex + 1);
-                indices.push_back(baseIndex + 2);
-                totalTriangles++;
-            }
-        }
-    }
-
-    printf("Total polygons processed: %d\n", totalPolygons);
-    printf("Total triangles generated: %d\n", totalTriangles);
-    printf("Vertices: %zu, Indices: %zu\n", vertices.size() / 6, indices.size());
-
-    if (vertices.empty() || indices.empty()) {
-        printf("No navmesh geometry found for zone %u\n", m_selectedZone->id);
-        return;
-    }
-
-    // Calculate proper normals for all triangles
-    printf("Calculating normals...\n");
-    for (size_t i = 0; i < indices.size(); i += 3) {
-        if (i + 2 >= indices.size()) break;
-
-        unsigned int i0 = indices[i] * 6;
-        unsigned int i1 = indices[i + 1] * 6;
-        unsigned int i2 = indices[i + 2] * 6;
-
-        if (i0 + 5 >= vertices.size() || i1 + 5 >= vertices.size() || i2 + 5 >= vertices.size()) {
+          if( vertIndex >= poly->vertCount )
+          {
+            printf( "Invalid vertex index: %d >= %d\n", vertIndex, poly->vertCount );
             continue;
+          }
+
+          const float *v = &tile->verts[ poly->verts[ vertIndex ] * 3 ];
+
+          // Position
+          vertices.push_back( v[ 0 ] );
+          vertices.push_back( v[ 1 ] );
+          vertices.push_back( v[ 2 ] );
+
+          // Normal (will be calculated later)
+          vertices.push_back( 0.0f );
+          vertices.push_back( 1.0f );
+          vertices.push_back( 0.0f );
         }
 
-        glm::vec3 v0(vertices[i0], vertices[i0 + 1], vertices[i0 + 2]);
-        glm::vec3 v1(vertices[i1], vertices[i1 + 1], vertices[i1 + 2]);
-        glm::vec3 v2(vertices[i2], vertices[i2 + 1], vertices[i2 + 2]);
+        // Add indices for this triangle
+        unsigned int baseIndex = ( vertices.size() / 6 ) - 3;
+        indices.push_back( baseIndex );
+        indices.push_back( baseIndex + 1 );
+        indices.push_back( baseIndex + 2 );
+        totalTriangles++;
+      }
+    }
+  }
 
-        glm::vec3 edge1 = v1 - v0;
-        glm::vec3 edge2 = v2 - v0;
-        glm::vec3 normal = glm::cross(edge1, edge2);
+  printf( "Total polygons processed: %d\n", totalPolygons );
+  printf( "Total triangles generated: %d\n", totalTriangles );
+  printf( "Vertices: %zu, Indices: %zu\n", vertices.size() / 6, indices.size() );
 
-        float length = glm::length(normal);
-        if (length > 0.0001f) {
-            normal = normal / length;
-        } else {
-            normal = glm::vec3(0, 1, 0); // Default up vector
-        }
+  if( vertices.empty() || indices.empty() )
+  {
+    printf( "No navmesh geometry found for zone %u\n", m_selectedZone->id );
+    return;
+  }
 
-        // Set normal for all three vertices
-        vertices[i0 + 3] = normal.x; vertices[i0 + 4] = normal.y; vertices[i0 + 5] = normal.z;
-        vertices[i1 + 3] = normal.x; vertices[i1 + 4] = normal.y; vertices[i1 + 5] = normal.z;
-        vertices[i2 + 3] = normal.x; vertices[i2 + 4] = normal.y; vertices[i2 + 5] = normal.z;
+  // Calculate proper normals for all triangles
+  printf( "Calculating normals...\n" );
+  for( size_t i = 0; i < indices.size(); i += 3 )
+  {
+    if( i + 2 >= indices.size() ) break;
+
+    unsigned int i0 = indices[ i ] * 6;
+    unsigned int i1 = indices[ i + 1 ] * 6;
+    unsigned int i2 = indices[ i + 2 ] * 6;
+
+    if( i0 + 5 >= vertices.size() || i1 + 5 >= vertices.size() || i2 + 5 >= vertices.size() )
+    {
+      continue;
     }
 
-    // Clean up existing buffers
+    glm::vec3 v0( vertices[ i0 ], vertices[ i0 + 1 ], vertices[ i0 + 2 ] );
+    glm::vec3 v1( vertices[ i1 ], vertices[ i1 + 1 ], vertices[ i1 + 2 ] );
+    glm::vec3 v2( vertices[ i2 ], vertices[ i2 + 1 ], vertices[ i2 + 2 ] );
+
+    glm::vec3 edge1 = v1 - v0;
+    glm::vec3 edge2 = v2 - v0;
+    glm::vec3 normal = glm::cross( edge1, edge2 );
+
+    float length = glm::length( normal );
+    if( length > 0.0001f )
+    {
+      normal = normal / length;
+    }
+    else
+    {
+      normal = glm::vec3( 0, 1, 0 ); // Default up vector
+    }
+
+    // Set normal for all three vertices
+    vertices[ i0 + 3 ] = normal.x;
+    vertices[ i0 + 4 ] = normal.y;
+    vertices[ i0 + 5 ] = normal.z;
+    vertices[ i1 + 3 ] = normal.x;
+    vertices[ i1 + 4 ] = normal.y;
+    vertices[ i1 + 5 ] = normal.z;
+    vertices[ i2 + 3 ] = normal.x;
+    vertices[ i2 + 4 ] = normal.y;
+    vertices[ i2 + 5 ] = normal.z;
+  }
+
+  // Clean up existing buffers
   //  cleanupNavmeshRendering();
 
-    // Create VAO, VBO, EBO
-    glGenVertexArrays(1, &m_navmeshVAO);
-    glGenBuffers(1, &m_navmeshVBO);
-    glGenBuffers(1, &m_navmeshEBO);
+  // Create VAO, VBO, EBO
+  glGenVertexArrays( 1, &m_navmeshVAO );
+  glGenBuffers( 1, &m_navmeshVBO );
+  glGenBuffers( 1, &m_navmeshEBO );
 
-    printf("Created buffers: VAO=%u, VBO=%u, EBO=%u\n", m_navmeshVAO, m_navmeshVBO, m_navmeshEBO);
+  printf( "Created buffers: VAO=%u, VBO=%u, EBO=%u\n", m_navmeshVAO, m_navmeshVBO, m_navmeshEBO );
 
-    // Bind VAO
-    glBindVertexArray(m_navmeshVAO);
+  // Bind VAO
+  glBindVertexArray( m_navmeshVAO );
 
-    // Upload vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, m_navmeshVBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+  // Upload vertex data
+  glBindBuffer( GL_ARRAY_BUFFER, m_navmeshVBO );
+  glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( float ), vertices.data(), GL_STATIC_DRAW );
 
-    // Upload index data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_navmeshEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+  // Upload index data
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_navmeshEBO );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof( unsigned int ), indices.data(), GL_STATIC_DRAW );
 
-    // Set vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+  // Set vertex attributes
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+  glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof( float ), ( void * ) ( 3 * sizeof( float ) ) );
+  glEnableVertexAttribArray( 1 );
 
-    // Unbind VAO
-    glBindVertexArray(0);
+  // Unbind VAO
+  glBindVertexArray( 0 );
 
-    m_navmeshIndexCount = indices.size();
-    m_currentNavmeshZoneId = m_selectedZone->id;
+  m_navmeshIndexCount = indices.size();
+  m_currentNavmeshZoneId = m_selectedZone->id;
 
-    // Check for OpenGL errors
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("OpenGL error after creating navmesh geometry: %d\n", error);
-    } else {
-        printf("Successfully created navmesh geometry with %d triangles\n", m_navmeshIndexCount / 3);
-    }
-    buildBnpcMarkerGeometry();
-
+  // Check for OpenGL errors
+  GLenum error = glGetError();
+  if( error != GL_NO_ERROR )
+  {
+    printf( "OpenGL error after creating navmesh geometry: %d\n", error );
+  }
+  else
+  {
+    printf( "Successfully created navmesh geometry with %d triangles\n", m_navmeshIndexCount / 3 );
+  }
+  buildBnpcMarkerGeometry();
 }
 
 void ZoneEditor::cleanupBnpcMarkerRendering()
 {
-  if (m_bnpcMarkerVAO) {
-    glDeleteVertexArrays(1, &m_bnpcMarkerVAO);
+  if( m_bnpcMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
     m_bnpcMarkerVAO = 0;
   }
 
-  if (m_bnpcMarkerVBO) {
-    glDeleteBuffers(1, &m_bnpcMarkerVBO);
+  if( m_bnpcMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
     m_bnpcMarkerVBO = 0;
   }
 
-  if (m_bnpcMarkerShader) {
-    glDeleteProgram(m_bnpcMarkerShader);
+  if( m_bnpcMarkerShader )
+  {
+    glDeleteProgram( m_bnpcMarkerShader );
     m_bnpcMarkerShader = 0;
   }
 
@@ -883,7 +912,7 @@ void ZoneEditor::buildSimpleNavmeshTest()
 void ZoneEditor::initializeNavmeshRendering()
 {
   // Create shaders (same as before)
-  const char* vertexShaderSource = R"(
+  const char *vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -899,7 +928,7 @@ void main()
 }
 )";
 
-  const char* fragmentShaderSource = R"(
+  const char *fragmentShaderSource = R"(
 #version 330 core
 in vec3 Normal;
 
@@ -919,25 +948,27 @@ void main()
 }
 )";
 
-  m_navmeshShader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
+  m_navmeshShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
 
   initializeBnpcMarkerRendering();
 
   // Create framebuffer for rendering to texture
   createNavmeshFramebuffer();
 
-  if (m_navmeshShader && m_navmeshFBO && m_bnpcMarkerShader ) {
-    printf("Navmesh rendering initialized successfully\n");
-  } else {
-    printf("Failed to initialize navmesh rendering\n");
+  if( m_navmeshShader && m_navmeshFBO && m_bnpcMarkerShader )
+  {
+    printf( "Navmesh rendering initialized successfully\n" );
   }
-
+  else
+  {
+    printf( "Failed to initialize navmesh rendering\n" );
+  }
 }
 
 void ZoneEditor::initializeBnpcMarkerRendering()
 {
   // Simple vertex shader for BNPC markers
-  const char* vertexShaderSource = R"(
+  const char *vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec3 position;
 
@@ -951,7 +982,7 @@ void main()
 )";
 
   // Simple fragment shader for BNPC markers
-  const char* fragmentShaderSource = R"(
+  const char *fragmentShaderSource = R"(
 #version 330 core
 
 out vec4 FragColor;
@@ -974,580 +1005,659 @@ void main()
 }
 )";
 
-  m_bnpcMarkerShader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
+  m_bnpcMarkerShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
 
-  if (m_bnpcMarkerShader) {
-    printf("BNPC marker shader created successfully (ID: %u)\n", m_bnpcMarkerShader);
-  } else {
-    printf("Failed to create BNPC marker shader\n");
+  if( m_bnpcMarkerShader )
+  {
+    printf( "BNPC marker shader created successfully (ID: %u)\n", m_bnpcMarkerShader );
+  }
+  else
+  {
+    printf( "Failed to create BNPC marker shader\n" );
   }
 }
 
 
 void ZoneEditor::buildBnpcMarkerGeometry()
 {
-    if (!m_selectedZone || m_bnpcs.empty()) {
-        return;
+  if( !m_selectedZone || m_bnpcs.empty() )
+  {
+    return;
+  }
+
+  std::vector< float > markerPositions;
+
+  // Get current zone's BNPCs
+  for( const auto& bnpc : m_bnpcs )
+  {
+    if( bnpc->territoryType == m_selectedZone->id )
+    {
+      // Add BNPC position
+      markerPositions.push_back( bnpc->x );
+      markerPositions.push_back( bnpc->y );
+      markerPositions.push_back( bnpc->z );
     }
+  }
 
-    std::vector<float> markerPositions;
+  if( markerPositions.empty() )
+  {
+    printf( "No BNPCs found for zone %u\n", m_selectedZone->id );
+    return;
+  }
 
-    // Get current zone's BNPCs
-    for (const auto& bnpc : m_bnpcs) {
-        if (bnpc->territoryType == m_selectedZone->id) {
-            // Add BNPC position
-            markerPositions.push_back(bnpc->x);
-            markerPositions.push_back(bnpc->y);
-            markerPositions.push_back(bnpc->z);
-        }
-    }
+  // Clean up existing marker buffers
+  if( m_bnpcMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
+  }
+  if( m_bnpcMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
+  }
 
-    if (markerPositions.empty()) {
-        printf("No BNPCs found for zone %u\n", m_selectedZone->id);
-        return;
-    }
+  // Create VAO and VBO for markers
+  glGenVertexArrays( 1, &m_bnpcMarkerVAO );
+  glGenBuffers( 1, &m_bnpcMarkerVBO );
 
-    // Clean up existing marker buffers
-    if (m_bnpcMarkerVAO) {
-        glDeleteVertexArrays(1, &m_bnpcMarkerVAO);
-    }
-    if (m_bnpcMarkerVBO) {
-        glDeleteBuffers(1, &m_bnpcMarkerVBO);
-    }
+  glBindVertexArray( m_bnpcMarkerVAO );
 
-    // Create VAO and VBO for markers
-    glGenVertexArrays(1, &m_bnpcMarkerVAO);
-    glGenBuffers(1, &m_bnpcMarkerVBO);
+  // Upload marker position data
+  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerVBO );
+  glBufferData( GL_ARRAY_BUFFER, markerPositions.size() * sizeof( float ), markerPositions.data(), GL_STATIC_DRAW );
 
-    glBindVertexArray(m_bnpcMarkerVAO);
+  // Set vertex attributes (position only)
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
 
-    // Upload marker position data
-    glBindBuffer(GL_ARRAY_BUFFER, m_bnpcMarkerVBO);
-    glBufferData(GL_ARRAY_BUFFER, markerPositions.size() * sizeof(float), markerPositions.data(), GL_STATIC_DRAW);
+  glBindVertexArray( 0 );
 
-    // Set vertex attributes (position only)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+  m_bnpcMarkerVertexCount = markerPositions.size() / 3;
 
-    glBindVertexArray(0);
-
-    m_bnpcMarkerVertexCount = markerPositions.size() / 3;
-
-    printf("Created %d BNPC markers for zone %u\n", m_bnpcMarkerVertexCount, m_selectedZone->id);
+  printf( "Created %d BNPC markers for zone %u\n", m_bnpcMarkerVertexCount, m_selectedZone->id );
 }
 
 void ZoneEditor::renderBnpcMarkers()
 {
-    if (!m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerVertexCount == 0) {
-        return;
-    }
+  if( !m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerVertexCount == 0 )
+  {
+    return;
+  }
 
-    // Set up matrices (same as navmesh)
-    glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                           (float)m_navmeshTextureWidth / (float)m_navmeshTextureHeight,
-                                           0.1f, 10000.0f);
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 mvp = projection * view * model;
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 model = glm::mat4( 1.0f );
+  glm::mat4 mvp = projection * view * model;
 
-    // Enable point rendering
-    glEnable(GL_PROGRAM_POINT_SIZE);
+  // Enable point rendering
+  glEnable( GL_PROGRAM_POINT_SIZE );
 
-    // Use marker shader
-    glUseProgram(m_bnpcMarkerShader);
+  // Use marker shader
+  glUseProgram( m_bnpcMarkerShader );
 
-    // Set uniforms
-    GLint mvpLoc = glGetUniformLocation(m_bnpcMarkerShader, "mvp");
-    if (mvpLoc != -1) {
-        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-    }
+  // Set uniforms
+  GLint mvpLoc = glGetUniformLocation( m_bnpcMarkerShader, "mvp" );
+  if( mvpLoc != -1 )
+  {
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  }
 
-    GLint colorLoc = glGetUniformLocation(m_bnpcMarkerShader, "markerColor");
-    if (colorLoc != -1) {
-        glUniform3f(colorLoc, 1.0f, 1.0f, 0.0f); // Yellow
-    }
+  GLint colorLoc = glGetUniformLocation( m_bnpcMarkerShader, "markerColor" );
+  if( colorLoc != -1 )
+  {
+    glUniform3f( colorLoc, 1.0f, 1.0f, 0.0f ); // Yellow
+  }
 
-    // Render markers as points
-    glBindVertexArray(m_bnpcMarkerVAO);
-    glDrawArrays(GL_POINTS, 0, m_bnpcMarkerVertexCount);
-    glBindVertexArray(0);
+  // Render markers as points
+  glBindVertexArray( m_bnpcMarkerVAO );
+  glDrawArrays( GL_POINTS, 0, m_bnpcMarkerVertexCount );
+  glBindVertexArray( 0 );
 
-    // Unbind shader
-    glUseProgram(0);
+  // Unbind shader
+  glUseProgram( 0 );
 
-    glDisable(GL_PROGRAM_POINT_SIZE);
+  glDisable( GL_PROGRAM_POINT_SIZE );
 }
 
 void ZoneEditor::renderNavmeshToTexture()
 {
-   if (!m_navmeshShader || !m_navmeshVAO || m_navmeshIndexCount == 0 || !m_navmeshFBO) {
-        return;
-    }
+  if( !m_navmeshShader || !m_navmeshVAO || m_navmeshIndexCount == 0 || !m_navmeshFBO )
+  {
+    return;
+  }
 
-    // Bind our framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, m_navmeshFBO);
+  // Bind our framebuffer
+  glBindFramebuffer( GL_FRAMEBUFFER, m_navmeshFBO );
 
-    // Set viewport to match texture size
-    glViewport(0, 0, m_navmeshTextureWidth, m_navmeshTextureHeight);
+  // Set viewport to match texture size
+  glViewport( 0, 0, m_navmeshTextureWidth, m_navmeshTextureHeight );
 
-    // Clear the framebuffer
-    glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Clear the framebuffer
+  glClearColor( 0.1f, 0.1f, 0.2f, 1.0f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    // Set up matrices
-    glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                           (float)m_navmeshTextureWidth / (float)m_navmeshTextureHeight,
-                                           0.1f, 10000.0f);
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 mvp = projection * view * model;
+  // Set up matrices
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 model = glm::mat4( 1.0f );
+  glm::mat4 mvp = projection * view * model;
 
-    // Set OpenGL state
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDisable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
+  // Set OpenGL state
+  glEnable( GL_DEPTH_TEST );
+  glDepthFunc( GL_LESS );
+  glDisable( GL_BLEND );
+  glDisable( GL_CULL_FACE );
 
-    // Render navmesh first
-    glUseProgram(m_navmeshShader);
+  // Render navmesh first
+  glUseProgram( m_navmeshShader );
 
-    GLint mvpLoc = glGetUniformLocation(m_navmeshShader, "mvp");
-    if (mvpLoc != -1) {
-        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-    }
+  GLint mvpLoc = glGetUniformLocation( m_navmeshShader, "mvp" );
+  if( mvpLoc != -1 )
+  {
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  }
 
-    GLint colorLoc = glGetUniformLocation(m_navmeshShader, "color");
-    if (colorLoc != -1) {
-        glUniform3f(colorLoc, 0.2f, 0.8f, 1.0f);
-    }
+  GLint colorLoc = glGetUniformLocation( m_navmeshShader, "color" );
+  if( colorLoc != -1 )
+  {
+    glUniform3f( colorLoc, 0.2f, 0.8f, 1.0f );
+  }
 
-    static bool showWireframe = false;
-    GLint wireframeLoc = glGetUniformLocation(m_navmeshShader, "wireframe");
-    if (wireframeLoc != -1) {
-        glUniform1i(wireframeLoc, showWireframe ? 1 : 0);
-    }
+  static bool showWireframe = false;
+  GLint wireframeLoc = glGetUniformLocation( m_navmeshShader, "wireframe" );
+  if( wireframeLoc != -1 )
+  {
+    glUniform1i( wireframeLoc, showWireframe ? 1 : 0 );
+  }
 
-    if (showWireframe) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glLineWidth(1.0f);
-    } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
+  if( showWireframe )
+  {
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glLineWidth( 1.0f );
+  }
+  else
+  {
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  }
 
-    glBindVertexArray(m_navmeshVAO);
-    glDrawElements(GL_TRIANGLES, m_navmeshIndexCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+  glBindVertexArray( m_navmeshVAO );
+  glDrawElements( GL_TRIANGLES, m_navmeshIndexCount, GL_UNSIGNED_INT, 0 );
+  glBindVertexArray( 0 );
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glUseProgram(0);
+  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  glUseProgram( 0 );
 
-    // Render BNPC markers on top
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    renderBnpcMarkers();
+  // Render BNPC markers on top
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  renderBnpcMarkers();
 
-    // Unbind framebuffer (back to default)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+  // Unbind framebuffer (back to default)
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
-glm::vec2 ZoneEditor::worldToNavmeshScreen(float worldX, float worldY, float worldZ, ImVec2 imageSize)
+
+glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize )
 {
   // Set up the same matrices as used in rendering
-  glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
-  glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                         imageSize.x / imageSize.y,
-                                         0.1f, 10000.0f);
-  glm::mat4 model = glm::mat4(1.0f);
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           imageSize.x / imageSize.y,
+                                           0.1f, 10000.0f );
+  glm::mat4 model = glm::mat4( 1.0f );
   glm::mat4 mvp = projection * view * model;
 
   // Transform world position to screen space
-  glm::vec4 worldPos(worldX, worldY, worldZ, 1.0f);
+  glm::vec4 worldPos( worldX, worldY, worldZ, 1.0f );
   glm::vec4 clipSpace = mvp * worldPos;
 
   // Perspective divide
-  if (clipSpace.w == 0.0f) {
-    return glm::vec2(-1, -1); // Invalid
+  if( clipSpace.w == 0.0f )
+  {
+    return glm::vec2( -1, -1 ); // Invalid
   }
 
-  glm::vec3 ndc = glm::vec3(clipSpace) / clipSpace.w;
+  glm::vec3 ndc = glm::vec3( clipSpace ) / clipSpace.w;
 
   // Check if point is behind camera or outside clip space
-  if (clipSpace.w < 0.0f || ndc.x < -1.0f || ndc.x > 1.0f || ndc.y < -1.0f || ndc.y > 1.0f) {
-    return glm::vec2(-1, -1); // Outside view
+  if( clipSpace.w < 0.0f || ndc.x < -1.0f || ndc.x > 1.0f || ndc.y < -1.0f || ndc.y > 1.0f )
+  {
+    return glm::vec2( -1, -1 ); // Outside view
   }
 
   // Convert to screen coordinates
   glm::vec2 screenPos;
-  screenPos.x = (ndc.x + 1.0f) * 0.5f * imageSize.x;
-  screenPos.y = (1.0f - ndc.y) * 0.5f * imageSize.y; // Flip Y
+  screenPos.x = ( ndc.x + 1.0f ) * 0.5f * imageSize.x;
+  screenPos.y = ( 1.0f - ndc.y ) * 0.5f * imageSize.y; // Flip Y
 
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize)
+void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
 {
-  if (!m_showBnpcMarkersInNavmesh || !m_selectedZone || m_bnpcs.empty()) {
+  if( !m_showBnpcMarkersInNavmesh || !m_selectedZone || m_bnpcs.empty() )
+  {
     return;
   }
 
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImDrawList *drawList = ImGui::GetWindowDrawList();
 
-  for (const auto& bnpc : m_bnpcs) {
-    if (bnpc->territoryType != m_selectedZone->id) {
+  for( const auto& bnpc : m_bnpcs )
+  {
+    if( bnpc->territoryType != m_selectedZone->id )
+    {
       continue;
     }
 
     // Convert world position to screen space
-    glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
 
     // Skip if outside view
-    if (screenPos.x < 0 || screenPos.y < 0 || screenPos.x >= imageSize.x || screenPos.y >= imageSize.y) {
+    if( screenPos.x < 0 || screenPos.y < 0 || screenPos.x >= imageSize.x || screenPos.y >= imageSize.y )
+    {
       continue;
     }
 
     // Convert to ImGui screen coordinates
-    ImVec2 markerPos(imagePos.x + screenPos.x, imagePos.y + screenPos.y);
+    ImVec2 markerPos( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
 
     // Draw diamond shape
     float size = 4.0f;
-    ImVec2 points[4] = {
-      ImVec2(markerPos.x, markerPos.y - size),      // Top
-      ImVec2(markerPos.x + size, markerPos.y),      // Right
-      ImVec2(markerPos.x, markerPos.y + size),      // Bottom
-      ImVec2(markerPos.x - size, markerPos.y)       // Left
-  };
+    ImVec2 points[ 4 ] = {
+      ImVec2( markerPos.x, markerPos.y - size ), // Top
+      ImVec2( markerPos.x + size, markerPos.y ), // Right
+      ImVec2( markerPos.x, markerPos.y + size ), // Bottom
+      ImVec2( markerPos.x - size, markerPos.y ) // Left
+    };
 
     // Draw filled diamond
-    drawList->AddConvexPolyFilled(points, 4, m_bnpcIconColor);
+    drawList->AddConvexPolyFilled( points, 4, m_bnpcIconColor );
 
     // Draw outline
-    drawList->AddPolyline(points, 4, IM_COL32(0, 0, 0, 255), ImDrawFlags_Closed, 1.0f);
+    drawList->AddPolyline( points, 4, IM_COL32( 0, 0, 0, 255 ), ImDrawFlags_Closed, 1.0f );
 
     // Optional: draw BNPC name on hover
-    if (ImGui::IsMouseHoveringRect(ImVec2(markerPos.x - size, markerPos.y - size),
-                                   ImVec2(markerPos.x + size, markerPos.y + size))) {
-      ImGui::SetTooltip("BNPC: %s\nID: %u\nPos: %.1f, %.1f, %.1f",
-                       bnpc->nameString.c_str(), bnpc->instanceId,
-                       bnpc->x, bnpc->y, bnpc->z);
-                                   }
+    if( ImGui::IsMouseHoveringRect( ImVec2( markerPos.x - size, markerPos.y - size ),
+                                    ImVec2( markerPos.x + size, markerPos.y + size ) ) )
+    {
+      ImGui::SetTooltip( "BNPC: %s\nID: %u\nPos: %.1f, %.1f, %.1f",
+                         bnpc->nameString.c_str(), bnpc->instanceId,
+                         bnpc->x, bnpc->y, bnpc->z );
+    }
   }
 }
 
 void ZoneEditor::createNavmeshFramebuffer()
 {
   // Clean up existing framebuffer
-  if (m_navmeshFBO) {
-    glDeleteFramebuffers(1, &m_navmeshFBO);
-    glDeleteTextures(1, &m_navmeshTexture);
-    glDeleteRenderbuffers(1, &m_navmeshDepthBuffer);
+  if( m_navmeshFBO )
+  {
+    glDeleteFramebuffers( 1, &m_navmeshFBO );
+    glDeleteTextures( 1, &m_navmeshTexture );
+    glDeleteRenderbuffers( 1, &m_navmeshDepthBuffer );
   }
 
   // Create framebuffer
-  glGenFramebuffers(1, &m_navmeshFBO);
-  glBindFramebuffer(GL_FRAMEBUFFER, m_navmeshFBO);
+  glGenFramebuffers( 1, &m_navmeshFBO );
+  glBindFramebuffer( GL_FRAMEBUFFER, m_navmeshFBO );
 
   // Create color texture
-  glGenTextures(1, &m_navmeshTexture);
-  glBindTexture(GL_TEXTURE_2D, m_navmeshTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_navmeshTextureWidth, m_navmeshTextureHeight,
-               0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glGenTextures( 1, &m_navmeshTexture );
+  glBindTexture( GL_TEXTURE_2D, m_navmeshTexture );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, m_navmeshTextureWidth, m_navmeshTextureHeight,
+                0, GL_RGB, GL_UNSIGNED_BYTE, nullptr );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
   // Attach color texture to framebuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_navmeshTexture, 0);
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_navmeshTexture, 0 );
 
   // Create depth buffer
-  glGenRenderbuffers(1, &m_navmeshDepthBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, m_navmeshDepthBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_navmeshTextureWidth, m_navmeshTextureHeight);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_navmeshDepthBuffer);
+  glGenRenderbuffers( 1, &m_navmeshDepthBuffer );
+  glBindRenderbuffer( GL_RENDERBUFFER, m_navmeshDepthBuffer );
+  glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_navmeshTextureWidth, m_navmeshTextureHeight );
+  glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_navmeshDepthBuffer );
 
   // Check framebuffer completeness
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Navmesh framebuffer not complete!\n");
+  if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
+  {
+    printf( "Navmesh framebuffer not complete!\n" );
   }
 
   // Unbind framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-  printf("Created navmesh framebuffer: FBO=%u, Texture=%u, Depth=%u (%dx%d)\n",
-         m_navmeshFBO, m_navmeshTexture, m_navmeshDepthBuffer,
-         m_navmeshTextureWidth, m_navmeshTextureHeight);
+  printf( "Created navmesh framebuffer: FBO=%u, Texture=%u, Depth=%u (%dx%d)\n",
+          m_navmeshFBO, m_navmeshTexture, m_navmeshDepthBuffer,
+          m_navmeshTextureWidth, m_navmeshTextureHeight );
 }
 
 void ZoneEditor::renderNavmesh()
 {
-    if (!m_navmeshTexture) {
-        ImGui::Text("No navmesh texture available");
-        return;
+  if( !m_navmeshTexture )
+  {
+    ImGui::Text( "No navmesh texture available" );
+    return;
+  }
+
+  // Render navmesh to our texture
+  renderNavmeshToTexture();
+
+  // Display the texture in ImGui
+  ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+
+  // Maintain aspect ratio
+  float aspectRatio = ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight;
+  ImVec2 imageSize;
+
+  if( contentRegion.x / aspectRatio <= contentRegion.y )
+  {
+    imageSize.x = contentRegion.x;
+    imageSize.y = contentRegion.x / aspectRatio;
+  }
+  else
+  {
+    imageSize.y = contentRegion.y;
+    imageSize.x = contentRegion.y * aspectRatio;
+  }
+
+  // Center the image
+  ImVec2 cursorPos = ImGui::GetCursorPos();
+  ImVec2 offset = ImVec2( ( contentRegion.x - imageSize.x ) * 0.5f, ( contentRegion.y - imageSize.y ) * 0.5f );
+  ImGui::SetCursorPos( ImVec2( cursorPos.x + offset.x, cursorPos.y + offset.y ) );
+
+  // Get the screen position of the image
+  ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
+
+  // Display the texture
+  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+
+  // Draw BNPC markers as overlay (alternative to 3D markers)
+  drawBnpcOverlayMarkers( imageScreenPos, imageSize );
+
+  // Handle mouse interaction over the image
+  if( ImGui::IsItemHovered() )
+  {
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Left mouse button - rotate camera
+    if( io.MouseDown[ 0 ] )
+    {
+      if( !m_navMouseDragging )
+      {
+        m_navMouseDragging = true;
+        m_navLastMousePos = io.MousePos;
+        m_navCameraControlActive = true;
+      }
+      else
+      {
+        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
+                               io.MousePos.y - m_navLastMousePos.y );
+
+        m_navCameraYaw += delta.x * 0.5f;
+        m_navCameraPitch -= delta.y * 0.5f;
+
+        // Clamp pitch
+        m_navCameraPitch = glm::clamp( m_navCameraPitch, -89.0f, 89.0f );
+
+        m_navLastMousePos = io.MousePos;
+      }
+    }
+    else
+    {
+      if( m_navMouseDragging )
+      {
+        m_navMouseDragging = false;
+        m_navCameraControlActive = false;
+      }
     }
 
-    // Render navmesh to our texture
-    renderNavmeshToTexture();
+    // Middle mouse button - pan camera
+    if( io.MouseDown[ 2 ] )
+    {
+      // Middle mouse button
+      if( !m_navMousePanning )
+      {
+        m_navMousePanning = true;
+        m_navLastMousePos = io.MousePos;
+        m_navCameraControlActive = true;
+      }
+      else
+      {
+        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
+                               io.MousePos.y - m_navLastMousePos.y );
 
-    // Display the texture in ImGui
-    ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+        // Convert mouse movement to world space movement
+        glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
 
-    // Maintain aspect ratio
-    float aspectRatio = (float)m_navmeshTextureWidth / (float)m_navmeshTextureHeight;
-    ImVec2 imageSize;
+        // Get camera right and up vectors
+        glm::vec3 cameraRight = glm::vec3( view[ 0 ][ 0 ], view[ 1 ][ 0 ], view[ 2 ][ 0 ] );
+        glm::vec3 cameraUp = glm::vec3( view[ 0 ][ 1 ], view[ 1 ][ 1 ], view[ 2 ][ 1 ] );
 
-    if (contentRegion.x / aspectRatio <= contentRegion.y) {
-        imageSize.x = contentRegion.x;
-        imageSize.y = contentRegion.x / aspectRatio;
-    } else {
-        imageSize.y = contentRegion.y;
-        imageSize.x = contentRegion.y * aspectRatio;
+        // Pan sensitivity based on distance
+        float panSensitivity = m_navCameraDistance * 0.001f;
+
+        // Move target in camera space
+        glm::vec3 panMovement = cameraRight * ( -delta.x * panSensitivity ) +
+                                cameraUp * ( delta.y * panSensitivity );
+
+        m_navCameraTarget += panMovement;
+
+        m_navLastMousePos = io.MousePos;
+      }
+    }
+    else
+    {
+      if( m_navMousePanning )
+      {
+        m_navMousePanning = false;
+        m_navCameraControlActive = false;
+      }
     }
 
-    // Center the image
-    ImVec2 cursorPos = ImGui::GetCursorPos();
-    ImVec2 offset = ImVec2((contentRegion.x - imageSize.x) * 0.5f, (contentRegion.y - imageSize.y) * 0.5f);
-    ImGui::SetCursorPos(ImVec2(cursorPos.x + offset.x, cursorPos.y + offset.y));
-
-    // Get the screen position of the image
-    ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
-
-    // Display the texture
-    ImGui::Image(reinterpret_cast<void*>(m_navmeshTexture), imageSize, ImVec2(0, 1), ImVec2(1, 0));
-
-    // Draw BNPC markers as overlay (alternative to 3D markers)
-    drawBnpcOverlayMarkers(imageScreenPos, imageSize);
-
-    // Handle mouse interaction over the image
-    if (ImGui::IsItemHovered()) {
-        ImGuiIO& io = ImGui::GetIO();
-
-        // Left mouse button - rotate camera
-        if (io.MouseDown[0]) {
-            if (!m_navMouseDragging) {
-                m_navMouseDragging = true;
-                m_navLastMousePos = io.MousePos;
-                m_navCameraControlActive = true;
-            } else {
-                ImVec2 delta = ImVec2(io.MousePos.x - m_navLastMousePos.x,
-                                     io.MousePos.y - m_navLastMousePos.y);
-
-                m_navCameraYaw += delta.x * 0.5f;
-                m_navCameraPitch -= delta.y * 0.5f;
-
-                // Clamp pitch
-                m_navCameraPitch = glm::clamp(m_navCameraPitch, -89.0f, 89.0f);
-
-                m_navLastMousePos = io.MousePos;
-            }
-        } else {
-            if (m_navMouseDragging) {
-                m_navMouseDragging = false;
-                m_navCameraControlActive = false;
-            }
-        }
-
-        // Middle mouse button - pan camera
-        if (io.MouseDown[2]) { // Middle mouse button
-            if (!m_navMousePanning) {
-                m_navMousePanning = true;
-                m_navLastMousePos = io.MousePos;
-                m_navCameraControlActive = true;
-            } else {
-                ImVec2 delta = ImVec2(io.MousePos.x - m_navLastMousePos.x,
-                                     io.MousePos.y - m_navLastMousePos.y);
-
-                // Convert mouse movement to world space movement
-                glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
-
-                // Get camera right and up vectors
-                glm::vec3 cameraRight = glm::vec3(view[0][0], view[1][0], view[2][0]);
-                glm::vec3 cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
-
-                // Pan sensitivity based on distance
-                float panSensitivity = m_navCameraDistance * 0.001f;
-
-                // Move target in camera space
-                glm::vec3 panMovement = cameraRight * (-delta.x * panSensitivity) +
-                                       cameraUp * (delta.y * panSensitivity);
-
-                m_navCameraTarget += panMovement;
-
-                m_navLastMousePos = io.MousePos;
-            }
-        } else {
-            if (m_navMousePanning) {
-                m_navMousePanning = false;
-                m_navCameraControlActive = false;
-            }
-        }
-
-        // Handle mouse wheel for zoom
-        if (io.MouseWheel != 0.0f) {
-            m_navCameraDistance -= io.MouseWheel * 10.0f;
-            m_navCameraDistance = glm::clamp(m_navCameraDistance, 1.0f, 1000.0f);
-            m_navCameraControlActive = true;
-        }
-    } else {
-        // Reset mouse states when not hovering
-        if (m_navMouseDragging) {
-            m_navMouseDragging = false;
-            m_navCameraControlActive = false;
-        }
-        if (m_navMousePanning) {
-            m_navMousePanning = false;
-            m_navCameraControlActive = false;
-        }
+    // Handle mouse wheel for zoom
+    if( io.MouseWheel != 0.0f )
+    {
+      m_navCameraDistance -= io.MouseWheel * 10.0f;
+      m_navCameraDistance = glm::clamp( m_navCameraDistance, 1.0f, 1000.0f );
+      m_navCameraControlActive = true;
     }
+  }
+  else
+  {
+    // Reset mouse states when not hovering
+    if( m_navMouseDragging )
+    {
+      m_navMouseDragging = false;
+      m_navCameraControlActive = false;
+    }
+    if( m_navMousePanning )
+    {
+      m_navMousePanning = false;
+      m_navCameraControlActive = false;
+    }
+  }
 
-    // Update camera position
-    updateNavmeshCamera();
+  // Update camera position
+  updateNavmeshCamera();
 
-    // Display info below the image
-    ImGui::SetCursorPos(ImVec2(cursorPos.x, cursorPos.y + contentRegion.y - 100));
-    ImGui::Text("Navmesh: %d triangles", m_navmeshIndexCount / 3);
-    ImGui::Text("BNPCs: %d markers", m_bnpcMarkerVertexCount);
-    ImGui::Checkbox("Show BNPC Markers", &m_showBnpcMarkersInNavmesh);
-    static bool showWireframe = false;
-    ImGui::Checkbox("Wireframe", &showWireframe);
-    ImGui::Text("Camera: dist=%.1f yaw=%.1f pitch=%.1f",
-               m_navCameraDistance, m_navCameraYaw, m_navCameraPitch);
-    ImGui::Text("Target: (%.1f, %.1f, %.1f)",
-               m_navCameraTarget.x, m_navCameraTarget.y, m_navCameraTarget.z);
-    ImGui::Text("Controls: LMB=rotate, MMB=pan, wheel=zoom");
-
+  // Display info below the image
+  ImGui::SetCursorPos( ImVec2( cursorPos.x, cursorPos.y + contentRegion.y - 100 ) );
+  ImGui::Text( "Navmesh: %d triangles", m_navmeshIndexCount / 3 );
+  ImGui::Text( "BNPCs: %d markers", m_bnpcMarkerVertexCount );
+  ImGui::Checkbox( "Show BNPC Markers", &m_showBnpcMarkersInNavmesh );
+  static bool showWireframe = false;
+  ImGui::Checkbox( "Wireframe", &showWireframe );
+  ImGui::Text( "Camera: dist=%.1f yaw=%.1f pitch=%.1f",
+               m_navCameraDistance, m_navCameraYaw, m_navCameraPitch );
+  ImGui::Text( "Target: (%.1f, %.1f, %.1f)",
+               m_navCameraTarget.x, m_navCameraTarget.y, m_navCameraTarget.z );
+  ImGui::Text( "Controls: LMB=rotate, MMB=pan, wheel=zoom" );
 }
 
 void ZoneEditor::showNavmeshWindow()
 {
-    if (!ImGui::Begin("Navmesh Viewer", &m_showNavmeshWindow)) {
-        ImGui::End();
-        return;
+  if( !ImGui::Begin( "Navmesh Viewer", &m_showNavmeshWindow ) )
+  {
+    ImGui::End();
+    return;
+  }
+
+  // Auto-build navmesh when window is opened and zone is selected
+  if( m_needsNavmeshRebuild || ( m_selectedZone && m_currentNavmeshZoneId != m_selectedZone->id && m_navmeshIndexCount
+                                 == 0 ) )
+  {
+    if( m_selectedZone )
+    {
+      buildNavmeshGeometry();
+      m_needsNavmeshRebuild = false;
+    }
+  }
+
+  // Add test buttons
+  if( ImGui::Button( "Test Simple Triangle" ) )
+  {
+    buildSimpleNavmeshTest();
+  }
+  ImGui::SameLine();
+
+  // Disable the button if no zone is selected or no navi provider
+  bool canBuildNavmesh = m_selectedZone && m_pNaviProvider;
+  if( !canBuildNavmesh )
+  {
+    ImGui::BeginDisabled();
+  }
+
+  if( ImGui::Button( "Build Real Navmesh" ) )
+  {
+    buildNavmeshGeometry();
+  }
+
+  if( !canBuildNavmesh )
+  {
+    ImGui::EndDisabled();
+    if( !m_selectedZone )
+    {
+      ImGui::SameLine();
+      ImGui::TextColored( ImVec4( 1.0f, 0.5f, 0.0f, 1.0f ), "(No zone selected)" );
+    }
+    else if( !m_pNaviProvider )
+    {
+      ImGui::SameLine();
+      ImGui::TextColored( ImVec4( 1.0f, 0.5f, 0.0f, 1.0f ), "(No NaviProvider)" );
+    }
+  }
+
+  if( ImGui::Button( "Clear Navmesh" ) )
+  {
+    cleanupNavmeshGeometry();
+  }
+
+  // Add some debug info
+  ImGui::Separator();
+  ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
+  ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
+  ImGui::Text( "NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No" );
+  ImGui::Text( "Loaded navmesh zone: %u", m_currentNavmeshZoneId );
+  ImGui::Text( "Triangle count: %d", m_navmeshIndexCount / 3 );
+
+  // Camera controls - only update sliders if not actively using mouse controls
+  if( ImGui::CollapsingHeader( "Camera Controls", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    // Disable sliders when mouse controls are active
+    if( m_navCameraControlActive )
+    {
+      ImGui::BeginDisabled();
     }
 
-    // Auto-build navmesh when window is opened and zone is selected
-    if (m_needsNavmeshRebuild || (m_selectedZone && m_currentNavmeshZoneId != m_selectedZone->id && m_navmeshIndexCount == 0)) {
-        if (m_selectedZone) {
-            buildNavmeshGeometry();
-            m_needsNavmeshRebuild = false;
-        }
+    if( ImGui::SliderFloat( "Distance", &m_navCameraDistance, 1.0f, 500.0f ) )
+    {
+      m_navCameraDistance = glm::clamp( m_navCameraDistance, 1.0f, 500.0f );
+    }
+    if( ImGui::SliderFloat( "Yaw", &m_navCameraYaw, -180.0f, 180.0f ) )
+    {
+      // Keep yaw in range
+      while( m_navCameraYaw > 180.0f ) m_navCameraYaw -= 360.0f;
+      while( m_navCameraYaw < -180.0f ) m_navCameraYaw += 360.0f;
+    }
+    if( ImGui::SliderFloat( "Pitch", &m_navCameraPitch, -89.0f, 89.0f ) )
+    {
+      m_navCameraPitch = glm::clamp( m_navCameraPitch, -89.0f, 89.0f );
     }
 
-    // Add test buttons
-    if (ImGui::Button("Test Simple Triangle")) {
-        buildSimpleNavmeshTest();
+    if( m_navCameraControlActive )
+    {
+      ImGui::EndDisabled();
+    }
+
+    // Target position controls
+    ImGui::Text( "Target Position:" );
+    ImGui::SliderFloat( "Target X", &m_navCameraTarget.x, -1000.0f, 1000.0f );
+    ImGui::SliderFloat( "Target Y", &m_navCameraTarget.y, -100.0f, 100.0f );
+    ImGui::SliderFloat( "Target Z", &m_navCameraTarget.z, -1000.0f, 1000.0f );
+
+    if( ImGui::Button( "Reset Camera" ) )
+    {
+      m_navCameraDistance = 100.0f;
+      m_navCameraYaw = 0.0f;
+      m_navCameraPitch = -30.0f;
+      m_navCameraTarget = glm::vec3( 0.0f, 0.0f, 0.0f );
+      m_navCameraControlActive = false;
+    }
+
+    if( ImGui::Button( "Top View" ) )
+    {
+      m_navCameraYaw = 0.0f;
+      m_navCameraPitch = -89.0f;
+      m_navCameraDistance = 200.0f;
+      m_navCameraControlActive = false;
     }
     ImGui::SameLine();
-
-    // Disable the button if no zone is selected or no navi provider
-    bool canBuildNavmesh = m_selectedZone && m_pNaviProvider;
-    if (!canBuildNavmesh) {
-        ImGui::BeginDisabled();
+    if( ImGui::Button( "Side View" ) )
+    {
+      m_navCameraYaw = 90.0f;
+      m_navCameraPitch = 0.0f;
+      m_navCameraDistance = 100.0f;
+      m_navCameraControlActive = false;
     }
 
-    if (ImGui::Button("Build Real Navmesh")) {
-        buildNavmeshGeometry();
+    // Reset mouse control flag after a short time of inactivity
+    static float lastMouseTime = 0.0f;
+    if( m_navCameraControlActive )
+    {
+      lastMouseTime = ImGui::GetTime();
     }
-
-    if (!canBuildNavmesh) {
-        ImGui::EndDisabled();
-        if (!m_selectedZone) {
-            ImGui::SameLine();
-            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "(No zone selected)");
-        } else if (!m_pNaviProvider) {
-            ImGui::SameLine();
-            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "(No NaviProvider)");
-        }
+    else if( ImGui::GetTime() - lastMouseTime > 0.5f )
+    {
+      // Half second delay
+      m_navCameraControlActive = false;
     }
+  }
 
-    if (ImGui::Button("Clear Navmesh")) {
-        cleanupNavmeshGeometry();
+  // Get available content region
+  ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+  if( contentRegion.x > 0 && contentRegion.y > 0 )
+  {
+    // Create child window for 3D rendering
+    if( ImGui::BeginChild( "NavmeshRender", contentRegion, true, ImGuiWindowFlags_NoScrollbar ) )
+    {
+      renderNavmesh();
     }
+    ImGui::EndChild();
+  }
 
-    // Add some debug info
-    ImGui::Separator();
-    ImGui::Text("Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None");
-    ImGui::Text("Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0);
-    ImGui::Text("NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No");
-    ImGui::Text("Loaded navmesh zone: %u", m_currentNavmeshZoneId);
-    ImGui::Text("Triangle count: %d", m_navmeshIndexCount / 3);
+  ImGui::End();
 
-    // Camera controls - only update sliders if not actively using mouse controls
-    if (ImGui::CollapsingHeader("Camera Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
-        // Disable sliders when mouse controls are active
-        if (m_navCameraControlActive) {
-            ImGui::BeginDisabled();
-        }
-
-        if (ImGui::SliderFloat("Distance", &m_navCameraDistance, 1.0f, 500.0f)) {
-            m_navCameraDistance = glm::clamp(m_navCameraDistance, 1.0f, 500.0f);
-        }
-        if (ImGui::SliderFloat("Yaw", &m_navCameraYaw, -180.0f, 180.0f)) {
-            // Keep yaw in range
-            while (m_navCameraYaw > 180.0f) m_navCameraYaw -= 360.0f;
-            while (m_navCameraYaw < -180.0f) m_navCameraYaw += 360.0f;
-        }
-        if (ImGui::SliderFloat("Pitch", &m_navCameraPitch, -89.0f, 89.0f)) {
-            m_navCameraPitch = glm::clamp(m_navCameraPitch, -89.0f, 89.0f);
-        }
-
-        if (m_navCameraControlActive) {
-            ImGui::EndDisabled();
-        }
-
-        // Target position controls
-        ImGui::Text("Target Position:");
-        ImGui::SliderFloat("Target X", &m_navCameraTarget.x, -1000.0f, 1000.0f);
-        ImGui::SliderFloat("Target Y", &m_navCameraTarget.y, -100.0f, 100.0f);
-        ImGui::SliderFloat("Target Z", &m_navCameraTarget.z, -1000.0f, 1000.0f);
-
-        if (ImGui::Button("Reset Camera")) {
-            m_navCameraDistance = 100.0f;
-            m_navCameraYaw = 0.0f;
-            m_navCameraPitch = -30.0f;
-            m_navCameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-            m_navCameraControlActive = false;
-        }
-
-        if (ImGui::Button("Top View")) {
-            m_navCameraYaw = 0.0f;
-            m_navCameraPitch = -89.0f;
-            m_navCameraDistance = 200.0f;
-            m_navCameraControlActive = false;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Side View")) {
-            m_navCameraYaw = 90.0f;
-            m_navCameraPitch = 0.0f;
-            m_navCameraDistance = 100.0f;
-            m_navCameraControlActive = false;
-        }
-
-        // Reset mouse control flag after a short time of inactivity
-        static float lastMouseTime = 0.0f;
-        if (m_navCameraControlActive) {
-            lastMouseTime = ImGui::GetTime();
-        } else if (ImGui::GetTime() - lastMouseTime > 0.5f) { // Half second delay
-            m_navCameraControlActive = false;
-        }
-    }
-
-    // Get available content region
-    ImVec2 contentRegion = ImGui::GetContentRegionAvail();
-    if (contentRegion.x > 0 && contentRegion.y > 0) {
-
-        // Create child window for 3D rendering
-        if (ImGui::BeginChild("NavmeshRender", contentRegion, true, ImGuiWindowFlags_NoScrollbar)) {
-            renderNavmesh();
-        }
-        ImGui::EndChild();
-    }
-
-    ImGui::End();
-
-    // If window was just closed, clean up geometry to free memory
-    if (!m_showNavmeshWindow && m_navmeshIndexCount > 0) {
-        cleanupNavmeshGeometry();
-    }
+  // If window was just closed, clean up geometry to free memory
+  if( !m_showNavmeshWindow && m_navmeshIndexCount > 0 )
+  {
+    cleanupNavmeshGeometry();
+  }
 }
 
 void ZoneEditor::showZoneList()
