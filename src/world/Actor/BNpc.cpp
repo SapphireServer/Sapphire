@@ -717,7 +717,10 @@ void BNpc::onDeath()
     {
       auto lootResult = lootTableMgr.rollLoot( "testTable" );
       // todo: make this a task? it's too fast and good to be retail-like
-      inventoryMgr.resolveLootTableResult( *pPlayer, lootResult );
+      for( auto resultItem : lootResult.items )
+      {
+        auto item = pPlayer->addItem( resultItem.id, resultItem.quantity, resultItem.isHq, false, true );
+      }
 
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );

@@ -191,14 +191,3 @@ void InventoryMgr::saveItem( Entity::Player& player, ItemPtr item )
 
   db.directExecute( stmt );
 }
-
-void InventoryMgr::resolveLootTableResult( Entity::Player& player, Loot::LootTableResult lootTableResult )
-{
-  // todo: handle HQ and better quantity
-  // todo: batch item creation, this might be needlessly slow on db
-  // todo: should this even be here and not in PlayerInventory? where am I? who is this? someone get me out of here!
-  for( auto resultItem : lootTableResult.items )
-  {
-    auto item = player.addItem( resultItem.id, resultItem.quantity, resultItem.isHq, false, true );
-  }
-}
