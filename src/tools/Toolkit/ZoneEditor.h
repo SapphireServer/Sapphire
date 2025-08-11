@@ -8,7 +8,13 @@
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
 #include <Navi/NaviProvider.h>
+#include "Engine/GfxApi.h"
+
+// Add Detour includes for navmesh
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
 
 struct CachedBnpc
 {
@@ -107,11 +113,50 @@ private:
   int m_selectedBnpcIndex = -1;
   std::shared_ptr< Sapphire::Common::Navi::NaviProvider > m_pNaviProvider;
 
+  // Navmesh rendering members
+  bool m_showNavmeshWindow = false;
+  GLuint m_navmeshVAO = 0;
+  GLuint m_navmeshVBO = 0;
+  GLuint m_navmeshEBO = 0;
+  GLuint m_navmeshShader = 0;
+  int m_navmeshIndexCount = 0;
+
+  GLuint m_navmeshFBO = 0;
+  GLuint m_navmeshTexture = 0;
+  GLuint m_navmeshDepthBuffer = 0;
+  int m_navmeshTextureWidth = 512;
+  int m_navmeshTextureHeight = 512;
+  bool m_needsNavmeshRebuild = false;
+  bool m_navCameraControlActive = false;
+
+
+  // Camera/view controls for navmesh
+  glm::vec3 m_navCameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
+  glm::vec3 m_navCameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+  float m_navCameraDistance = 50.0f;
+  float m_navCameraYaw = 0.0f;
+  float m_navCameraPitch = -30.0f;
+  // Mouse interaction state
+  bool m_navMouseDragging = false;
+  bool m_navMousePanning = false;
+  ImVec2 m_navLastMousePos = ImVec2(0, 0);
+
+  uint32_t m_currentNavmeshZoneId = 0;
+  // Add these methods
+  void cleanupNavmeshGeometry(); // Separate from full cleanup
+
   // Add these methods
   void showBnpcWindow();
   void updateBnpcSearchFilter();
-
-
+  void showNavmeshWindow();
+  void initializeNavmeshRendering();
+  void buildNavmeshGeometry();
+  void buildSimpleNavmeshTest();
+  void updateNavmeshCamera();
+  void renderNavmesh();
+  void cleanupNavmeshRendering();
+  void createNavmeshFramebuffer();
+  void renderNavmeshToTexture();
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
 
 public:
@@ -167,6 +212,22 @@ public:
   // Helper methods
   void drawBnpcIcons();
   ImVec2 worldToScreenPos(float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize);
+
+
+  // Add these new members for BNPC rendering
+  bool m_showBnpcMarkersInNavmesh = true;
+  GLuint m_bnpcMarkerVAO = 0;
+  GLuint m_bnpcMarkerVBO = 0;
+  GLuint m_bnpcMarkerShader = 0;
+  int m_bnpcMarkerVertexCount = 0;
+
+  // Add these methods
+  void initializeBnpcMarkerRendering();
+  void buildBnpcMarkerGeometry();
+  void renderBnpcMarkers();
+  void cleanupBnpcMarkerRendering();
+  void drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize);
+  glm::vec2 worldToNavmeshScreen(float worldX, float worldY, float worldZ, ImVec2 imageSize);
 
 
 private:
