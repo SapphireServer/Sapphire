@@ -10,6 +10,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
       "target": []
@@ -26,6 +27,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
       "target": []
@@ -42,6 +44,7 @@
     "restorePercentage": 0,
     "targetFilter": 0,
     "nextCombo": [],
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
       "target": []
@@ -58,6 +61,7 @@
     "restorePercentage": 0,
     "targetFilter": 0,
     "nextCombo": [],
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [
         {
@@ -85,6 +89,7 @@
     "restorePercentage": 0,
     "targetFilter": 0,
     "nextCombo": [],
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
       "target": []
@@ -101,6 +106,7 @@
     "restorePercentage": 0,
     "targetFilter": 0,
     "nextCombo": [],
+    "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
       "target": []

@@ -89,11 +89,7 @@ public:
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( MagesBalladStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( Flags );
-            effect->setModifier( Common::ParamModifier::Refresh, potencyParty );
-            targetChara->addStatusEffect( effect );
-            Network::Util::Packet::sendHudParam( *targetChara );
+            statusEffectMgr().applyStatusEffect( actor.getAsChara(), targetChara->getAsChara(), MagesBalladStatus, 5000, 0, { StatusModifier{ Common::ParamModifier::Refresh, potencyParty } }, Flags, true );
           }
         }
       }

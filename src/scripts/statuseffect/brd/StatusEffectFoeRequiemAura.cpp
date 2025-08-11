@@ -9,6 +9,7 @@
 #include <Network/Util/PacketUtil.h>
 
 #include "Manager/PartyMgr.h"
+#include "Manager/StatusEffectMgr.h"
 
 #include <Math/CalcStats.h>
 #include "Util/UtilMath.h"
@@ -58,7 +59,7 @@ public:
 
     for( auto& target : actor.getInRangeActors( false ) )
     {
-      if( target->isBattleNpc() )
+      if( actor.isHostile( *target->getAsChara() ) )
       {
         auto distance = Sapphire::Common::Util::distance( actor.getPos(), target->getPos() );
         if( distance <= 20.0f )
@@ -72,11 +73,7 @@ public:
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( FoeRequiemStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( Flags );
-            effect->setModifier( Common::ParamModifier::MagicDefensePercent, modifierVal );
-            targetChara->addStatusEffect( effect );
-            Network::Util::Packet::sendHudParam( *targetChara );
+            statusEffectMgr().applyStatusEffect( actor.getAsChara(), target->getAsChara(), FoeRequiemStatus, 5000, 0, { StatusModifier{ Common::ParamModifier::MagicDefensePercent, modifierVal } }, Flags, true );
           }
         }
       }

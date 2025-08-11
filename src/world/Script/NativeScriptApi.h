@@ -7,6 +7,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/StatusEffectMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Exd/ExdData.h"
@@ -130,6 +131,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::StatusEffectMgr& statusEffectMgr()
+    {
+      return Common::Service< World::Manager::StatusEffectMgr >::ref();
     }
   };
 
@@ -267,6 +273,8 @@ namespace Sapphire::ScriptAPI
     virtual void onSay( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t sayId );
 
     virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
+
+    virtual void onEventGroundItem( World::Quest& quest, Sapphire::Entity::Player& player, Common::FFXIVARR_POSITION3 pos );
 
     virtual void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player );
 

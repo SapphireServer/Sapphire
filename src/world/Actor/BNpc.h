@@ -118,6 +118,8 @@ namespace Sapphire::Entity
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
+    std::vector< CharaPtr > getHateList() override;
+    void hateListUpdatePlayers();
     
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );
@@ -126,7 +128,7 @@ namespace Sapphire::Entity
     void update( uint64_t tickCount ) override;
     void onTick() override;
 
-    void onActionHostile( CharaPtr pSource ) override;
+    void onActionHostile( CharaPtr pSource, int32_t aggro ) override;
 
     void onDeath() override;
 
@@ -176,9 +178,14 @@ namespace Sapphire::Entity
 
     void setRoamTargetPos( const Common::FFXIVARR_POSITION3& targetPos );
 
+    void updateAggroTarget();
+
     const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
     const Common::FFXIVARR_POSITION3& getSpawnPos() const;
     void initFsm();
+
+    bool getCanSwapTarget();
+    void setCanSwapTarget( bool value );
 
   private:
     uint32_t m_bNpcBaseId;
@@ -216,6 +223,7 @@ namespace Sapphire::Entity
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
+    bool m_canSwapTarget{ true };
 
     uint64_t m_naviLastUpdate;
     std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;

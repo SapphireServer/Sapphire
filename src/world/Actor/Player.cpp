@@ -965,35 +965,48 @@ void Player::updateHowtosSeen( uint32_t howToId )
 void Player::initHateSlotQueue()
 {
   m_freeHateSlotQueue = std::queue< uint8_t >();
-  for( int32_t i = 1; i < 26; ++i )
+  for( int32_t i = 0; i < 26; ++i )
     m_freeHateSlotQueue.push( i );
 }
 
 void Player::hateListAdd( const BNpc& bnpc )
 {
+  // todo: fix letter assignment. It doesn't seem to perfectly replicate retail yet.
   if( !m_freeHateSlotQueue.empty() )
   {
     uint8_t hateId = m_freeHateSlotQueue.front();
     m_freeHateSlotQueue.pop();
     m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
     Network::Util::Packet::sendHateList( *this );
+    Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
   }
+  else
+  {
+    uint8_t hateId = m_actorIdTohateSlotMap.size();
+    m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
+    Network::Util::Packet::sendHateList( *this );
+    Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
+}
 }
 
 void Player::hateListRemove( const BNpc& bnpc )
 {
+  auto bnpcId = bnpc.getId();
+  auto result = m_actorIdTohateSlotMap.find( bnpcId );
+  if( result == m_actorIdTohateSlotMap.end() )
+    return;
 
-  auto it = m_actorIdTohateSlotMap.begin();
-  for( ; it != m_actorIdTohateSlotMap.end(); ++it )
+  uint8_t hateSlot = m_actorIdTohateSlotMap[ bnpcId ];
+  if( hateSlot < 26 )
   {
-    if( it->first == bnpc.getId() )
-    {
-      uint8_t hateSlot = it->second;
       m_freeHateSlotQueue.push( hateSlot );
-      m_actorIdTohateSlotMap.erase( it );
+    m_actorIdTohateSlotMap.erase( bnpcId );
       Network::Util::Packet::sendHateList( *this );
-      return;
     }
+  else
+  {
+    m_actorIdTohateSlotMap.erase( bnpcId );
+    Network::Util::Packet::sendHateList( *this );
   }
 }
 
@@ -1001,6 +1014,20 @@ bool Player::hateListHasEntry( const BNpc& bnpc )
 {
   return std::any_of( m_actorIdTohateSlotMap.begin(), m_actorIdTohateSlotMap.end(),
                      [ bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
+}
+
+std::vector< CharaPtr > Player::getHateList()
+{
+  std::vector< CharaPtr > hateList = {};
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  for( auto entry : m_actorIdTohateSlotMap )
+  {
+    hateList.push_back( pZone->getActiveBNpcByEntityId( entry.first ) );
+  }
+
+  return hateList;
 }
 
 const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
@@ -1023,6 +1050,22 @@ void Player::onMobDeaggro( const BNpc& bnpc )
     removeCondition( PlayerCondition::InCombat );
     Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
   }
+}
+
+void Player::hateListLetterUpdate( const BNpc& bnpc )
+{
+  auto pos = m_actorIdTohateSlotMap.find( bnpc.getId() );
+  if( pos == m_actorIdTohateSlotMap.end() )
+    return;
+
+  uint8_t hateId = pos->second;
+  if( hateId < 26 || m_freeHateSlotQueue.empty() )
+    return;
+
+  hateId = m_freeHateSlotQueue.front();
+  m_freeHateSlotQueue.pop();
+  m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
+  Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
 }
 
 bool Player::isLogin() const
@@ -1165,8 +1208,6 @@ void Player::autoAttack( CharaPtr pTarget )
   uint32_t attackId = 7;
   if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm)
     attackId = 8;
-
-  pTarget->onActionHostile( getAsChara() );
 
   auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );

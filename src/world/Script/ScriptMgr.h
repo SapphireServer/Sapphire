@@ -71,6 +71,8 @@ namespace Sapphire::Scripting
 
     bool onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint64_t targetId );
 
+    bool onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, Common::FFXIVARR_POSITION3 pos );
+
     bool onBNpcKill( Entity::Player& player, Entity::BNpc& bnpc );
 
     bool onPlayerDeath( Entity::Player& player );

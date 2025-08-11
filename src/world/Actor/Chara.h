@@ -251,7 +251,7 @@ namespace Sapphire::Entity
 
     virtual bool isHostile( const Chara& chara );
 
-    virtual void onActionHostile( CharaPtr pSource ) {};
+    virtual void onActionHostile( CharaPtr pSource, int32_t aggro ) {};
 
     virtual bool isFriendly( const Chara& chara );
 
@@ -289,6 +289,8 @@ namespace Sapphire::Entity
 
     int32_t getAgentId() const;
     void setAgentId( int32_t agentId );
+
+    virtual std::vector< CharaPtr > getHateList();
 
     float getRadius() const;
 

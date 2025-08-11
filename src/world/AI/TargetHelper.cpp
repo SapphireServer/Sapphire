@@ -112,8 +112,8 @@ namespace Sapphire::World::AI
     bool ret = false;
     if( pBNpc )
     {
-      // todo: this is so dumb
-
+      // todo: make this work
+      /*
       auto hateList = pBNpc->getHateList();
       std::vector sorted( hateList.begin(), hateList.end() );
       std::sort( sorted.begin(), sorted.end(), []( Entity::HateListEntryPtr a, Entity::HateListEntryPtr b ) {
@@ -122,9 +122,10 @@ namespace Sapphire::World::AI
       Entity::CharaPtr pChara = nullptr;
       auto topIt = sorted.begin();
       if( topIt != sorted.end() && ++topIt != sorted.end() )
-        pChara = topIt->get()->m_pChara;
+        pChara = topIt->get()->getAsChara();
 
       ret = pChara == pTarget;
+      */
     }
     return m_negate ? !ret : ret;
   }

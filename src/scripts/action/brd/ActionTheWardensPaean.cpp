@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 #include <Network/Util/PacketUtil.h>
 
