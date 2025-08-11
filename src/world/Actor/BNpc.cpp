@@ -32,7 +32,7 @@
 #include "Common.h"
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 #include <Manager/InventoryMgr.h>
 #include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
@@ -611,7 +611,7 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
-  auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& pRNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )

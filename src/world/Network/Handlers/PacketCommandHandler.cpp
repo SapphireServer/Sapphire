@@ -27,7 +27,7 @@
 #include <Service.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/PlayerMgr.h>
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;

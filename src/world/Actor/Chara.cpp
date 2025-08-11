@@ -978,7 +978,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
       }
     }
     setPos( navPos );
-    pNav->updateAgentPosition( *this );
+    pNav->updateAgentPosition( getAgentId(), getPos(), getRadius() );
   }
   else
   {
