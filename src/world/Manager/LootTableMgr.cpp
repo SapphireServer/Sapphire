@@ -55,7 +55,7 @@ LootTableResult LootTableMgr::rollLoot( const std::string& name )
 
   if( auto pLootTable = getLootTableByName( name ); pLootTable )
   {
-    Logger::info( "LootMgr: Rolling for " + name );
+    Logger::info( "LootTableMgr: Rolling for " + name );
     result.name = pLootTable->lootTable;
 
     for( const auto& pool : pLootTable->pools )
@@ -83,7 +83,7 @@ LootTableResult LootTableMgr::rollLoot( const std::string& name )
       }
     }
 
-    Logger::debug( "LootMgr: Rolled total of {0} items", result.count() );
+    Logger::debug( "LootTableMgr: Rolled total of {0} items", result.count() );
   }
     
   return result;
