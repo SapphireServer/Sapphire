@@ -146,3 +146,5 @@ doxygen/*.tmp
 config/*.ini
 !config/config.ini.default
 /CMakeSettings.json
+
+imgui.ini

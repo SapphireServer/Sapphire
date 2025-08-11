@@ -10,3 +10,15 @@
 [submodule "deps/ffxiv-actions"]
 	path = deps/ffxiv-actions
 	url = https://github.com/SapphireServer/ffxiv-actions.git
+[submodule "deps/glm"]
+	path = deps/glm
+	url = https://github.com/g-truc/glm
+[submodule "deps/glew"]
+	path = deps/glew
+	url = https://github.com/Perlmint/glew-cmake
+[submodule "deps/glfw"]
+	path = deps/glfw
+	url = https://github.com/glfw/glfw
+[submodule "deps/imgui"]
+	path = deps/imgui
+	url = https://github.com/ocornut/imgui

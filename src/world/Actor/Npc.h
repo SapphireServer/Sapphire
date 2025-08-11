@@ -29,7 +29,6 @@ namespace Sapphire::Entity
   private:
     bool m_bPathingActive{false};
 
-
   };
 
 }

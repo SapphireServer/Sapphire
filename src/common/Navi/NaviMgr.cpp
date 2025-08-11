@@ -1,12 +1,11 @@
 #include "NaviMgr.h"
-#include "Navi/NaviProvider.h"
-#include <Logging/Logger.h>
+#include <Navi/NaviProvider.h>
+#include <Service.h>
+#include <filesystem>
 
 using namespace Sapphire;
-using namespace Sapphire::World;
-using namespace Sapphire::World::Manager;
 
-bool NaviMgr::setupTerritory( const std::string& bgPath, uint32_t guid )
+bool Common::Navi::NaviMgr::setupTerritory( const std::string& bgPath, uint32_t guid )
 {
   std::string bg = getBgName( bgPath );
 
@@ -14,9 +13,9 @@ bool NaviMgr::setupTerritory( const std::string& bgPath, uint32_t guid )
   if( m_naviProviderTerritoryMap.find( guid ) != m_naviProviderTerritoryMap.end() )
     return true;
 
-  auto provider = Navi::make_NaviProvider( bg );
+  auto provider = std::make_shared< Common::Navi::NaviProvider >( bg );
 
-  if( provider->init() )
+  if( provider->init( m_naviPath ) )
   {
     m_naviProviderTerritoryMap[ guid ] = provider;
     return true;
@@ -25,7 +24,7 @@ bool NaviMgr::setupTerritory( const std::string& bgPath, uint32_t guid )
   return false;
 }
 
-Navi::NaviProviderPtr NaviMgr::getNaviProvider( const std::string& bgPath, uint32_t guid )
+Common::Navi::NaviProviderPtr Common::Navi::NaviMgr::getNaviProvider( const std::string& bgPath, uint32_t guid )
 {
   std::string bg = getBgName( bgPath );
 
@@ -35,7 +34,7 @@ Navi::NaviProviderPtr NaviMgr::getNaviProvider( const std::string& bgPath, uint3
   return nullptr;
 }
 
-std::string NaviMgr::getBgName( const std::string& bgPath )
+std::string Common::Navi::NaviMgr::getBgName( const std::string& bgPath )
 {
   auto findPos = bgPath.find_last_of( '/' );
   if( findPos != std::string::npos )

@@ -15,7 +15,6 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
-
   bool hasQueuedAction = bnpc.checkAction();
 
   auto pHatedActor = bnpc.hateListGetHighest();
@@ -23,7 +22,10 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     return;
 
   if( pNaviProvider && bnpc.pathingActive() )
-    pNaviProvider->updateAgentParameters( bnpc );
+  {
+    auto state = bnpc.getState();
+    pNaviProvider->updateAgentParameters( bnpc.getAgentId(), bnpc.getRadius(), state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat );
+  }
 
   auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );
 
@@ -53,12 +55,14 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   {
 
     if( pNaviProvider )
-      pNaviProvider->setMoveTarget( bnpc, pHatedActor->getPos() );
+      pNaviProvider->setMoveTarget( bnpc.getAgentId(), pHatedActor->getPos() );
 
     bnpc.moveTo( *pHatedActor );
   }
 
-  pNaviProvider->syncPosToChara( bnpc );
+  auto pos = pNaviProvider->getMovePos( bnpc.getAgentId() );
+  if( pos.x != bnpc.getPos().x || pos.y != bnpc.getPos().y || pos.z != bnpc.getPos().z )
+    bnpc.setPos( pos );
 
   if( !hasQueuedAction && (distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) || !bnpc.pathingActive() ) )
   {

@@ -1,11 +1,2 @@
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}*.c*")
-
-add_executable(exd_struct_gen ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
-
-if (UNIX)
-  target_link_libraries (exd_struct_gen common xivdat pthread mysql dl z stdc++fs)
-else()
-  target_link_libraries (exd_struct_gen common xivdat mysql zlib)
-endif()
-
+add_executable( exd_struct_gen main.cpp )
+target_link_libraries( exd_struct_gen PRIVATE common )
