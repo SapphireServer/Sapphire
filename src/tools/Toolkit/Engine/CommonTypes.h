@@ -4,7 +4,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <algorithm>
-
+#include <string>
+#include <functional>
 
 namespace Engine
 {
@@ -47,23 +48,6 @@ namespace std
       hash_combine( hash, std::hash< float >{}( v.x ) );
       hash_combine( hash, std::hash< float >{}( v.y ) );
       hash_combine( hash, std::hash< float >{}( v.z ) );
-      return hash;
-    }
-  };
-}
-
-namespace std
-{
-  template<>
-  struct ::std::hash< glm::ivec3 >
-  {
-    size_t operator()( const glm::vec3& v ) const
-    {
-      // You can use a simple hash function like this
-      size_t hash = 0;
-      hash_combine( hash, std::hash< int >{}( v.x ) );
-      hash_combine( hash, std::hash< int >{}( v.y ) );
-      hash_combine( hash, std::hash< int >{}( v.z ) );
       return hash;
     }
   };

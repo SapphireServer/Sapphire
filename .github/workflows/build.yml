@@ -20,7 +20,7 @@ jobs:
     - name: update
       run: sudo apt-get update
     - name: install deps
-      run: sudo apt install -y ninja-build libmariadb-dev zlib1g-dev mariadb-server
+      run: sudo apt install -y ninja-build libmariadb-dev zlib1g-dev mariadb-server xorg-dev libwayland-dev
     - name: cmake
       run: |
         mkdir build 
