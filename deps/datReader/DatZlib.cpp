@@ -1,7 +1,7 @@
-#include "zlib.h"
+#include "DatZlib.h"
 #include <string>
 #include <stdexcept>
-#include <zlib/zlib.h>
+#include <zlib.h>
 #include <vector>
 
 namespace xiv::utils::zlib

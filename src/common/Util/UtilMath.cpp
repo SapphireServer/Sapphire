@@ -55,6 +55,10 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
 {
   float dx = x - x1;
   float dy = y - y1;
+
+  if( dx == 0.0f && dy == 0.0f )
+    return 0.0f;
+
   if( dy != 0.0f )
   {
     return atan2( dy, dx );
@@ -88,6 +92,39 @@ float Util::radiansToDegrees( float val )
 float Util::degreesToRadians(float val)
 {
   return val * ( PI / 180 );
+}
+
+FFXIVARR_POSITION3 Util::getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rot, float right, float up, float forward )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  // height
+  ret.y += up;
+
+  // forward
+  float angle = rot + ( PI / 2 );
+  ret.x -= forward * cos( angle );
+  ret.z += forward * sin( angle );
+
+  // side
+  ret.x -= right * cos( rot );
+  ret.z += right * sin( rot );
+
+  return ret;
+}
+
+FFXIVARR_POSITION3 Util::getKnockbackPosition( const FFXIVARR_POSITION3& origin, const FFXIVARR_POSITION3& pos, float distance )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  float from = Common::Util::calcAngFrom( origin.x, origin.z, pos.x, pos.z );
+  float angle = PI - from + ( PI / 2 );
+
+  angle = angle + ( PI / 2 );
+  ret.x -= distance * cos( angle );
+  ret.z += distance * sin( angle );
+
+  return ret;
 }
 
 FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )

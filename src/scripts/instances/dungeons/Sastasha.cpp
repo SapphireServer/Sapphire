@@ -1,6 +1,6 @@
 #include <ScriptObject.h>
 #include <Territory/InstanceContent.h>
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>
@@ -58,7 +58,7 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     // Random coral
-    auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+    auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
     instance.setCustomVar( Coral, RNGMgr.getRandGenerator< uint32_t >( Corals::Blue, Corals::Green ).next() );
 
     switch( instance.getCustomVar( Coral ) )

@@ -18,10 +18,6 @@
 // - Off-mesh connections can optionally be exported as OBJ "l" segments when
 //   --with-offmesh is passed.
 
-#include <recastnavigation/Detour/Include/DetourNavMesh.h>
-#include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
-
-
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -34,12 +30,10 @@
 #include <sstream>
 #include <limits>
 #include <cmath>
+#include <memory>
 
-#ifndef DT_NAVMESH_MAGIC
-// Some distros use camel-case include path; attempt fallback include if not found.
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>
-#endif
 
 // ------------------------- Serialization (RecastDemo-style) ------------------
 
@@ -163,7 +157,8 @@ static void ExportNavMeshToObj( dtNavMesh *nav, const std::string& outPath, bool
 
   for( int t = 0; t < maxTiles; ++t )
   {
-    const dtMeshTile *tile = nav->getTile( t );
+    auto tileRef = nav->encodePolyId(0, t, 0);
+    const dtMeshTile *tile = nav->getTileByRef( tileRef );
     if( !tile || !tile->header ) continue;
     const dtMeshHeader *h = tile->header;
 

@@ -1,0 +1,1232 @@
+{
+  "actors": [
+    {
+      "hp": 13884,
+      "id": 1,
+      "layoutId": 4126276,
+      "name": "Ifrit",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Phase 1",
+          "timepoints": [
+            {
+              "data": {
+                "actionId": 453,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "target"
+              },
+              "description": "Incinerate",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 454,
+                "selectorIndex": 0,
+                "selectorName": "Vulcan Burst",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Vulcan Burst",
+              "startTime": 8000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 453,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "target"
+              },
+              "description": "Incinerate",
+              "startTime": 16000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 453,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "target"
+              },
+              "description": "Incinerate",
+              "startTime": 24000,
+              "type": "castAction"
+            },
+            {
+              "data": {},
+              "description": "",
+              "startTime": 28000,
+              "type": "idle"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 2,
+          "name": "Phase 2 Start",
+          "timepoints": [
+            {
+              "data": {
+                "battleTalkId": 2601,
+                "kind": 2,
+                "length": 5000,
+                "nameId": 1185,
+                "params": [
+                  0
+                ],
+                "talkerActorName": "Ifrit"
+              },
+              "description": "Battle Talk",
+              "startTime": 0,
+              "type": "battleTalk"
+            },
+            {
+              "data": {
+                "conditionId": 2,
+                "conditionStr": "If Ifrit state is Combat, loop Ifrit->Phase 2 Main",
+                "enabled": true
+              },
+              "description": "Enable Condition Ifrit Phase 2 Main",
+              "startTime": 1000,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 3,
+          "name": "Phase 2 Main",
+          "timepoints": [
+            {
+              "data": {
+                "actionId": 453,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "target"
+              },
+              "description": "Incinerate",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 455,
+                "selectorIndex": 0,
+                "selectorName": "Eruption",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Eruption",
+              "startTime": 8000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "selectorName": "Eruption",
+                "sourceActor": "Ifrit"
+              },
+              "description": "Eruption snapshot",
+              "startTime": 10000,
+              "type": "snapshot"
+            },
+            {
+              "data": {
+                "conditionId": 9,
+                "conditionStr": "If Ifrit casts Action#455, loop Ifrit Control->Eruption",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 10000,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "actionId": 454,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Vulcan Burst",
+              "startTime": 12000,
+              "type": "castAction"
+            },
+            {
+              "data": {},
+              "description": "",
+              "startTime": 16000,
+              "type": "idle"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 4,
+          "name": "Nail Spawn",
+          "timepoints": [
+            {
+              "data": {
+                "battleTalkId": 2602,
+                "kind": 2,
+                "length": 5000,
+                "nameId": 1185,
+                "params": [
+                  0
+                ],
+                "talkerActorName": "Ifrit"
+              },
+              "description": "Surrender thyself to the fires of judgment",
+              "startTime": 0,
+              "type": "battleTalk"
+            },
+            {
+              "data": {
+                "conditionId": 3,
+                "conditionStr": "If Ifrit state is Combat, loop Ifrit->Phase 1",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "flags": 339,
+                "hateSource": {
+                  "hateType": "<to-be-defined>",
+                  "source": "<to-de-befined>"
+                },
+                "spawnActor": "Ifrit Nail 1"
+              },
+              "description": "Spawn Nail",
+              "startTime": 5000,
+              "type": "bNpcSpawn"
+            },
+            {
+              "data": {
+                "conditionId": 7,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire Failure",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 40000,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 5,
+          "name": "Hellfire Success",
+          "timepoints": [
+            {
+              "data": {
+                "conditionId": 7,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire Failure",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "conditionId": 3,
+                "conditionStr": "If Ifrit state is Combat, loop Ifrit->Phase 1",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "conditionId": 6,
+                "conditionStr": "If Ifrit has 25% < HP < 50%, push Ifrit->Nail Spawn",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "conditionId": 2,
+                "conditionStr": "If Ifrit has 50% < HP < 70%, loop Ifrit->Phase 2 Main",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "flags": 375,
+                "targetActor": ""
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "bNpcFlags"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit",
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actionTimelineId": 140,
+                "actorName": "Ifrit"
+              },
+              "description": "",
+              "startTime": 2000,
+              "type": "actionTimeline"
+            },
+            {
+              "data": {
+                "actionTimelineId": 141,
+                "actorName": "Ifrit"
+              },
+              "description": "",
+              "startTime": 6000,
+              "type": "actionTimeline"
+            },
+            {
+              "data": {
+                "flags": 16,
+                "targetActor": ""
+              },
+              "description": "",
+              "startTime": 7000,
+              "type": "bNpcFlags"
+            },
+            {
+              "data": {
+                "actionId": 458,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 7300,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 10,
+                "conditionStr": "If Ifrit state is Combat, loop Ifrit->Final Phase",
+                "enabled": true
+              },
+              "description": "enable final phase",
+              "startTime": 12000,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 9,
+          "name": "Hellfire Success Director",
+          "timepoints": [
+            {
+              "data": {
+                "idx": 0,
+                "opc": "set",
+                "val": 1
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "directorVar"
+            },
+            {
+              "data": {
+                "conditionId": 4,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire Success",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 6,
+          "name": "Hellfire Failure",
+          "timepoints": [
+            {
+              "data": {
+                "idx": 0,
+                "opc": "set",
+                "val": 2
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "directorVar"
+            },
+            {
+              "data": {
+                "despawnActor": "Ifrit Nail 1"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "bNpcDespawn"
+            },
+            {
+              "data": {
+                "conditionId": 4,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire Success",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 7,
+          "name": "Final Phase",
+          "timepoints": [
+            {
+              "data": {
+                "actionId": 455,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 455,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "target"
+              },
+              "description": "",
+              "startTime": 8000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 456,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Ifrit Plumes In",
+              "startTime": 16000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 8,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes In",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 16000,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "actionId": 456,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Ifrit Plumes Out",
+              "startTime": 23000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 13,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes Out",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 23000,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 8,
+          "name": "Reset",
+          "timepoints": [
+            {
+              "data": {
+                "flags": 16,
+                "targetActor": ""
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "bNpcFlags"
+            },
+            {
+              "data": {
+                "despawnActor": "Ifrit Nail 1"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "bNpcDespawn"
+            }
+          ]
+        }
+      ],
+      "subactors": [],
+      "type": "bnpc"
+    },
+    {
+      "hp": 445,
+      "id": 2,
+      "layoutId": 4126284,
+      "name": "Ifrit Control",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Eruption",
+          "timepoints": [
+            {
+              "data": {
+                "actionId": 733,
+                "selectorIndex": 0,
+                "selectorName": "Eruption",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "selector"
+              },
+              "description": "",
+              "startTime": 100,
+              "type": "castAction"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 2,
+          "name": "Plumes In",
+          "timepoints": [
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 1>",
+                "pos": [
+                  -5,
+                  0,
+                  5
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 2>",
+                "pos": [
+                  -5,
+                  0,
+                  -5
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 3>",
+                "pos": [
+                  5,
+                  0,
+                  5
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 4>",
+                "pos": [
+                  5,
+                  0,
+                  -5
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 2>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 3>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 4>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 8,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes In",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 3,
+          "name": "Plumes Out",
+          "timepoints": [
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 1>",
+                "pos": [
+                  0,
+                  0,
+                  -20
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 2>",
+                "pos": [
+                  0,
+                  0,
+                  20
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 3>",
+                "pos": [
+                  -20,
+                  0,
+                  0
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 4>",
+                "pos": [
+                  20,
+                  0,
+                  0
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 5>",
+                "pos": [
+                  -15,
+                  0,
+                  15
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 6>",
+                "pos": [
+                  -15,
+                  0,
+                  -15
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 7>",
+                "pos": [
+                  15,
+                  0,
+                  -15
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 8>",
+                "pos": [
+                  15,
+                  0,
+                  15
+                ],
+                "positionType": "absolute",
+                "rot": 0,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "targetActor": "<unknown>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 2>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 3>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 4>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 5>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 6>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 7>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 8>",
+                "targetType": "self"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 13,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes Out",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            }
+          ]
+        }
+      ],
+      "subactors": [
+        "Ifrit Control <subactor 1>",
+        "Ifrit Control <subactor 2>",
+        "Ifrit Control <subactor 3>",
+        "Ifrit Control <subactor 4>",
+        "Ifrit Control <subactor 5>",
+        "Ifrit Control <subactor 6>",
+        "Ifrit Control <subactor 7>",
+        "Ifrit Control <subactor 8>"
+      ],
+      "type": "bnpc"
+    },
+    {
+      "hp": 445,
+      "id": 3,
+      "layoutId": 4126281,
+      "name": "Ifrit Nail 1",
+      "schedules": [],
+      "subactors": [],
+      "type": "bnpc"
+    }
+  ],
+  "conditions": [
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": true,
+      "id": 1,
+      "loop": true,
+      "paramData": {
+        "hpMax": 100,
+        "hpMin": 70,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Phase 1"
+    },
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": true,
+      "id": 12,
+      "loop": false,
+      "paramData": {
+        "hpMax": 71,
+        "hpMin": 50,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Phase 2 Start"
+    },
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": false,
+      "id": 2,
+      "loop": true,
+      "paramData": {
+        "hpMax": 70,
+        "hpMin": 50,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Phase 2 Main"
+    },
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": true,
+      "id": 6,
+      "loop": false,
+      "paramData": {
+        "hpMax": 50,
+        "hpMin": 0,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Nail Spawn"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": false,
+      "id": 3,
+      "loop": true,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Phase 1"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": false,
+      "id": 4,
+      "loop": false,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Hellfire Success"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 5,
+      "loop": false,
+      "paramData": {
+        "combatState": 5,
+        "sourceActor": "Ifrit Nail 1"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Hellfire Success Director"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": false,
+      "id": 7,
+      "loop": false,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Hellfire Failure"
+    },
+    {
+      "condition": "scheduleActive",
+      "description": "",
+      "enabled": false,
+      "id": 8,
+      "loop": false,
+      "paramData": {
+        "scheduleName": "Final Phase",
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetSchedule": "Plumes In"
+    },
+    {
+      "condition": "scheduleActive",
+      "description": "",
+      "enabled": false,
+      "id": 13,
+      "loop": false,
+      "paramData": {
+        "scheduleName": "Final Phase",
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetSchedule": "Plumes Out"
+    },
+    {
+      "condition": "getAction",
+      "description": "",
+      "enabled": true,
+      "id": 9,
+      "loop": true,
+      "paramData": {
+        "actionId": 455,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetSchedule": "Eruption"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": false,
+      "id": 10,
+      "loop": true,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Final Phase"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 11,
+      "loop": false,
+      "paramData": {
+        "combatState": 0,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Reset"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 14,
+      "loop": false,
+      "paramData": {
+        "combatState": 4,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Reset"
+    }
+  ],
+  "name": "Brand new timeline",
+  "selectors": [
+    {
+      "count": 1,
+      "description": "",
+      "excludeSelectorName": "",
+      "fillRandomEntries": true,
+      "filters": [
+        {
+          "enforceOnRandom": false,
+          "negate": true,
+          "param": null,
+          "type": "topAggro"
+        },
+        {
+          "enforceOnRandom": true,
+          "negate": false,
+          "param": null,
+          "type": "player"
+        }
+      ],
+      "id": 1,
+      "name": "Eruption"
+    }
+  ],
+  "version": 10
+}

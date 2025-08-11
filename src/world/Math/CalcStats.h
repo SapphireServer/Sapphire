@@ -2,7 +2,7 @@
 
 #include <Common.h>
 #include "Forwards.h"
-#include "Manager/RNGMgr.h"
+#include <Random/RNGMgr.h>
 
 namespace Sapphire::Math
 {
@@ -142,6 +142,22 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::CalcResultType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
+    /*!
+     * @brief Calculates aggro generated from an action including modifiers
+     *
+     * @param source The source/casting character
+     * @param damage Damage dealt
+     * @param actionAggroModifier Aggro modifier from action (eg. 3 for Tomahawk, 0.5 for Cure)
+     */
+    static int32_t calcAggro( const Sapphire::Entity::Chara& source, int32_t damage, float actionAggroModifier = 1.0f );
+
+    /*!
+     * @brief Calculates aggro generated from applying a status effect. This does not include the equal aggro split between all targets at the end if the status effect is a buff
+     *
+     * @param source The source/casting character
+     */
+    static int32_t calcStatusAggro( const Sapphire::Entity::Chara& source );
+
     static uint32_t calcMpRefresh( uint32_t potency, uint8_t level );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
@@ -155,7 +171,7 @@ namespace Sapphire::Math
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
     static float getRandomNumber0To100();
-    static std::unique_ptr< RandGenerator< float > > rnd;
+    static std::unique_ptr< Common::Random::RandGenerator< float > > rnd;
   };
 
 }

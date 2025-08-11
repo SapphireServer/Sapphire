@@ -99,8 +99,6 @@ bool Action::Action::init()
   auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
   m_resultId = zone->getNextActionResultId();
 
-  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_resultId, m_requestId );
-
   m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );
   m_cooldownGroup = m_actionData->data().RecastGroup;
@@ -168,8 +166,10 @@ bool Action::Action::init()
     m_lutEntry.rearPotency = 0;
     m_lutEntry.frontPotency = 0;
     m_lutEntry.nextCombo.clear();
+    m_lutEntry.aggroModifier = 1;
   }
 
+  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_lutEntry.aggroModifier, m_resultId, m_requestId );
   addDefaultActorFilters();
 
   return true;
@@ -183,6 +183,16 @@ void Action::Action::setPos( const Common::FFXIVARR_POSITION3& pos )
 const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
 {
   return m_pos;
+}
+
+void Action::Action::setRot( float rot )
+{
+  m_rot = rot;
+}
+
+float Action::Action::getRot() const
+{
+  return m_rot;
 }
 
 void Action::Action::setTargetId( uint64_t targetId )
@@ -319,7 +329,7 @@ void Action::Action::start()
   m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
-
+  
   if( hasCastTime() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( m_pSource->getId() );
@@ -331,10 +341,10 @@ void Action::Action::start()
     data.CastTime = static_cast< float >( m_castTimeMs ) / 1000.f;
     data.Target = static_cast< uint32_t >( m_targetId );
 
-    data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pSource->getPos().x );
-    data.TargetPos[ 1 ] = Common::Util::floatToUInt16( m_pSource->getPos().y );
-    data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pSource->getPos().z );
-    data.Dir = m_pSource->getRot();
+    data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pos.x );
+    data.TargetPos[ 1 ] = Common::Util::floatToUInt16( m_pos.y );
+    data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pos.z );
+    data.Dir = m_rot;
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( m_pSource->isPlayer() ), castPacket );
 
@@ -553,9 +563,6 @@ void Action::Action::buildActionResults()
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
       m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
-      if( dmg.first > 0 )
-        actor->onActionHostile( m_pSource );
-
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
         m_actionResultBuilder->comboSucceed( m_pSource );
@@ -733,9 +740,6 @@ void Action::Action::handleStatusEffects()
         applyStatusEffect( false, actor, m_pSource, status );
         // pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
-
-      if( !actor->getStatusEffectMap().empty() )
-        actor->onActionHostile( m_pSource );
     }
   }
 }
@@ -962,6 +966,8 @@ void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
+    // todo: figure these out and remove 5/RectangularAOE to own handler
+    case( Common::CastType ) 5:
     case Common::CastType::SingleTarget:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
@@ -977,9 +983,9 @@ void Action::Action::addDefaultActorFilters()
     }
     case Common::CastType::Box:
     {
-        auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
-        addActorFilter( filter );
-        break;
+      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+      addActorFilter( filter );
+      break;
     }
     case Common::CastType::Cone:
     {
@@ -1106,11 +1112,6 @@ uint8_t Action::Action::getActionKind() const
 void Action::Action::setActionKind( uint8_t actionKind )
 {
   m_actionKind = actionKind;
-}
-
-void Action::Action::setAggroMultiplier( float aggroMultiplier )
-{
-  m_aggroMultiplier = aggroMultiplier;
 }
 
 uint64_t Action::Action::getCastTimeRest() const

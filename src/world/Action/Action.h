@@ -31,6 +31,9 @@ namespace Sapphire::World::Action
     void setPos( const Common::FFXIVARR_POSITION3& pos );
     const Common::FFXIVARR_POSITION3& getPos() const;
 
+    void setRot( float rot );
+    float getRot() const;
+
     void setTargetId( uint64_t targetId );
     uint64_t getTargetId() const;
     Entity::CharaPtr getSourceChara() const;
@@ -51,8 +54,6 @@ namespace Sapphire::World::Action
 
     uint8_t getActionKind() const;
     void setActionKind( uint8_t actionKind );
-
-    void setAggroMultiplier( float aggroMultiplier );
 
     uint64_t getCastTimeRest() const;
 
@@ -190,8 +191,6 @@ namespace Sapphire::World::Action
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
 
-    float m_aggroMultiplier{ 1.f };
-
     uint64_t m_startTime{};
     uint64_t m_castTimeRestMs{};
     uint32_t m_castTimeMs{};
@@ -223,6 +222,7 @@ namespace Sapphire::World::Action
     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos{};
+    float m_rot{};
 
     ActionResultBuilderPtr m_actionResultBuilder;
 

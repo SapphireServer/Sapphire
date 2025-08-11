@@ -3,7 +3,7 @@
 #include <mutex>
 #include <vector>
 
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 namespace internal
 {
@@ -11,7 +11,7 @@ namespace internal
     std::mutex crc_creation_mutex;
 
     typedef std::vector<uint32_t> CrcTable;
-    
+
     // Our crc/rev_crc tables
     CrcTable crc_table;
     CrcTable rev_crc_table;

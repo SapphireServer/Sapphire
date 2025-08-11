@@ -793,17 +793,36 @@ void Graphics::initializeGlew()
   }
 }
 
-int Graphics::init( const std::string& title, int screenWidth, int screenHeight, bool fullscreen, bool resizeable )
+const char* Graphics::init( const std::string& title, int screenWidth, int screenHeight, bool fullscreen, bool resizeable )
 {
   glewExperimental = true;
   if( !glfwInit() )
     throw std::runtime_error( "Error initializing GLFW" );
 
-  // Set window hints for OpenGL 3.3 Core context creation.
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-  glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  // Decide GL+GLSL versions
+#if defined( IMGUI_IMPL_OPENGL_ES2 )
+  // GL ES 2.0 + GLSL 100
+  const char* glsl_version = "#version 100";
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
+  glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_ES_API );
+#elif defined( __APPLE__ )
+  // GL 3.2 + GLSL 150
+  const char* glsl_version = "#version 150";
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 2 );
+  glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );// 3.2+ only
+  glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );          // Required on Mac
+#else
+  // GL 3.0 + GLSL 130
+  const char* glsl_version = "#version 130";
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+  glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
+  //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+  //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#endif
+
+  glfwWindowHint( GLFW_DOUBLEBUFFER, GLFW_TRUE );
 
   // Request stencil buffer of at least 8-bit size to supporting clipping on transformed elements.
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
@@ -824,8 +843,10 @@ int Graphics::init( const std::string& title, int screenWidth, int screenHeight,
 
   if( !m_pWindow )
   {
+    const char* glfwError = nullptr;
+    glfwGetError( &glfwError );
     glfwTerminate();
-    throw std::runtime_error( "Could not create GLFW window" );
+    throw std::runtime_error( std::string( "Could not create GLFW window: " ) + glfwError );
   }
   // glfwSetWindowUserPointer(window, &context);
   // thats useful for key-callbacks
@@ -851,7 +872,7 @@ int Graphics::init( const std::string& title, int screenWidth, int screenHeight,
 
   initializeGlew();
 
-  return 0;
+  return glsl_version;
 }
 
 void Graphics::clearColor( float red, float green, float blue, float alpha )

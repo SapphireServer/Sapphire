@@ -84,7 +84,6 @@ std::vector< Sapphire::Entity::PlayerPtr > PlayerMgr::searchPlayersByName( const
   return results;
 }
 
-
 std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
 {
   if( !forceDbLoad )
@@ -99,13 +98,12 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
   auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
 
   if( !res->next() )
-    return "Unknown";
+    return "Obtaining Signature";
 
   std::string playerName = res->getString( 1 );
 
   return playerName;
 }
-
 
 Sapphire::Entity::PlayerPtr PlayerMgr::addPlayer( uint64_t characterId )
 {
@@ -473,6 +471,15 @@ void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint
   Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
 
+void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,
+                                uint32_t kind, uint32_t nameId, uint32_t talkerId, uint32_t time,
+                                uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4,
+                                uint32_t param5, uint32_t param6, uint32_t param7, uint32_t param8 )
+{
+  Network::Util::Packet::sendBattleTalk( player, battleTalkId, handlerId, kind, nameId, talkerId, time,
+                                         param1, param2, param3, param4, param5, param6, param7, param8 );
+}
+
 void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
@@ -484,12 +491,13 @@ void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
   if( !classJobInfo )
     return;
 
-  auto currentClassId = classJobInfo->data().MainClass;
+  auto currentClassId = classJobInfo->data().MonsterNote;
+  if( currentClassId == -1 || currentClassId == 127 )
+    return;
 
-  auto& logEntry = player.getHuntingLogEntry( currentClassId - 1 );
+  auto& logEntry = player.getHuntingLogEntry( currentClassId );
 
   bool logChanged = false;
-
 
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )

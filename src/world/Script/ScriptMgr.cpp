@@ -463,6 +463,40 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, Common::FFXIVARR_POSITION3 pos )
+{
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  std::string eventName = "onEventGroundItem";
+  std::string objName = eventMgr.getEventName( eventId );
+  PlayerMgr::sendDebug( player, "Calling: {0}.{1} - {2}", objName, eventName, eventId );
+
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    if( script )
+    {
+      auto questId = static_cast< uint16_t >( eventId );
+      if( player.hasQuest( eventId ) )
+      {
+        World::Quest preQ;
+        auto questIdx = player.getQuestIndex( questId );
+        auto& quest = player.getQuestByIndex( questIdx );
+        preQ = quest;
+        script->onEventGroundItem( quest, player, pos );
+        if( quest != preQ )
+          player.updateQuest( quest );
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 void Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -717,10 +751,28 @@ bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
 {
+  auto instId = instance.getDirectorId();
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
   if( script )
   {
     script->onInit( instance );
+
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceReset( InstanceContent& instance )
+{
+  auto instId = instance.getDirectorId();
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onReset( instance );
+
     return true;
   }
 
@@ -734,11 +786,32 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance
   if( script )
   {
     script->onUpdate( instance, tickCount );
+
     return true;
   }
 
   return false;
 }
+
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceStateChange( Sapphire::InstanceContent& instance,
+                                                            Sapphire::InstanceContentState oldState,
+                                                            Sapphire::InstanceContentState newState )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onStateChange( instance, oldState, newState );
+
+    return true;
+  }
+
+  return false;
+}
+
+
+
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player,
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
@@ -801,7 +874,6 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattle& instance, ui
 
   return false;
 }
-
 
 bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
 {
@@ -894,3 +966,4 @@ bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, ui
   }
   return false;
 }
+

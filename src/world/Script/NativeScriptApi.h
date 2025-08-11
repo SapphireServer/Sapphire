@@ -7,9 +7,11 @@
 #include "Manager/EventMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/StatusEffectMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Exd/ExdData.h"
+#include "Territory/InstanceContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Service.h"
 
@@ -129,6 +131,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::StatusEffectMgr& statusEffectMgr()
+    {
+      return Common::Service< World::Manager::StatusEffectMgr >::ref();
     }
   };
 
@@ -267,6 +274,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
 
+    virtual void onEventGroundItem( World::Quest& quest, Sapphire::Entity::Player& player, Common::FFXIVARR_POSITION3 pos );
+
     virtual void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player );
 
     virtual void onTriggerOwnerDeaggro( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player );
@@ -364,11 +373,17 @@ namespace Sapphire::ScriptAPI
 
     virtual void onInit( Sapphire::InstanceContent& instance );
 
+    virtual void onReset( Sapphire::InstanceContent& instance );
+
     virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, uint32_t eventId );
 
     virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId );
 
     virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );
+
+    virtual void onStateChange( Sapphire::InstanceContent& instance,
+                                Sapphire::InstanceContentState oldState,
+                                Sapphire::InstanceContentState newState );
 
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
@@ -387,7 +402,7 @@ namespace Sapphire::ScriptAPI
   };
 
   /*!
-  * @brief The base class for any scripts that implement behaviour related to instance content zones
+  * @brief The base class for any scripts that implement behaviour related to quest battles
   */
   class QuestBattleScript : public ScriptObject
   {
@@ -417,7 +432,6 @@ namespace Sapphire::ScriptAPI
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
-
 }
 
 #endif

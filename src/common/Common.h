@@ -811,6 +811,14 @@ namespace Sapphire::Common
 
   };
 
+  struct QuestEobject
+  {
+    uint32_t id;
+    uint32_t teri;
+    FFXIVARR_POSITION3 pos;
+    float radius;
+  };
+
   enum class ParamModifier : uint16_t
   {
     None = 0,
@@ -1873,15 +1881,7 @@ namespace Sapphire::Common
     THREAT
   };
 
-  enum class TargetFilter : uint8_t
-  {
-    All,
-    Players,
-    Allies,
-    Party,
-    Enemies
-  };
-
+  // todo: fill this out (Action.exd EffectType)
   enum class CastType : uint8_t
   {
     None,
@@ -1891,8 +1891,17 @@ namespace Sapphire::Common
     Box,
     Unknown,
     Unknown2,
-    PersistentArea, // for when you set aoe like asylum
+    PersistentArea,// for when you set aoe like asylum
     Unknown3
+  };
+
+  enum class TargetFilter : uint8_t
+  {
+    All,
+    Players,
+    Allies,
+    Party,
+    Enemies
   };
 
   enum class Role : uint8_t
@@ -1909,6 +1918,7 @@ namespace Sapphire::Common
 
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
+  // todo: load BNpcBase and other exd data into this struct
   struct BNPCInstanceObject
   {
     uint16_t territoryType;

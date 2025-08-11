@@ -26,6 +26,7 @@ namespace Sapphire::World::Manager
 #include <filesystem>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/WarpMgr.h>
+#include <Random/RNGMgr.h>
 
 namespace fs = std::filesystem;
 
@@ -129,7 +130,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
   using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
   using win32initIObjectCache = void(*)( std::shared_ptr< Sapphire::InstanceObjectCache > );
-  using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::RNGMgr > );
+  using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::Common::Random::RNGMgr > );
   using win32initHouMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::HousingMgr > );
   using win32initServerMgr = void(*)( std::shared_ptr< Sapphire::World::WorldServer > );
   using win32initFuncFc = void(*)( std::shared_ptr< Sapphire::World::Manager::FreeCompanyMgr > );
@@ -168,7 +169,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
 
   if( win32initRng )
   {
-    auto ioCache = Common::Service< Sapphire::World::Manager::RNGMgr >::get();
+    auto ioCache = Common::Service< Sapphire::Common::Random::RNGMgr >::get();
     auto ptr = ioCache.lock();
     win32initRng( ptr );
   }
@@ -241,7 +242,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   }
   else
   {
-    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+    Logger::warn( "did not find a win32initWarp export on a windows script target - the server will likely crash!" );
   }
 #else
   auto func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );

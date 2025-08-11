@@ -11,9 +11,9 @@
 #include <chrono>
 #include <Engine/Service.h>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #include <utility>
 
@@ -140,7 +140,7 @@ bool Engine::Application::init()
   using namespace Engine::Rendering;
 
   m_context->pGraphics = std::make_shared< Graphics >();
-  m_context->pGraphics->init( m_applicationName, m_resX, m_resY, m_fullscreen, !m_fullscreen ? true : false );
+  auto glsl_version = m_context->pGraphics->init( m_applicationName, m_resX, m_resY, m_fullscreen, !m_fullscreen ? true : false );
   Engine::Service< Graphics >::set( m_context->pGraphics );
 
   auto device = m_context->pGraphics->getDeviceString();
@@ -169,7 +169,7 @@ bool Engine::Application::init()
 
 
   onInit();
-  initImGui();
+  initImGui( glsl_version );
   initStates();
 
   return true;
@@ -328,14 +328,13 @@ double Engine::Application::calculateDeltaTime( uint64_t& lastTick )
   return static_cast< double >( deltaTime ) / 1000.0;
 }
 
-void Engine::Application::initImGui()
+void Engine::Application::initImGui(const char* glsl_version)
 {
   auto& graphics = *m_context->pGraphics;
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
 
-  const char *glsl_version = "#version 430";
   ImGui_ImplGlfw_InitForOpenGL( graphics.getWindowHandle(), true );
   ImGui_ImplOpenGL3_Init( glsl_version );
 

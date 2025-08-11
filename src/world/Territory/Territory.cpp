@@ -768,6 +768,18 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
+{
+  if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
+    return it->second;
+  return nullptr;
+}
+
+const std::unordered_map< uint32_t, Entity::PlayerPtr >& Territory::getPlayers()
+{
+  return m_playerMap;
+}
+
 InstanceContentPtr Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -845,6 +857,18 @@ Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t h
   return pBNpc;
 }
 
+Entity::BNpcPtr Territory::createBNpcFromLayoutIdNoPush( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
+{
+  auto infoPtr = m_bNpcBaseMap.find( layoutId );
+  if( infoPtr == m_bNpcBaseMap.end() )
+    return nullptr;
+
+  auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
+  pBNpc->init();
+  pBNpc->setTriggerOwnerId( triggerOwnerId );
+  return pBNpc;
+}
+
 Entity::BNpcPtr Territory::getActiveBNpcByEntityId( uint32_t entityId )
 {
   auto it = m_bNpcMap.find( entityId );
@@ -885,6 +909,8 @@ bool Territory::loadBNpcs()
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
   stmt->setUInt( 1, getTerritoryTypeId() );
   auto res = db.query( stmt );
+
+  // todo: load any exd links, cache them, build more info and setup bnpcs properly
 
   while( res->next() )
   {

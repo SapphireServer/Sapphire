@@ -9,8 +9,8 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <common/Exd/ExdData.h>
-#include <common/Logging/Logger.h>
+#include <Exd/ExdData.h>
+#include <Logging/Logger.h>
 #include <boost/range/algorithm/remove_if.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/shared_ptr.hpp>
@@ -136,7 +136,7 @@ std::string generateStruct( const std::string &exd )
          {
             index = 0;
          }
-         try 
+         try
          {
             std::string fieldName = show.second.get< std::string >( "name" );
             indexToNameMap[index] = fieldName;
@@ -150,7 +150,7 @@ std::string generateStruct( const std::string &exd )
                indexToTarget[index] = converterTarget;
          }
          catch( ... ) {}
-         
+
          try
          {
             show.second.get< std::string >( "type" );
@@ -176,7 +176,7 @@ std::string generateStruct( const std::string &exd )
 
       std::string type;
       if( it != g_typeMap.end() )
-         type = it->second; 
+         type = it->second;
       else
          type = "bool";
 
@@ -195,7 +195,7 @@ std::string generateStruct( const std::string &exd )
          fieldName = indexToNameMap[count];
       }
       fieldName[0] = std::tolower( fieldName[0] );
-      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );   
+      fieldName.erase( boost::remove_if( fieldName, boost::is_any_of(",-':![](){}<>% \x02\x1f\x01\x03") ), fieldName.end() );
       indexToNameMap[count] = fieldName;
       indexToTypeMap[count] = type;
       if( indexToTarget.find( count ) != indexToTarget.end() )
@@ -207,15 +207,15 @@ std::string generateStruct( const std::string &exd )
             type = "std::vector< " + type + " >";
          }
          result += "   " + type + " " + fieldName + ";\n";
-        
+
       }
-   
+
       count++;
    }
 
    result += "\n   " + exd + "( uint32_t row_id, Core::Data::ExdDataGenerated* exdData );\n";
    result += "};\n\n";
-   
+
    return result;
 }
 
@@ -235,7 +235,7 @@ std::string generateConstructorsDecl( const std::string& exd )
    std::string indent = "         ";
    result += indent + "auto row = exdData->m_" + exd + "Dat.get_row( row_id );\n";
    for( auto member : exhMem )
-   {  
+   {
       if( indexToNameMap.find( count ) == indexToNameMap.end() )
       { count++; continue; }
       if( indexToTarget.find( count ) != indexToTarget.end() )
@@ -251,9 +251,9 @@ std::string generateConstructorsDecl( const std::string& exd )
             uint32_t amount = indexCountMap[count];
             for( int i = 0; i < amount; i++ )
             {
-            
+
                result += indent + indexToNameMap[count] + ".push_back( exdData->getField< " + indexToTypeMap[count] + " >( row, " + std::to_string( count + i ) + " ) );\n";
- 
+
             }
 
 
@@ -306,7 +306,7 @@ int main()
    }
    g_log.info( "Generating structs, this may take several minutes..." );
    g_log.info( "Go grab a coffee..." );
-  
+
    std::string structDefs;
    std::string idListsDecl;
    std::string dataDecl;
@@ -326,7 +326,7 @@ int main()
    BOOST_FOREACH( boost::property_tree::ptree::value_type &sheet, m_propTree.get_child( "sheets" ) )
    {
       std::string name = sheet.second.get< std::string >( "sheet" );
-    
+
       forwards += "struct " + name +";\n";
       structDefs += generateStruct( name );
       dataDecl += generateDatAccessDecl( name );
@@ -358,11 +358,11 @@ int main()
    result = std::regex_replace( exdC, std::regex( "\\SETUPDATACCESS" ), datAccCall );
    result = std::regex_replace( result, std::regex( "\\DIRECTGETTERS" ), getterDef );
    result = std::regex_replace( result, std::regex( "\\CONSTRUCTORS" ), constructorDecl );
-   
+
    std::ofstream outC("ExdDataGenerated.cpp");
    outC << result;
    outC.close();
-   
+
 //   g_log.info( result );
 
    return 0;

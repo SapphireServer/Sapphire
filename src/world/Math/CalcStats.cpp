@@ -85,7 +85,7 @@ const int levelTable[61][6] =
   { 218, 354, 858, 2600, 282, 215 },
 };
 
-std::unique_ptr< RandGenerator< float > > CalcStats::rnd = nullptr;
+std::unique_ptr< Sapphire::Common::Random::RandGenerator< float > > CalcStats::rnd = nullptr;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -663,6 +663,20 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealin
   return std::pair( factor, hitType );
 }
 
+int32_t CalcStats::calcAggro( const Sapphire::Entity::Chara& source, int32_t value, float actionAggroModifier )
+{
+  int32_t aggro = value * actionAggroModifier;
+  auto aggroMod = 1 - ( source.getModifier( Common::ParamModifier::EnmityReduction ) / 100 );
+  return aggro * aggroMod;
+}
+
+int32_t CalcStats::calcStatusAggro( const Sapphire::Entity::Chara& source )
+{
+  int32_t aggro = static_cast< int32_t >( levelTable[ source.getLevel() ][ Common::LevelTableEntry::THREAT ] );
+  auto aggroMod = 1 - ( source.getModifier( Common::ParamModifier::EnmityReduction ) / 100 );
+  return aggro * aggroMod;
+}
+
 uint32_t CalcStats::calcMpRefresh(uint32_t potency, uint8_t level)
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -689,7 +703,7 @@ float CalcStats::getRandomNumber0To100()
 {
   if( !rnd )
   {
-    rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
+    rnd = std::make_unique< Common::Random::RandGenerator< float > >( Common::Service< Common::Random::RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
   }
   return rnd->next();
 }

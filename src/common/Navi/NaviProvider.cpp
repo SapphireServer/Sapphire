@@ -350,7 +350,7 @@ Sapphire::Common::FFXIVARR_POSITION3
 
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
   Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
-                                                        const Common::FFXIVARR_POSITION3& endPos )
+                                                       const Common::FFXIVARR_POSITION3& endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::runtime_error( "No navimesh loaded" );

@@ -1,4 +1,3 @@
-#pragma once
 #include "State.h"
 
 #include "Engine/GfxApi.h"
