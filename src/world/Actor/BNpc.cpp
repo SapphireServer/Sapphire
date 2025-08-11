@@ -32,7 +32,7 @@
 #include "Common.h"
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 #include <Manager/InventoryMgr.h>
 #include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
@@ -91,6 +91,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -118,7 +119,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_enemyType = bNpcBaseData->data().Battalion;
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
-    setFlag( Immobile );
+    setFlag( NoRoam | Immobile );
 
   m_class = ClassJob::Gladiator;
 
@@ -140,6 +141,8 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
+
+  m_bnpcType = BNpcType::Enemy;
 
   memset( m_customize, 0, sizeof( m_customize ) );
   memset( m_modelEquip, 0, sizeof( m_modelEquip ) );
@@ -177,12 +180,12 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   }
 
   // todo: is this actually good?
-  m_naviTargetReachedDistance = m_radius * 2;
+  m_naviTargetReachedDistance = m_radius;
 
   calculateStats();
 
-  if( m_bnpcType == BNpcType::Friendly )
-    m_maxHp *= 5;
+  //if( m_bnpcType == BNpcType::Friendly )
+  //  m_maxHp *= 5;
 
 }
 
@@ -206,6 +209,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -218,7 +222,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_territoryId = zone.getGuId();
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
-    setFlag( Immobile );
+    setFlag( Immobile | NoRoam );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -277,7 +281,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   auto modelChara = exdData.getRow< Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().ModelType );
+    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
       m_radius *= modelSkeleton->data().Radius;
   }
@@ -439,12 +443,24 @@ void BNpc::sendPositionUpdate()
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
-  server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z )
+  {
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
+    server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  }
+  m_lastPos = m_pos;
+}
+
+const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
+{
+  return m_hateList;
 }
 
 void BNpc::hateListClear()
 {
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+
   for( auto& listEntry : m_hateList )
   {
     if( isInRangeSet( listEntry->m_pChara ) )
@@ -512,8 +528,10 @@ CharaPtr BNpc::hateListGetHighest()
 
 void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
 {
+  if( hateAmount > 0 )
+  {
   auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
+    hateEntry->m_hateAmount = hateAmount;
   hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
@@ -521,7 +539,9 @@ void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
   {
     auto pPlayer = pChara->getAsPlayer();
     pPlayer->hateListAdd( *this );
+      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
   }
+}
 }
 
 void BNpc::hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount )
@@ -539,30 +559,29 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   {
     if( listEntry->m_pChara == pChara )
     {
-      listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
+      auto currentHate = listEntry->m_hateAmount;
+      if( hateAmount >= 0 || currentHate > abs( hateAmount ) )
+        listEntry->m_hateAmount += hateAmount;
+      else
+        listEntry->m_hateAmount = 0;
       hasEntry = true;
+
+      if( auto player = pChara->getAsPlayer() )
+      {
+        player->hateListLetterUpdate( *this );
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
+      }
       break;
     }
   }
 
   if( !hasEntry )
   {
-    auto hateEntry = std::make_shared< HateListEntry >();
-    hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
-    hateEntry->m_pChara = pChara;
-    m_hateList.insert( hateEntry );
+    hateListAdd( pChara, hateAmount );
   }
 
-  for( const auto& listEntry : m_hateList )
-  {
-    // update entire hatelist for all players who are on aggro with this bnpc
-    if( pChara->isPlayer() )
-    {
-      auto pPlayer = pChara->getAsPlayer();
-      Network::Util::Packet::sendHateList( *pPlayer );
+  hateListUpdatePlayers();
     }
-  }
-}
 
 void BNpc::hateListRemove( const CharaPtr& pChara )
 {
@@ -598,9 +617,34 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
 }
 
+std::vector< CharaPtr > BNpc::getHateList()
+{
+  std::vector< CharaPtr > hateList = {};
+
+  for( auto& entry : m_hateList )
+  {
+    hateList.push_back( entry->m_pChara );
+  }
+
+  return hateList;
+}
+
+void BNpc::hateListUpdatePlayers()
+{
+  for( const auto& listEntry : m_hateList )
+  {
+    // update entire hatelist for all players who are on aggro with this bnpc
+    if( listEntry->m_pChara->isPlayer() )
+    {
+      auto pPlayer = listEntry->m_pChara->getAsPlayer();
+      Network::Util::Packet::sendHateList( *pPlayer );
+    }
+  }
+}
+
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
-  auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& pRNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )
@@ -616,19 +660,23 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle, 1 );
 
   changeTarget( pChara->getId() );
-
-  if( pChara->isPlayer() )
-  {
-    PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->onMobAggro( *getAsBNpc() );
   }
-
-}
 
 void BNpc::deaggro( const CharaPtr& pChara )
 {
   if( hateListHasActor( pChara ) )
+  {
     hateListRemove( pChara );
+    if( getTargetId() == pChara->getId() )
+    {
+      updateAggroTarget();
+      hateListUpdatePlayers();
+    }
+    if( m_pOwner == pChara )
+    {
+      setOwner( hateListGetHighest() );
+    }
+  }
 
   if( pChara->isPlayer() )
     notifyPlayerDeaggro( pChara );
@@ -636,9 +684,13 @@ void BNpc::deaggro( const CharaPtr& pChara )
 
 void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
 {
-  PlayerPtr tmpPlayer = pChara->getAsPlayer();
+  if( m_hateList.empty() )
+  {
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+  }
+
+  PlayerPtr tmpPlayer = pChara->getAsPlayer();
   tmpPlayer->onMobDeaggro( *this );
 
   if( getTriggerOwnerId() == pChara->getId() )
@@ -661,6 +713,11 @@ void BNpc::onTick()
 void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
+
+  // removed check for now, replaced by position check to last position
+  //if( m_dirtyFlag & DirtyFlag::Position )
+  sendPositionUpdate();
+
   m_fsm->update( *this, tickCount );
 }
 
@@ -679,12 +736,12 @@ void BNpc::restHp()
   Network::Util::Packet::sendHudParam( *this );
 }
 
-void BNpc::onActionHostile( CharaPtr pSource )
+void BNpc::onActionHostile( CharaPtr pSource, int32_t aggro )
 {
-  if( !hateListGetHighest() )
-    aggro( pSource );
+  hateListUpdate( pSource, aggro );
 
-  hateListUpdate( pSource, 1 );
+  if( getCanSwapTarget() ) // todo: only call on global server tick
+    updateAggroTarget();
 
   if( !m_pOwner )
     setOwner( pSource );
@@ -810,10 +867,6 @@ void BNpc::setOwner( const CharaPtr& m_pChara )
   setOwnerPacket->data().Type = 0x01;
   setOwnerPacket->data().Id = targetId;
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
-
-  if( m_pChara && m_pChara->isPlayer() )
-    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
-
 }
 
 void BNpc::setLevelId( uint32_t levelId )
@@ -895,6 +948,16 @@ void BNpc::setFlag( uint32_t flag )
   }
 }
 
+void BNpc::removeFlag( uint32_t flag )
+{
+  m_flags &= ~flag;
+}
+
+void BNpc::clearFlags()
+{
+  m_flags = 0;
+}
+
 void BNpc::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
@@ -907,7 +970,6 @@ void BNpc::autoAttack( CharaPtr pTarget )
   // todo: this needs to use the auto attack delay for the equipped weapon
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
     actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
@@ -957,6 +1019,15 @@ void BNpc::calculateStats()
 
 }
 
+void BNpc::updateAggroTarget()
+{
+  auto highestAggro = hateListGetHighest();
+  if( highestAggro && getTargetId() != highestAggro->getId() )
+  {
+    aggro( highestAggro );
+  }
+}
+
 uint32_t BNpc::getRank() const
 {
   return m_rank;
@@ -984,15 +1055,16 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
-/*
+
   auto gambitPack = AI::make_GambitRuleSetPack();
   gambitPack->addRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   gambitPack->addRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 10000 );
   m_pGambitPack = gambitPack;
-*/
+
 
   auto gambitPack = AI::make_GambitTimeLinePack( -1 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 2 );
@@ -1003,13 +1075,18 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 81, 0 ), 12 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
+  */
+  initFsm();
+}
 
+void BNpc::initFsm()
+{
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
   auto stateIdle = make_StateIdle();
   auto stateCombat = make_StateCombat();
   auto stateDead = make_StateDead();
-  if( !hasFlag( Immobile ) )
+  if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
   {
     auto stateRoam = make_StateRoam();
     stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
@@ -1035,7 +1112,8 @@ void BNpc::init()
 void BNpc::processGambits( uint64_t tickCount )
 {
   m_tp = 1000;
-  m_pGambitPack->update( *this, tickCount );
+  if( m_pGambitPack )
+    m_pGambitPack->update( *this, tickCount );
 }
 
 uint32_t BNpc::getLastRoamTargetReachedTime() const
@@ -1076,4 +1154,29 @@ const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
 const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
+}
+
+bool BNpc::getCanSwapTarget()
+{
+  return m_canSwapTarget;
+}
+
+void BNpc::setCanSwapTarget( bool value )
+{
+  m_canSwapTarget = value;
+
+  if( m_canSwapTarget ) // todo: only call on global server tick
+  {
+    updateAggroTarget();
+  }
+}
+
+void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  Chara::setPos( x, y, z, broadcastUpdate );
+}
+
+void BNpc::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
 }

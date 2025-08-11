@@ -9,7 +9,7 @@ namespace Sapphire::World::Action
   class ActionResultBuilder
   {
   public:
-    ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, uint32_t resultId, uint16_t requestId );
+    ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, float aggroModifier, uint32_t resultId, uint16_t requestId );
 
     void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount,
                Common::CalcResultType hitType = Common::CalcResultType::TypeRecoverMp,
@@ -47,9 +47,12 @@ namespace Sapphire::World::Action
 
   private:
     uint32_t m_actionId;
+    float m_aggroModifier;
     uint16_t m_requestId;
     uint32_t m_resultId;
 
+    bool m_applyHealAggro { true };
+    bool m_applyStatusAggro { true };
     Entity::CharaPtr m_sourceChara;
     std::unordered_map< Entity::CharaPtr, std::vector< ActionResultPtr > > m_actorResultsMap;
   };

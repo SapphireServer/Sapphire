@@ -89,11 +89,7 @@ public:
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( ArmysPaeonStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( Flags );
-            effect->setModifier( Common::ParamModifier::TpRefresh, partyPotency );
-            targetChara->addStatusEffect( effect );
-            Network::Util::Packet::sendHudParam( *targetChara );
+            statusEffectMgr().applyStatusEffect( actor.getAsChara(), targetChara->getAsChara(), ArmysPaeonStatus, 5000, 0, { StatusModifier{ Common::ParamModifier::TpRefresh, partyPotency } }, Flags, true );
           }
         }
       }

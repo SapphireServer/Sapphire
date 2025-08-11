@@ -4,6 +4,7 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -32,7 +33,9 @@ public:
     if( pSource->hasStatusEffect( ArmysPaeonAura ) )
       pSource->removeSingleStatusEffectById( ArmysPaeonAura );
     else
+    {
       pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
+    }
   }
 };
 

@@ -2,6 +2,8 @@
 #include <Actor/Player.h>
 #include <Action/Action.h>
 
+#include <Math/CalcStats.h>
+
 class ActionSprint3 : public Sapphire::ScriptAPI::ActionScript
 {
 public:

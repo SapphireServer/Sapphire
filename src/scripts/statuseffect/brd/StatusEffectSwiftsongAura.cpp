@@ -73,11 +73,7 @@ public:
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( SwiftsongStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( Flags );
-            effect->setParam( 20 );
-            targetChara->addStatusEffect( effect );
-            Network::Util::Packet::sendHudParam( *targetChara );
+            statusEffectMgr().applyStatusEffect( actor.getAsChara(), targetChara->getAsChara(), SwiftsongStatus, 5000, 20, { }, Flags, true );
           }
         }
       }

@@ -66,6 +66,7 @@ struct ActionEntry
   uint32_t restorePercentage;
   std::vector< uint32_t > nextCombo{};
   Common::TargetFilter targetFilter = Common::TargetFilter::All;
+  float aggroModifier;
   StatusEffect statuses;
 };
 
@@ -102,6 +103,7 @@ void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
     { "restorePercentage", action.restorePercentage },
     { "nextCombo", action.nextCombo },
     { "targetFilter", action.targetFilter },
+    { "aggroModifier", action.aggroModifier },
     { "statuses", {
         { "caster", action.statuses.caster },
         { "target", action.statuses.target }
@@ -316,6 +318,12 @@ int main( int argc, char* argv[] )
 //          Logger::info( "Cure Percentage: {}", resStr );
           entry.restorePercentage = stripNonNumerics( resStr );
         }
+      }
+
+      entry.aggroModifier = 1;
+      if( entry.potency == 0 && entry.curePotency > 0 )
+      {
+        entry.aggroModifier = 0.5f;
       }
 
       actions[ id ] = std::move( entry );

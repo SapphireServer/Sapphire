@@ -1,6 +1,6 @@
 
 file( GLOB_RECURSE SOURCES
-  *.cpp
+        *.cpp
   *.h
 )
 
@@ -8,7 +8,7 @@ add_executable( world ${SOURCES} )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 set_target_properties( world PROPERTIES
-  ENABLE_EXPORTS ON
+                           ENABLE_EXPORTS ON
   WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
 

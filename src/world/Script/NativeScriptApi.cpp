@@ -247,6 +247,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onReset( InstanceContent& instance )
+  {
+  }
+
   void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, 
                                       uint32_t eventId )
   {
@@ -258,6 +262,12 @@ namespace Sapphire::ScriptAPI
   }
 
   void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
+  {
+  }
+
+  void InstanceContentScript::onStateChange( InstanceContent& instance,
+                                             InstanceContentState oldState,
+                                             InstanceContentState newState )
   {
   }
 
@@ -302,6 +312,5 @@ namespace Sapphire::ScriptAPI
                                             uint16_t param1, uint16_t param2 )
   {
   }
-
 }
 

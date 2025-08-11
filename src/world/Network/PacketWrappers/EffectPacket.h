@@ -2,6 +2,7 @@
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Util/UtilMath.h>
 #include "Forwards.h"
 #include <string>
 #include <cstring>
@@ -86,6 +87,13 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     void setResultId( uint32_t resultId )
     {
       m_data.ResultId = static_cast< uint32_t >( resultId );
+    }
+
+    void setTargetPosition( Common::FFXIVARR_POSITION3& pos )
+    {
+      m_data.TargetPos[ 0 ] = Common::Util::floatToUInt16( pos.x );
+      m_data.TargetPos[ 1 ] = Common::Util::floatToUInt16( pos.y );
+      m_data.TargetPos[ 2 ] = Common::Util::floatToUInt16( pos.z );
     }
   private:
     uint8_t m_targetEffectCount{ 0 };

@@ -13,6 +13,14 @@
 
 namespace Sapphire::Entity
 {
+  // todo: probably macro/template operators for enums
+  enum DirtyFlag : uint32_t
+  {
+    Position   = 0x01,
+    HpMpTp     = 0x02,
+    Status     = 0x04,
+    Appearance = 0x08
+  };
 
   /*!
   \class Chara
@@ -91,10 +99,12 @@ namespace Sapphire::Entity
     std::set< uint8_t > m_statusEffectSlots;
 
     /*! Detour Crowd AgentId */
-    uint32_t m_agentId;
+    int32_t m_agentId{-1};
 
     /*! Detour Crowd actor scale */
     float m_radius;
+
+    uint32_t m_dirtyFlag{};
 
   public:
     Chara( Common::ObjKind type );
@@ -199,6 +209,12 @@ namespace Sapphire::Entity
 
     bool isAlive() const;
 
+    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+
+    virtual void setRot( float rot ) override;
+
     virtual uint32_t getMaxHp() const;
 
     virtual uint32_t getMaxMp() const;
@@ -235,7 +251,7 @@ namespace Sapphire::Entity
 
     virtual bool isHostile( const Chara& chara );
 
-    virtual void onActionHostile( CharaPtr pSource ) {};
+    virtual void onActionHostile( CharaPtr pSource, int32_t aggro ) {};
 
     virtual bool isFriendly( const Chara& chara );
 
@@ -271,12 +287,16 @@ namespace Sapphire::Entity
     uint32_t getDirectorId() const;
     void setDirectorId( uint32_t directorId );
 
-    uint32_t getAgentId() const;
-    void setAgentId( uint32_t agentId );
+    int32_t getAgentId() const;
+    void setAgentId( int32_t agentId );
+
+    virtual std::vector< CharaPtr > getHateList();
 
     float getRadius() const;
 
     Common::BaseParam getPrimaryStat() const;
+
+    void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
 
   };
 

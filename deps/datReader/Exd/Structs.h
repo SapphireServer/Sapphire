@@ -302,18 +302,18 @@ namespace Excel
     uint16_t LimitBreakAction[3];
     uint16_t PvpLimitBreakAction[3];
     uint8_t Kind;
-    uint8_t UIPriority;
     uint8_t Unknown6;
+    uint8_t JobIndex;
     uint8_t MainClass;
     uint8_t Role;
     uint8_t Town;
-    int8_t MonsterNote;
+    int8_t UIPriority;
     int8_t StartingLevel;
     uint8_t PartyBuff;
     int8_t WorkIndex;
     int8_t BattleClassIndex;
     int8_t CraftingClassIndex;
-    int8_t Unknown7;
+    int8_t MonsterNote;
   };
 
   /* 63507 */
@@ -391,10 +391,10 @@ namespace Excel
     uint8_t EffectWidth;
     uint8_t CostType;
     uint8_t Cond;
-    uint8_t Element;
-    uint8_t ProcStatus;
-    uint8_t ClassJobCategory;
     uint8_t RecastGroup;
+    uint8_t ProcStatus;
+    uint8_t Unknown1; // todo: possibly cost type? tp etc?
+    uint8_t ClassJobCategory; // recastgroup
     uint8_t Init;
     uint8_t Omen;
     uint8_t Learn;

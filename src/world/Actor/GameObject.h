@@ -10,7 +10,6 @@
 
 namespace Sapphire::Entity
 {
-
   /*!
   \class GameObject
   \brief Base class for all actor/objects
@@ -59,13 +58,13 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3& getPos();
     const Common::FFXIVARR_POSITION3& getPos() const;
 
-    void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
+    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
 
-    void setPos( float x, float y, float z, bool broadcastUpdate = true );
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true );
 
     float getRot() const;
 
-    void setRot( float rot );
+    virtual void setRot( float rot );
 
     bool isChara() const;
 

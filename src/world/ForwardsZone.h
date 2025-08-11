@@ -29,6 +29,8 @@ TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
 TYPE_FORWARD( FreeCompany );
+TYPE_FORWARD( Encounter );
+TYPE_FORWARD( EncounterState );
 
 namespace World
 {
@@ -106,6 +108,7 @@ TYPE_FORWARD( LootTableMgr );
 namespace StatusEffect
 {
 TYPE_FORWARD( StatusEffect );
+TYPE_FORWARD( StatusEffectResult );
 TYPE_FORWARD( StatusEffectContainer );
 }
 
