@@ -30,6 +30,7 @@
 #include <sstream>
 #include <limits>
 #include <cmath>
+#include <memory>
 
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>

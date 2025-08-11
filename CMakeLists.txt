@@ -72,6 +72,7 @@ if( SAPPHIRE_BUILD_TOOLKIT )
   set( GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE )
   set( GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE )
   set( GLFW_INSTALL OFF CACHE BOOL "" FORCE )
+  option( GLFW_USE_WAYLAND "Use Wayland for window creation" OFF )
   add_subdirectory( "deps/glfw" )
   # Only build GLEW as a static library
   set( ONLY_LIBS ON CACHE BOOL "" FORCE )
