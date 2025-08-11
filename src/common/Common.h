@@ -1874,15 +1874,19 @@ namespace Sapphire::Common
   };
 
   // todo: fill this out (Action.exd EffectType)
-  enum CastType : uint8_t
+  enum class CastType : uint8_t
   {
-    SingleTarget = 1,
-    CircularAOE = 2,
-    RectangularAOE = 3,
-    ConeAOE = 4,
-    CircularAOESelf = 5,
-    CircularAoEPlaced = 7
+    None,
+    SingleTarget,
+    Circle,
+    Cone,
+    Box,
+    Unknown,
+    Unknown2,
+    PersistentArea,// for when you set aoe like asylum
+    Unknown3
   };
+
   enum class TargetFilter : uint8_t
   {
     All,

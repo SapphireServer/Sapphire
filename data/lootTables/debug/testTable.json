@@ -1,0 +1,72 @@
+{
+  "lootTable": "testTable",
+  "pools": [
+    {
+      "duplicates": true,
+      "enabled": true,
+      "items": [
+        {
+          "id": 9,
+          "isHq": false,
+          "weight": 1
+        },
+        {
+          "id": 8,
+          "isHq": false,
+          "weight": 1
+        }
+      ],
+      "name": "Test #1 (Standard)",
+      "pickMax": 1,
+      "pickMin": 1
+    },
+    {
+      "duplicates": false,
+      "enabled": true,
+      "items": [
+        {
+          "id": 5016,
+          "isHq": false,
+          "weight": 1
+        },
+        {
+          "id": 12728,
+          "isHq": false,
+          "weight": 1
+        }
+      ],
+      "name": "Test #2 (Duplicates disabled)",
+      "pickMax": 2,
+      "pickMin": 2
+    },
+    {
+      "duplicates": false,
+      "enabled": true,
+      "items": [
+        {
+          "id": 4551,
+          "isHq": true,
+          "weight": 1
+        }
+      ],
+      "name": "Test #3 (HQ Item Test)",
+      "pickMax": 1,
+      "pickMin": 1
+    },
+    {
+      "duplicates": true,
+      "enabled": false,
+      "items": [
+        {
+          "id": 13229,
+          "isHq": false,
+          "weight": 1
+        }
+      ],
+      "name": "Test #4 (Disabled Pool)",
+      "pickMax": 1,
+      "pickMin": 1
+    }
+  ],
+  "type": "bNPC"
+}

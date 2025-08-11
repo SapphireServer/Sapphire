@@ -71,34 +71,25 @@ if( UNIX )
     list( APPEND MYSQL_ADD_LIBRARIES "mysqlclient_r" )
     list( APPEND MYSQL_ADD_LIBRARIES "mariadbclient" )
   endif()
-endif()
 
-if( WIN32 )
-  file(
-    GLOB MYSQL_INCLUDE_DIRS
-    "$ENV{ProgramW6432}/MariaDB */include/mysql"
-    "$ENV{ProgramW6432}/MySQL/MySQL Server */include"
+  find_path( MYSQL_INCLUDE_DIR
+    NAMES
+      mysql.h
+    PATHS
+      ${MYSQL_ADD_INCLUDE_PATH}
+      /usr/include
+      /usr/include/mariadb
+      /usr/include/mysql
+      /usr/local/include
+      /usr/local/include/mysql
+      /usr/local/mysql/include
+      ${MYSQL_INCLUDE_DIRS}
+      "$ENV{MYSQL_HOME}/include"
+    DOC
+      "Specify the directory containing mysql.h."
+    REQUIRED
   )
-endif()
 
-find_path( MYSQL_INCLUDE_DIR
-  NAMES
-    mysql.h
-  PATHS
-    ${MYSQL_ADD_INCLUDE_PATH}
-    /usr/include
-    /usr/include/mariadb
-    /usr/include/mysql
-    /usr/local/include
-    /usr/local/include/mysql
-    /usr/local/mysql/include
-    ${MYSQL_INCLUDE_DIRS}
-    "$ENV{MYSQL_ROOT}/include"
-  DOC
-    "Specify the directory containing mysql.h."
-)
-
-if( UNIX )
   foreach( LIB ${MYSQL_ADD_LIBRARIES} )
     find_library( MYSQL_LIBRARY
       NAMES
@@ -114,36 +105,14 @@ if( UNIX )
       DOC "Specify the location of the mysql library here."
     )
   endforeach()
-endif()
 
-if( WIN32 )
-  file(
-    GLOB MYSQL_LIBRARY_DIRS
-    "$ENV{ProgramW6432}/MariaDB */lib"
-    "$ENV{ProgramW6432}/MySQL/MySQL Server */lib"
-    "$ENV{ProgramW6432}/MySQL/MySQL Server */lib/opt"
-  )
-  find_library( MYSQL_LIBRARY
-    NAMES
-      libmysql
-      libmariadb
-    PATHS
-      ${MYSQL_ADD_LIBRARIES_PATH}
-      ${MYSQL_LIBRARY_DIRS}
-      "$ENV{ProgramW6432}/MySQL/lib"
-      "$ENV{MYSQL_ROOT}/lib"
-    DOC "Specify the location of the mysql library here."
-  )
+  if( NOT MYSQL_LIBRARY )
+    message( FATAL_ERROR "Could not find the MySQL libraries! Please install the development libraries and headers" )
+  endif()
 
-  STRING( REGEX REPLACE "(.lib)$" ".dll" MYSQL_DLL ${MYSQL_LIBRARY} )
+  # On Windows you typically don't need to include any extra libraries
+  # to build MYSQL stuff.
 
-  file( COPY ${MYSQL_DLL} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin" )
-endif()
-
-# On Windows you typically don't need to include any extra libraries
-# to build MYSQL stuff.
-
-if( NOT WIN32 )
   find_library( MYSQL_EXTRA_LIBRARIES
     NAMES
       z zlib
@@ -153,12 +122,8 @@ if( NOT WIN32 )
     DOC
       "if more libraries are necessary to link in a MySQL client (typically zlib), specify them here."
   )
-else()
-  set( MYSQL_EXTRA_LIBRARIES "" )
-endif()
 
-if( UNIX )
-  find_program( MYSQL_EXECUTABLE mysql
+  find_program( MYSQL_EXECUTABLE mysql mariadb
     PATHS
       ${MYSQL_CONFIG_PREFER_PATH}
       /usr/local/mysql/bin/
@@ -166,38 +131,118 @@ if( UNIX )
       /usr/bin/
     DOC
       "path to your mysql binary."
+    REQUIRED
   )
-endif()
+elseif( WIN32 )
+  function( check_mysql dir out_error out_include out_library out_executable )
+    cmake_path( ABSOLUTE_PATH dir BASE_DIRECTORY "${PROJECT_SOURCE_DIR}" NORMALIZE OUTPUT_VARIABLE MYSQL_DIR )
 
-if( WIN32 )
-  file(
-    GLOB MYSQL_BIN_DIRS
-    "$ENV{ProgramW6432}/MariaDB */bin"
-    "$ENV{ProgramW6432}/MySQL/MySQL Server */bin"
-    "$ENV{ProgramW6432}/MySQL/MySQL Server */bin/opt"
-  )
-  find_program( MYSQL_EXECUTABLE mysql
-    PATHS
-      ${MYSQL_BIN_DIRS}
-      "${PROGRAM_FILES_64}/MySQL/bin"
-      "$ENV{MYSQL_ROOT}/bin"
-    DOC
-      "path to your mysql binary."
-  )
-endif()
+    set( MYSQL_INCLUDE_DIR "${MYSQL_DIR}/include/mysql" )
+    if( NOT EXISTS "${MYSQL_INCLUDE_DIR}/mysql.h" )
+      set( MYSQL_INCLUDE_DIR "${MYSQL_DIR}/include" )
+      if( NOT EXISTS "${MYSQL_INCLUDE_DIR}/mysql.h" )
+        set( ${out_error} "Could not find mysql.h in ${MYSQL_DIR}" PARENT_SCOPE )
+        return()
+      endif()
+    endif()
 
-if( MYSQL_LIBRARY )
-  if( MYSQL_INCLUDE_DIR )
-    set( MYSQL_FOUND 1 )
-    message( STATUS "Found MySQL library: ${MYSQL_LIBRARY}" )
-    message( STATUS "Found MySQL headers: ${MYSQL_INCLUDE_DIR}" )
+    set( MYSQL_LIBRARY "${MYSQL_DIR}/lib/libmariadb.lib" )
+    if( NOT EXISTS "${MYSQL_LIBRARY}" )
+      set( MYSQL_LIBRARY "${MYSQL_DIR}/lib/libmysql.lib" )
+      if( NOT EXISTS "${MYSQL_LIBRARY}" )
+        set( ${out_error} "Could not find libmysql.lib or libmariadb.lib in ${MYSQL_DIR}" PARENT_SCOPE )
+        return()
+      endif()
+    endif()
+
+    set( MYSQL_EXECUTABLE "${MYSQL_DIR}/bin/mysql.exe" )
+    if( NOT EXISTS "${MYSQL_EXECUTABLE}" )
+      set( ${out_error} "Could not find mysql.exe in ${MYSQL_DIR}" PARENT_SCOPE )
+      return()
+    endif()
+
+    set( ${out_include} "${MYSQL_INCLUDE_DIR}" PARENT_SCOPE )
+    set( ${out_library} "${MYSQL_LIBRARY}" PARENT_SCOPE )
+    set( ${out_executable} "${MYSQL_EXECUTABLE}" PARENT_SCOPE )
+    set( ${out_error} "" PARENT_SCOPE )
+  endfunction()
+
+  if( NOT MYSQL_HOME AND DEFINED ENV{MYSQL_HOME} )
+    message( STATUS "Using MySQL from environment variable MYSQL_HOME" )
+    set( MYSQL_HOME $ENV{MYSQL_HOME} )
+  endif()
+  if( MYSQL_HOME )
+    check_mysql( "${MYSQL_HOME}" MYSQL_ERROR MYSQL_INCLUDE_DIR MYSQL_LIBRARY MYSQL_EXECUTABLE )
+    if( MYSQL_ERROR )
+      message( FATAL_ERROR "Invalid MySQL home: ${MYSQL_HOME}\n  ${MYSQL_ERROR}\n" )
+    endif()
+    set( MYSQL_DIR ${MYSQL_HOME} )
   else()
-    message( FATAL_ERROR "Could not find MySQL headers! Please install the development libraries and headers" )
+    file( GLOB MYSQL_DIRS "$ENV{ProgramW6432}/MariaDB *" )
+    if( MYSQL_DIRS )
+      set( MYSQL_HIGHEST_VERSION "" )
+      foreach( MYSQL_DIR ${MYSQL_DIRS} )
+        string( REPLACE "\\" "/" MYSQL_DIR ${MYSQL_DIR} )
+        string( REGEX MATCH "MariaDB ([0-9.]+)" MYSQL_VERSION_MATCH "${MYSQL_DIR}" )
+        if( NOT MYSQL_DIR MATCHES "MariaDB ([0-9.]+)" )
+          continue()
+        endif()
+        set( MYSQL_VERSION ${CMAKE_MATCH_1} )
+
+        check_mysql( "${MYSQL_DIR}" MYSQL_ERROR MYSQL_INCLUDE_DIR MYSQL_LIBRARY MYSQL_EXECUTABLE )
+        if( MYSQL_ERROR )
+          continue()
+        endif()
+        
+        if( NOT MYSQL_HIGHEST_VERSION OR MYSQL_VERSION VERSION_GREATER MYSQL_HIGHEST_VERSION )
+          set( MYSQL_HIGHEST_VERSION ${MYSQL_VERSION} )
+          set( MYSQL_HIGHEST_DIR ${MYSQL_DIR} )
+        endif()
+      endforeach()
+
+      set( MYSQL_DIR ${MYSQL_HIGHEST_DIR} )
+    endif()
+
+    if( NOT MYSQL_DIR )
+      file( GLOB MYSQL_DIRS "$ENV{ProgramW6432}/MySQL/MySQL Server *" )
+      if( MYSQL_DIRS )
+        set( MYSQL_HIGHEST_VERSION "" )
+        foreach( MYSQL_DIR ${MYSQL_DIRS} )
+          string( REPLACE "\\" "/" MYSQL_DIR ${MYSQL_DIR} )
+          string( REGEX MATCH "MySQL Server ([0-9.]+)" MYSQL_VERSION_MATCH "${MYSQL_DIR}" )
+          if( NOT MYSQL_DIR MATCHES "MySQL Server ([0-9.]+)" )
+            continue()
+          endif()
+          set( MYSQL_VERSION ${CMAKE_MATCH_1} )
+
+          check_mysql( "${MYSQL_DIR}" MYSQL_ERROR MYSQL_INCLUDE_DIR MYSQL_LIBRARY MYSQL_EXECUTABLE )
+          if( MYSQL_ERROR )
+            continue()
+          endif()
+          
+          if( NOT MYSQL_HIGHEST_VERSION OR MYSQL_VERSION VERSION_GREATER MYSQL_HIGHEST_VERSION )
+            set( MYSQL_HIGHEST_VERSION ${MYSQL_VERSION} )
+            set( MYSQL_HIGHEST_DIR ${MYSQL_DIR} )
+          endif()
+        endforeach()
+
+        set( MYSQL_DIR ${MYSQL_HIGHEST_DIR} )
+      endif()
+    endif()
+
+    if( NOT MYSQL_DIR )
+      message( FATAL_ERROR "Could not find MySQL! Use -DMYSQL_HOME=<path> to specify the MySQL directory." )
+    endif()
   endif()
-  if( MYSQL_EXECUTABLE )
-    message( STATUS "Found MySQL executable: ${MYSQL_EXECUTABLE}" )
-  endif()
-  mark_as_advanced( MYSQL_FOUND MYSQL_LIBRARY MYSQL_EXTRA_LIBRARIES MYSQL_INCLUDE_DIR MYSQL_EXECUTABLE )
+
+  STRING( REGEX REPLACE "(.lib)$" ".dll" MYSQL_DLL ${MYSQL_LIBRARY} )
+  file( COPY ${MYSQL_DLL} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 else()
-  message( FATAL_ERROR "Could not find the MySQL libraries! Please install the development libraries and headers" )
+  message( FATAL_ERROR "Unsupported platform!" )
 endif()
+
+set( MYSQL_FOUND 1 )
+message( STATUS "Found MySQL library: ${MYSQL_LIBRARY}" )
+message( STATUS "Found MySQL headers: ${MYSQL_INCLUDE_DIR}" )
+message( STATUS "Found MySQL executable: ${MYSQL_EXECUTABLE}" )
+mark_as_advanced( MYSQL_FOUND MYSQL_LIBRARY MYSQL_EXTRA_LIBRARIES MYSQL_INCLUDE_DIR MYSQL_EXECUTABLE )

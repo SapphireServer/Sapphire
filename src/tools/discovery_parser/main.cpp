@@ -147,7 +147,7 @@ std::string zoneNameToPath( const std::string& name )
   bool found = false;
 
   static auto& cat = eData->get_category( "TerritoryType" );
-  static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+  static auto& exd = cat.get_data_ln( xiv::exd::Language::none );
   static auto& rows = exd.get_rows();
 
   if( zoneInfoMap.size() == 0 )
@@ -209,7 +209,7 @@ std::string zoneNameToPath( const std::string& name )
 void loadEobjNames()
 {
   static auto& cat = eData->get_category( "EObjName" );
-  static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
+  static auto& exd = cat.get_data_ln( xiv::exd::Language::en );
   for( auto& row : exd.get_rows() )
   {
     auto id = row.first;

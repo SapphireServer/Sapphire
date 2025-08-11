@@ -29,6 +29,10 @@ namespace Sapphire::Common::Util
 
   uint8_t floatToUInt8Rot( float val );
 
+  float radiansToDegrees( float val );
+
+  float degreesToRadians( float val );
+
   FFXIVARR_POSITION3 getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rotation, float right, float up, float forward );
 
   FFXIVARR_POSITION3 getKnockbackPosition( const FFXIVARR_POSITION3& origin, const FFXIVARR_POSITION3& pos, float distance );

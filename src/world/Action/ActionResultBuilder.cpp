@@ -166,7 +166,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   if( !actionData )
     throw std::runtime_error( "No actiondata found!" );
 
-  if( targetCount > 1 || actionData->data().EffectType != Common::CastType::SingleTarget ) // use AoeEffect packets
+  if( targetCount > 1 || actionData->data().EffectType != static_cast< uint8_t >( Common::CastType::SingleTarget ) ) // use AoeEffect packets
   {
     // todo: maintarget logic is lackluster. There needs to be some criteria for when a main target is required.
     uint32_t mainTarget = Common::INVALID_GAME_OBJECT_ID;

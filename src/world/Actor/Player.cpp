@@ -71,7 +71,6 @@ Player::Player() :
   m_townWarpFstFlags( 0 ),
   m_playTime( 0 ),
   m_lastActionTick( 0 ),
-  m_bInCombat( false ),
   m_bLoadingComplete( false ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
@@ -598,13 +597,7 @@ void Player::setCurrentExp( uint32_t amount )
 
 bool Player::isInCombat() const
 {
-  return m_bInCombat;
-}
-
-void Player::setInCombat( bool mode )
-{
-  //m_lastAttack = GetTickCount();
-  m_bInCombat = mode;
+  return hasCondition( PlayerCondition::InCombat );
 }
 
 void Player::setClassJob( Common::ClassJob classJob )
@@ -702,7 +695,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), WarpStart, 4, getId(), 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, pTarget->getId(), WarpStart, 4, getId(), 1 );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )

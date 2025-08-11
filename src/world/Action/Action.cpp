@@ -936,14 +936,19 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
     if( !preFilterActor( *actor ) )
       continue;
 
+
+    bool snapshotActor = true;
     for( const auto& filter : m_actorFilters )
     {
-      if( filter->conditionApplies( *actor ) )
+      if( !filter->conditionApplies( *actor ) )
       {
-        actors.push_back( actor->getAsChara() );
+        snapshotActor = false;
         break;
       }
     }
+
+    if( snapshotActor )
+      actors.push_back( actor->getAsChara() );
   }
 
   if( auto player = m_pSource->getAsPlayer() )
@@ -976,17 +981,30 @@ void Action::Action::addDefaultActorFilters()
       break;
     }
 
-    case Common::CastType::CircularAOE:
+    case Common::CastType::Circle:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
       addActorFilter( filter );
       break;
     }
-
-    case Common::CastType::RectangularAOE:
+    case Common::CastType::Box:
     {
       auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
       addActorFilter( filter );
+      break;
+    }
+    case Common::CastType::Cone:
+    {
+      ConeEntry shapeEntry = { 0, 0 };
+      if( ActionShapeLut::validConeEntryExists( static_cast< uint16_t >( getId() ) ) )
+      {
+        shapeEntry = ActionShapeLut::getConeEntry( static_cast< uint16_t >( getId() ) );
+      }
+
+      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), m_range );
+      addActorFilter( rangeFilter );
+      auto coneFilter = std::make_shared< World::Util::ActorFilterCone >( m_pSource->getPos(), m_pos, shapeEntry.startAngle, shapeEntry.endAngle );
+      addActorFilter( coneFilter );
       break;
     }
 

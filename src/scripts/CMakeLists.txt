@@ -15,6 +15,14 @@ if( WIN32 )
     set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}" )
 endif()
 
+# Enable unity builds if not explicitly enabled/disabled
+if(NOT DEFINED CMAKE_UNITY_BUILD)
+    message(STATUS "Enabled unity builds for scripts (-DCMAKE_UNITY_BUILD=OFF to disable)")
+    set(CMAKE_UNITY_BUILD ON)
+    set(CMAKE_UNITY_BUILD_BATCH_SIZE 16)
+    set(SCRIPT_UNITY_BUILD ON)
+endif()
+
 file(GLOB children "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 foreach(_scriptDir ${children})
     get_filename_component(_name "${_scriptDir}" NAME_WE)
@@ -78,3 +86,7 @@ foreach(_scriptDir ${children})
         unset(ScriptNames)
     endif()
 endforeach()
+
+if(SCRIPT_UNITY_BUILD)
+    set(CMAKE_UNITY_BUILD OFF)
+endif()

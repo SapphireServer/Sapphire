@@ -97,6 +97,18 @@ namespace Sapphire::World::Manager
       return RandGenerator< T >( m_engine );
     }
 
+    /*!
+     * @brief Manually seeds the engine with a given 32-bit seed. Intended *only* for debugging purposes
+     * Seeds ideally need to be <int, STATE_SIZE> - note that this does not guarantee deterministic distribution
+     * Manually seeding with < STATE_SIZE is weird - it'll likely permutate the rest of STATE_SIZE from given seed
+     * @param 32-bit seed value
+     * @return void
+     */
+    void reseedEngine( uint32_t seed )
+    {
+      m_engine->seed( seed );
+    }
+
     std::shared_ptr< std::mt19937 > getRNGEngine()
     {
       return m_engine;
