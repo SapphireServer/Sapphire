@@ -33,7 +33,7 @@ namespace Sapphire::Math
     /*!
      * @brief Calculates the probability of a block happening
      */
-    static float blockProbability( const Sapphire::Entity::Chara& chara );
+    static uint16_t blockProbability( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a critical hit happening

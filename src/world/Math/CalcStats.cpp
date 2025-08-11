@@ -218,13 +218,14 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
 }
 
 
-float CalcStats::blockProbability( const Chara& chara )
+uint16_t CalcStats::blockProbability( const Chara& chara )
 {
   auto level = chara.getLevel();
   auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  uint16_t blockMod = chara.getModifier( Common::ParamModifier::BlockRate );
 
-  return std::floor( ( 30 * blockRate ) / levelVal + 10 );
+  return std::floor( ( 30 * blockRate ) / levelVal + 10 ) + blockMod;
 }
 
 float CalcStats::criticalHitProbability( const Chara& chara )
@@ -626,6 +627,7 @@ uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::getRandomNumber0To100()
 {
+  return 50;
   if( !rnd )
   {
     rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
