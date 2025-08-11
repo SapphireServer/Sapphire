@@ -6,7 +6,7 @@
 
 #include <map>
 #include <utility>
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #include "bparse.h"
 #include "DatCat.h"

@@ -1,42 +1,29 @@
-file(GLOB UTILS_SOURCE_FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Config/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Crypt/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Database/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Exd/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Logging/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Navi/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Network/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Network/PacketDef/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Script/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Random/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
+file( GLOB_RECURSE SOURCES
+  *.cpp
+  *.h
+)
 
+add_library( common ${SOURCES} )
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
+find_package( Threads REQUIRED )
 
-target_link_libraries( common
-        PUBLIC
-        xivdat
-        mysqlConnector
-        mysql
-        Detour
-        DetourCrowd )
+target_link_libraries( common PUBLIC
+  xivdat
+  mysqlConnector
+  mysql
+  Threads::Threads
+  DetourCrowd
+)
 
-if( UNIX )
-    target_link_libraries( common
-            PUBLIC
-            pthread
-            stdc++fs
-            Detour
-            DetourCrowd )
-endif()
+target_include_directories( common PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  # NOTE: This is for #include <datReader/xxx>
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../deps"
+)
 
-target_include_directories( common
-                              PUBLIC
-                                "${CMAKE_CURRENT_SOURCE_DIR}/"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/"
-                                Detour)
-
+# Add asio and spdlog as system includes to suppress pointless warnings
+target_include_directories( common SYSTEM PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include"
+)

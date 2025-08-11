@@ -1,6 +1,6 @@
 #include "Dat.h"
 
-#include "zlib.h"
+#include "DatZlib.h"
 
 #include "File.h"
 

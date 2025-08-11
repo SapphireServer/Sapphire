@@ -71,7 +71,7 @@ namespace Engine
 
     double calculateDeltaTime( uint64_t& lastTick );
 
-    void initImGui();
+    void initImGui(const char* glsl_version);
 
     std::shared_ptr< ApplicationContext > getContext() const;
 
