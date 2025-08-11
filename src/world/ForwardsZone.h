@@ -84,6 +84,15 @@ namespace World::AI::Fsm
 
 }
 
+namespace World::Loot
+{
+TYPE_FORWARD( LootTableItem );
+TYPE_FORWARD( LootTablePool );
+TYPE_FORWARD( LootTable );
+TYPE_FORWARD( LootTableResultItem );
+TYPE_FORWARD( LootTableResult );
+}
+
 namespace Inventory
 {
 using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
@@ -94,6 +103,7 @@ TYPE_FORWARD( HousingItem );
 namespace World::Manager
 {
 TYPE_FORWARD( HousingMgr );
+TYPE_FORWARD( LootTableMgr );
 }
 
 namespace StatusEffect

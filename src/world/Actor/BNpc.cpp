@@ -33,6 +33,7 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/InventoryMgr.h>
 #include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
@@ -694,6 +695,8 @@ void BNpc::onDeath()
 {
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+  auto& lootTableMgr = Common::Service< World::Manager::LootTableMgr >::ref();
+  auto& inventoryMgr = Common::Service< World::Manager::InventoryMgr >::ref();
 
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
@@ -709,14 +712,13 @@ void BNpc::onDeath()
 
   for( const auto& pHateEntry : m_hateList )
   {
-    // TODO: handle drops
-    auto& lootTableMgr = Common::Service< World::Manager::LootTableMgr >::ref();
-
-    auto lootResult = lootTableMgr.rollLoot( "testTable" );
-
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
+      auto lootResult = lootTableMgr.rollLoot( "testTable" );
+      // todo: make this a task? it's too fast and good to be retail-like
+      inventoryMgr.resolveLootTableResult( *pPlayer, lootResult );
+
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }

@@ -11,6 +11,7 @@
 #include "LootTableMgr.h"
 
 using namespace Sapphire;
+using namespace Sapphire::World::Loot;
 using namespace Sapphire::World::Manager;
 namespace fs = std::filesystem;
 

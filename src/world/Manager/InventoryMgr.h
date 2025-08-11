@@ -71,6 +71,13 @@ namespace Sapphire::World::Manager
      */
     void saveItem( Entity::Player& player, ItemPtr item );
 
+    /*!
+     * @brief Creates items from loot table result and adds it to player
+     * @param player The player that will 'own' the items
+     * @param lootTableResult LootTable result data
+     */
+    void resolveLootTableResult( Entity::Player& player, Loot::LootTableResult lootTableResult );
+
   private:
     /*!
      * @brief Saves an individual item to the db.

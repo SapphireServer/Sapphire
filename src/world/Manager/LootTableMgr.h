@@ -7,10 +7,9 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire::World::Manager
+namespace Sapphire::World::Loot
 {
-  struct LootTableItem
-  {
+  struct LootTableItem {
     uint32_t id;
     uint32_t weight;
     bool isHq;
@@ -18,8 +17,7 @@ namespace Sapphire::World::Manager
     NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTableItem, id, weight, isHq )
   };
 
-  struct LootTablePool
-  {
+  struct LootTablePool {
     std::string name;
     bool enabled;
     bool duplicates;
@@ -43,8 +41,7 @@ namespace Sapphire::World::Manager
     bool isHq;
   };
 
-  struct LootTableResult
-  {
+  struct LootTableResult {
     std::string name;
     std::vector< LootTableResultItem > items;
 
@@ -53,6 +50,11 @@ namespace Sapphire::World::Manager
   };
 
   using LootTablePtr = std::shared_ptr< LootTable >;
+}
+
+
+namespace Sapphire::World::Manager
+{
 
   class LootTableMgr
   {
@@ -70,7 +72,7 @@ namespace Sapphire::World::Manager
     /// </summary>
     /// <param name="name"></param>
     /// <returns>ptr to LootTable or null</returns>
-    LootTablePtr getLootTableByName( const std::string& name );
+    Loot::LootTablePtr getLootTableByName( const std::string& name );
 
     /// <summary>
     /// rolls a given loot table by name
@@ -80,10 +82,10 @@ namespace Sapphire::World::Manager
     /// </summary>
     /// <param name="name"></param>
     /// <returns>struct of loot table rolls</returns>
-    LootTableResult rollLoot( const std::string& name );
+    Loot::LootTableResult rollLoot( const std::string& name );
 
   private:
-    std::map< std::string, LootTablePtr > m_lootTableMap;
+    std::map< std::string, Loot::LootTablePtr > m_lootTableMap;
 
     /// <summary>
     /// picks a single item per weight out of a total weight of vector of items
@@ -92,7 +94,7 @@ namespace Sapphire::World::Manager
     /// </summary>
     /// <param name="items"></param>
     /// <returns>singular item pick from given items</returns>
-    const LootTableItem& pickWeightedItem( const std::vector< LootTableItem >& items );
+    const Loot::LootTableItem& pickWeightedItem( const std::vector< Loot::LootTableItem >& items );
   };
 
 }
