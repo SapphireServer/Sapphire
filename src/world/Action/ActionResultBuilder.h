@@ -51,8 +51,8 @@ namespace Sapphire::World::Action
     uint16_t m_requestId;
     uint32_t m_resultId;
 
-    bool m_applyHealAggro = true;
-    bool m_applyStatusAggro = true;
+    bool m_applyHealAggro { true };
+    bool m_applyStatusAggro { true };
     Entity::CharaPtr m_sourceChara;
     std::unordered_map< Entity::CharaPtr, std::vector< ActionResultPtr > > m_actorResultsMap;
   };

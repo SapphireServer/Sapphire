@@ -790,8 +790,7 @@ void Chara::setAgentId( uint32_t agentId )
 
 std::vector< CharaPtr > Chara::getHateList()
 {
-  std::vector< CharaPtr > hateList = {};
-  return hateList;
+  return {};
 }
 
 float Chara::getRadius() const

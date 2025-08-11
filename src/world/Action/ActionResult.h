@@ -45,7 +45,7 @@ namespace Sapphire::World::Action
 
     Common::CalcResultParam m_result;
     float m_aggroModifier;
-    bool m_applyStatusAggro = false;
+    bool m_applyStatusAggro { false };
     bool m_bShouldOverride { false };
 
     Sapphire::StatusEffect::StatusEffectPtr m_pStatus;

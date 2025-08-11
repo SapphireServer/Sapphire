@@ -1054,7 +1054,11 @@ void Player::onMobDeaggro( const BNpc& bnpc )
 
 void Player::hateListLetterUpdate( const BNpc& bnpc )
 {
-  uint8_t hateId = m_actorIdTohateSlotMap[ bnpc.getId() ];
+  auto pos = m_actorIdTohateSlotMap.find( bnpc.getId() );
+  if( pos == m_actorIdTohateSlotMap.end() )
+    return;
+
+  uint8_t hateId = pos->second;
   if( hateId < 26 || m_freeHateSlotQueue.empty() )
     return;
 

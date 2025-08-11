@@ -660,7 +660,7 @@ void BNpc::deaggro( const CharaPtr& pChara )
       updateAggroTarget();
       hateListUpdatePlayers();
     }
-    if( m_pOwner == pChara  )
+    if( m_pOwner == pChara )
     {
       setOwner( hateListGetHighest() );
     }
