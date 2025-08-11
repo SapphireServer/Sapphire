@@ -9,23 +9,30 @@
 
 namespace Sapphire::World::Loot
 {
+  struct LootTableRange {
+    uint32_t min;
+    uint32_t max;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTableRange, min, max )
+  };
+
   struct LootTableItem {
     uint32_t id;
     uint32_t weight;
     bool isHq;
+    LootTableRange quantity;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTableItem, id, weight, isHq )
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTableItem, id, weight, isHq, quantity )
   };
 
   struct LootTablePool {
     std::string name;
     bool enabled;
     bool duplicates;
-    uint32_t pickMin;
-    uint32_t pickMax;
+    LootTableRange pick;
     std::vector< LootTableItem > items;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTablePool, name, enabled, duplicates, pickMin, pickMax, items )
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE( LootTablePool, name, enabled, duplicates, pick, items )
   };
 
   struct LootTable {

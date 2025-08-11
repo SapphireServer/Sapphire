@@ -1,0 +1,16 @@
+{
+  "lootTable": "bnpc_3rdCohortOptio",
+  "pools": [
+    {
+      "name": "Pool #1 (empty)",
+      "enabled": false,
+      "duplicates": false,
+      "pick": {
+        "min": 0,
+        "max": 0
+      },
+      "items": []
+    }
+  ],
+  "type": "bNPC"
+}
