@@ -208,74 +208,13 @@ uint32_t CalcStats::calculateMaxMp( Player& player )
 
 uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
 {
-  auto level = chara.getLevel();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
+  if( !paramGrowthInfo )
+    return 0;
 
-  // each level range is 1-10, 11-20, 21-30, ... therefore:
-  // level 50 should be in the 4th group, not the 5t
-  // dividing by 10 on the border will break this unless we subtract 1
-  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
-
-  float cost = baseCost;
-
-  // thanks to andrew for helping me figure this shit out
-  // played with this some more and it seems to be accurate for everything i've tried
-  switch( levelGroup )
-  {
-    // level 1-10
-    case 0:
-    {
-      // r^2 = 0.9999
-      cost = 0.0952f * level + 0.9467f;
-      break;
-    }
-
-    // level 11-20
-    case 1:
-    {
-      // r^2 = 1
-      cost = 0.19f * level;
-      break;
-    }
-
-    // level 21-30
-    case 2:
-    {
-      // r^2 = 1
-      cost = 0.38f * level - 3.8f;
-      break;
-    }
-
-    // level 31-40
-    case 3:
-    {
-      // r^2 = 1
-      cost = 0.6652f * level - 12.358f;
-      break;
-    }
-
-    // level 41-50
-    case 4:
-    {
-      // r^2 = 1
-      cost = 1.2352f * level - 35.159f;
-      break;
-    }
-
-    // level 51-60
-    case 5:
-    {
-      // r^2 = 1
-      cost = 0.0654f * std::exp( 0.1201f * level );
-      break;
-    }
-
-    default:
-    {
-      return 0;
-    }
-  }
-
-  return static_cast< uint16_t >( std::round( cost * baseCost ) );
+  uint16_t mpMod = paramGrowthInfo->data().Mp;
+  return baseCost * mpMod / 100;
 }
 
 
