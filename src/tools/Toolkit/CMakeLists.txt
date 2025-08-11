@@ -27,16 +27,11 @@ file( GLOB_RECURSE SOURCES
 )
 
 add_executable( Toolkit ${SOURCES} )
-
-if( NOT TARGET imgui OR NOT TARGET glfw OR NOT TARGET libglew_static OR NOT TARGET glm )
-  message( FATAL_ERROR "Missing dependencies for Toolkit" )
-endif()
-
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_link_libraries( Toolkit PRIVATE
   common
   imgui
   libglew_static
   glm
 )
-
 target_include_directories( Toolkit PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )

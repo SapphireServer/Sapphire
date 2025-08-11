@@ -67,7 +67,15 @@ if( SAPPHIRE_BUILD_TOOLKIT )
   # Build GLM as a static library
   set( BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE )
   add_subdirectory( "deps/glm" )
+  # Only build GLFW as a static library
+  set( GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE )
+  set( GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE )
+  set( GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE )
+  set( GLFW_INSTALL OFF CACHE BOOL "" FORCE )
   add_subdirectory( "deps/glfw" )
+  # Only build GLEW as a static library
+  set( ONLY_LIBS ON CACHE BOOL "" FORCE )
+  set( glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE )
   add_subdirectory( "deps/glew" )
 endif()
 

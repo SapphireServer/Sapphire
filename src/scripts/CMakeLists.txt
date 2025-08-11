@@ -30,7 +30,8 @@ foreach(_scriptDir ${children})
         message("discovered plugin lib: ${_scriptDir} (${_name})")
 
         file(GLOB_RECURSE SCRIPT_BUILD_FILES "${_scriptDir}/*.cpp")
-        file(GLOB_RECURSE SCRIPT_FILES RELATIVE "${_scriptDir}" "${_name}/*.cpp")
+        file(GLOB_RECURSE SCRIPT_FILES "${_name}/*.cpp")
+        source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SCRIPT_BUILD_FILES} ${SCRIPT_FILES})
 
         # build file list
         foreach(_script ${SCRIPT_FILES})

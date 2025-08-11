@@ -4,6 +4,7 @@ file( GLOB_RECURSE SOURCES
 )
 
 add_library( common ${SOURCES} )
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 find_package( Threads REQUIRED )
 
