@@ -52,7 +52,7 @@ extern "C" EXPORT void win32initHouMgr( std::shared_ptr< Sapphire::World::Manage
   Sapphire::Common::Service< Sapphire::World::Manager::HousingMgr >::set( rngMgr );
 }
 
-extern "C" EXPORT void win32initRngMgr( std::shared_ptr< Sapphire::World::Manager::RNGMgr > rngMgr )
+extern "C" EXPORT void win32initRngMgr( std::shared_ptr< Sapphire::Common::Random::RNGMgr > rngMgr )
 {
   Sapphire::Common::Service< Sapphire::Common::Random::RNGMgr >::set( rngMgr );
 }
