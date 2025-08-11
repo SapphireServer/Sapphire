@@ -1,13 +1,7 @@
 #include <Common.h>
-#include <Territory/Territory.h>
 #include <Logging/Logger.h>
-#include <WorldServer.h>
 
-#include "Actor/GameObject.h"
-#include "Actor/Chara.h"
-#include "Actor/BNpc.h"
-
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 
 #include "NaviProvider.h"
 
@@ -18,7 +12,7 @@
 #include <filesystem>
 #include <Service.h>
 
-Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
+Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
   m_naviMesh( nullptr ),
   m_naviMeshQuery( nullptr ),
   m_internalName( internalName )
@@ -29,12 +23,9 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
   m_polyFindRange[ 2 ] = 20;
 }
 
-bool Sapphire::World::Navi::NaviProvider::init()
+bool Sapphire::Common::Navi::NaviProvider::init( const std::string& naviPath )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto& cfg = server.getConfig();
-
-  auto meshesFolder = std::filesystem::path( cfg.navigation.meshPath );
+  auto meshesFolder = std::filesystem::path( naviPath );
   auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
 
   if( std::filesystem::exists( meshFolder ) )
@@ -93,12 +84,12 @@ bool Sapphire::World::Navi::NaviProvider::init()
   return false;
 }
 
-bool Sapphire::World::Navi::NaviProvider::hasNaviMesh() const
+bool Sapphire::Common::Navi::NaviProvider::hasNaviMesh() const
 {
   return m_naviMesh != nullptr;
 }
 
-void Sapphire::World::Navi::NaviProvider::initQuery()
+void Sapphire::Common::Navi::NaviProvider::initQuery()
 {
   if( m_naviMeshQuery )
     dtFreeNavMeshQuery( m_naviMeshQuery );
@@ -107,7 +98,7 @@ void Sapphire::World::Navi::NaviProvider::initQuery()
   m_naviMeshQuery->init( m_naviMesh, 2048 );
 }
 
-int32_t Sapphire::World::Navi::NaviProvider::fixupCorridor( dtPolyRef* path, const int32_t npath, const int32_t maxPath,
+int32_t Sapphire::Common::Navi::NaviProvider::fixupCorridor( dtPolyRef* path, const int32_t npath, const int32_t maxPath,
                                                             const dtPolyRef* visited, const int32_t nvisited )
 {
   int32_t furthestPath = -1;
@@ -152,7 +143,7 @@ int32_t Sapphire::World::Navi::NaviProvider::fixupCorridor( dtPolyRef* path, con
   return req + size;
 }
 
-int32_t Sapphire::World::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, int32_t npath, dtNavMeshQuery* navQuery )
+int32_t Sapphire::Common::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, int32_t npath, dtNavMeshQuery* navQuery )
 {
   if( npath < 3 )
     return npath;
@@ -203,7 +194,7 @@ int32_t Sapphire::World::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, in
   return npath;
 }
 
-bool Sapphire::World::Navi::NaviProvider::inRange( const float* v1, const float* v2, const float r, const float h )
+bool Sapphire::Common::Navi::NaviProvider::inRange( const float* v1, const float* v2, const float r, const float h )
 {
   const float dx = v2[ 0 ] - v1[ 0 ];
   const float dy = v2[ 1 ] - v1[ 1 ];
@@ -211,7 +202,7 @@ bool Sapphire::World::Navi::NaviProvider::inRange( const float* v1, const float*
   return ( dx * dx + dz * dz ) < r * r && fabsf( dy ) < h;
 }
 
-bool Sapphire::World::Navi::NaviProvider::getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos,
+bool Sapphire::Common::Navi::NaviProvider::getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos,
                                                           const float minTargetDist, const dtPolyRef* path, const int32_t pathSize,
                                                           float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef,
                                                           float* outPoints, int32_t* outPointCount )
@@ -263,7 +254,7 @@ static float frand()
 
 
 Sapphire::Common::FFXIVARR_POSITION3
-  Sapphire::World::Navi::NaviProvider::findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
+  Sapphire::Common::Navi::NaviProvider::findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
                                                                    float maxRadius )
 {
   dtStatus status;
@@ -297,7 +288,7 @@ Sapphire::Common::FFXIVARR_POSITION3
     return {};
   }
 
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto rng = RNGMgr.getRandGenerator< float >( 0.f, 1.f );
   status = m_naviMeshQuery->findRandomPointAroundCircle( startRef, spos, maxRadius, &filter, frand,
              &randomRef, randomPt );
@@ -310,9 +301,56 @@ Sapphire::Common::FFXIVARR_POSITION3
   return { randomPt[ 0 ], randomPt[ 1 ], randomPt[ 2 ] };
 }
 
+
+
+Sapphire::Common::FFXIVARR_POSITION3
+  Sapphire::Common::Navi::NaviProvider::findNearestPosition( float x, float z )
+{
+  dtStatus status;
+
+  float spos[ 3 ] = { x, 50, z };
+
+  float polyPickExt[ 3 ];
+  polyPickExt[ 0 ] = 0.1f;
+  polyPickExt[ 1 ] = 300;
+  polyPickExt[ 2 ] = 0.1f;
+  float snearest[ 3 ];
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
+
+  dtPolyRef startRef;
+
+  status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+  if( dtStatusFailed( status ) )
+  {
+    // Key improvement 3: Try with larger search radius if first attempt fails
+    polyPickExt[ 0 ] = 0.1f;
+    polyPickExt[ 1 ] = 500.0f;
+    polyPickExt[ 2 ] = 0.1f;
+
+    status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+    if( dtStatusFailed( status ) )
+    {
+      return {};
+    }
+  }
+
+
+  if( !m_naviMesh->isValidPolyRef( startRef ) )
+  {
+    return {};
+  }
+
+  return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
+}
+
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
-  Sapphire::World::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
-                                                       const Common::FFXIVARR_POSITION3& endPos )
+  Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
+                                                        const Common::FFXIVARR_POSITION3& endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::runtime_error( "No navimesh loaded" );
@@ -355,6 +393,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
+    // todo: adjust these for the actor radius
     const float STEP_SIZE = 0.5f;
     const float SLOP = 0.15f;
 
@@ -477,7 +516,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
   return resultCoords;
 }
 
-bool Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
+bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
 {
   FILE* fp = fopen( path.c_str(), "rb" );
   if( !fp )
@@ -567,39 +606,41 @@ bool Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
   return true;
 }
 
-int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
+int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::FFXIVARR_POSITION3& pos, float radius )
 {
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
   params.maxSpeed = (std::pow( 2.f, 1.f * 0.35f ) + 1.f)*0.5f;
-  params.radius = ( chara.getRadius() ) * 0.75f;
+  params.radius = radius * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
   params.updateFlags = 0;
   params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS;
-  float position[] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
+  float position[] = { pos.x, pos.y, pos.z };
   return m_pCrowd->addAgent( position, &params );
 }
 
-void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& bnpc )
+void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning )
 {
+  if( naviAgentId == -1 )
+    return;
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
   params.maxSpeed = (std::pow( 2.f, 1.f * 0.35f ) + 1.f)*0.5f;
-  if( bnpc.getState() == Entity::BNpcState::Combat || bnpc.getState() == Entity::BNpcState::Retreat )
+  if( isRunning )
     params.maxSpeed *= 2;
-  params.radius = ( bnpc.getRadius() ) * 0.75f;
+  params.radius = ( radius ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
   params.updateFlags = 0;
-  m_pCrowd->updateAgentParameters( bnpc.getAgentId(), &params );
+  m_pCrowd->updateAgentParameters( naviAgentId, &params );
 }
 
-void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )
+void Sapphire::Common::Navi::NaviProvider::updateCrowd( float timeInSeconds )
 {
   dtCrowdAgentDebugInfo info{};
   info.idx = -1;
@@ -607,12 +648,12 @@ void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )
   m_pCrowd->update( timeInSeconds, &info );
 }
 
-void Sapphire::World::Navi::NaviProvider::removeAgent( Sapphire::Entity::Chara& chara )
+void Sapphire::Common::Navi::NaviProvider::removeAgent( int32_t naviAgentId )
 {
-  m_pCrowd->removeAgent( chara.getAgentId() );
+  m_pCrowd->removeAgent( naviAgentId );
 }
 
-void Sapphire::World::Navi::NaviProvider::calcVel( float* vel, const float* pos, const float* tgt, const float speed )
+void Sapphire::Common::Navi::NaviProvider::calcVel( float* vel, const float* pos, const float* tgt, const float speed )
 {
   dtVsub( vel, tgt, pos );
   vel[ 1 ] = 0.0;
@@ -620,12 +661,12 @@ void Sapphire::World::Navi::NaviProvider::calcVel( float* vel, const float* pos,
   dtVscale( vel, vel, speed );
 }
 
-void Sapphire::World::Navi::NaviProvider::resetMoveTarget( Entity::Chara& chara )
+void Sapphire::Common::Navi::NaviProvider::resetMoveTarget( int32_t naviAgentId )
 {
-  m_pCrowd->resetMoveTarget( chara.getAgentId() );
+  m_pCrowd->resetMoveTarget( naviAgentId );
 }
 
-void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
+void Sapphire::Common::Navi::NaviProvider::setMoveTarget( int32_t naviAgentId,
                                                          const Sapphire::Common::FFXIVARR_POSITION3& endPos )
 {
   // Find nearest point on navmesh and set move request to that location.
@@ -642,60 +683,50 @@ void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
 
   if( !dtStatusSucceed( status ) )
   {
-    Logger::error( "Failed to find nearest poly for Chara#{} for pos X: {} Y: {} Z: {}",
-                   chara.getId(), endPos.x, endPos.y, endPos.z );
+    Logger::error( "Failed to find nearest poly for Chara-Agent#{} for pos X: {} Y: {} Z: {}",
+                   naviAgentId, endPos.x, endPos.y, endPos.z );
 
     return;
   }
 
-  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   if( ag && ag->active )
   {
-    m_pCrowd->requestMoveTarget( chara.getAgentId(), ref, p );
+    m_pCrowd->requestMoveTarget( naviAgentId, ref, p );
   }
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::World::Navi::NaviProvider::getMovePos( Entity::Chara& chara )
+Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Common::Navi::NaviProvider::getMovePos( int32_t naviAgentId )
 {
-  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   if( !ag )
     return { 0.f, 0.f, 0.f };
   return { ag->npos[ 0 ], ag->npos[ 1 ], ag->npos[ 2 ] };
 }
 
-bool Sapphire::World::Navi::NaviProvider::isAgentActive( Entity::Chara& chara ) const
+bool Sapphire::Common::Navi::NaviProvider::isAgentActive( int32_t naviAgentId ) const
 {
-  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   return ag && ag->active;
 
 }
 
-bool Sapphire::World::Navi::NaviProvider::hasTargetState( Entity::Chara& chara ) const
+bool Sapphire::Common::Navi::NaviProvider::hasTargetState( int32_t naviAgentId ) const
 {
-  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
 }
 
-void Sapphire::World::Navi::NaviProvider::updateAgentPosition( Entity::Chara& chara )
+int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius )
 {
-  removeAgent( chara );
-  auto newIndex = addAgent( chara );
-  chara.setAgentId( newIndex );
+  removeAgent( naviAgentId );
+  auto newIndex = addAgent( pos, radius );
+  return newIndex;
 }
 
-bool Sapphire::World::Navi::NaviProvider::syncPosToChara( Entity::Chara& chara )
+void Sapphire::Common::Navi::NaviProvider::addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags )
 {
-  auto pos = getMovePos( chara );
-  if( pos.x == chara.getPos().x && pos.y == chara.getPos().y && pos.z == chara.getPos().z )
-    return false;
-
-  chara.setPos( pos );
-  return true;
-}
-
-void Sapphire::World::Navi::NaviProvider::addAgentUpdateFlag( Sapphire::Entity::Chara& chara, uint8_t flags )
-{
-  auto ag = m_pCrowd->getEditableAgent( chara.getAgentId() );
+  auto ag = m_pCrowd->getEditableAgent( naviAgentId );
 
   if( !ag )
     return;
@@ -703,9 +734,9 @@ void Sapphire::World::Navi::NaviProvider::addAgentUpdateFlag( Sapphire::Entity::
   ag->params.updateFlags |= flags;
 }
 
-void Sapphire::World::Navi::NaviProvider::removeAgentUpdateFlag( Sapphire::Entity::Chara& chara, uint8_t flags )
+void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags )
 {
-  auto ag = m_pCrowd->getEditableAgent( chara.getAgentId() );
+  auto ag = m_pCrowd->getEditableAgent( naviAgentId );
 
   if( !ag )
     return;

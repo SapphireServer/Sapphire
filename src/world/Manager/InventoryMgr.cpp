@@ -5,6 +5,7 @@
 #include "Inventory/ItemContainer.h"
 #include "Inventory/HousingItem.h"
 #include "Manager/ItemMgr.h"
+#include "Manager/LootTableMgr.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacket.h>
 

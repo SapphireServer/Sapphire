@@ -695,7 +695,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), WarpStart, 4, getId(), 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, pTarget->getId(), WarpStart, 4, getId(), 1 );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )

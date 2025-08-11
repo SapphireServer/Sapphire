@@ -33,6 +33,8 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/InventoryMgr.h>
+#include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
@@ -42,6 +44,7 @@
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
 #include <Task/ActionIntegrityTask.h>
+#include <Task/LootBNpcTask.h>
 #include <Service.h>
 
 #include <Action/Action.h>
@@ -371,7 +374,7 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, pos );
 
   if( distance < getNaviTargetReachedDistance() )
@@ -379,8 +382,8 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    sendPositionUpdate();
-    pNaviProvider->updateAgentPosition( *this );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -391,7 +394,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   else
     face( pos );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -409,7 +411,7 @@ bool BNpc::moveTo( const Chara& targetChara )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, targetChara.getPos() );
 
   if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
@@ -417,9 +419,9 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    sendPositionUpdate();
-    pNaviProvider->resetMoveTarget( *this );
-    pNaviProvider->updateAgentPosition( *this );
+    pNaviProvider->resetMoveTarget( getAgentId() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -429,7 +431,6 @@ bool BNpc::moveTo( const Chara& targetChara )
   else
     face( targetChara.getPos() );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -734,6 +735,8 @@ void BNpc::onDeath()
 {
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+  auto& lootTableMgr = Common::Service< World::Manager::LootTableMgr >::ref();
+  auto& inventoryMgr = Common::Service< World::Manager::InventoryMgr >::ref();
 
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
@@ -749,10 +752,12 @@ void BNpc::onDeath()
 
   for( const auto& pHateEntry : m_hateList )
   {
-    // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
+      // todo: get this outta here!
+      taskMgr.queueTask( makeLootBNpcTask( *pPlayer, "testTable", 2000 ) );
+
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }
@@ -863,9 +868,68 @@ bool BNpc::hasFlag( uint32_t flag ) const
   return m_flags & flag;
 }
 
+
+void BNpc::resetFlags( uint32_t flags )
+{
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
+  m_flags |= flags;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( getAgentId() );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
+}
+
+
 void BNpc::setFlag( uint32_t flag )
 {
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
   m_flags |= flag;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( getAgentId() );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
 }
 
 void BNpc::autoAttack( CharaPtr pTarget )

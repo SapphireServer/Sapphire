@@ -36,6 +36,14 @@ file( COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR}/bin )
 include( "cmake/paths.cmake" )
 include( "cmake/compiler.cmake" )
 
+include_directories(
+        "deps/glew/include"
+        "deps/glfw/include"
+        "deps/glm"
+        "deps/freetype/include"
+        "deps/"
+)
+
 ##############################
 #             Git            #
 ##############################
@@ -44,6 +52,20 @@ get_git_head_revision( GIT_REFSPEC GIT_SHA1 )
 git_describe( VERSION --all --dirty=-d )
 configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
+
+
+link_directories(
+        "${CMAKE_SOURCE_DIR}/deps/glew/lib/Release/x64"
+        "${CMAKE_SOURCE_DIR}/deps/glfw/lib-vc2015"
+        "${CMAKE_BUILD_PATH}"
+        "${CMAKE_BUILD_PATH}/../")
+
+
+set( FREETYPE_LIBRARY "${CMAKE_SOURCE_DIR}/lib/freetype.lib" )
+set( FREETYPE_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/freetype/include" )
+set( ONLY_LIBS ON )
+set( glew-cmake_BUILD_SHARED OFF )
+add_definitions(-DGLEW_STATIC)
 
 ##############################
 #           Mysql            #
@@ -60,6 +82,9 @@ add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/recastnavigation" )
+add_subdirectory( "deps/glm" )
+add_subdirectory( "deps/glfw" )
+add_subdirectory( "deps/glew" )
 
 ##############################
 #  Main Sapphire Components  #

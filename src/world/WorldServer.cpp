@@ -33,7 +33,7 @@
 #include <Service.h>
 #include "Manager/AchievementMgr.h"
 #include "Manager/LinkshellMgr.h"
-#include "Manager/TerritoryMgr.h"
+#include "Manager/LootTableMgr.h"
 #include "Manager/HousingMgr.h"
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/PlayerMgr.h"
@@ -42,8 +42,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
-#include "Manager/RNGMgr.h"
-#include "Manager/NaviMgr.h"
+
 #include "Manager/ActionMgr.h"
 #include "Manager/ChatChannelMgr.h"
 #include "Manager/QuestMgr.h"
@@ -57,6 +56,9 @@
 #include "ContentFinder/ContentFinder.h"
 
 #include "Territory/InstanceObjectCache.h"
+
+#include <Navi/NaviMgr.h>
+#include <Random/RNGMgr.h>
 
 using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
@@ -210,8 +212,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::set( pDb );
 
-  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
-  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
+  auto pRNGMgr = std::make_shared< Common::Random::RNGMgr >();
+  Common::Service< Common::Random::RNGMgr >::set( pRNGMgr );
 
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   Logger::info( "Loading all players" );
@@ -253,6 +255,16 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Manager::AchievementMgr >::set( pAchvMgr );
 
+  auto pLootTableMgr = std::make_shared< Manager::LootTableMgr >();
+
+  Logger::info( "LootTableMgr: Caching loot tables" );
+  if( !pLootTableMgr->cacheLootTables() )
+  {
+    Logger::fatal( "Unable to cache loot tables!" );
+    return;
+  }
+  Common::Service< Manager::LootTableMgr >::set( pLootTableMgr );
+
   Logger::info( "Setting up InstanceObjectCache" );
   auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
   Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
@@ -282,8 +294,9 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Manager::MapMgr >::set( pMapMgr );
 
-  auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
-  Common::Service< Manager::NaviMgr >::set( pNaviMgr );
+  auto& cfg = getConfig();
+  auto pNaviMgr = std::make_shared< Common::Navi::NaviMgr >( cfg.navigation.meshPath );
+  Common::Service< Common::Navi::NaviMgr >::set( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();

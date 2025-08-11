@@ -16,7 +16,7 @@ void AI::Fsm::StateRoam::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   auto pNaviProvider = pZone->getNaviProvider();
 
   if( pNaviProvider )
-    pNaviProvider->setMoveTarget( bnpc, bnpc.getRoamTargetPos() );
+    pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getRoamTargetPos() );
 
   if( bnpc.moveTo( bnpc.getRoamTargetPos() ) )
   {

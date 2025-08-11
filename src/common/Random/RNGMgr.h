@@ -1,17 +1,16 @@
 #pragma once
 
-#include "Forwards.h"
-#include <Logging/Logger.h>
 
 #include <array>
 #include <algorithm>
-#include <chrono>
 #include <random>
 #include <memory>
 #include <type_traits>
 #include <vector>
 
-namespace Sapphire::World::Manager
+#include <Logging/Logger.h>
+
+namespace Sapphire::Common::Random
 {
   /*!
    * @brief Generator object that is used on multiple state situations
@@ -96,16 +95,9 @@ namespace Sapphire::World::Manager
       return RandGenerator< T >( m_engine );
     }
 
-    /*!
-     * @brief Manually seeds the engine with a given 32-bit seed. Intended *only* for debugging purposes
-     * Seeds ideally need to be <int, STATE_SIZE> - note that this does not guarantee deterministic distribution
-     * Manually seeding with < STATE_SIZE is weird - it'll likely permutate the rest of STATE_SIZE from given seed
-     * @param 32-bit seed value
-     * @return void
-     */
-    void reseedEngine( uint32_t seed )
+    std::shared_ptr< std::mt19937 > getRNGEngine()
     {
-      m_engine->seed( seed );
+      return m_engine;
     }
 
   private:
@@ -120,8 +112,8 @@ namespace Sapphire::World::Manager
 
       // check if kernel can supply sufficiently non-deterministic output
 
-      if( rd.entropy() == 0.f )
-        Logger::error( "Kernel random device entropy reported zero - Random number generator may be poor quality" );
+      //if( rd.entropy() == 0.f )
+      //  Logger::error( "Kernel random device entropy reported zero - Random number generator may be poor quality" );
 
       std::generate_n( seedArray.data(), seedArray.size(), std::ref( rd ) );
       auto pSeq = std::make_unique< std::seed_seq >( std::begin( seedArray ), std::end( seedArray ) );
