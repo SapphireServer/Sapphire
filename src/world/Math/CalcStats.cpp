@@ -627,7 +627,6 @@ uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::getRandomNumber0To100()
 {
-  return 50;
   if( !rnd )
   {
     rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
