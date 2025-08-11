@@ -1,0 +1,37 @@
+{
+  "lootTable": "bnpc_dullahan",
+  "pools": [
+    {
+      "name": "Pool #1 (Gil, Gil)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 2,
+        "max": 2
+      },
+      "items": [
+        {
+          "id": 1,
+          "name": "Gil",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 41,
+            "max": 58
+          }
+        },
+        {
+          "id": 1,
+          "name": "Gil",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 41,
+            "max": 58
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

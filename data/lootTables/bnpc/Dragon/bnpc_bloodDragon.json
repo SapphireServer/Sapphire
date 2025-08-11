@@ -1,0 +1,130 @@
+{
+  "lootTable": "bnpc_bloodDragon",
+  "pools": [
+    {
+      "name": "Pool #1 (Dragon Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12571,
+          "name": "Dragon Skin",
+          "weight": 478,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 522,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Dragon Fang)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12576,
+          "name": "Dragon Fang",
+          "weight": 478,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 522,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #3 (Dragon Blood)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12630,
+          "name": "Dragon Blood",
+          "weight": 681,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 319,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #4 (Dragon Scale)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12627,
+          "name": "Dragon Scale",
+          "weight": 942,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 58,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

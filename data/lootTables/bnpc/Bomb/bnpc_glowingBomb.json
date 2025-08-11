@@ -1,0 +1,37 @@
+{
+  "lootTable": "bnpc_glowingBomb",
+  "pools": [
+    {
+      "name": "Pool #1 (Bomb Ash)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5528,
+          "name": "Bomb Ash",
+          "weight": 667,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 333,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}
