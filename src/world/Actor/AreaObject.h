@@ -8,7 +8,8 @@ namespace Sapphire::Entity
   class AreaObject : public GameObject
   {
   public:
-    AreaObject( uint32_t actorId, uint32_t actionId, uint32_t vfxId, uint32_t ownerId, const Common::FFXIVARR_POSITION3& pos );
+    AreaObject( uint32_t actorId, uint32_t actionId, uint32_t vfxId, float scale,
+      uint32_t ownerId, const Common::FFXIVARR_POSITION3& pos );
 
     void spawn( PlayerPtr pTarget ) override;
 
@@ -24,5 +25,6 @@ namespace Sapphire::Entity
     uint32_t m_actionId;
     uint32_t m_ownerId;
     uint32_t m_vfxId;
+    float m_scale;
   };
 }

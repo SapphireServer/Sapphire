@@ -24,10 +24,12 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-AreaObject::AreaObject( uint32_t actorId, uint32_t actionId, uint32_t vfxId, uint32_t ownerId, const FFXIVARR_POSITION3& pos ) :
+AreaObject::AreaObject( uint32_t actorId, uint32_t actionId, uint32_t vfxId,
+    float scale, uint32_t ownerId, const Common::FFXIVARR_POSITION3& pos ) :
   GameObject( ObjKind::Area ),
   m_actionId( actionId ),
   m_vfxId( vfxId ),
+  m_scale( scale ),
   m_ownerId( ownerId )
 {
   m_id = actorId;
@@ -57,7 +59,7 @@ void AreaObject::spawn( PlayerPtr pTarget )
   areaSpawnPacket->data().Args = 227;
   areaSpawnPacket->data().Args2 = 2133301740;
   areaSpawnPacket->data().Args3 = 1743564264;
-  areaSpawnPacket->data().Scale = 6.f;
+  areaSpawnPacket->data().Scale = m_scale;
   server.queueForPlayer( pTarget->getCharacterId(), areaSpawnPacket );
 }
 

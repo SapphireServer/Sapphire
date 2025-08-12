@@ -26,7 +26,7 @@ public:
     if( !pActionBuilder )
       return;
 
-    pSource->spawnAreaObject( FlamingArrow, 196, action.getPos() );
+    pSource->spawnAreaObject( FlamingArrow, 196, action.getActionData()->data().EffectRange, action.getPos() );
     pActionBuilder->applyStatusEffectSelf( FlamingArrowStatus, 30000, 0, { }, Flags, false );
 
   }

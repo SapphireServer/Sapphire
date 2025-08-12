@@ -23,20 +23,26 @@ public:
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
     auto inRange = actor.getInRangeActors();
-    for( auto& pActor : inRange )
+    if( auto pAreaObject = actor.getAreaObject(); pAreaObject->getActionId() == FlamingArrow )
     {
-      if( !pActor->isChara() )
-        continue;
-      auto pChara = pActor->getAsChara();
-
-      const auto& pos = actor.getAreaObjectPos();
-      if( Common::Util::distance( pos, pChara->getPos() ) < 5.f )
+      // todo: probably use selectors
+      for( auto& pActor : inRange )
       {
-        auto dmg = Math::CalcStats::calcActionDamage( *pChara, Potency, 1.0f );
-        float damageVal = dmg.first;
-        Common::CalcResultType damageType = dmg.second;
+        // make sure we're only hitting enemies
+        if( !pActor->isBattleNpc() || pActor->getAsBNpc()->getEnemyType() == Common::Friendly )
+          continue;
 
-        statusEffectMgr().damage( actor.getAsChara(), pChara, static_cast< int32_t >( damageVal ) );
+        auto pChara = pActor->getAsChara();
+
+        const auto& pos = pAreaObject->getPos();
+        if( Common::Util::distance( pos, pChara->getPos() ) < 5.f )
+        {
+          auto dmg = Math::CalcStats::calcActionDamage( *pChara, Potency, 1.0f );
+          float damageVal = dmg.first;
+          Common::CalcResultType damageType = dmg.second;
+
+          statusEffectMgr().damage( actor.getAsChara(), pChara, static_cast< int32_t >( damageVal ) );
+        }
       }
     }
   }
