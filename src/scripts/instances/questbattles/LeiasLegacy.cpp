@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -121,17 +124,90 @@ public:
 
   }
 
+  enum vars
+  {
+    SUCCESS_CALLED
+  };
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -1.30f );
+    player.setPos( { -179.f, -27.40f, 291.33f } );
+  }
+
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_01 );
+    auto kopo = instance.getActiveBNpcByLayoutId( INIT_P_POP_KUPURU_KOPO );
+    auto pPlayer = instance.getPlayerPtr();
+    auto successCalled = instance.getDirectorVar( SUCCESS_CALLED );
 
+    if( !kopo )
+      return;
+
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setDirectorVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
-
+    eventMgr().playScene( player, instance.getDirectorId(), 1,
+                          NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                  DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                  // todo: wtf is 0x00100000
+                                  DISABLE_CANCEL_EMOTE,
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            player.setOnEnterEventDone( true );
+                          } );
   }
 
+    void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+    {
+      auto boss = instance.createBNpcFromLayoutId( INIT_POP_01, 21141, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_02, 1440, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_03, 1440, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_04, 1440, Common::BNpcType::Enemy );
+
+      auto kopo = instance.createBNpcFromLayoutId( INIT_P_POP_KUPURU_KOPO, 27780, Common::BNpcType::Enemy );
+
+      boss->setFlag( Entity::NoDeaggro );
+      a2->setFlag( Entity::NoDeaggro );
+      a3->setFlag( Entity::NoDeaggro );
+      a4->setFlag( Entity::NoDeaggro );
+      kopo->setFlag( Entity::NoDeaggro );
+
+      boss->hateListAdd( player.getAsChara(), 10000 );
+      boss->hateListAdd( kopo, 1 );
+
+      a2->hateListAdd( player.getAsChara(), 1 );
+      a2->hateListAdd( kopo, 10000 );
+
+      a3->hateListAdd( player.getAsChara(), 1 );
+      a3->hateListAdd( kopo, 10000 );
+
+      a4->hateListAdd( player.getAsChara(), 1 );
+      a4->hateListAdd( kopo, 10000 );
+
+      kopo->hateListAdd( a2, 10000 );
+      kopo->hateListAdd( a3, 10000 );
+      kopo->hateListAdd( a4, 10000 );
+      kopo->hateListAdd( boss, 1 );
+    }
+
+    void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+    {
+      auto idx = player.getQuestIndex( instance.getQuestId() );
+      if( idx == -1 )
+        return;
+      auto& quest = player.getQuestByIndex( idx );
+      quest.setSeq( 4 );
+    }
 };
 
 EXPOSE_SCRIPT( LeiasLegacy );

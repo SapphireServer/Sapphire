@@ -66,9 +66,10 @@ public:
     if( quest.getUI8AL() < 4 )
     {
       quest.setUI8AL( quest.getUI8AL() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 );
+
       if( quest.getUI8AL() == 4 )
       {
-        eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 );
         quest.setSeq( SeqFinish );
       }
     }
