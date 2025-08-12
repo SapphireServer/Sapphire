@@ -670,6 +670,10 @@ void ZoneEditor::buildNavmeshGeometry()
   int totalPolygons = 0;
   int totalTriangles = 0;
 
+  float minHeight = std::numeric_limits<float>::max();
+  float maxHeight = std::numeric_limits<float>::lowest();
+
+
   // Process ALL tiles, not just a limited number
   for( int i = 0; i < navMesh->getMaxTiles(); ++i )
   {
@@ -705,6 +709,9 @@ void ZoneEditor::buildNavmeshGeometry()
 
           const float *v = &tile->verts[ poly->verts[ vertIndex ] * 3 ];
 
+          minHeight = std::min(minHeight,  v[ 1 ]);
+          maxHeight = std::max(maxHeight,  v[ 1 ]);
+
           // Position
           vertices.push_back( v[ 0 ] );
           vertices.push_back( v[ 1 ] );
@@ -725,6 +732,10 @@ void ZoneEditor::buildNavmeshGeometry()
       }
     }
   }
+
+  m_navmeshMinHeight = minHeight;
+  m_navmeshMaxHeight = maxHeight;
+
 
   printf( "Total polygons processed: %d\n", totalPolygons );
   printf( "Total triangles generated: %d\n", totalTriangles );
@@ -908,41 +919,53 @@ void ZoneEditor::buildSimpleNavmeshTest()
 void ZoneEditor::initializeNavmeshRendering()
 {
   // Create shaders (same as before)
-  const char *vertexShaderSource = R"(
-#version 330 core
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
+  const char* vertexShaderSource = R"(
+    #version 330 core
+    layout(location = 0) in vec3 position;
+    layout(location = 1) in vec3 normal;   // Add normal input
 
-uniform mat4 mvp;
 
-out vec3 Normal;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+    uniform float minHeight;
+    uniform float maxHeight;
 
-void main()
-{
-    Normal = normal;
-    gl_Position = mvp * vec4(position, 1.0);
-}
-)";
+    out vec4 vertexColor;
 
-  const char *fragmentShaderSource = R"(
-#version 330 core
-in vec3 Normal;
+    void main()
+    {
+      gl_Position = projection * view * model * vec4(position, 1.0);
 
-out vec4 FragColor;
+      // Calculate normalized height (0.0 to 1.0)
+      float heightNormalized = (position.y - minHeight) / (maxHeight - minHeight);
 
-uniform vec3 color = vec3(0.0, 0.8, 1.0);
-uniform bool wireframe = false;
+      // Calculate basic lighting - we'll use a light from above and slightly to the side
+      vec3 lightDir = normalize(vec3(0.5, 1.0, 0.3));
+      float normalShading = max(dot(normal, lightDir), 0.3); // 0.3 is ambient light level
 
-void main()
-{
-    if (wireframe) {
-        FragColor = vec4(1.0, 1.0, 0.0, 1.0);
-    } else {
-        float shade = abs(Normal.y) * 0.5 + 0.5;
-        FragColor = vec4(color * shade, 1.0);
+      // Generate base color from height gradient (green to red)
+      vec3 baseColor = vec3(heightNormalized, 1.0 - heightNormalized, 0.0);
+
+      // Apply normal shading to the base color
+      vertexColor = vec4(baseColor * normalShading, 1.0);
+
     }
-}
-)";
+  )";
+
+
+
+  const char* fragmentShaderSource = R"(
+    #version 330 core
+    in vec4 vertexColor;
+    out vec4 FragColor;
+
+    void main()
+    {
+      FragColor = vertexColor;
+    }
+  )";
+
 
   m_navmeshShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
 
@@ -1148,20 +1171,22 @@ void ZoneEditor::renderNavmeshToTexture()
   glDisable( GL_BLEND );
   glDisable( GL_CULL_FACE );
 
-  // Render navmesh first
-  glUseProgram( m_navmeshShader );
+  // Use shader
+  glUseProgram(m_navmeshShader);
 
-  GLint mvpLoc = glGetUniformLocation( m_navmeshShader, "mvp" );
-  if( mvpLoc != -1 )
-  {
-    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
-  }
+  // Set uniforms with correct names
+  GLint modelLoc = glGetUniformLocation(m_navmeshShader, "model");
+  GLint viewLoc = glGetUniformLocation(m_navmeshShader, "view");
+  GLint projectionLoc = glGetUniformLocation(m_navmeshShader, "projection");
+  GLint minHeightLoc = glGetUniformLocation(m_navmeshShader, "minHeight");
+  GLint maxHeightLoc = glGetUniformLocation(m_navmeshShader, "maxHeight");
 
-  GLint colorLoc = glGetUniformLocation( m_navmeshShader, "color" );
-  if( colorLoc != -1 )
-  {
-    glUniform3f( colorLoc, 0.2f, 0.8f, 1.0f );
-  }
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+  glUniform1f(minHeightLoc, m_navmeshMinHeight);
+  glUniform1f(maxHeightLoc, m_navmeshMaxHeight);
+
 
   static bool showWireframe = false;
   GLint wireframeLoc = glGetUniformLocation( m_navmeshShader, "wireframe" );
@@ -1232,56 +1257,139 @@ glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float wo
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
+void ZoneEditor::drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize)
 {
-  if( !m_showBnpcMarkersInNavmesh || !m_selectedZone || m_bnpcs.empty() )
-  {
+  if (!m_selectedZone || m_bnpcs.empty())
     return;
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  // Define colors
+  ImU32 filteredColor = m_bnpcIconColor;            // Yellow for filtered BNPCs
+  ImU32 selectedColor = m_selectedBnpcIconColor;    // Red for selected BNPC
+  ImU32 unfilteredColor = IM_COL32(150, 150, 150, 180); // Grey for unfiltered BNPCs
+
+  // Keep track of the selected BNPC for special rendering
+  CachedBnpc* selectedBnpc = nullptr;
+  ImVec2 selectedPos;
+
+  // Create a set of filtered BNPC IDs for quick lookup
+  std::unordered_set<uint32_t> filteredBnpcIds;
+  for (auto* bnpc : m_filteredBnpcs)
+  {
+    filteredBnpcIds.insert(bnpc->instanceId);
   }
 
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  for( const auto& bnpc : m_bnpcs )
+  // First pass: Render all BNPCs except the selected one
+  for (const auto& bnpc : m_bnpcs)
   {
-    if( bnpc->territoryType != m_selectedZone->id )
-    {
+    // Skip BNPCs from other territories
+    if (bnpc->territoryType != m_selectedZone->id)
       continue;
+
+    // Convert 3D world position to 2D screen position
+    glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+
+    // Skip if outside visible area
+    if (screenPos.x < 0 || screenPos.x > imageSize.x ||
+        screenPos.y < 0 || screenPos.y > imageSize.y)
+      continue;
+
+    // Add the window position offset
+    ImVec2 pos = ImVec2(imagePos.x + screenPos.x, imagePos.y + screenPos.y);
+
+    // Check if this is the selected BNPC
+    bool isSelected = false;
+    if (m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
+        m_filteredBnpcs[m_selectedBnpcIndex]->instanceId == bnpc->instanceId)
+    {
+      isSelected = true;
+      selectedBnpc = bnpc.get();
+      selectedPos = pos;
+      continue; // Skip rendering selected BNPC in first pass
     }
 
-    // Convert world position to screen space
-    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
+    // Determine color based on filter status
+    bool isFiltered = filteredBnpcIds.find(bnpc->instanceId) != filteredBnpcIds.end();
+    ImU32 iconColor = isFiltered ? filteredColor : unfilteredColor;
 
-    // Skip if outside view
-    if( screenPos.x < 0 || screenPos.y < 0 || screenPos.x >= imageSize.x || screenPos.y >= imageSize.y )
+    // Draw the marker
+    float iconSize = m_bnpcIconSize;
+    drawList->AddCircleFilled(pos, iconSize, iconColor);
+    drawList->AddCircle(pos, iconSize, IM_COL32(0, 0, 0, 255));
+
+    // Show tooltip on hover
+    if (ImGui::IsWindowHovered() &&
+        ImGui::IsMouseHoveringRect(
+          ImVec2(pos.x - iconSize, pos.y - iconSize),
+          ImVec2(pos.x + iconSize, pos.y + iconSize)))
     {
-      continue;
+      // Draw a tooltip with BNPC info
+      ImGui::SetTooltip("%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
+                       bnpc->nameString.c_str(),
+                       bnpc->instanceId,
+                       bnpc->x, bnpc->y, bnpc->z);
+    }
+  }
+
+  // Second pass: Render the selected BNPC on top
+  if (selectedBnpc)
+  {
+    // Draw the selected BNPC with larger size and different color
+    float iconSize = m_bnpcIconSize * 1.5f;
+    drawList->AddCircleFilled(selectedPos, iconSize, selectedColor);
+    drawList->AddCircle(selectedPos, iconSize, IM_COL32(255, 255, 255, 255), 0, 2.0f);
+
+    // Draw the name above the marker
+    ImVec2 textPos = ImVec2(selectedPos.x, selectedPos.y - iconSize - 20);
+    // Add a background for better readability
+    ImVec2 textSize = ImGui::CalcTextSize(selectedBnpc->nameString.c_str());
+    drawList->AddRectFilled(
+      ImVec2(textPos.x - textSize.x/2 - 4, textPos.y - 2),
+      ImVec2(textPos.x + textSize.x/2 + 4, textPos.y + textSize.y + 2),
+      IM_COL32(0, 0, 0, 180)
+    );
+    // Center the text
+    textPos.x -= textSize.x / 2;
+    drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), selectedBnpc->nameString.c_str());
+  }
+
+  // Handle mouse clicks for selection
+  if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+  {
+    ImVec2 mousePos = ImGui::GetMousePos();
+    mousePos.x -= imagePos.x;
+    mousePos.y -= imagePos.y;
+
+    // Find closest BNPC to the click position
+    float closestDistance = FLT_MAX;
+    int closestIndex = -1;
+
+    for (size_t i = 0; i < m_filteredBnpcs.size(); i++)
+    {
+      CachedBnpc* bnpc = m_filteredBnpcs[i];
+
+      // Convert 3D position to screen space
+      glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+
+      // Calculate distance from mouse to BNPC icon
+      float dx = screenPos.x - mousePos.x;
+      float dy = screenPos.y - mousePos.y;
+      float distance = sqrtf(dx * dx + dy * dy);
+
+      // Check if this is within selection radius and closest so far
+      if (distance < 15.0f && distance < closestDistance) // 15.0f = selection radius
+      {
+        closestDistance = distance;
+        closestIndex = static_cast<int>(i);
+      }
     }
 
-    // Convert to ImGui screen coordinates
-    ImVec2 markerPos( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-    // Draw diamond shape
-    float size = 4.0f;
-    ImVec2 points[ 4 ] = {
-      ImVec2( markerPos.x, markerPos.y - size ), // Top
-      ImVec2( markerPos.x + size, markerPos.y ), // Right
-      ImVec2( markerPos.x, markerPos.y + size ), // Bottom
-      ImVec2( markerPos.x - size, markerPos.y ) // Left
-    };
-
-    // Draw filled diamond
-    drawList->AddConvexPolyFilled( points, 4, m_bnpcIconColor );
-
-    // Draw outline
-    drawList->AddPolyline( points, 4, IM_COL32( 0, 0, 0, 255 ), ImDrawFlags_Closed, 1.0f );
-
-    // Optional: draw BNPC name on hover
-    if( ImGui::IsMouseHoveringRect( ImVec2( markerPos.x - size, markerPos.y - size ),
-                                    ImVec2( markerPos.x + size, markerPos.y + size ) ) )
+    // If we found a close BNPC, select it
+    if (closestIndex >= 0)
     {
-      ImGui::SetTooltip( "BNPC: %s\nID: %u\nPos: %.1f, %.1f, %.1f",
-                         bnpc->nameString.c_str(), bnpc->instanceId,
-                         bnpc->x, bnpc->y, bnpc->z );
+      m_selectedBnpcIndex = closestIndex;
+      onSelectionChanged(); // Update any selection-dependent state
     }
   }
 }
@@ -1381,6 +1489,45 @@ void ZoneEditor::renderNavmesh()
   {
     ImGuiIO& io = ImGui::GetIO();
 
+        if( ImGui::IsMouseClicked(0) )
+        {
+          ImVec2 mousePos = ImGui::GetMousePos();
+          mousePos.x -= imageScreenPos.x;
+          mousePos.y -= imageScreenPos.y;
+
+          // Find closest BNPC to the click position
+          float closestDistance = FLT_MAX;
+          int closestIndex = -1;
+
+          for (size_t i = 0; i < m_filteredBnpcs.size(); i++)
+          {
+            CachedBnpc* bnpc = m_filteredBnpcs[i];
+
+            // Convert 3D position to screen space
+            glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+
+            // Calculate distance from mouse to BNPC icon
+            float dx = screenPos.x - mousePos.x;
+            float dy = screenPos.y - mousePos.y;
+            float distance = sqrtf(dx * dx + dy * dy);
+
+            // Check if this is within selection radius and closest so far
+            if (distance < 15.0f && distance < closestDistance) // 15.0f = selection radius
+            {
+              closestDistance = distance;
+              closestIndex = static_cast<int>(i);
+            }
+          }
+
+          // If we found a close BNPC, select it
+          if (closestIndex >= 0)
+          {
+            m_selectedBnpcIndex = closestIndex;
+            onSelectionChanged(); // Update any selection-dependent state
+          }
+        }
+
+
     // Left mouse button - rotate camera
     if( io.MouseDown[ 0 ] )
     {
@@ -1436,7 +1583,7 @@ void ZoneEditor::renderNavmesh()
         glm::vec3 cameraUp = glm::vec3( view[ 0 ][ 1 ], view[ 1 ][ 1 ], view[ 2 ][ 1 ] );
 
         // Pan sensitivity based on distance
-        float panSensitivity = m_navCameraDistance * 0.001f;
+        float panSensitivity = 1;
 
         // Move target in camera space
         glm::vec3 panMovement = cameraRight * ( -delta.x * panSensitivity ) +
@@ -1459,9 +1606,20 @@ void ZoneEditor::renderNavmesh()
     // Handle mouse wheel for zoom
     if( io.MouseWheel != 0.0f )
     {
-      m_navCameraDistance -= io.MouseWheel * 10.0f;
-      m_navCameraDistance = glm::clamp( m_navCameraDistance, 1.0f, 1000.0f );
-      m_navCameraControlActive = true;
+      // Calculate the direction vector (forward vector)
+      glm::vec3 forward = glm::normalize( m_navCameraTarget - m_navCameraPos );
+
+      // Set a fixed movement speed per scroll unit
+      float moveSpeed = 20.0f;
+      float moveAmount = io.MouseWheel * moveSpeed;
+
+      // Move both the camera AND target along the forward vector
+      // This maintains the same view direction while allowing unlimited movement
+      m_navCameraPos += forward * moveAmount;
+      m_navCameraTarget += forward * moveAmount;
+
+      // We don't need to update m_navCameraDistance since we're
+      // maintaining the same relative position between camera and target
     }
   }
   else
@@ -1498,7 +1656,11 @@ void ZoneEditor::renderNavmesh()
 
 void ZoneEditor::showNavmeshWindow()
 {
-  if( !ImGui::Begin( "Navmesh Viewer", &m_showNavmeshWindow ) )
+  ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar |
+                                  ImGuiWindowFlags_NoScrollWithMouse;
+
+
+  if( !ImGui::Begin( "Navmesh Viewer", &m_showNavmeshWindow, window_flags ) )
   {
     ImGui::End();
     return;
@@ -1515,11 +1677,6 @@ void ZoneEditor::showNavmeshWindow()
     }
   }
 
-  // Add test buttons
-  if( ImGui::Button( "Test Simple Triangle" ) )
-  {
-    buildSimpleNavmeshTest();
-  }
   ImGui::SameLine();
 
   // Disable the button if no zone is selected or no navi provider
@@ -1527,11 +1684,6 @@ void ZoneEditor::showNavmeshWindow()
   if( !canBuildNavmesh )
   {
     ImGui::BeginDisabled();
-  }
-
-  if( ImGui::Button( "Build Real Navmesh" ) )
-  {
-    buildNavmeshGeometry();
   }
 
   if( !canBuildNavmesh )
@@ -1549,11 +1701,6 @@ void ZoneEditor::showNavmeshWindow()
     }
   }
 
-  if( ImGui::Button( "Clear Navmesh" ) )
-  {
-    cleanupNavmeshGeometry();
-  }
-
   // Add some debug info
   ImGui::Separator();
   ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
@@ -1563,7 +1710,7 @@ void ZoneEditor::showNavmeshWindow()
   ImGui::Text( "Triangle count: %d", m_navmeshIndexCount / 3 );
 
   // Camera controls - only update sliders if not actively using mouse controls
-  if( ImGui::CollapsingHeader( "Camera Controls", ImGuiTreeNodeFlags_DefaultOpen ) )
+  if( ImGui::CollapsingHeader( "Camera Controls" ) )
   {
     // Disable sliders when mouse controls are active
     if( m_navCameraControlActive )
@@ -1640,7 +1787,9 @@ void ZoneEditor::showNavmeshWindow()
   if( contentRegion.x > 0 && contentRegion.y > 0 )
   {
     // Create child window for 3D rendering
-    if( ImGui::BeginChild( "NavmeshRender", contentRegion, true, ImGuiWindowFlags_NoScrollbar ) )
+    if( ImGui::BeginChild( "NavmeshRender", contentRegion, true, ImGuiWindowFlags_NoScrollbar |
+                                                                 ImGuiWindowFlags_NoScrollWithMouse
+    ) )
     {
       renderNavmesh();
     }

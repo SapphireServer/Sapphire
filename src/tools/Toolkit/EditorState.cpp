@@ -664,7 +664,7 @@ ImGuiID EditorState::setupDockspace( bool& p_open, ImGuiIO& io ) const
 
   ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0.0f, 0.0f ) );
   ImGui::Begin( "DockSpace", &p_open, window_flags );
-  ImGui::PopStyleVar( 2 );
+  ImGui::PopStyleVar( 3 );
 
   ImGuiID dockspace_id = ImGui::GetID( "DockSpace" );
   //if( ImGui::DockBuilderGetNode( dockspace_id ) == NULL )

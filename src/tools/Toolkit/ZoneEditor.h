@@ -128,6 +128,8 @@ private:
   int m_navmeshTextureHeight = 512;
   bool m_needsNavmeshRebuild = false;
   bool m_navCameraControlActive = false;
+  float m_navmeshMinHeight = 0.0f;
+  float m_navmeshMaxHeight = 1.0f;
 
 
   // Camera/view controls for navmesh
