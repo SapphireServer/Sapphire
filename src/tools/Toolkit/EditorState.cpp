@@ -625,8 +625,16 @@ void EditorState::render( double deltaTime )
 
 
       ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.6, &left1_id, &right1_id );
-      ImGui::DockBuilderDockWindow( "BNPC Information", right1_id );
-      ImGui::DockBuilderDockWindow( "Map Viewer", left1_id );
+      ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
+
+      unsigned int top_id;
+      unsigned int down_id;
+
+      ImGui::DockBuilderSplitNode( right1_id, ImGuiDir_Down, 0.6, &top_id, &down_id );
+      ImGui::DockBuilderDockWindow( "Map Viewer", down_id );
+      ImGui::DockBuilderDockWindow( "BNPC Information", top_id );
+
+
       dockInitialized = true;
     }
   }
