@@ -24,8 +24,8 @@
 
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #include <random>
 #include <vector>
@@ -639,8 +639,6 @@ void EditorState::render( double deltaTime )
     first_time = false;
     //  setupDockingLayout( dockspace_id );
   }
-
-  ImGui::End();
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 }
@@ -671,7 +669,7 @@ ImGuiID EditorState::setupDockspace( bool& p_open, ImGuiIO& io ) const
   {
     ImGui::DockSpace( dockspace_id, ImVec2( 0.0f, 0.0f ), dockspace_flags );
   }
-  ImGui::End();
+
 
 
   return dockspace_id;
