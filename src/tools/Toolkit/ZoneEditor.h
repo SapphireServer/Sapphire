@@ -145,6 +145,36 @@ private:
 
   uint32_t m_currentNavmeshZoneId = 0;
 
+  // OBJ Model support
+  struct ObjVertex {
+    glm::vec3 position;  // Only position, no normals or texcoords
+  };
+
+
+  struct ObjModel {
+    std::vector<ObjVertex> vertices;
+    std::vector<unsigned int> indices;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint ebo = 0;
+    int indexCount = 0;
+    bool loaded = false;
+  };
+
+  ObjModel m_objModel;
+  GLuint m_objShader = 0;
+  bool m_objLoaded = false;
+  bool m_showObjModel = false;
+  std::string m_currentObjPath;
+
+  // Methods for OBJ model support
+  bool loadObjModel(const std::string& filepath);
+  void cleanupObjModel();
+  void renderObjModel();
+  void checkForObjFile();
+  std::string getObjFilePath();
+
+
   // Add these methods
   void cleanupNavmeshGeometry(); // Separate from full cleanup
 

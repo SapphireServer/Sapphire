@@ -116,10 +116,18 @@ ZoneEditor::~ZoneEditor()
 {
   clearMapTexture();
   cleanupNavmeshRendering();
+  cleanupObjModel();
+
   if( m_navmeshShader )
   {
     glDeleteProgram( m_navmeshShader );
     m_navmeshShader = 0;
+  }
+
+  if( m_objShader )
+  {
+    glDeleteProgram( m_objShader );
+    m_objShader = 0;
   }
 }
 
@@ -589,6 +597,9 @@ void ZoneEditor::onSelectionChanged()
         m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_selectedZone->id );
         m_needsNavmeshRebuild = true;
         buildNavmeshGeometry();
+
+        // Check if there's an OBJ file for this zone
+        checkForObjFile();
       }
       else
         m_pNaviProvider = nullptr;
@@ -596,6 +607,289 @@ void ZoneEditor::onSelectionChanged()
   }
 }
 
+// First, let's add a method to check for an .obj file alongside the navmesh
+std::string ZoneEditor::getObjFilePath()
+{
+  if( !m_selectedZone || !m_pNaviProvider )
+  {
+    return "";
+  }
+
+  // The path is based on the current zone and LVB name
+  auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+  auto zoneRow = exdD.getRow< Excel::TerritoryType >( m_selectedZone->id );
+  if( !zoneRow )
+  {
+    return "";
+  }
+
+
+  std::string lvb = zoneRow->getString( zoneRow->data().Name );
+
+  // Construct the path to check
+  // We're assuming the OBJ file might be in the same folder as the navmesh
+  std::string objPath = m_pNaviProvider->getNaviPath() + "/" + lvb + "/" + lvb + ".obj";
+
+  return objPath;
+}
+
+void ZoneEditor::checkForObjFile()
+{
+  // Clean up any existing OBJ data
+  cleanupObjModel();
+  m_objLoaded = false;
+  m_showObjModel = false;
+
+  // Get the potential OBJ file path
+  std::string objPath = getObjFilePath();
+  if( objPath.empty() )
+  {
+    return;
+  }
+
+  // Check if the file exists
+  std::ifstream file( objPath );
+  if( !file.good() )
+  {
+    printf( "No OBJ file found at: %s\n", objPath.c_str() );
+    return;
+  }
+
+  // File exists, attempt to load it
+  if( loadObjModel( objPath ) )
+  {
+    m_objLoaded = true;
+    m_currentObjPath = objPath;
+    printf( "Successfully loaded OBJ model from: %s\n", objPath.c_str() );
+  }
+}
+
+bool ZoneEditor::loadObjModel(const std::string& filepath) {
+    printf("Loading OBJ model: %s\n", filepath.c_str());
+
+    // Clear existing model data
+    cleanupObjModel();
+
+    // Open file
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        printf("Failed to open OBJ file: %s\n", filepath.c_str());
+        return false;
+    }
+
+    std::vector<glm::vec3> positions;
+    std::vector<unsigned int> indices;
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') continue;
+
+        std::istringstream iss(line);
+        std::string prefix;
+        iss >> prefix;
+
+        if (prefix == "v") {
+            // Vertex position
+            glm::vec3 pos;
+            iss >> pos.x >> pos.y >> pos.z;
+            positions.push_back(pos);
+        }
+        else if (prefix == "f") {
+            // Face - only handle triangles, convert to 0-based indexing
+            std::string vertex1, vertex2, vertex3;
+            iss >> vertex1 >> vertex2 >> vertex3;
+
+            // Extract just the position index (before any '/' character)
+            auto getIndex = [](const std::string& str) -> unsigned int {
+                size_t slashPos = str.find('/');
+                std::string indexStr = (slashPos != std::string::npos) ? str.substr(0, slashPos) : str;
+                return std::stoi(indexStr) - 1; // Convert to 0-based
+            };
+
+            indices.push_back(getIndex(vertex1));
+            indices.push_back(getIndex(vertex2));
+            indices.push_back(getIndex(vertex3));
+        }
+    }
+    file.close();
+
+    if (positions.empty()) {
+        printf("No vertices found in OBJ file\n");
+        return false;
+    }
+
+    // Convert positions to ObjVertex format
+    m_objModel.vertices.clear();
+    m_objModel.vertices.reserve(positions.size());
+
+    // Calculate bounds for debugging
+    glm::vec3 minPos = positions[0];
+    glm::vec3 maxPos = positions[0];
+
+    for (const auto& pos : positions) {
+        ObjVertex vertex;
+        vertex.position = pos;
+        m_objModel.vertices.push_back(vertex);
+
+        minPos = glm::min(minPos, pos);
+        maxPos = glm::max(maxPos, pos);
+    }
+
+    m_objModel.indices = indices;
+
+    // Print model info
+    glm::vec3 size = maxPos - minPos;
+    glm::vec3 center = (minPos + maxPos) * 0.5f;
+    printf("Loaded %zu vertices, %zu indices\n", m_objModel.vertices.size(), m_objModel.indices.size());
+    printf("Bounds: min(%.2f,%.2f,%.2f) max(%.2f,%.2f,%.2f)\n",
+           minPos.x, minPos.y, minPos.z, maxPos.x, maxPos.y, maxPos.z);
+    printf("Size: (%.2f,%.2f,%.2f) Center: (%.2f,%.2f,%.2f)\n",
+           size.x, size.y, size.z, center.x, center.y, center.z);
+
+    // Create OpenGL objects
+    glGenVertexArrays(1, &m_objModel.vao);
+    glGenBuffers(1, &m_objModel.vbo);
+    glGenBuffers(1, &m_objModel.ebo);
+
+    // Upload data
+    glBindVertexArray(m_objModel.vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_objModel.vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 m_objModel.vertices.size() * sizeof(ObjVertex),
+                 m_objModel.vertices.data(),
+                 GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_objModel.ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 m_objModel.indices.size() * sizeof(unsigned int),
+                 m_objModel.indices.data(),
+                 GL_STATIC_DRAW);
+
+    // Set up vertex attributes (only position)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ObjVertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    // Create simple shader
+    if (m_objShader == 0) {
+      const char* vertexShader = R"(
+    #version 330 core
+    layout(location = 0) in vec3 aPos;
+
+    uniform mat4 mvp;
+
+    out vec3 FragPos;
+    out vec3 WorldPos;
+
+    void main() {
+        WorldPos = aPos;
+        FragPos = aPos;
+        gl_Position = mvp * vec4(aPos, 1.0);
+    }
+)";
+
+      const char* fragmentShader = R"(
+    #version 330 core
+    in vec3 FragPos;
+    in vec3 WorldPos;
+
+    out vec4 FragColor;
+
+    void main() {
+        // Simple lighting based on world position
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+
+        // Calculate normal from derivatives (flat shading)
+        vec3 dFdxPos = dFdx(WorldPos);
+        vec3 dFdyPos = dFdy(WorldPos);
+        vec3 normal = normalize(cross(dFdxPos, dFdyPos));
+
+        // Simple diffuse lighting
+        float diffuse = max(dot(normal, lightDir), 0.0);
+        vec3 color = vec3(0.7, 0.7, 0.9); // Light blue-gray
+
+        // Add some ambient lighting
+        float ambient = 0.3;
+        vec3 result = color * (ambient + diffuse * 0.7);
+
+        FragColor = vec4(result, 0.8); // Slightly transparent
+    }
+)";
+
+
+        m_objShader = createShaderProgram(vertexShader, fragmentShader);
+        if (m_objShader == 0) {
+            printf("Failed to create OBJ shader\n");
+            return false;
+        }
+    }
+
+    m_objModel.indexCount = m_objModel.indices.size();
+    m_objModel.loaded = true;
+
+    printf("OBJ model loaded successfully!\n");
+    return true;
+}
+
+void ZoneEditor::cleanupObjModel()
+{
+  if( m_objModel.vao != 0 )
+  {
+    glDeleteVertexArrays( 1, &m_objModel.vao );
+    glDeleteBuffers( 1, &m_objModel.vbo );
+    glDeleteBuffers( 1, &m_objModel.ebo );
+
+    m_objModel.vao = 0;
+    m_objModel.vbo = 0;
+    m_objModel.ebo = 0;
+  }
+
+  m_objModel.vertices.clear();
+  m_objModel.indices.clear();
+  m_objModel.indexCount = 0;
+  m_objModel.loaded = false;
+}
+
+void ZoneEditor::renderObjModel() {
+    if (!m_objModel.loaded || !m_showObjModel) {
+        return;
+    }
+
+    // Use exactly the same matrices as navmesh
+    glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                           (float)m_navmeshTextureWidth / (float)m_navmeshTextureHeight,
+                                           0.1f, 10000.0f);
+
+    // Identity matrix - no transformation since navmesh uses same coordinates
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 mvp = projection * view * model;
+
+    // Enable proper depth testing for shaded rendering
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glUseProgram(m_objShader);
+
+    // Set MVP matrix
+    GLint mvpLocation = glGetUniformLocation(m_objShader, "mvp");
+    if (mvpLocation != -1) {
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+    }
+
+    glBindVertexArray(m_objModel.vao);
+
+    // Render filled triangles with shading
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDrawElements(GL_TRIANGLES, m_objModel.indexCount, GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+
+    //printf("OBJ rendered with shading\n");
+}
 
 void ZoneEditor::updateNavmeshCamera()
 {
@@ -670,8 +964,8 @@ void ZoneEditor::buildNavmeshGeometry()
   int totalPolygons = 0;
   int totalTriangles = 0;
 
-  float minHeight = std::numeric_limits<float>::max();
-  float maxHeight = std::numeric_limits<float>::lowest();
+  float minHeight = std::numeric_limits< float >::max();
+  float maxHeight = std::numeric_limits< float >::lowest();
 
 
   // Process ALL tiles, not just a limited number
@@ -709,8 +1003,8 @@ void ZoneEditor::buildNavmeshGeometry()
 
           const float *v = &tile->verts[ poly->verts[ vertIndex ] * 3 ];
 
-          minHeight = std::min(minHeight,  v[ 1 ]);
-          maxHeight = std::max(maxHeight,  v[ 1 ]);
+          minHeight = std::min( minHeight, v[ 1 ] );
+          maxHeight = std::max( maxHeight, v[ 1 ] );
 
           // Position
           vertices.push_back( v[ 0 ] );
@@ -919,7 +1213,7 @@ void ZoneEditor::buildSimpleNavmeshTest()
 void ZoneEditor::initializeNavmeshRendering()
 {
   // Create shaders (same as before)
-  const char* vertexShaderSource = R"(
+  const char *vertexShaderSource = R"(
     #version 330 core
     layout(location = 0) in vec3 position;
     layout(location = 1) in vec3 normal;   // Add normal input
@@ -954,8 +1248,7 @@ void ZoneEditor::initializeNavmeshRendering()
   )";
 
 
-
-  const char* fragmentShaderSource = R"(
+  const char *fragmentShaderSource = R"(
     #version 330 core
     in vec4 vertexColor;
     out vec4 FragColor;
@@ -1142,8 +1435,9 @@ void ZoneEditor::renderBnpcMarkers()
 
 void ZoneEditor::renderNavmeshToTexture()
 {
-  if( !m_navmeshShader || !m_navmeshVAO || m_navmeshIndexCount == 0 || !m_navmeshFBO )
+  if( !m_navmeshFBO )
   {
+    printf( "No framebuffer for navmesh rendering\n" );
     return;
   }
 
@@ -1157,60 +1451,87 @@ void ZoneEditor::renderNavmeshToTexture()
   glClearColor( 0.1f, 0.1f, 0.2f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  // Set up matrices
-  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
-  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
-                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
-                                           0.1f, 10000.0f );
-  glm::mat4 model = glm::mat4( 1.0f );
-  glm::mat4 mvp = projection * view * model;
-
-  // Set OpenGL state
-  glEnable( GL_DEPTH_TEST );
-  glDepthFunc( GL_LESS );
-  glDisable( GL_BLEND );
-  glDisable( GL_CULL_FACE );
-
-  // Use shader
-  glUseProgram(m_navmeshShader);
-
-  // Set uniforms with correct names
-  GLint modelLoc = glGetUniformLocation(m_navmeshShader, "model");
-  GLint viewLoc = glGetUniformLocation(m_navmeshShader, "view");
-  GLint projectionLoc = glGetUniformLocation(m_navmeshShader, "projection");
-  GLint minHeightLoc = glGetUniformLocation(m_navmeshShader, "minHeight");
-  GLint maxHeightLoc = glGetUniformLocation(m_navmeshShader, "maxHeight");
-
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniform1f(minHeightLoc, m_navmeshMinHeight);
-  glUniform1f(maxHeightLoc, m_navmeshMaxHeight);
-
-
-  static bool showWireframe = false;
-  GLint wireframeLoc = glGetUniformLocation( m_navmeshShader, "wireframe" );
-  if( wireframeLoc != -1 )
+  // Check which rendering mode to use
+  if( m_showObjModel && m_objModel.loaded )
   {
-    glUniform1i( wireframeLoc, showWireframe ? 1 : 0 );
+    //printf( "Rendering OBJ model to texture\n" );
+    renderObjModel();
   }
-
-  if( showWireframe )
+  else if( m_navmeshShader && m_navmeshVAO && m_navmeshIndexCount > 0 )
   {
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    glLineWidth( 1.0f );
+    // Original navmesh rendering code
+    //printf( "Rendering navmesh to texture\n" );
+
+    // Set up matrices
+    glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+    glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                             ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                             0.1f, 10000.0f );
+    glm::mat4 model = glm::mat4( 1.0f );
+
+    // Set OpenGL state
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+    glDisable( GL_BLEND );
+
+
+    // Use shader
+    glUseProgram( m_navmeshShader );
+
+    // Set uniforms with correct names
+    GLint modelLoc = glGetUniformLocation( m_navmeshShader, "model" );
+    GLint viewLoc = glGetUniformLocation( m_navmeshShader, "view" );
+    GLint projectionLoc = glGetUniformLocation( m_navmeshShader, "projection" );
+    GLint minHeightLoc = glGetUniformLocation( m_navmeshShader, "minHeight" );
+    GLint maxHeightLoc = glGetUniformLocation( m_navmeshShader, "maxHeight" );
+
+    if( modelLoc != -1 )
+      glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+    if( viewLoc != -1 )
+      glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
+    if( projectionLoc != -1 )
+      glUniformMatrix4fv( projectionLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
+    if( minHeightLoc != -1 )
+      glUniform1f( minHeightLoc, m_navmeshMinHeight );
+    if( maxHeightLoc != -1 )
+      glUniform1f( maxHeightLoc, m_navmeshMaxHeight );
+
+    static bool showWireframe = false;
+    GLint wireframeLoc = glGetUniformLocation( m_navmeshShader, "wireframe" );
+    if( wireframeLoc != -1 )
+    {
+      glUniform1i( wireframeLoc, showWireframe ? 1 : 0 );
+    }
+
+    if( showWireframe )
+    {
+      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+      glLineWidth( 1.0f );
+    }
+    else
+    {
+      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+
+    glBindVertexArray( m_navmeshVAO );
+    glDrawElements( GL_TRIANGLES, m_navmeshIndexCount, GL_UNSIGNED_INT, 0 );
+
+    GLenum err = glGetError();
+    if( err != GL_NO_ERROR )
+    {
+      printf( "OpenGL error during navmesh rendering: 0x%x\n", err );
+    }
+
+    glBindVertexArray( 0 );
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    glUseProgram( 0 );
   }
   else
   {
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    printf( "Nothing to render: showObj=%d, objLoaded=%d, navmeshShader=%u, navmeshVAO=%u, navmeshIndexCount=%d\n",
+            m_showObjModel, m_objModel.loaded, m_navmeshShader, m_navmeshVAO, m_navmeshIndexCount );
   }
-
-  glBindVertexArray( m_navmeshVAO );
-  glDrawElements( GL_TRIANGLES, m_navmeshIndexCount, GL_UNSIGNED_INT, 0 );
-  glBindVertexArray( 0 );
-
-  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-  glUseProgram( 0 );
 
   // Render BNPC markers on top
   glEnable( GL_BLEND );
@@ -1257,51 +1578,51 @@ glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float wo
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize)
+void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
 {
-  if (!m_selectedZone || m_bnpcs.empty())
+  if( !m_selectedZone || m_bnpcs.empty() )
     return;
 
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImDrawList *drawList = ImGui::GetWindowDrawList();
 
   // Define colors
-  ImU32 filteredColor = m_bnpcIconColor;            // Yellow for filtered BNPCs
-  ImU32 selectedColor = m_selectedBnpcIconColor;    // Red for selected BNPC
-  ImU32 unfilteredColor = IM_COL32(150, 150, 150, 180); // Grey for unfiltered BNPCs
+  ImU32 filteredColor = m_bnpcIconColor; // Yellow for filtered BNPCs
+  ImU32 selectedColor = m_selectedBnpcIconColor; // Red for selected BNPC
+  ImU32 unfilteredColor = IM_COL32( 150, 150, 150, 180 ); // Grey for unfiltered BNPCs
 
   // Keep track of the selected BNPC for special rendering
-  CachedBnpc* selectedBnpc = nullptr;
+  CachedBnpc *selectedBnpc = nullptr;
   ImVec2 selectedPos;
 
   // Create a set of filtered BNPC IDs for quick lookup
-  std::unordered_set<uint32_t> filteredBnpcIds;
-  for (auto* bnpc : m_filteredBnpcs)
+  std::unordered_set< uint32_t > filteredBnpcIds;
+  for( auto *bnpc : m_filteredBnpcs )
   {
-    filteredBnpcIds.insert(bnpc->instanceId);
+    filteredBnpcIds.insert( bnpc->instanceId );
   }
 
   // First pass: Render all BNPCs except the selected one
-  for (const auto& bnpc : m_bnpcs)
+  for( const auto& bnpc : m_bnpcs )
   {
     // Skip BNPCs from other territories
-    if (bnpc->territoryType != m_selectedZone->id)
+    if( bnpc->territoryType != m_selectedZone->id )
       continue;
 
     // Convert 3D world position to 2D screen position
-    glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
 
     // Skip if outside visible area
-    if (screenPos.x < 0 || screenPos.x > imageSize.x ||
-        screenPos.y < 0 || screenPos.y > imageSize.y)
+    if( screenPos.x < 0 || screenPos.x > imageSize.x ||
+        screenPos.y < 0 || screenPos.y > imageSize.y )
       continue;
 
     // Add the window position offset
-    ImVec2 pos = ImVec2(imagePos.x + screenPos.x, imagePos.y + screenPos.y);
+    ImVec2 pos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
 
     // Check if this is the selected BNPC
     bool isSelected = false;
-    if (m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
-        m_filteredBnpcs[m_selectedBnpcIndex]->instanceId == bnpc->instanceId)
+    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
+        m_filteredBnpcs[ m_selectedBnpcIndex ]->instanceId == bnpc->instanceId )
     {
       isSelected = true;
       selectedBnpc = bnpc.get();
@@ -1310,52 +1631,52 @@ void ZoneEditor::drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize)
     }
 
     // Determine color based on filter status
-    bool isFiltered = filteredBnpcIds.find(bnpc->instanceId) != filteredBnpcIds.end();
+    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
     ImU32 iconColor = isFiltered ? filteredColor : unfilteredColor;
 
     // Draw the marker
     float iconSize = m_bnpcIconSize;
-    drawList->AddCircleFilled(pos, iconSize, iconColor);
-    drawList->AddCircle(pos, iconSize, IM_COL32(0, 0, 0, 255));
+    drawList->AddCircleFilled( pos, iconSize, iconColor );
+    drawList->AddCircle( pos, iconSize, IM_COL32( 0, 0, 0, 255 ) );
 
     // Show tooltip on hover
-    if (ImGui::IsWindowHovered() &&
+    if( ImGui::IsWindowHovered() &&
         ImGui::IsMouseHoveringRect(
-          ImVec2(pos.x - iconSize, pos.y - iconSize),
-          ImVec2(pos.x + iconSize, pos.y + iconSize)))
+          ImVec2( pos.x - iconSize, pos.y - iconSize ),
+          ImVec2( pos.x + iconSize, pos.y + iconSize ) ) )
     {
       // Draw a tooltip with BNPC info
-      ImGui::SetTooltip("%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
-                       bnpc->nameString.c_str(),
-                       bnpc->instanceId,
-                       bnpc->x, bnpc->y, bnpc->z);
+      ImGui::SetTooltip( "%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
+                         bnpc->nameString.c_str(),
+                         bnpc->instanceId,
+                         bnpc->x, bnpc->y, bnpc->z );
     }
   }
 
   // Second pass: Render the selected BNPC on top
-  if (selectedBnpc)
+  if( selectedBnpc )
   {
     // Draw the selected BNPC with larger size and different color
     float iconSize = m_bnpcIconSize * 1.5f;
-    drawList->AddCircleFilled(selectedPos, iconSize, selectedColor);
-    drawList->AddCircle(selectedPos, iconSize, IM_COL32(255, 255, 255, 255), 0, 2.0f);
+    drawList->AddCircleFilled( selectedPos, iconSize, selectedColor );
+    drawList->AddCircle( selectedPos, iconSize, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
 
     // Draw the name above the marker
-    ImVec2 textPos = ImVec2(selectedPos.x, selectedPos.y - iconSize - 20);
+    ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
     // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize(selectedBnpc->nameString.c_str());
+    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.c_str() );
     drawList->AddRectFilled(
-      ImVec2(textPos.x - textSize.x/2 - 4, textPos.y - 2),
-      ImVec2(textPos.x + textSize.x/2 + 4, textPos.y + textSize.y + 2),
-      IM_COL32(0, 0, 0, 180)
+      ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
+      ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
+      IM_COL32( 0, 0, 0, 180 )
     );
     // Center the text
     textPos.x -= textSize.x / 2;
-    drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), selectedBnpc->nameString.c_str());
+    drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
   }
 
   // Handle mouse clicks for selection
-  if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+  if( ImGui::IsWindowHovered() && ImGui::IsMouseClicked( 0 ) )
   {
     ImVec2 mousePos = ImGui::GetMousePos();
     mousePos.x -= imagePos.x;
@@ -1365,28 +1686,28 @@ void ZoneEditor::drawBnpcOverlayMarkers(ImVec2 imagePos, ImVec2 imageSize)
     float closestDistance = FLT_MAX;
     int closestIndex = -1;
 
-    for (size_t i = 0; i < m_filteredBnpcs.size(); i++)
+    for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
     {
-      CachedBnpc* bnpc = m_filteredBnpcs[i];
+      CachedBnpc *bnpc = m_filteredBnpcs[ i ];
 
       // Convert 3D position to screen space
-      glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
+      glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
 
       // Calculate distance from mouse to BNPC icon
       float dx = screenPos.x - mousePos.x;
       float dy = screenPos.y - mousePos.y;
-      float distance = sqrtf(dx * dx + dy * dy);
+      float distance = sqrtf( dx * dx + dy * dy );
 
       // Check if this is within selection radius and closest so far
-      if (distance < 15.0f && distance < closestDistance) // 15.0f = selection radius
+      if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
       {
         closestDistance = distance;
-        closestIndex = static_cast<int>(i);
+        closestIndex = static_cast< int >( i );
       }
     }
 
     // If we found a close BNPC, select it
-    if (closestIndex >= 0)
+    if( closestIndex >= 0 )
     {
       m_selectedBnpcIndex = closestIndex;
       onSelectionChanged(); // Update any selection-dependent state
@@ -1489,43 +1810,43 @@ void ZoneEditor::renderNavmesh()
   {
     ImGuiIO& io = ImGui::GetIO();
 
-        if( ImGui::IsMouseClicked(0) )
+    if( ImGui::IsMouseClicked( 0 ) )
+    {
+      ImVec2 mousePos = ImGui::GetMousePos();
+      mousePos.x -= imageScreenPos.x;
+      mousePos.y -= imageScreenPos.y;
+
+      // Find closest BNPC to the click position
+      float closestDistance = FLT_MAX;
+      int closestIndex = -1;
+
+      for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
+      {
+        CachedBnpc *bnpc = m_filteredBnpcs[ i ];
+
+        // Convert 3D position to screen space
+        glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
+
+        // Calculate distance from mouse to BNPC icon
+        float dx = screenPos.x - mousePos.x;
+        float dy = screenPos.y - mousePos.y;
+        float distance = sqrtf( dx * dx + dy * dy );
+
+        // Check if this is within selection radius and closest so far
+        if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
         {
-          ImVec2 mousePos = ImGui::GetMousePos();
-          mousePos.x -= imageScreenPos.x;
-          mousePos.y -= imageScreenPos.y;
-
-          // Find closest BNPC to the click position
-          float closestDistance = FLT_MAX;
-          int closestIndex = -1;
-
-          for (size_t i = 0; i < m_filteredBnpcs.size(); i++)
-          {
-            CachedBnpc* bnpc = m_filteredBnpcs[i];
-
-            // Convert 3D position to screen space
-            glm::vec2 screenPos = worldToNavmeshScreen(bnpc->x, bnpc->y, bnpc->z, imageSize);
-
-            // Calculate distance from mouse to BNPC icon
-            float dx = screenPos.x - mousePos.x;
-            float dy = screenPos.y - mousePos.y;
-            float distance = sqrtf(dx * dx + dy * dy);
-
-            // Check if this is within selection radius and closest so far
-            if (distance < 15.0f && distance < closestDistance) // 15.0f = selection radius
-            {
-              closestDistance = distance;
-              closestIndex = static_cast<int>(i);
-            }
-          }
-
-          // If we found a close BNPC, select it
-          if (closestIndex >= 0)
-          {
-            m_selectedBnpcIndex = closestIndex;
-            onSelectionChanged(); // Update any selection-dependent state
-          }
+          closestDistance = distance;
+          closestIndex = static_cast< int >( i );
         }
+      }
+
+      // If we found a close BNPC, select it
+      if( closestIndex >= 0 )
+      {
+        m_selectedBnpcIndex = closestIndex;
+        onSelectionChanged(); // Update any selection-dependent state
+      }
+    }
 
 
     // Left mouse button - rotate camera
@@ -1659,7 +1980,6 @@ void ZoneEditor::showNavmeshWindow()
   ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar |
                                   ImGuiWindowFlags_NoScrollWithMouse;
 
-
   if( !ImGui::Begin( "Navmesh Viewer", &m_showNavmeshWindow, window_flags ) )
   {
     ImGui::End();
@@ -1706,8 +2026,62 @@ void ZoneEditor::showNavmeshWindow()
   ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
   ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
   ImGui::Text( "NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No" );
-  ImGui::Text( "Loaded navmesh zone: %u", m_currentNavmeshZoneId );
-  ImGui::Text( "Triangle count: %d", m_navmeshIndexCount / 3 );
+
+  // Add OBJ model info with more detailed status
+  if( m_objLoaded )
+  {
+    ImGui::TextColored( ImVec4( 0.0f, 1.0f, 0.0f, 1.0f ), "OBJ Model loaded: %s",
+                        m_currentObjPath.c_str() );
+    ImGui::Text( "Model stats: %zu vertices, %d indices",
+                 m_objModel.vertices.size(), m_objModel.indexCount );
+  }
+  else
+  {
+    ImGui::TextColored( ImVec4( 1.0f, 0.5f, 0.0f, 1.0f ), "No OBJ Model available" );
+  }
+
+  // Add radio buttons to switch between navmesh and OBJ model
+  if( m_objLoaded )
+  {
+    ImGui::Separator();
+    ImGui::Text( "Visualization Mode:" );
+
+    // Store old state to detect changes
+    bool oldShowObj = m_showObjModel;
+
+    // Clearer radio button labels
+    if( ImGui::RadioButton( "Show NavMesh", !m_showObjModel ) )
+    {
+      m_showObjModel = false;
+    }
+    ImGui::SameLine();
+    if( ImGui::RadioButton( "Show 3D Model", m_showObjModel ) )
+    {
+      m_showObjModel = true;
+    }
+
+    // If we changed modes, force a redraw
+    if( oldShowObj != m_showObjModel )
+    {
+      printf( "Switched visualization mode: showObjModel = %d\n", m_showObjModel );
+    }
+
+    // Add a refresh button
+    if( ImGui::Button( "Refresh Visualization" ) )
+    {
+      // Force rebuild of the appropriate geometry
+      if( m_showObjModel )
+      {
+        cleanupObjModel();
+        checkForObjFile();
+      }
+      else
+      {
+        cleanupNavmeshGeometry();
+        buildNavmeshGeometry();
+      }
+    }
+  }
 
   // Camera controls - only update sliders if not actively using mouse controls
   if( ImGui::CollapsingHeader( "Camera Controls" ) )
@@ -1721,16 +2095,21 @@ void ZoneEditor::showNavmeshWindow()
     if( ImGui::SliderFloat( "Distance", &m_navCameraDistance, 1.0f, 500.0f ) )
     {
       m_navCameraDistance = glm::clamp( m_navCameraDistance, 1.0f, 500.0f );
+      updateNavmeshCamera();
     }
+
     if( ImGui::SliderFloat( "Yaw", &m_navCameraYaw, -180.0f, 180.0f ) )
     {
       // Keep yaw in range
       while( m_navCameraYaw > 180.0f ) m_navCameraYaw -= 360.0f;
       while( m_navCameraYaw < -180.0f ) m_navCameraYaw += 360.0f;
+      updateNavmeshCamera();
     }
+
     if( ImGui::SliderFloat( "Pitch", &m_navCameraPitch, -89.0f, 89.0f ) )
     {
       m_navCameraPitch = glm::clamp( m_navCameraPitch, -89.0f, 89.0f );
+      updateNavmeshCamera();
     }
 
     if( m_navCameraControlActive )
@@ -1740,9 +2119,15 @@ void ZoneEditor::showNavmeshWindow()
 
     // Target position controls
     ImGui::Text( "Target Position:" );
-    ImGui::SliderFloat( "Target X", &m_navCameraTarget.x, -1000.0f, 1000.0f );
-    ImGui::SliderFloat( "Target Y", &m_navCameraTarget.y, -100.0f, 100.0f );
-    ImGui::SliderFloat( "Target Z", &m_navCameraTarget.z, -1000.0f, 1000.0f );
+    bool targetChanged = false;
+    targetChanged |= ImGui::SliderFloat( "Target X", &m_navCameraTarget.x, -1000.0f, 1000.0f );
+    targetChanged |= ImGui::SliderFloat( "Target Y", &m_navCameraTarget.y, -100.0f, 100.0f );
+    targetChanged |= ImGui::SliderFloat( "Target Z", &m_navCameraTarget.z, -1000.0f, 1000.0f );
+
+    if( targetChanged )
+    {
+      updateNavmeshCamera();
+    }
 
     if( ImGui::Button( "Reset Camera" ) )
     {
@@ -1751,6 +2136,7 @@ void ZoneEditor::showNavmeshWindow()
       m_navCameraPitch = -30.0f;
       m_navCameraTarget = glm::vec3( 0.0f, 0.0f, 0.0f );
       m_navCameraControlActive = false;
+      updateNavmeshCamera();
     }
 
     if( ImGui::Button( "Top View" ) )
@@ -1759,14 +2145,18 @@ void ZoneEditor::showNavmeshWindow()
       m_navCameraPitch = -89.0f;
       m_navCameraDistance = 200.0f;
       m_navCameraControlActive = false;
+      updateNavmeshCamera();
     }
+
     ImGui::SameLine();
+
     if( ImGui::Button( "Side View" ) )
     {
       m_navCameraYaw = 90.0f;
       m_navCameraPitch = 0.0f;
       m_navCameraDistance = 100.0f;
       m_navCameraControlActive = false;
+      updateNavmeshCamera();
     }
 
     // Reset mouse control flag after a short time of inactivity
@@ -1788,8 +2178,7 @@ void ZoneEditor::showNavmeshWindow()
   {
     // Create child window for 3D rendering
     if( ImGui::BeginChild( "NavmeshRender", contentRegion, true, ImGuiWindowFlags_NoScrollbar |
-                                                                 ImGuiWindowFlags_NoScrollWithMouse
-    ) )
+                                                                 ImGuiWindowFlags_NoScrollWithMouse ) )
     {
       renderNavmesh();
     }
@@ -1799,9 +2188,13 @@ void ZoneEditor::showNavmeshWindow()
   ImGui::End();
 
   // If window was just closed, clean up geometry to free memory
-  if( !m_showNavmeshWindow && m_navmeshIndexCount > 0 )
+  if( !m_showNavmeshWindow )
   {
     cleanupNavmeshGeometry();
+    if( m_objLoaded )
+    {
+      cleanupObjModel();
+    }
   }
 }
 

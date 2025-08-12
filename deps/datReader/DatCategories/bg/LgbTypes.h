@@ -90,16 +90,26 @@ struct InstanceObject
   Transformation transform;
 };
 
+enum eModelConfigCollisionType : __int32
+{
+  COLLISION_ATTRIBUTE_TYPE_None = 0x0,
+  COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
+  COLLISION_ATTRIBUTE_TYPE_Box = 0x2,
+};
+
 struct BgPartsData : public InstanceObject
 {
   uint32_t modelFileOffset;
   uint32_t collisionFileOffset;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
+  eModelConfigCollisionType CollisionType;
+  uint32_t AttributeMask;
+  uint32_t Attribute;
+  int32_t CollisionConfig;
+  int8_t IsVisible;
+  uint8_t RenderShadowEnabled;
+  uint8_t RenderLightShadowEnabled;
+  uint8_t Padding00[1];
+  float RenderModelClipRange;
 };
 
 struct RelativePositions
@@ -161,6 +171,15 @@ struct TriggerBoxInstanceObject
 struct EventRangeData : public InstanceObject
 {
   TriggerBoxInstanceObject triggerBox;
+};
+
+struct CollisionBoxInstanceObject : public InstanceObject
+{
+  TriggerBoxInstanceObject triggerBox;
+  uint32_t m_attribute;
+  uint32_t m_attributeMask;
+  uint32_t m_resourceId;
+  bool m_pushPlayerOut;
 };
 
 struct ExitRangeData : public InstanceObject

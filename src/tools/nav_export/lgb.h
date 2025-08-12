@@ -109,18 +109,28 @@ public:
   };
 };
 
+enum eModelConfigCollisionType : __int32
+{
+  COLLISION_ATTRIBUTE_TYPE_None = 0x0,
+  COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
+  COLLISION_ATTRIBUTE_TYPE_Box = 0x2,
+};
+
 
 struct BgPartsData :
   public InstanceObject
 {
   uint32_t modelFileOffset;
   uint32_t collisionFileOffset;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
+  eModelConfigCollisionType CollisionType;
+  uint32_t AttributeMask;
+  uint32_t Attribute;
+  int32_t CollisionConfig;
+  int8_t IsVisible;
+  uint8_t RenderShadowEnabled;
+  uint8_t RenderLightShadowEnabled;
+  uint8_t Padding00[1];
+  float RenderModelClipRange;
 };
 
 class LGB_BGPARTS_ENTRY :
@@ -283,21 +293,59 @@ struct LGB_COLLISION_BOX_ENTRY :
   }
 };
 
+struct LayerGroup
+{
+  uint32_t LayerGroupID;
+  int32_t Name;
+  int32_t Layers;
+  int32_t Layer_Count;
+};
+
+struct Layer
+{
+  uint32_t LayerID;
+  int32_t Name;
+  int32_t InstanceObjects;
+  int32_t InstanceObject_Count;
+  int8_t ToolModeVisible;
+  int8_t ToolModeReadOnly;
+  int8_t IsBushLayer;
+  int8_t PS3Visible;
+  int32_t LayerSetRef;
+  uint16_t FestivalID;
+  uint16_t FestivalPhaseID;
+  int8_t IsTemporary;
+  int8_t IsHousing;
+  uint16_t VersionMask;
+  uint32_t Reserved;
+  int32_t OBSetReferencedList;
+  int32_t OBSetReferencedList_Count;
+  int32_t OBSetEnableReferencedList;
+  int32_t OBSetEnableReferencedList_Count;
+};
+
+
 struct LGB_GROUP_HEADER
 {
-  uint32_t unknown;
+  uint32_t id;
   int32_t groupNameOffset;
   int32_t entriesOffset;
   int32_t entryCount;
-  uint32_t unknown2;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
-  uint32_t unknown10;
+  int8_t ToolModeVisible;
+  int8_t ToolModeReadOnly;
+  int8_t IsBushLayer;
+  int8_t PS3Visible;
+  int32_t LayerSetRef;
+  uint16_t FestivalID;
+  uint16_t FestivalPhaseID;
+  int8_t IsTemporary;
+  int8_t IsHousing;
+  uint16_t VersionMask;
+  uint32_t Reserved;
+  int32_t OBSetReferencedList;
+  int32_t OBSetReferencedList_Count;
+  int32_t OBSetEnableReferencedList;
+  int32_t OBSetEnableReferencedList_Count;
 };
 
 struct LGB_GROUP
@@ -335,10 +383,12 @@ struct LGB_GROUP
             entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             break;
           case LgbEntryType::CollisionBox:
+          //case LgbEntryType::NaviMeshRange:
+            //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
             //entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
             break;
           default:
-            //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
+         //   std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
             break;
         }
       }

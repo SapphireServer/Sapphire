@@ -25,6 +25,7 @@ Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalN
 
 bool Sapphire::Common::Navi::NaviProvider::init( const std::string& naviPath )
 {
+  m_naviPath = naviPath;
   auto meshesFolder = std::filesystem::path( naviPath );
   auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
 
