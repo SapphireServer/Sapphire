@@ -5,6 +5,7 @@
 
 #include "Forwards.h"
 #include "GameObject.h"
+#include "AreaObject.h"
 #include <set>
 #include <map>
 #include <queue>
@@ -105,6 +106,8 @@ namespace Sapphire::Entity
     float m_radius;
 
     uint32_t m_dirtyFlag{};
+
+    Entity::AreaObjectPtr m_pAreaObject;
 
   public:
     Chara( Common::ObjKind type );
@@ -298,6 +301,10 @@ namespace Sapphire::Entity
 
     void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
 
+    void spawnAreaObject( uint32_t actionId, uint32_t vfxId, const Common::FFXIVARR_POSITION3& pos );
+    void despawnAreaObject( uint32_t actionId );
+    void despawnAreaObject();
+    const Common::FFXIVARR_POSITION3& getAreaObjectPos() const;
   };
 
 }

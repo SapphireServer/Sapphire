@@ -1001,6 +1001,12 @@ void Action::Action::addDefaultActorFilters()
       addActorFilter( coneFilter );
       break;
     }
+    case Common::CastType::PersistentArea:
+    {
+      auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
+      addActorFilter( filter );
+      break;
+    }
 
     default:
     {

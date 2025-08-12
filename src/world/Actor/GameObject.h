@@ -84,6 +84,8 @@ namespace Sapphire::Entity
 
     bool isAetheryte() const;
 
+    bool isArea() const;
+
     ///// IN RANGE LOGIC ///////////////////////////////
     virtual void onRemoveInRangeActor( GameObject& pActor ) {}
 
@@ -119,6 +121,8 @@ namespace Sapphire::Entity
     EventObjectPtr getAsEventObj();
 
     BNpcPtr getAsBNpc();
+
+    AreaObjectPtr getAsArea();
 
     uint32_t getTerritoryTypeId() const;
     void setTerritoryTypeId( uint32_t territoryTypeId );

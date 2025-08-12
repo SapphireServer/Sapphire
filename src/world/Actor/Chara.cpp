@@ -993,3 +993,51 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   // todo: send the correct knockback packet to player
   server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }
+
+void Chara::spawnAreaObject( uint32_t actionId, uint32_t vfxId, const Common::FFXIVARR_POSITION3& pos )
+{
+  despawnAreaObject();
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, vfxId, getId(), pos );
+  pTeri->pushActor( m_pAreaObject );
+
+  for( const auto& pPlayer : m_inRangePlayers )
+    m_pAreaObject->spawn( pPlayer );
+
+  if( isPlayer() )
+    m_pAreaObject->spawn( getAsPlayer() );
+}
+
+void Chara::despawnAreaObject( uint32_t actionId )
+{
+  if( m_pAreaObject && m_pAreaObject->getActionId() == actionId )
+    despawnAreaObject();
+}
+
+void Chara::despawnAreaObject()
+{
+  if( m_pAreaObject )
+  {
+    for( const auto& pPlayer : m_inRangePlayers )
+      m_pAreaObject->despawn( pPlayer );
+
+    if( isPlayer() )
+      m_pAreaObject->despawn( getAsPlayer() );
+
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+    pTeri->removeActor( m_pAreaObject );
+  }
+
+  m_pAreaObject = nullptr;
+}
+
+const Common::FFXIVARR_POSITION3& Chara::getAreaObjectPos() const
+{
+  if( m_pAreaObject )
+    return m_pAreaObject->getPos();
+  return m_pos;
+}
