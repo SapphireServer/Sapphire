@@ -114,7 +114,7 @@ private:
   std::shared_ptr< Sapphire::Common::Navi::NaviProvider > m_pNaviProvider;
 
   // Navmesh rendering members
-  bool m_showNavmeshWindow = false;
+  bool m_showNavmeshWindow = true;
   GLuint m_navmeshVAO = 0;
   GLuint m_navmeshVBO = 0;
   GLuint m_navmeshEBO = 0;
