@@ -934,20 +934,21 @@ namespace Sapphire::Common
 
   enum class StatusEffectFlag : uint32_t
   {
-    BuffCategory = 1,
-    DebuffCategory = 2,
-    Permanent = 4,
-    IsGaze = 8,
-    Transfiguration = 16,
-    CanDispel = 32,
-    LockActions = 64,
-    LockControl = 128,
-    LockMovement = 256,
-    Invisibilty = 512,
-    CanStatusOff = 1024,
-    FcBuff = 2048,
-    RemoveOnSuccessfulHit = 4096,
-    ReplaceSameCaster = 8192
+    BuffCategory = 0x01,
+    DebuffCategory = 0x02,
+    Permanent = 0x04,
+    IsGaze = 0x08,
+    Transfiguration = 0x10,
+    CanDispel = 0x20,
+    LockActions = 0x40,
+    LockControl = 0x80,
+    LockMovement = 0x100,
+    Invisibilty = 0x200,
+    CanStatusOff = 0x400,
+    FcBuff = 0x800,
+    RemoveOnSuccessfulHit = 0x1000,
+    ReplaceSameCaster = 0x2000,
+    GroundTarget = 0x4000
   };
 
   enum class StatusRefreshPolicy : uint8_t

@@ -37,11 +37,11 @@ public:
         const auto& pos = pAreaObject->getPos();
         if( Common::Util::distance( pos, pChara->getPos() ) < 5.f )
         {
-          auto dmg = Math::CalcStats::calcActionDamage( *pChara, Potency, 1.0f );
+          auto dmg = Math::CalcStats::calcActionDamage( *effect.getSrcActor(), Potency, 1.0f );
           float damageVal = dmg.first;
           Common::CalcResultType damageType = dmg.second;
 
-          statusEffectMgr().damage( actor.getAsChara(), pChara, static_cast< int32_t >( damageVal ) );
+          statusEffectMgr().damage( effect.getSrcActor(), pChara, static_cast< int32_t >( damageVal ) );
         }
       }
     }
@@ -49,12 +49,12 @@ public:
 
   void onRemove( Entity::Chara& actor ) override
   {
-    actor.despawnAreaObject( FlamingArrow );
+    actor.despawnAreaObject();
   }
 
   void onExpire( Entity::Chara& actor ) override
   {
-    actor.despawnAreaObject( FlamingArrow );
+    actor.despawnAreaObject();
   }
 };
 

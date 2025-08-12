@@ -997,18 +997,14 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
 void Chara::spawnAreaObject( uint32_t actionId, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
 {
   despawnAreaObject();
+  removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
 
+  // todo: delay spawning the ground target til action shows hit effect
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, vfxId, scale, getId(), pos );
   pTeri->pushActor( m_pAreaObject );
-}
-
-void Chara::despawnAreaObject( uint32_t actionId )
-{
-  if( m_pAreaObject && m_pAreaObject->getActionId() == actionId )
-    despawnAreaObject();
 }
 
 void Chara::despawnAreaObject()
@@ -1018,9 +1014,9 @@ void Chara::despawnAreaObject()
     auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
     pTeri->removeActor( m_pAreaObject );
-  }
 
-  m_pAreaObject = nullptr;
+    m_pAreaObject = nullptr;
+  }
 }
 
 const AreaObjectPtr Chara::getAreaObject() const

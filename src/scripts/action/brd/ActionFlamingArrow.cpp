@@ -16,7 +16,8 @@ public:
   {
   }
 
-  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory );
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget );
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
