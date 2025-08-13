@@ -630,7 +630,7 @@ std::string ZoneEditor::getObjFilePath()
   // We're assuming the OBJ file might be in the same folder as the navmesh
   static auto exportPath = std::filesystem::current_path() / "navi";
 
-  auto objPath = std::filesystem::path(m_pNaviProvider->getNaviPath()) / lvb / ( lvb + ".obj" );
+  auto objPath = std::filesystem::path( m_pNaviProvider->getNaviPath() ) / lvb / ( lvb + ".obj" );
 
   return objPath.string();
 }
@@ -1014,7 +1014,7 @@ void ZoneEditor::buildNavmeshGeometry()
     const dtMeshTile *tile = navMesh->getTile( i );
     if( !tile || !tile->header || !tile->dataSize ) continue;
 
-    printf( "Processing tile %d: %d polygons\n", i, tile->header->polyCount );
+    //printf( "Processing tile %d: %d polygons\n", i, tile->header->polyCount );
     totalPolygons += tile->header->polyCount;
 
     for( int j = 0; j < tile->header->polyCount; ++j )
@@ -1754,7 +1754,8 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
                         ImGuiWindowFlags_NoSavedSettings |
                         ImGuiWindowFlags_AlwaysAutoResize ) )
       {
-        ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
+        if( !hoveredBnpc->nameString.empty() )
+          ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
         ImGui::Separator();
         ImGui::Text( "ID: %u", hoveredBnpc->instanceId );
         ImGui::Text( "Level: %u", hoveredBnpc->Level );
@@ -1782,7 +1783,8 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
         {
           // Draw name above the selected BNPC
           ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
-          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.c_str() );
+
+          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty() ? "not set" : selectedBnpc->nameString.c_str() );
 
           // Center the text horizontally
           textPos.x -= textSize.x * 0.5f;
@@ -1794,8 +1796,8 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
             IM_COL32( 0, 0, 0, 200 )
           );
 
-          // Draw text
-          drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
+          if( !selectedBnpc->nameString.empty() )
+            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
         }
         break;
       }
@@ -2089,8 +2091,8 @@ void ZoneEditor::renderNavmeshToTexture()
   }
   else
   {
-    printf( "Nothing to render: showObj=%d, objLoaded=%d, navmeshShader=%u, navmeshVAO=%u, navmeshIndexCount=%d\n",
-            m_showObjModel, m_objModel.loaded, m_navmeshShader, m_navmeshVAO, m_navmeshIndexCount );
+    //printf( "Nothing to render: showObj=%d, objLoaded=%d, navmeshShader=%u, navmeshVAO=%u, navmeshIndexCount=%d\n",
+    //        m_showObjModel, m_objModel.loaded, m_navmeshShader, m_navmeshVAO, m_navmeshIndexCount );
   }
 
   // Render BNPC markers on top
@@ -2224,7 +2226,7 @@ void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
     // Draw the name above the marker
     ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
     // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.c_str() );
+    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty() ? "not set" : selectedBnpc->nameString.c_str() );
     drawList->AddRectFilled(
       ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
       ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
@@ -2232,7 +2234,8 @@ void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
     );
     // Center the text
     textPos.x -= textSize.x / 2;
-    drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
+    if( !selectedBnpc->nameString.empty() )
+      drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
   }
 
   // Handle mouse clicks for selection
@@ -3218,7 +3221,8 @@ void ZoneEditor::drawBnpcIcons()
       if( ImGui::IsItemHovered() )
       {
         ImGui::BeginTooltip();
-        ImGui::Text( "%s", bnpc->nameString.c_str() );
+        if( !bnpc->nameString.empty() )
+          ImGui::Text( "%s", bnpc->nameString.c_str() );
         ImGui::Text( "BNPC: %s", bnpc->bnpcName.c_str() );
         ImGui::Text( "ID: %u", bnpc->instanceId );
         ImGui::Text( "Level: %u", bnpc->Level );
