@@ -16,7 +16,7 @@ if( WIN32 )
 endif()
 
 # Enable unity builds if not explicitly enabled/disabled
-if(NOT DEFINED CMAKE_UNITY_BUILD)
+if( "${CMAKE_UNITY_BUILD}" STREQUAL "" )
     message(STATUS "Enabled unity builds for scripts (-DCMAKE_UNITY_BUILD=OFF to disable)")
     set(CMAKE_UNITY_BUILD ON)
     set(CMAKE_UNITY_BUILD_BATCH_SIZE 16)
@@ -48,11 +48,16 @@ foreach(_scriptDir ${children})
             endif()
         endforeach()
 
-        add_library( "script_${_name}"
-                       MODULE 
-                         ${SCRIPT_BUILD_FILES} 
-                         "${SCRIPT_INCLUDE_FILES}"
-                         "${_scriptDir}/ScriptLoader.cpp" ) 
+        add_library( "script_${_name}" MODULE
+            ${SCRIPT_BUILD_FILES}
+            "${SCRIPT_INCLUDE_FILES}"
+            "${_scriptDir}/ScriptLoader.cpp"
+        )
+
+        # Discussion: https://gitlab.kitware.com/cmake/cmake/-/issues/21189
+        if(APPLE)
+            set_target_properties( "script_${_name}" PROPERTIES SUFFIX ".dylib" )
+        endif()
 
         target_link_libraries( "script_${_name}" PRIVATE world ${CMAKE_DL_LIBS} )
 
@@ -65,7 +70,7 @@ foreach(_scriptDir ${children})
         set(ScriptTargetName "script_${_name}")
 
         # Copy the modules over once they're built. Prevent watchdog from trying to reload partially written files.
-        if(MSVC)
+        if(WIN32)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"

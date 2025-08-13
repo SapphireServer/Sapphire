@@ -109,7 +109,7 @@ public:
   };
 };
 
-enum eModelConfigCollisionType : __int32
+enum eModelConfigCollisionType : int32_t
 {
   COLLISION_ATTRIBUTE_TYPE_None = 0x0,
   COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
@@ -417,7 +417,7 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  
+
   LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
