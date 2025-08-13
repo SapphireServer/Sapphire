@@ -1290,139 +1290,6 @@ void ZoneEditor::initializeNavmeshRendering()
   }
 }
 
-void ZoneEditor::initializeBnpcMarkerRendering()
-{
-  // Enhanced billboard vertex shader with better visibility
-  const char *vertexShaderSource = R"(
-#version 330 core
-layout (location = 0) in vec3 worldPos;
-layout (location = 1) in vec2 offset;  // -1 to 1 for quad corners
-layout (location = 2) in vec3 color;   // Per-instance color
-layout (location = 3) in float size;   // Per-instance size
-layout (location = 4) in float selected; // 1.0 if selected, 0.0 if not
-
-uniform mat4 view;
-uniform mat4 projection;
-
-out vec3 markerColor;
-out vec2 texCoord;
-out float markerAlpha;
-out float isSelected;
-out float distanceFactor;
-
-void main() {
-    // Extract camera right and up vectors from view matrix
-    vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
-    vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
-
-    // Scale up selected markers significantly
-    float finalSize = size * (selected > 0.5 ? 2.0 : 1.0);
-
-    // Create billboard position
-    vec3 billboardPos = worldPos +
-                       cameraRight * offset.x * finalSize +
-                       cameraUp * offset.y * finalSize;
-
-    gl_Position = projection * view * vec4(billboardPos, 1.0);
-
-    // Pass through color
-    markerColor = color;
-    texCoord = offset; // -1 to 1, will be used to create shapes
-    isSelected = selected;
-
-    // Calculate distance for better alpha management
-    vec4 viewPos = view * vec4(worldPos, 1.0);
-    float distance = length(viewPos.xyz);
-    distanceFactor = distance;
-
-    // More visible alpha calculation - higher minimum alpha
-    markerAlpha = clamp(200.0 / distance, 0.7, 1.0);
-}
-)";
-
-  // Fixed fragment shader that only renders the diamond shape
-  const char *fragmentShaderSource = R"(
-#version 330 core
-in vec3 markerColor;
-in vec2 texCoord;
-in float markerAlpha;
-in float isSelected;
-in float distanceFactor;
-
-out vec4 FragColor;
-
-void main() {
-    // Create a diamond shape - discard pixels outside the diamond
-    float dist = abs(texCoord.x) + abs(texCoord.y);
-
-    // Hard cutoff for diamond shape - anything outside gets discarded
-    if (dist > 0.9) {
-        discard;
-    }
-
-    // Create layers within the diamond
-    float innerCore = 1.0 - smoothstep(0.0, 0.4, dist);
-    float midRing = smoothstep(0.2, 0.5, dist) - smoothstep(0.5, 0.7, dist);
-    float outerRing = smoothstep(0.6, 0.8, dist) - smoothstep(0.8, 0.9, dist);
-
-    // Enhanced colors for better contrast
-    vec3 finalColor = markerColor;
-
-    if (isSelected > 0.5) {
-        // Selected markers: bright white core with colored ring
-        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.8);
-
-        // Add pulsing effect for selected markers
-        float time = gl_FragCoord.x * 0.02 + gl_FragCoord.y * 0.02;
-        float pulse = sin(time) * 0.15 + 1.0;
-        finalColor *= pulse;
-
-        // Boost brightness
-        finalColor *= 1.5;
-    } else {
-        // Normal markers: brighter colors with white highlights in center
-        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.4);
-        finalColor *= 1.3; // Make brighter
-    }
-
-    // Add black border only at the very edge of the diamond
-    if (outerRing > 0.5) {
-        finalColor = vec3(0.0, 0.0, 0.0); // Black border
-    }
-
-    // Calculate alpha based on distance from center (for anti-aliasing)
-    float edgeAlpha = 1.0 - smoothstep(0.7, 0.9, dist);
-    float finalAlpha = edgeAlpha * markerAlpha;
-
-    // Boost alpha for very distant markers
-    if (distanceFactor > 150.0) {
-        finalAlpha = max(finalAlpha, 0.8);
-    }
-
-    // Minimum visibility threshold
-    finalAlpha = max(finalAlpha, 0.6);
-
-    // Final check - if alpha is too low, discard
-    if (finalAlpha < 0.1) {
-        discard;
-    }
-
-    FragColor = vec4(finalColor, finalAlpha);
-}
-)";
-
-  m_bnpcMarkerShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
-
-  if( m_bnpcMarkerShader )
-  {
-    printf( "Enhanced BNPC billboard shader created successfully (ID: %u)\n", m_bnpcMarkerShader );
-  }
-  else
-  {
-    printf( "Failed to create enhanced BNPC billboard shader\n" );
-  }
-}
-
 void ZoneEditor::renderBnpcMarkers()
 {
   if( !m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerInstanceCount == 0 )
@@ -1477,6 +1344,203 @@ void ZoneEditor::renderBnpcMarkers()
   glUseProgram( 0 );
 }
 
+void ZoneEditor::initializeBnpcMarkerRendering()
+{
+  // Enhanced billboard vertex shader with world-space rotation
+  const char *vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec3 worldPos;
+layout (location = 1) in vec2 offset;  // -1 to 1 for quad corners
+layout (location = 2) in vec3 color;   // Per-instance color
+layout (location = 3) in float size;   // Per-instance size
+layout (location = 4) in float selected; // 1.0 if selected, 0.0 if not
+layout (location = 5) in float rotation; // Y rotation in radians (π = 180°)
+
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 markerColor;
+out vec2 texCoord;
+out float markerAlpha;
+out float isSelected;
+out float distanceFactor;
+out vec2 worldRotationDir; // World-space rotation direction
+
+void main() {
+    // Extract camera right and up vectors from view matrix
+    vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
+    vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
+
+    // Scale up selected markers significantly
+    float finalSize = size * (selected > 0.5 ? 2.0 : 1.0);
+
+    // Create billboard position
+    vec3 billboardPos = worldPos +
+                       cameraRight * offset.x * finalSize +
+                       cameraUp * offset.y * finalSize;
+
+    gl_Position = projection * view * vec4(billboardPos, 1.0);
+
+    // Pass through values
+    markerColor = color;
+    texCoord = offset; // -1 to 1, will be used to create shapes
+    isSelected = selected;
+
+    // Calculate world-space direction from rotation
+    // Convert Y rotation to world-space XZ direction
+    vec3 worldDirection = vec3(sin(rotation), 0.0, cos(rotation));
+
+    // Project world direction onto camera plane to get screen-space direction
+    float dirDotRight = dot(worldDirection, cameraRight);
+    float dirDotUp = dot(worldDirection, cameraUp);
+    worldRotationDir = normalize(vec2(dirDotRight, dirDotUp));
+
+    // Calculate distance for better alpha management
+    vec4 viewPos = view * vec4(worldPos, 1.0);
+    float distance = length(viewPos.xyz);
+    distanceFactor = distance;
+
+    // More visible alpha calculation - higher minimum alpha
+    markerAlpha = clamp(200.0 / distance, 0.7, 1.0);
+}
+)";
+
+  // Enhanced fragment shader with world-space rotation indicator
+  const char *fragmentShaderSource = R"(
+#version 330 core
+in vec3 markerColor;
+in vec2 texCoord;
+in float markerAlpha;
+in float isSelected;
+in float distanceFactor;
+in vec2 worldRotationDir; // Screen-space projection of world rotation
+
+out vec4 FragColor;
+
+void main() {
+    // Create a diamond shape - discard pixels outside the diamond
+    float dist = abs(texCoord.x) + abs(texCoord.y);
+
+    // Hard cutoff for diamond shape
+    if (dist > 0.9) {
+        discard;
+    }
+
+    // Create layers within the diamond
+    float innerCore = 1.0 - smoothstep(0.0, 0.4, dist);
+    float midRing = smoothstep(0.2, 0.5, dist) - smoothstep(0.5, 0.7, dist);
+    float outerRing = smoothstep(0.6, 0.8, dist) - smoothstep(0.8, 0.9, dist);
+
+    // Enhanced colors for better contrast
+    vec3 finalColor = markerColor;
+
+    // Use the world-space rotation direction (already projected to screen space)
+    vec2 rotDir = normalize(worldRotationDir);
+
+    // Check if current pixel is part of the rotation indicator
+    vec2 pixelPos = texCoord;
+
+    // Create an arrow pointing in the world-space rotation direction
+    // Arrow line (from center towards the rotation direction)
+    float lineDistance = abs(dot(pixelPos, vec2(-rotDir.y, rotDir.x))); // Perpendicular distance to line
+    float alongLine = dot(pixelPos, rotDir); // Distance along the line
+
+    // Arrow shaft: thin line from center to near the edge
+    bool isArrowLine = (lineDistance < 0.06) && (alongLine > 0.0) && (alongLine < 0.65) && (dist > 0.15);
+
+    // Arrow head: create a more visible triangle at the tip
+    vec2 arrowTip = rotDir * 0.7;
+    vec2 arrowBase1 = rotDir * 0.5 + vec2(-rotDir.y, rotDir.x) * 0.2;
+    vec2 arrowBase2 = rotDir * 0.5 + vec2(rotDir.y, -rotDir.x) * 0.2;
+
+    // Check if pixel is inside the arrow head triangle using barycentric coordinates
+    vec2 v0 = arrowTip - pixelPos;
+    vec2 v1 = arrowBase1 - pixelPos;
+    vec2 v2 = arrowBase2 - pixelPos;
+
+    float d1 = v0.x * v1.y - v0.y * v1.x;
+    float d2 = v1.x * v2.y - v1.y * v2.x;
+    float d3 = v2.x * v0.y - v2.y * v0.x;
+
+    bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+    bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+    bool isArrowHead = !(hasNeg && hasPos);
+
+    // Combine rotation indicator elements
+    bool isRotationIndicator = isArrowLine || isArrowHead;
+
+    if (isSelected > 0.5) {
+        // Selected markers: bright white core with colored ring
+        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.8);
+
+        // Add pulsing effect for selected markers
+        float time = gl_FragCoord.x * 0.02 + gl_FragCoord.y * 0.02;
+        float pulse = sin(time) * 0.15 + 1.0;
+        finalColor *= pulse;
+
+        // Boost brightness
+        finalColor *= 1.5;
+
+        // Make rotation indicator very bright for selected
+        if (isRotationIndicator) {
+            finalColor = vec3(1.0, 1.0, 1.0); // Pure white arrow
+        }
+    } else {
+        // Normal markers: brighter colors with white highlights in center
+        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.4);
+        finalColor *= 1.3; // Make brighter
+
+        // Make rotation indicator contrasting color
+        if (isRotationIndicator) {
+            finalColor = vec3(0.0, 0.0, 0.0); // Black arrow for contrast
+        }
+    }
+
+    // Add black border only at the very edge of the diamond (but not over rotation indicator)
+    if (outerRing > 0.5 && !isRotationIndicator) {
+        finalColor = vec3(0.0, 0.0, 0.0); // Black border
+    }
+
+    // Calculate alpha based on distance from center (for anti-aliasing)
+    float edgeAlpha = 1.0 - smoothstep(0.7, 0.9, dist);
+    float finalAlpha = edgeAlpha * markerAlpha;
+
+    // Boost alpha for rotation indicator
+    if (isRotationIndicator) {
+        finalAlpha = max(finalAlpha, 0.9);
+    }
+
+    // Boost alpha for very distant markers
+    if (distanceFactor > 150.0) {
+        finalAlpha = max(finalAlpha, 0.8);
+    }
+
+    // Minimum visibility threshold
+    finalAlpha = max(finalAlpha, 0.6);
+
+    // Final check - if alpha is too low, discard
+    if (finalAlpha < 0.1) {
+        discard;
+    }
+
+    FragColor = vec4(finalColor, finalAlpha);
+}
+)";
+
+  m_bnpcMarkerShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
+
+  if( m_bnpcMarkerShader )
+  {
+    printf( "Enhanced BNPC billboard shader with world-space rotation created successfully (ID: %u)\n",
+            m_bnpcMarkerShader );
+  }
+  else
+  {
+    printf( "Failed to create enhanced BNPC billboard shader\n" );
+  }
+}
+
+
 void ZoneEditor::buildBnpcMarkerGeometry()
 {
   if( !m_selectedZone || m_bnpcs.empty() )
@@ -1509,13 +1573,14 @@ void ZoneEditor::buildBnpcMarkerGeometry()
     -1.0f, 1.0f // top-left
   };
 
-  // Create instance data for each BNPC
+  // Create instance data for each BNPC (now includes rotation)
   struct BnpcInstance
   {
     glm::vec3 worldPos;
     glm::vec3 color;
     float size;
     float selected;
+    float rotation; // New: Y rotation in radians
   };
 
   std::vector< BnpcInstance > instanceData;
@@ -1559,11 +1624,25 @@ void ZoneEditor::buildBnpcMarkerGeometry()
     else
     {
       // Brighter, more saturated colors for filtered BNPCs
-      instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
+      if( bnpc->Level > 50 )
+      {
+        instance.color = glm::vec3( 1.0f, 0.0f, 0.0f ); // Pure red for high level
+      }
+      else if( bnpc->Level > 30 )
+      {
+        instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
+      }
+      else
+      {
+        instance.color = glm::vec3( 0.0f, 1.0f, 0.0f ); // Pure green for low level
+      }
     }
 
     // Check if this BNPC is selected
     instance.selected = ( selectedBnpc && selectedBnpc->instanceId == bnpc->instanceId ) ? 1.0f : 0.0f;
+
+    // Set rotation - the value is already in radians where π = 180°
+    instance.rotation = bnpc->rotation;
 
     // Larger base sizes for better visibility
     float baseSize = 2.5f + ( bnpc->Level * 0.03f );
@@ -1624,11 +1703,18 @@ void ZoneEditor::buildBnpcMarkerGeometry()
   glEnableVertexAttribArray( 4 );
   glVertexAttribDivisor( 4, 1 ); // One per instance
 
+  // Rotation (float) - NEW
+  glVertexAttribPointer( 5, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
+                         ( void * ) offsetof( BnpcInstance, rotation ) );
+  glEnableVertexAttribArray( 5 );
+  glVertexAttribDivisor( 5, 1 ); // One per instance
+
   glBindVertexArray( 0 );
 
   m_bnpcMarkerInstanceCount = instanceData.size();
 
-  printf( "Created %d enhanced BNPC billboard markers for zone %u\n", m_bnpcMarkerInstanceCount, m_selectedZone->id );
+  printf( "Created %d enhanced BNPC billboard markers with rotation indicators for zone %u\n",
+          m_bnpcMarkerInstanceCount, m_selectedZone->id );
 }
 
 // Helper function to project 3D world position to 2D screen coordinates
@@ -1781,7 +1867,9 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
           // Draw name above the selected BNPC
           ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
 
-          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty() ? "not set" : selectedBnpc->nameString.c_str() );
+          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
+                                                   ? "not set"
+                                                   : selectedBnpc->nameString.c_str() );
 
           // Center the text horizontally
           textPos.x -= textSize.x * 0.5f;
@@ -1849,6 +1937,34 @@ void ZoneEditor::renderNavmesh()
   if( ImGui::IsItemHovered() )
   {
     ImGuiIO& io = ImGui::GetIO();
+
+
+    // Right click for world editing
+    if( ImGui::IsMouseClicked( ImGuiMouseButton_Right ) )
+    {
+      ImVec2 mousePos = ImGui::GetMousePos();
+      mousePos.x -= imageScreenPos.x;
+      mousePos.y -= imageScreenPos.y;
+
+      // Cast ray to find world position
+      Ray ray = screenToWorldRay( mousePos, imageSize );
+      RayHit hit = castRayToGeometry( ray );
+
+      if( hit.hit )
+      {
+        m_lastClickWorldPos = hit.position;
+        m_showClickMarker = true;
+
+        printf( "Clicked world position: (%.2f, %.2f, %.2f)\n",
+                hit.position.x, hit.position.y, hit.position.z );
+        printf( "Surface normal: (%.2f, %.2f, %.2f)\n",
+                hit.normal.x, hit.normal.y, hit.normal.z );
+
+        // Here you can add your world editing logic
+        onWorldClick( hit );
+      }
+    }
+
 
     // Left mouse button - rotate camera (only if not clicking on BNPC)
     if( io.MouseDown[ 0 ] )
@@ -2223,7 +2339,9 @@ void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
     // Draw the name above the marker
     ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
     // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty() ? "not set" : selectedBnpc->nameString.c_str() );
+    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
+                                             ? "not set"
+                                             : selectedBnpc->nameString.c_str() );
     drawList->AddRectFilled(
       ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
       ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
@@ -2429,6 +2547,34 @@ void ZoneEditor::showNavmeshWindow()
       }
     }
   }
+
+  // Add world editing controls
+  if( ImGui::CollapsingHeader( "World Editing" ) )
+  {
+    ImGui::Checkbox( "World Editing Mode", &m_worldEditingMode );
+
+    if( m_showClickMarker )
+    {
+      ImGui::Text( "Last click: (%.2f, %.2f, %.2f)",
+                   m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+
+      if( ImGui::Button( "Clear Marker" ) )
+      {
+        m_showClickMarker = false;
+      }
+
+      ImGui::SameLine();
+      if( ImGui::Button( "Copy Position" ) )
+      {
+        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                          m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+        ImGui::SetClipboardText( posStr.c_str() );
+      }
+    }
+
+    ImGui::Text( "Right-click on geometry to get world position" );
+  }
+
 
   // Camera controls - only update sliders if not actively using mouse controls
   if( ImGui::CollapsingHeader( "Camera Controls" ) )
@@ -3328,4 +3474,266 @@ void ZoneEditor::refresh()
   initializeCache();
   m_lastSearchTerm = "N/A";
   m_lastBnpcSearchTerm = "N/A";
+}
+
+// Convert screen coordinates to world ray
+ZoneEditor::Ray ZoneEditor::screenToWorldRay( const ImVec2& screenPos, const ImVec2& imageSize )
+{
+  // Convert screen coordinates to normalized device coordinates (-1 to 1)
+  float x = ( 2.0f * screenPos.x ) / imageSize.x - 1.0f;
+  float y = 1.0f - ( 2.0f * screenPos.y ) / imageSize.y; // Flip Y axis
+
+  // Create matrices (same as used in rendering)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           imageSize.x / imageSize.y,
+                                           0.1f, 10000.0f );
+
+  // Create inverse matrices
+  glm::mat4 invProjection = glm::inverse( projection );
+  glm::mat4 invView = glm::inverse( view );
+
+  // Convert NDC to view space
+  glm::vec4 rayClip = glm::vec4( x, y, -1.0, 1.0 );
+  glm::vec4 rayEye = invProjection * rayClip;
+  rayEye = glm::vec4( rayEye.x, rayEye.y, -1.0, 0.0 ); // Set Z to -1 for direction, W to 0
+
+  // Convert to world space
+  glm::vec4 rayWorld = invView * rayEye;
+  glm::vec3 rayDirection = glm::normalize( glm::vec3( rayWorld ) );
+
+  Ray ray;
+  ray.origin = m_navCameraPos;
+  ray.direction = rayDirection;
+
+  return ray;
+}
+
+// Ray-triangle intersection using Möller-Trumbore algorithm with backface culling
+bool ZoneEditor::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+                                       float& distance, glm::vec3& normal )
+{
+  const float EPSILON = 0.0000001f;
+
+  glm::vec3 edge1 = v1 - v0;
+  glm::vec3 edge2 = v2 - v0;
+  glm::vec3 h = glm::cross( ray.direction, edge2 );
+  float a = glm::dot( edge1, h );
+
+  if( a > -EPSILON && a < EPSILON )
+  {
+    return false; // Ray is parallel to triangle
+  }
+
+  float f = 1.0f / a;
+  glm::vec3 s = ray.origin - v0;
+  float u = f * glm::dot( s, h );
+
+  if( u < 0.0f || u > 1.0f )
+  {
+    return false;
+  }
+
+  glm::vec3 q = glm::cross( s, edge1 );
+  float v = f * glm::dot( ray.direction, q );
+
+  if( v < 0.0f || u + v > 1.0f )
+  {
+    return false;
+  }
+
+  // Calculate distance
+  float t = f * glm::dot( edge2, q );
+
+  if( t > EPSILON )
+  {
+    // Ray intersection
+    distance = t;
+
+    // Calculate triangle normal
+    normal = glm::normalize( glm::cross( edge1, edge2 ) );
+
+    // Backface culling: only accept hits from the front side
+    // If dot product is positive, ray is hitting the back of the triangle
+    float backfaceCheck = glm::dot( ray.direction, normal );
+    if( backfaceCheck > 0.0f )
+    {
+      return false; // Hit backface, reject
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+// Cast ray to navmesh geometry
+ZoneEditor::RayHit ZoneEditor::castRayToNavmesh( const Ray& ray )
+{
+  RayHit hit;
+
+  if( !m_pNaviProvider || m_navmeshIndexCount == 0 )
+  {
+    return hit;
+  }
+
+  // Get navmesh data from provider
+  const dtNavMesh *navMesh = m_pNaviProvider->getNavMesh();
+  if( !navMesh )
+  {
+    return hit;
+  }
+
+  float closestDistance = FLT_MAX;
+  glm::vec3 closestNormal;
+  int closestTriangle = -1;
+
+  // Test against all navmesh triangles
+  for( int i = 0; i < navMesh->getMaxTiles(); ++i )
+  {
+    const dtMeshTile *tile = navMesh->getTile( i );
+    if( !tile || !tile->header || !tile->dataSize ) continue;
+
+    for( int j = 0; j < tile->header->polyCount; ++j )
+    {
+      const dtPoly *poly = &tile->polys[ j ];
+      if( poly->vertCount < 3 ) continue;
+
+      // Fan triangulation
+      for( int k = 1; k < poly->vertCount - 1; ++k )
+      {
+        const float *v0 = &tile->verts[ poly->verts[ 0 ] * 3 ];
+        const float *v1 = &tile->verts[ poly->verts[ k ] * 3 ];
+        const float *v2 = &tile->verts[ poly->verts[ k + 1 ] * 3 ];
+
+        glm::vec3 vert0( v0[ 0 ], v0[ 1 ], v0[ 2 ] );
+        glm::vec3 vert1( v1[ 0 ], v1[ 1 ], v1[ 2 ] );
+        glm::vec3 vert2( v2[ 0 ], v2[ 1 ], v2[ 2 ] );
+
+        float distance;
+        glm::vec3 normal;
+
+        if( rayTriangleIntersect( ray, vert0, vert1, vert2, distance, normal ) )
+        {
+          if( distance < closestDistance )
+          {
+            closestDistance = distance;
+            closestNormal = normal;
+            closestTriangle = j; // Store polygon index
+            hit.hit = true;
+          }
+        }
+      }
+    }
+  }
+
+  if( hit.hit )
+  {
+    hit.position = ray.origin + ray.direction * closestDistance;
+    hit.normal = closestNormal;
+    hit.distance = closestDistance;
+    hit.triangleIndex = closestTriangle;
+  }
+
+  return hit;
+}
+
+// Cast ray to OBJ model geometry
+ZoneEditor::RayHit ZoneEditor::castRayToObjModel( const Ray& ray )
+{
+  RayHit hit;
+
+  if( !m_objModel.loaded || m_objModel.vertices.empty() || m_objModel.indices.empty() )
+  {
+    return hit;
+  }
+
+  float closestDistance = FLT_MAX;
+  glm::vec3 closestNormal;
+  int closestTriangle = -1;
+
+  // Test against all triangles in the OBJ model
+  for( size_t i = 0; i < m_objModel.indices.size(); i += 3 )
+  {
+    if( i + 2 >= m_objModel.indices.size() ) break;
+
+    const glm::vec3& v0 = m_objModel.vertices[ m_objModel.indices[ i ] ].position;
+    const glm::vec3& v1 = m_objModel.vertices[ m_objModel.indices[ i + 1 ] ].position;
+    const glm::vec3& v2 = m_objModel.vertices[ m_objModel.indices[ i + 2 ] ].position;
+
+    float distance;
+    glm::vec3 normal;
+
+    if( rayTriangleIntersect( ray, v0, v1, v2, distance, normal ) )
+    {
+      if( distance < closestDistance )
+      {
+        closestDistance = distance;
+        closestNormal = normal;
+        closestTriangle = static_cast< int >( i / 3 );
+        hit.hit = true;
+      }
+    }
+  }
+
+  if( hit.hit )
+  {
+    hit.position = ray.origin + ray.direction * closestDistance;
+    hit.normal = closestNormal;
+    hit.distance = closestDistance;
+    hit.triangleIndex = closestTriangle;
+  }
+
+  return hit;
+}
+
+// Unified ray casting method
+ZoneEditor::RayHit ZoneEditor::castRayToGeometry( const Ray& ray )
+{
+  RayHit bestHit;
+
+  if( m_showObjModel && m_objModel.loaded )
+  {
+    // Use OBJ model if it's being displayed
+    bestHit = castRayToObjModel( ray );
+  }
+  else
+  {
+    // Use navmesh
+    bestHit = castRayToNavmesh( ray );
+  }
+
+  return bestHit;
+}
+
+// Add world position marker rendering
+void ZoneEditor::renderWorldMarker( const glm::vec3& worldPos )
+{
+  if( !m_showClickMarker ) return;
+
+  // Simple marker implementation - draw a small cross at the clicked position
+  // You can expand this to draw a more sophisticated marker
+
+  // For now, we'll just store the position and optionally print it
+  // The actual rendering could be added to your existing rendering pipeline
+}
+
+// Callback for world clicking - implement your editing logic here
+void ZoneEditor::onWorldClick( const RayHit& hit )
+{
+  // Example: Create a new BNPC at the clicked position
+  if( m_worldEditingMode )
+  {
+    // This is where you'd implement your BNPC creation logic
+    printf( "Would create BNPC at position: (%.2f, %.2f, %.2f)\n",
+            hit.position.x, hit.position.y, hit.position.z );
+
+    // You can also use the NaviProvider to find the nearest walkable position
+    if( m_pNaviProvider )
+    {
+      auto nearestPos = m_pNaviProvider->findNearestPosition( hit.position.x, hit.position.z );
+      printf( "Nearest walkable position: (%.2f, %.2f, %.2f)\n",
+              nearestPos.x, nearestPos.y, nearestPos.z );
+    }
+  }
 }

@@ -132,15 +132,55 @@ private:
   float m_navmeshMaxHeight = 1.0f;
   GLuint m_bnpcMarkerInstanceVBO = 0;
   int m_bnpcMarkerInstanceCount = 0;
-  struct BnpcWorldPos {
+
+  struct BnpcWorldPos
+  {
     glm::vec3 worldPos;
-    CachedBnpc* bnpc;
+    CachedBnpc *bnpc;
   };
-  std::vector<BnpcWorldPos> m_bnpcWorldPositions;
+
+  std::vector< BnpcWorldPos > m_bnpcWorldPositions;
 
   // Helper functions
   glm::vec2 worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& imageSize );
+
   void handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize );
+
+  // Ray casting for world interaction
+  struct Ray
+  {
+    glm::vec3 origin;
+    glm::vec3 direction;
+  };
+
+  struct RayHit
+  {
+    bool hit = false;
+    glm::vec3 position;
+    glm::vec3 normal;
+    float distance = 0.0f;
+    int triangleIndex = -1;
+  };
+
+  // Ray casting methods
+  Ray screenToWorldRay( const ImVec2& screenPos, const ImVec2& imageSize );
+
+  RayHit castRayToNavmesh( const Ray& ray );
+
+  RayHit castRayToObjModel( const Ray& ray );
+
+  RayHit castRayToGeometry( const Ray& ray ); // Unified method
+  bool rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+                             float& distance, glm::vec3& normal );
+
+  void onWorldClick( const RayHit& hit );
+
+  void renderWorldMarker( const glm::vec3& worldPos );
+
+  // World editing state
+  bool m_worldEditingMode = false;
+  glm::vec3 m_lastClickWorldPos = glm::vec3( 0.0f );
+  bool m_showClickMarker = false;
 
 
   // Camera/view controls for navmesh
@@ -157,14 +197,16 @@ private:
   uint32_t m_currentNavmeshZoneId = 0;
 
   // OBJ Model support
-  struct ObjVertex {
-    glm::vec3 position;  // Only position, no normals or texcoords
+  struct ObjVertex
+  {
+    glm::vec3 position; // Only position, no normals or texcoords
   };
 
 
-  struct ObjModel {
-    std::vector<ObjVertex> vertices;
-    std::vector<unsigned int> indices;
+  struct ObjModel
+  {
+    std::vector< ObjVertex > vertices;
+    std::vector< unsigned int > indices;
     GLuint vao = 0;
     GLuint vbo = 0;
     GLuint ebo = 0;
@@ -179,10 +221,14 @@ private:
   std::string m_currentObjPath;
 
   // Methods for OBJ model support
-  bool loadObjModel(const std::string& filepath);
+  bool loadObjModel( const std::string& filepath );
+
   void cleanupObjModel();
+
   void renderObjModel();
+
   void checkForObjFile();
+
   std::string getObjFilePath();
 
 
