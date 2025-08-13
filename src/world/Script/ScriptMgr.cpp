@@ -25,7 +25,6 @@
 #include "Script/ScriptMgr.h"
 
 #include "NativeScriptMgr.h"
-#include "WorldServer.h"
 
 #include "Quest/Quest.h"
 
@@ -227,7 +226,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
       }
     }
   }
-
+  
   // check for a direct eventid match first, otherwise default to base type
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
@@ -238,11 +237,11 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   else
   {
     script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
-    if( !script )
-      return false;
-
-    script->onTalk( eventId, player, actorId );
-    return true;
+    if( script )
+    {
+      script->onTalk( eventId, player, actorId );
+      return true;
+    }
   }
 
   // check for instance script
@@ -256,7 +255,98 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     }
   }
 
+  if( eventType == Event::EventHandler::EventHandlerType::Warp )
+  {
+    World::Manager::PlayerMgr::sendUrgent( player, "Evento Warp: {}", eventId );
+
+    auto warp = exdData.getRow< Excel::Warp >( eventId );
+
+    if( !warp )
+      return false;
+
+    auto warpNotQualified = warp->_data.UnqualifiedPreTalk;
+
+
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+    auto warpCondition = exdData.getRow< Excel::WarpCondition >( warp->_data.WarpCondition );
+    auto warpOperator = warpCondition->_data.CompletedQuestOperator;
+
+    bool questDone = warpOperator == 1 ? true : false;
+
+    /*
+    warpOperator == 1
+      And logic->reset questDone to true and set it to false at first quest not completed yet and exit
+    warpOperator == 2
+      Or logic -> questDone is ok false, at first quest already done, set it to true and exit
+    */
+
+    auto questCondsNotZero = std::any_of( std::begin( warpCondition->_data.CompletedQuest ), std::end( warpCondition->_data.CompletedQuest ), []( uint32_t val ) {
+      return val != 0;
+    } );
+
+    if( questCondsNotZero )
+    {
+      for( auto quest : warpCondition->_data.CompletedQuest )
+      {
+        if( quest == 0 ) continue;
+
+        questDone = player.isQuestCompleted( quest );
+        if( ( warpOperator == 1 && !questDone ) || ( warpOperator == 2 && questDone ) )
+          break;
+      }
+    }
+    else
+      questDone = true;
+
+    if( questDone )
+    {
+      pEventMgr.playScene( player, eventId, 0, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
+        if( result.getResult( 0 ) == 1 )
+        {
+          auto exdData = Common::Service< Data::ExdData >::ref();
+          auto warp = exdData.getRow< Excel::Warp >( result.eventId );
+
+          /* auto eventId = warp->_data.QualifiedPreTalk != 0 ? warp->_data.QualifiedPreTalk : result.eventId;
+            
+            if( eventId != result.eventId )
+            {
+              eventMgr.eventFinish( player, eventId, 1 );
+              eventMgr.eventStart( player, result.actorId, eventId, Event::EventHandler::EventType::Talk, 0, 0, nullptr ); 
+            }*/
+
+          if( warp )
+          {
+            auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+            auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
+            auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+            auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+            auto popRangeInfo = instanceObjectCache.getPopRangeInfo( warp->data().PopRange );
+
+            if( popRangeInfo )
+            {
+              auto pTeri = teriMgr.getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
+              warpMgr.requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
+                                            pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+              
+
+            }
+          }
+        }
+      } );
+    }
+    else
+    {
+      pEventMgr.eventFinish( player, eventId, 1 );
+      pEventMgr.eventStart( player, actorId, warpNotQualified, Event::EventHandler::EventType::Talk, 0, 0, nullptr );
+    }
+
+    return true;
+  }
+
   return false;
+
 }
 
 bool Sapphire::Scripting::ScriptMgr::onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
