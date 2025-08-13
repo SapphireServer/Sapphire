@@ -628,10 +628,7 @@ std::string ZoneEditor::getObjFilePath()
 
   // Construct the path to check
   // We're assuming the OBJ file might be in the same folder as the navmesh
-  static auto exportPath = std::filesystem::current_path() / "navi";
-
   auto objPath = std::filesystem::path( m_pNaviProvider->getNaviPath() ) / lvb / ( lvb + ".obj" );
-
   return objPath.string();
 }
 

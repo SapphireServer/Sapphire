@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <filesystem>
 
 #include "Engine/State.h"
 
@@ -74,7 +75,7 @@ namespace Client
     // Add these members
     bool m_showSettingsDialog = false;
     char m_datLocationBuffer[ 512 ]; // Buffer for ImGui input
-    static constexpr const char *CONFIG_FILE = "editor_config.txt";
+    std::filesystem::path m_configFile;
 
     enum EditorMode
     {

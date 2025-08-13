@@ -148,3 +148,4 @@ config/*.ini
 /CMakeSettings.json
 
 imgui.ini
+.DS_Store
