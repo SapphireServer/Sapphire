@@ -2577,6 +2577,8 @@ void ZoneEditor::showZoneList()
         // Only trigger selection changed if it actually changed
         if( oldSelectedId != m_selectedZoneId )
         {
+          m_selectedBnpcIndex = -1;
+          m_bnpcWorldPositions.clear();
           onSelectionChanged();
         }
       }
