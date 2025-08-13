@@ -90,7 +90,7 @@ struct InstanceObject
   Transformation transform;
 };
 
-enum eModelConfigCollisionType : __int32
+enum eModelConfigCollisionType : int32_t
 {
   COLLISION_ATTRIBUTE_TYPE_None = 0x0,
   COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
