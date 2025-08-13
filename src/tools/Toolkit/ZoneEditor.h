@@ -130,6 +130,17 @@ private:
   bool m_navCameraControlActive = false;
   float m_navmeshMinHeight = 0.0f;
   float m_navmeshMaxHeight = 1.0f;
+  GLuint m_bnpcMarkerInstanceVBO = 0;
+  int m_bnpcMarkerInstanceCount = 0;
+  struct BnpcWorldPos {
+    glm::vec3 worldPos;
+    CachedBnpc* bnpc;
+  };
+  std::vector<BnpcWorldPos> m_bnpcWorldPositions;
+
+  // Helper functions
+  glm::vec2 worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& imageSize );
+  void handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize );
 
 
   // Camera/view controls for navmesh

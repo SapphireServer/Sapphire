@@ -664,173 +664,249 @@ void ZoneEditor::checkForObjFile()
   }
 }
 
-bool ZoneEditor::loadObjModel(const std::string& filepath) {
-    printf("Loading OBJ model: %s\n", filepath.c_str());
+void ZoneEditor::renderObjModel()
+{
+  if( !m_objModel.loaded || !m_showObjModel )
+  {
+    return;
+  }
 
-    // Clear existing model data
-    cleanupObjModel();
+  // Use exactly the same matrices as navmesh
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
 
-    // Open file
-    std::ifstream file(filepath);
-    if (!file.is_open()) {
-        printf("Failed to open OBJ file: %s\n", filepath.c_str());
-        return false;
+  // Identity matrix - no transformation since navmesh uses same coordinates
+  glm::mat4 model = glm::mat4( 1.0f );
+
+  // Enable proper depth testing for shaded rendering
+  glEnable( GL_DEPTH_TEST );
+  glDepthFunc( GL_LESS );
+
+  glUseProgram( m_objShader );
+
+  // Set matrices
+  GLint modelLoc = glGetUniformLocation( m_objShader, "model" );
+  GLint viewLoc = glGetUniformLocation( m_objShader, "view" );
+  GLint projectionLoc = glGetUniformLocation( m_objShader, "projection" );
+
+  if( modelLoc != -1 )
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+  if( viewLoc != -1 )
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
+  if( projectionLoc != -1 )
+    glUniformMatrix4fv( projectionLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
+
+  // Set height range for coloring (use the same as navmesh if available)
+  GLint minHeightLoc = glGetUniformLocation( m_objShader, "minHeight" );
+  GLint maxHeightLoc = glGetUniformLocation( m_objShader, "maxHeight" );
+
+  if( minHeightLoc != -1 )
+    glUniform1f( minHeightLoc, m_navmeshMinHeight );
+  if( maxHeightLoc != -1 )
+    glUniform1f( maxHeightLoc, m_navmeshMaxHeight );
+
+  glBindVertexArray( m_objModel.vao );
+
+  // Render filled triangles with shading
+  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  glDrawElements( GL_TRIANGLES, m_objModel.indexCount, GL_UNSIGNED_INT, 0 );
+
+  glBindVertexArray( 0 );
+  glUseProgram( 0 );
+}
+
+bool ZoneEditor::loadObjModel( const std::string& filepath )
+{
+  printf( "Loading OBJ model: %s\n", filepath.c_str() );
+
+  // Clear existing model data
+  cleanupObjModel();
+
+  // Open file
+  std::ifstream file( filepath );
+  if( !file.is_open() )
+  {
+    printf( "Failed to open OBJ file: %s\n", filepath.c_str() );
+    return false;
+  }
+
+  std::vector< glm::vec3 > positions;
+  std::vector< unsigned int > indices;
+
+  std::string line;
+  while( std::getline( file, line ) )
+  {
+    if( line.empty() || line[ 0 ] == '#' ) continue;
+
+    std::istringstream iss( line );
+    std::string prefix;
+    iss >> prefix;
+
+    if( prefix == "v" )
+    {
+      // Vertex position
+      glm::vec3 pos;
+      iss >> pos.x >> pos.y >> pos.z;
+      positions.push_back( pos );
     }
+    else if( prefix == "f" )
+    {
+      // Face - only handle triangles, convert to 0-based indexing
+      std::string vertex1, vertex2, vertex3;
+      iss >> vertex1 >> vertex2 >> vertex3;
 
-    std::vector<glm::vec3> positions;
-    std::vector<unsigned int> indices;
+      // Extract just the position index (before any '/' character)
+      auto getIndex = []( const std::string& str ) -> unsigned int
+      {
+        size_t slashPos = str.find( '/' );
+        std::string indexStr = ( slashPos != std::string::npos ) ? str.substr( 0, slashPos ) : str;
+        return std::stoi( indexStr ) - 1; // Convert to 0-based
+      };
 
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') continue;
-
-        std::istringstream iss(line);
-        std::string prefix;
-        iss >> prefix;
-
-        if (prefix == "v") {
-            // Vertex position
-            glm::vec3 pos;
-            iss >> pos.x >> pos.y >> pos.z;
-            positions.push_back(pos);
-        }
-        else if (prefix == "f") {
-            // Face - only handle triangles, convert to 0-based indexing
-            std::string vertex1, vertex2, vertex3;
-            iss >> vertex1 >> vertex2 >> vertex3;
-
-            // Extract just the position index (before any '/' character)
-            auto getIndex = [](const std::string& str) -> unsigned int {
-                size_t slashPos = str.find('/');
-                std::string indexStr = (slashPos != std::string::npos) ? str.substr(0, slashPos) : str;
-                return std::stoi(indexStr) - 1; // Convert to 0-based
-            };
-
-            indices.push_back(getIndex(vertex1));
-            indices.push_back(getIndex(vertex2));
-            indices.push_back(getIndex(vertex3));
-        }
+      indices.push_back( getIndex( vertex1 ) );
+      indices.push_back( getIndex( vertex2 ) );
+      indices.push_back( getIndex( vertex3 ) );
     }
-    file.close();
+  }
+  file.close();
 
-    if (positions.empty()) {
-        printf("No vertices found in OBJ file\n");
-        return false;
-    }
+  if( positions.empty() )
+  {
+    printf( "No vertices found in OBJ file\n" );
+    return false;
+  }
 
-    // Convert positions to ObjVertex format
-    m_objModel.vertices.clear();
-    m_objModel.vertices.reserve(positions.size());
+  // Convert positions to ObjVertex format
+  m_objModel.vertices.clear();
+  m_objModel.vertices.reserve( positions.size() );
 
-    // Calculate bounds for debugging
-    glm::vec3 minPos = positions[0];
-    glm::vec3 maxPos = positions[0];
+  // Calculate bounds and update the global height range
+  glm::vec3 minPos = positions[ 0 ];
+  glm::vec3 maxPos = positions[ 0 ];
 
-    for (const auto& pos : positions) {
-        ObjVertex vertex;
-        vertex.position = pos;
-        m_objModel.vertices.push_back(vertex);
+  for( const auto& pos : positions )
+  {
+    ObjVertex vertex;
+    vertex.position = pos;
+    m_objModel.vertices.push_back( vertex );
 
-        minPos = glm::min(minPos, pos);
-        maxPos = glm::max(maxPos, pos);
-    }
+    minPos = glm::min( minPos, pos );
+    maxPos = glm::max( maxPos, pos );
+  }
 
-    m_objModel.indices = indices;
+  // Update global height range for consistent coloring with navmesh
+  m_navmeshMinHeight = std::min( m_navmeshMinHeight, minPos.y );
+  m_navmeshMaxHeight = std::max( m_navmeshMaxHeight, maxPos.y );
 
-    // Print model info
-    glm::vec3 size = maxPos - minPos;
-    glm::vec3 center = (minPos + maxPos) * 0.5f;
-    printf("Loaded %zu vertices, %zu indices\n", m_objModel.vertices.size(), m_objModel.indices.size());
-    printf("Bounds: min(%.2f,%.2f,%.2f) max(%.2f,%.2f,%.2f)\n",
-           minPos.x, minPos.y, minPos.z, maxPos.x, maxPos.y, maxPos.z);
-    printf("Size: (%.2f,%.2f,%.2f) Center: (%.2f,%.2f,%.2f)\n",
-           size.x, size.y, size.z, center.x, center.y, center.z);
+  m_objModel.indices = indices;
 
-    // Create OpenGL objects
-    glGenVertexArrays(1, &m_objModel.vao);
-    glGenBuffers(1, &m_objModel.vbo);
-    glGenBuffers(1, &m_objModel.ebo);
+  // Print model info
+  glm::vec3 size = maxPos - minPos;
+  glm::vec3 center = ( minPos + maxPos ) * 0.5f;
+  printf( "Loaded %zu vertices, %zu indices\n", m_objModel.vertices.size(), m_objModel.indices.size() );
+  printf( "Bounds: min(%.2f,%.2f,%.2f) max(%.2f,%.2f,%.2f)\n",
+          minPos.x, minPos.y, minPos.z, maxPos.x, maxPos.y, maxPos.z );
+  printf( "Size: (%.2f,%.2f,%.2f) Center: (%.2f,%.2f,%.2f)\n",
+          size.x, size.y, size.z, center.x, center.y, center.z );
 
-    // Upload data
-    glBindVertexArray(m_objModel.vao);
+  // Create OpenGL objects
+  glGenVertexArrays( 1, &m_objModel.vao );
+  glGenBuffers( 1, &m_objModel.vbo );
+  glGenBuffers( 1, &m_objModel.ebo );
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_objModel.vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 m_objModel.vertices.size() * sizeof(ObjVertex),
-                 m_objModel.vertices.data(),
-                 GL_STATIC_DRAW);
+  // Upload data
+  glBindVertexArray( m_objModel.vao );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_objModel.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 m_objModel.indices.size() * sizeof(unsigned int),
-                 m_objModel.indices.data(),
-                 GL_STATIC_DRAW);
+  glBindBuffer( GL_ARRAY_BUFFER, m_objModel.vbo );
+  glBufferData( GL_ARRAY_BUFFER,
+                m_objModel.vertices.size() * sizeof( ObjVertex ),
+                m_objModel.vertices.data(),
+                GL_STATIC_DRAW );
 
-    // Set up vertex attributes (only position)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ObjVertex), (void*)0);
-    glEnableVertexAttribArray(0);
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_objModel.ebo );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER,
+                m_objModel.indices.size() * sizeof( unsigned int ),
+                m_objModel.indices.data(),
+                GL_STATIC_DRAW );
 
-    glBindVertexArray(0);
+  // Set up vertex attributes (only position)
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( ObjVertex ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
 
-    // Create simple shader
-    if (m_objShader == 0) {
-      const char* vertexShader = R"(
-    #version 330 core
-    layout(location = 0) in vec3 aPos;
+  glBindVertexArray( 0 );
 
-    uniform mat4 mvp;
+  // Create enhanced shader with height-based coloring
+  if( m_objShader == 0 )
+  {
+    const char *vertexShader = R"(
+#version 330 core
+layout(location = 0) in vec3 aPos;
 
-    out vec3 FragPos;
-    out vec3 WorldPos;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+uniform float minHeight;
+uniform float maxHeight;
 
-    void main() {
-        WorldPos = aPos;
-        FragPos = aPos;
-        gl_Position = mvp * vec4(aPos, 1.0);
-    }
+out vec3 FragPos;
+out vec3 WorldPos;
+out vec4 vertexColor;
+
+void main() {
+    WorldPos = (model * vec4(aPos, 1.0)).xyz;
+    FragPos = WorldPos;
+    gl_Position = projection * view * vec4(WorldPos, 1.0);
+
+    // Calculate normalized height (0.0 to 1.0) - same as navmesh
+    float heightNormalized = (WorldPos.y - minHeight) / (maxHeight - minHeight);
+
+    // Generate base color from height gradient (green to red) - same as navmesh
+    vec3 baseColor = vec3(heightNormalized, 1.0 - heightNormalized, 0.0);
+
+    vertexColor = vec4(baseColor, 1.0);
+}
 )";
 
-      const char* fragmentShader = R"(
-    #version 330 core
-    in vec3 FragPos;
-    in vec3 WorldPos;
+    const char *fragmentShader = R"(
+#version 330 core
+in vec3 FragPos;
+in vec3 WorldPos;
+in vec4 vertexColor;
 
-    out vec4 FragColor;
+out vec4 FragColor;
 
-    void main() {
-        // Simple lighting based on world position
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+void main() {
+    // Calculate normal from derivatives for lighting (flat shading)
+    vec3 dFdxPos = dFdx(WorldPos);
+    vec3 dFdyPos = dFdy(WorldPos);
+    vec3 normal = normalize(cross(dFdxPos, dFdyPos));
 
-        // Calculate normal from derivatives (flat shading)
-        vec3 dFdxPos = dFdx(WorldPos);
-        vec3 dFdyPos = dFdy(WorldPos);
-        vec3 normal = normalize(cross(dFdxPos, dFdyPos));
+    // Simple lighting - same as navmesh
+    vec3 lightDir = normalize(vec3(0.5, 1.0, 0.3));
+    float normalShading = max(dot(normal, lightDir), 0.3); // 0.3 is ambient light level
 
-        // Simple diffuse lighting
-        float diffuse = max(dot(normal, lightDir), 0.0);
-        vec3 color = vec3(0.7, 0.7, 0.9); // Light blue-gray
+    // Apply lighting to the height-based color
+    vec3 finalColor = vertexColor.rgb * normalShading;
 
-        // Add some ambient lighting
-        float ambient = 0.3;
-        vec3 result = color * (ambient + diffuse * 0.7);
-
-        FragColor = vec4(result, 0.8); // Slightly transparent
-    }
+    FragColor = vec4(finalColor, 0.9); // Slightly transparent
+}
 )";
 
-
-        m_objShader = createShaderProgram(vertexShader, fragmentShader);
-        if (m_objShader == 0) {
-            printf("Failed to create OBJ shader\n");
-            return false;
-        }
+    m_objShader = createShaderProgram( vertexShader, fragmentShader );
+    if( m_objShader == 0 )
+    {
+      printf( "Failed to create enhanced OBJ shader\n" );
+      return false;
     }
+  }
 
-    m_objModel.indexCount = m_objModel.indices.size();
-    m_objModel.loaded = true;
+  m_objModel.indexCount = m_objModel.indices.size();
+  m_objModel.loaded = true;
 
-    printf("OBJ model loaded successfully!\n");
-    return true;
+  printf( "OBJ model loaded successfully with height-based coloring!\n" );
+  return true;
 }
 
 void ZoneEditor::cleanupObjModel()
@@ -852,44 +928,6 @@ void ZoneEditor::cleanupObjModel()
   m_objModel.loaded = false;
 }
 
-void ZoneEditor::renderObjModel() {
-    if (!m_objModel.loaded || !m_showObjModel) {
-        return;
-    }
-
-    // Use exactly the same matrices as navmesh
-    glm::mat4 view = glm::lookAt(m_navCameraPos, m_navCameraTarget, glm::vec3(0, 1, 0));
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                           (float)m_navmeshTextureWidth / (float)m_navmeshTextureHeight,
-                                           0.1f, 10000.0f);
-
-    // Identity matrix - no transformation since navmesh uses same coordinates
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 mvp = projection * view * model;
-
-    // Enable proper depth testing for shaded rendering
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glUseProgram(m_objShader);
-
-    // Set MVP matrix
-    GLint mvpLocation = glGetUniformLocation(m_objShader, "mvp");
-    if (mvpLocation != -1) {
-        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
-    }
-
-    glBindVertexArray(m_objModel.vao);
-
-    // Render filled triangles with shading
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDrawElements(GL_TRIANGLES, m_objModel.indexCount, GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
-    glUseProgram(0);
-
-    //printf("OBJ rendered with shading\n");
-}
 
 void ZoneEditor::updateNavmeshCamera()
 {
@@ -1132,30 +1170,6 @@ void ZoneEditor::buildNavmeshGeometry()
   buildBnpcMarkerGeometry();
 }
 
-void ZoneEditor::cleanupBnpcMarkerRendering()
-{
-  if( m_bnpcMarkerVAO )
-  {
-    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
-    m_bnpcMarkerVAO = 0;
-  }
-
-  if( m_bnpcMarkerVBO )
-  {
-    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
-    m_bnpcMarkerVBO = 0;
-  }
-
-  if( m_bnpcMarkerShader )
-  {
-    glDeleteProgram( m_bnpcMarkerShader );
-    m_bnpcMarkerShader = 0;
-  }
-
-  m_bnpcMarkerVertexCount = 0;
-}
-
-
 // Also add a simplified version for testing
 void ZoneEditor::buildSimpleNavmeshTest()
 {
@@ -1279,41 +1293,122 @@ void ZoneEditor::initializeNavmeshRendering()
 
 void ZoneEditor::initializeBnpcMarkerRendering()
 {
-  // Simple vertex shader for BNPC markers
+  // Enhanced billboard vertex shader with better visibility
   const char *vertexShaderSource = R"(
 #version 330 core
-layout (location = 0) in vec3 position;
+layout (location = 0) in vec3 worldPos;
+layout (location = 1) in vec2 offset;  // -1 to 1 for quad corners
+layout (location = 2) in vec3 color;   // Per-instance color
+layout (location = 3) in float size;   // Per-instance size
+layout (location = 4) in float selected; // 1.0 if selected, 0.0 if not
 
-uniform mat4 mvp;
+uniform mat4 view;
+uniform mat4 projection;
 
-void main()
-{
-    gl_Position = mvp * vec4(position, 1.0);
-    gl_PointSize = 8.0;
+out vec3 markerColor;
+out vec2 texCoord;
+out float markerAlpha;
+out float isSelected;
+out float distanceFactor;
+
+void main() {
+    // Extract camera right and up vectors from view matrix
+    vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
+    vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
+
+    // Scale up selected markers significantly
+    float finalSize = size * (selected > 0.5 ? 2.0 : 1.0);
+
+    // Create billboard position
+    vec3 billboardPos = worldPos +
+                       cameraRight * offset.x * finalSize +
+                       cameraUp * offset.y * finalSize;
+
+    gl_Position = projection * view * vec4(billboardPos, 1.0);
+
+    // Pass through color
+    markerColor = color;
+    texCoord = offset; // -1 to 1, will be used to create shapes
+    isSelected = selected;
+
+    // Calculate distance for better alpha management
+    vec4 viewPos = view * vec4(worldPos, 1.0);
+    float distance = length(viewPos.xyz);
+    distanceFactor = distance;
+
+    // More visible alpha calculation - higher minimum alpha
+    markerAlpha = clamp(200.0 / distance, 0.7, 1.0);
 }
 )";
 
-  // Simple fragment shader for BNPC markers
+  // Fixed fragment shader that only renders the diamond shape
   const char *fragmentShaderSource = R"(
 #version 330 core
+in vec3 markerColor;
+in vec2 texCoord;
+in float markerAlpha;
+in float isSelected;
+in float distanceFactor;
 
 out vec4 FragColor;
 
-uniform vec3 markerColor = vec3(1.0, 1.0, 0.0); // Yellow
+void main() {
+    // Create a diamond shape - discard pixels outside the diamond
+    float dist = abs(texCoord.x) + abs(texCoord.y);
 
-void main()
-{
-    // Create a diamond shape within the point
-    vec2 coord = gl_PointCoord - vec2(0.5, 0.5);
-    float dist = abs(coord.x) + abs(coord.y);
-
-    if (dist > 0.4) {
+    // Hard cutoff for diamond shape - anything outside gets discarded
+    if (dist > 0.9) {
         discard;
     }
 
-    // Add some anti-aliasing
-    float alpha = 1.0 - smoothstep(0.3, 0.4, dist);
-    FragColor = vec4(markerColor, alpha);
+    // Create layers within the diamond
+    float innerCore = 1.0 - smoothstep(0.0, 0.4, dist);
+    float midRing = smoothstep(0.2, 0.5, dist) - smoothstep(0.5, 0.7, dist);
+    float outerRing = smoothstep(0.6, 0.8, dist) - smoothstep(0.8, 0.9, dist);
+
+    // Enhanced colors for better contrast
+    vec3 finalColor = markerColor;
+
+    if (isSelected > 0.5) {
+        // Selected markers: bright white core with colored ring
+        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.8);
+
+        // Add pulsing effect for selected markers
+        float time = gl_FragCoord.x * 0.02 + gl_FragCoord.y * 0.02;
+        float pulse = sin(time) * 0.15 + 1.0;
+        finalColor *= pulse;
+
+        // Boost brightness
+        finalColor *= 1.5;
+    } else {
+        // Normal markers: brighter colors with white highlights in center
+        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.4);
+        finalColor *= 1.3; // Make brighter
+    }
+
+    // Add black border only at the very edge of the diamond
+    if (outerRing > 0.5) {
+        finalColor = vec3(0.0, 0.0, 0.0); // Black border
+    }
+
+    // Calculate alpha based on distance from center (for anti-aliasing)
+    float edgeAlpha = 1.0 - smoothstep(0.7, 0.9, dist);
+    float finalAlpha = edgeAlpha * markerAlpha;
+
+    // Boost alpha for very distant markers
+    if (distanceFactor > 150.0) {
+        finalAlpha = max(finalAlpha, 0.8);
+    }
+
+    // Minimum visibility threshold
+    finalAlpha = max(finalAlpha, 0.6);
+
+    // Final check - if alpha is too low, discard
+    if (finalAlpha < 0.1) {
+        discard;
+    }
+
+    FragColor = vec4(finalColor, finalAlpha);
 }
 )";
 
@@ -1321,39 +1416,72 @@ void main()
 
   if( m_bnpcMarkerShader )
   {
-    printf( "BNPC marker shader created successfully (ID: %u)\n", m_bnpcMarkerShader );
+    printf( "Enhanced BNPC billboard shader created successfully (ID: %u)\n", m_bnpcMarkerShader );
   }
   else
   {
-    printf( "Failed to create BNPC marker shader\n" );
+    printf( "Failed to create enhanced BNPC billboard shader\n" );
   }
 }
 
+void ZoneEditor::renderBnpcMarkers()
+{
+  if( !m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerInstanceCount == 0 )
+  {
+    return;
+  }
+
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+
+  // Enhanced blending for better visibility
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+  // Temporarily disable depth writing but keep depth testing
+  // This prevents markers from being occluded too aggressively
+  glDepthMask( GL_FALSE );
+
+  // Bias depth slightly to ensure markers appear on top
+  glEnable( GL_POLYGON_OFFSET_FILL );
+  glPolygonOffset( -1.0f, -1.0f );
+
+  // Use billboard shader
+  glUseProgram( m_bnpcMarkerShader );
+
+  // Set uniforms
+  GLint viewLoc = glGetUniformLocation( m_bnpcMarkerShader, "view" );
+  if( viewLoc != -1 )
+  {
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
+  }
+
+  GLint projectionLoc = glGetUniformLocation( m_bnpcMarkerShader, "projection" );
+  if( projectionLoc != -1 )
+  {
+    glUniformMatrix4fv( projectionLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
+  }
+
+  // Render instanced billboards
+  glBindVertexArray( m_bnpcMarkerVAO );
+  glDrawArraysInstanced( GL_TRIANGLES, 0, 6, m_bnpcMarkerInstanceCount ); // 6 vertices per quad
+  glBindVertexArray( 0 );
+
+  // Restore OpenGL state
+  glDisable( GL_POLYGON_OFFSET_FILL );
+  glDepthMask( GL_TRUE );
+
+  // Unbind shader
+  glUseProgram( 0 );
+}
 
 void ZoneEditor::buildBnpcMarkerGeometry()
 {
   if( !m_selectedZone || m_bnpcs.empty() )
   {
-    return;
-  }
-
-  std::vector< float > markerPositions;
-
-  // Get current zone's BNPCs
-  for( const auto& bnpc : m_bnpcs )
-  {
-    if( bnpc->territoryType == m_selectedZone->id )
-    {
-      // Add BNPC position
-      markerPositions.push_back( bnpc->x );
-      markerPositions.push_back( bnpc->y );
-      markerPositions.push_back( bnpc->z );
-    }
-  }
-
-  if( markerPositions.empty() )
-  {
-    printf( "No BNPCs found for zone %u\n", m_selectedZone->id );
     return;
   }
 
@@ -1366,71 +1494,501 @@ void ZoneEditor::buildBnpcMarkerGeometry()
   {
     glDeleteBuffers( 1, &m_bnpcMarkerVBO );
   }
-
-  // Create VAO and VBO for markers
-  glGenVertexArrays( 1, &m_bnpcMarkerVAO );
-  glGenBuffers( 1, &m_bnpcMarkerVBO );
-
-  glBindVertexArray( m_bnpcMarkerVAO );
-
-  // Upload marker position data
-  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerVBO );
-  glBufferData( GL_ARRAY_BUFFER, markerPositions.size() * sizeof( float ), markerPositions.data(), GL_STATIC_DRAW );
-
-  // Set vertex attributes (position only)
-  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
-  glEnableVertexAttribArray( 0 );
-
-  glBindVertexArray( 0 );
-
-  m_bnpcMarkerVertexCount = markerPositions.size() / 3;
-
-  printf( "Created %d BNPC markers for zone %u\n", m_bnpcMarkerVertexCount, m_selectedZone->id );
-}
-
-void ZoneEditor::renderBnpcMarkers()
-{
-  if( !m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerVertexCount == 0 )
+  if( m_bnpcMarkerInstanceVBO )
   {
+    glDeleteBuffers( 1, &m_bnpcMarkerInstanceVBO );
+  }
+
+  // Create quad template (will be instanced for each BNPC)
+  std::vector< float > quadVertices = {
+    // positions (offset from center)
+    -1.0f, -1.0f, // bottom-left
+    1.0f, -1.0f, // bottom-right
+    1.0f, 1.0f, // top-right
+    -1.0f, -1.0f, // bottom-left
+    1.0f, 1.0f, // top-right
+    -1.0f, 1.0f // top-left
+  };
+
+  // Create instance data for each BNPC
+  struct BnpcInstance
+  {
+    glm::vec3 worldPos;
+    glm::vec3 color;
+    float size;
+    float selected;
+  };
+
+  std::vector< BnpcInstance > instanceData;
+  m_bnpcWorldPositions.clear(); // Clear the cache
+  instanceData.reserve( m_bnpcs.size() );
+
+  // Create a set of filtered BNPC IDs for quick lookup
+  std::unordered_set< uint32_t > filteredBnpcIds;
+  for( auto *bnpc : m_filteredBnpcs )
+  {
+    filteredBnpcIds.insert( bnpc->instanceId );
+  }
+
+  // Get selected BNPC for highlighting
+  CachedBnpc *selectedBnpc = nullptr;
+  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() )
+  {
+    selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+  }
+
+  for( const auto& bnpc : m_bnpcs )
+  {
+    if( bnpc->territoryType != m_selectedZone->id )
+      continue;
+
+    BnpcInstance instance;
+    instance.worldPos = glm::vec3( bnpc->x, bnpc->y + 3.0f, bnpc->z ); // Higher above ground for visibility
+
+    // Store world position for mouse picking
+    m_bnpcWorldPositions.push_back( { instance.worldPos, bnpc.get() } );
+
+    // Determine if this BNPC is filtered (visible in search results)
+    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
+
+    // Enhanced colors with better contrast
+    if( !isFiltered )
+    {
+      // Darker grey for unfiltered BNPCs but still visible
+      instance.color = glm::vec3( 0.6f, 0.6f, 0.6f );
+    }
+    else
+    {
+      // Brighter, more saturated colors for filtered BNPCs
+      instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
+    }
+
+    // Check if this BNPC is selected
+    instance.selected = ( selectedBnpc && selectedBnpc->instanceId == bnpc->instanceId ) ? 1.0f : 0.0f;
+
+    // Larger base sizes for better visibility
+    float baseSize = 2.5f + ( bnpc->Level * 0.03f );
+    if( !isFiltered )
+    {
+      baseSize *= 0.8f; // Slightly smaller for unfiltered but still visible
+    }
+    instance.size = baseSize;
+
+    instanceData.push_back( instance );
+  }
+
+  if( instanceData.empty() )
+  {
+    printf( "No BNPCs found for zone %u\n", m_selectedZone->id );
     return;
   }
 
-  // Set up matrices (same as navmesh)
-  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
-  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
-                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
-                                           0.1f, 10000.0f );
-  glm::mat4 model = glm::mat4( 1.0f );
-  glm::mat4 mvp = projection * view * model;
+  // Create VAO and VBOs
+  glGenVertexArrays( 1, &m_bnpcMarkerVAO );
+  glGenBuffers( 1, &m_bnpcMarkerVBO );
+  glGenBuffers( 1, &m_bnpcMarkerInstanceVBO );
 
-  // Enable point rendering
-  glEnable( GL_PROGRAM_POINT_SIZE );
-
-  // Use marker shader
-  glUseProgram( m_bnpcMarkerShader );
-
-  // Set uniforms
-  GLint mvpLoc = glGetUniformLocation( m_bnpcMarkerShader, "mvp" );
-  if( mvpLoc != -1 )
-  {
-    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
-  }
-
-  GLint colorLoc = glGetUniformLocation( m_bnpcMarkerShader, "markerColor" );
-  if( colorLoc != -1 )
-  {
-    glUniform3f( colorLoc, 1.0f, 1.0f, 0.0f ); // Yellow
-  }
-
-  // Render markers as points
   glBindVertexArray( m_bnpcMarkerVAO );
-  glDrawArrays( GL_POINTS, 0, m_bnpcMarkerVertexCount );
+
+  // Upload quad vertex data (static)
+  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerVBO );
+  glBufferData( GL_ARRAY_BUFFER, quadVertices.size() * sizeof( float ), quadVertices.data(), GL_STATIC_DRAW );
+
+  // Set vertex attributes for quad offsets
+  glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 1 );
+
+  // Upload instance data (per-BNPC data)
+  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerInstanceVBO );
+  glBufferData( GL_ARRAY_BUFFER, instanceData.size() * sizeof( BnpcInstance ), instanceData.data(), GL_DYNAMIC_DRAW );
+
+  // Set instance attributes
+  // World position (vec3)
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
+                         ( void * ) offsetof( BnpcInstance, worldPos ) );
+  glEnableVertexAttribArray( 0 );
+  glVertexAttribDivisor( 0, 1 ); // One per instance
+
+  // Color (vec3)
+  glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ), ( void * ) offsetof( BnpcInstance, color ) );
+  glEnableVertexAttribArray( 2 );
+  glVertexAttribDivisor( 2, 1 ); // One per instance
+
+  // Size (float)
+  glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ), ( void * ) offsetof( BnpcInstance, size ) );
+  glEnableVertexAttribArray( 3 );
+  glVertexAttribDivisor( 3, 1 ); // One per instance
+
+  // Selected (float)
+  glVertexAttribPointer( 4, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
+                         ( void * ) offsetof( BnpcInstance, selected ) );
+  glEnableVertexAttribArray( 4 );
+  glVertexAttribDivisor( 4, 1 ); // One per instance
+
   glBindVertexArray( 0 );
 
-  // Unbind shader
-  glUseProgram( 0 );
+  m_bnpcMarkerInstanceCount = instanceData.size();
 
-  glDisable( GL_PROGRAM_POINT_SIZE );
+  printf( "Created %d enhanced BNPC billboard markers for zone %u\n", m_bnpcMarkerInstanceCount, m_selectedZone->id );
+}
+
+// Helper function to project 3D world position to 2D screen coordinates
+glm::vec2 ZoneEditor::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& imageSize )
+{
+  // Set up the same matrices as used in 3D rendering
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           imageSize.x / imageSize.y,
+                                           0.1f, 10000.0f );
+  glm::mat4 mvp = projection * view;
+
+  // Transform world position to screen space
+  glm::vec4 clipSpace = mvp * glm::vec4( worldPos, 1.0f );
+
+  // Perspective divide
+  if( clipSpace.w <= 0.0f )
+  {
+    return glm::vec2( -1, -1 ); // Behind camera
+  }
+
+  glm::vec3 ndc = glm::vec3( clipSpace ) / clipSpace.w;
+
+  // Check if point is outside clip space
+  if( ndc.x < -1.0f || ndc.x > 1.0f || ndc.y < -1.0f || ndc.y > 1.0f || ndc.z < -1.0f || ndc.z > 1.0f )
+  {
+    return glm::vec2( -1, -1 ); // Outside view
+  }
+
+  // Convert to screen coordinates
+  glm::vec2 screenPos;
+  screenPos.x = ( ndc.x + 1.0f ) * 0.5f * imageSize.x;
+  screenPos.y = ( 1.0f - ndc.y ) * 0.5f * imageSize.y; // Flip Y
+
+  return screenPos;
+}
+
+// New function to handle 3D BNPC tooltips and selection
+void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
+{
+  if( !m_selectedZone || m_bnpcWorldPositions.empty() )
+    return;
+
+  ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+  // Handle mouse interaction
+  if( ImGui::IsWindowHovered() )
+  {
+    ImVec2 mousePos = ImGui::GetMousePos();
+    mousePos.x -= imagePos.x;
+    mousePos.y -= imagePos.y;
+
+    // Find the closest BNPC to the mouse cursor
+    float closestDistance = FLT_MAX;
+    int closestIndex = -1;
+    CachedBnpc *hoveredBnpc = nullptr;
+    ImVec2 hoveredScreenPos;
+
+    for( size_t i = 0; i < m_bnpcWorldPositions.size(); i++ )
+    {
+      const auto& entry = m_bnpcWorldPositions[ i ];
+      glm::vec2 screenPos = worldTo3DScreen( entry.worldPos, imageSize );
+
+      // Skip if outside visible area
+      if( screenPos.x < 0 || screenPos.x > imageSize.x ||
+          screenPos.y < 0 || screenPos.y > imageSize.y )
+        continue;
+
+      // Calculate distance from mouse to BNPC
+      float dx = screenPos.x - mousePos.x;
+      float dy = screenPos.y - mousePos.y;
+      float distance = sqrtf( dx * dx + dy * dy );
+
+      // Check if this is within hover radius and closest so far
+      if( distance < 25.0f && distance < closestDistance )
+      {
+        closestDistance = distance;
+        hoveredBnpc = entry.bnpc;
+        hoveredScreenPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
+
+        // Find this BNPC in filtered list for potential selection
+        for( size_t j = 0; j < m_filteredBnpcs.size(); j++ )
+        {
+          if( m_filteredBnpcs[ j ]->instanceId == entry.bnpc->instanceId )
+          {
+            closestIndex = static_cast< int >( j );
+            break;
+          }
+        }
+      }
+    }
+
+    // Handle mouse click for selection
+    if( ImGui::IsMouseClicked( 0 ) && closestIndex >= 0 )
+    {
+      m_selectedBnpcIndex = closestIndex;
+      // Rebuild markers to update selection highlighting
+      buildBnpcMarkerGeometry();
+    }
+
+    // Show tooltip for hovered BNPC
+    if( hoveredBnpc )
+    {
+      ImGui::SetMouseCursor( ImGuiMouseCursor_Hand );
+
+      // Position tooltip near the BNPC but avoid screen edges
+      ImVec2 tooltipPos = hoveredScreenPos;
+      tooltipPos.x += 15;
+      tooltipPos.y -= 10;
+
+      ImGui::SetNextWindowPos( tooltipPos );
+      ImGui::SetNextWindowBgAlpha( 0.9f );
+
+      if( ImGui::Begin( "##BnpcTooltip", nullptr,
+                        ImGuiWindowFlags_Tooltip |
+                        ImGuiWindowFlags_NoInputs |
+                        ImGuiWindowFlags_NoTitleBar |
+                        ImGuiWindowFlags_NoMove |
+                        ImGuiWindowFlags_NoResize |
+                        ImGuiWindowFlags_NoSavedSettings |
+                        ImGuiWindowFlags_AlwaysAutoResize ) )
+      {
+        ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
+        ImGui::Separator();
+        ImGui::Text( "ID: %u", hoveredBnpc->instanceId );
+        ImGui::Text( "Level: %u", hoveredBnpc->Level );
+        ImGui::Text( "Position: %.1f, %.1f, %.1f", hoveredBnpc->x, hoveredBnpc->y, hoveredBnpc->z );
+
+        ImGui::End();
+      }
+    }
+  }
+
+  // Draw name for selected BNPC
+  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() )
+  {
+    CachedBnpc *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+
+    // Find the world position of selected BNPC
+    for( const auto& entry : m_bnpcWorldPositions )
+    {
+      if( entry.bnpc->instanceId == selectedBnpc->instanceId )
+      {
+        glm::vec2 screenPos = worldTo3DScreen( entry.worldPos, imageSize );
+
+        if( screenPos.x >= 0 && screenPos.x <= imageSize.x &&
+            screenPos.y >= 0 && screenPos.y <= imageSize.y )
+        {
+          // Draw name above the selected BNPC
+          ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
+          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.c_str() );
+
+          // Center the text horizontally
+          textPos.x -= textSize.x * 0.5f;
+
+          // Draw background
+          drawList->AddRectFilled(
+            ImVec2( textPos.x - 4, textPos.y - 2 ),
+            ImVec2( textPos.x + textSize.x + 4, textPos.y + textSize.y + 2 ),
+            IM_COL32( 0, 0, 0, 200 )
+          );
+
+          // Draw text
+          drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
+        }
+        break;
+      }
+    }
+  }
+}
+
+void ZoneEditor::renderNavmesh()
+{
+  if( !m_navmeshTexture )
+  {
+    ImGui::Text( "No navmesh texture available" );
+    return;
+  }
+
+  // Render navmesh to our texture
+  renderNavmeshToTexture();
+
+  // Display the texture in ImGui
+  ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+
+  // Maintain aspect ratio
+  float aspectRatio = ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight;
+  ImVec2 imageSize;
+
+  if( contentRegion.x / aspectRatio <= contentRegion.y )
+  {
+    imageSize.x = contentRegion.x;
+    imageSize.y = contentRegion.x / aspectRatio;
+  }
+  else
+  {
+    imageSize.y = contentRegion.y;
+    imageSize.x = contentRegion.y * aspectRatio;
+  }
+
+  // Center the image
+  ImVec2 cursorPos = ImGui::GetCursorPos();
+  ImVec2 offset = ImVec2( ( contentRegion.x - imageSize.x ) * 0.5f, ( contentRegion.y - imageSize.y ) * 0.5f );
+  ImGui::SetCursorPos( ImVec2( cursorPos.x + offset.x, cursorPos.y + offset.y ) );
+
+  // Get the screen position of the image
+  ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
+
+  // Display the texture
+  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+
+  // Handle 3D BNPC interaction (replaces the old 2D overlay)
+  handle3DBnpcInteraction( imageScreenPos, imageSize );
+
+  // Handle mouse interaction over the image (camera controls only)
+  if( ImGui::IsItemHovered() )
+  {
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Left mouse button - rotate camera (only if not clicking on BNPC)
+    if( io.MouseDown[ 0 ] )
+    {
+      if( !m_navMouseDragging )
+      {
+        m_navMouseDragging = true;
+        m_navLastMousePos = io.MousePos;
+        m_navCameraControlActive = true;
+      }
+      else
+      {
+        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
+                               io.MousePos.y - m_navLastMousePos.y );
+
+        m_navCameraYaw += delta.x * 0.5f;
+        m_navCameraPitch -= delta.y * 0.5f;
+
+        // Clamp pitch
+        m_navCameraPitch = glm::clamp( m_navCameraPitch, -89.0f, 89.0f );
+
+        m_navLastMousePos = io.MousePos;
+      }
+    }
+    else
+    {
+      if( m_navMouseDragging )
+      {
+        m_navMouseDragging = false;
+        m_navCameraControlActive = false;
+      }
+    }
+
+    // Middle mouse button - pan camera
+    if( io.MouseDown[ 2 ] )
+    {
+      if( !m_navMousePanning )
+      {
+        m_navMousePanning = true;
+        m_navLastMousePos = io.MousePos;
+        m_navCameraControlActive = true;
+      }
+      else
+      {
+        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
+                               io.MousePos.y - m_navLastMousePos.y );
+
+        glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+
+        glm::vec3 cameraRight = glm::vec3( view[ 0 ][ 0 ], view[ 1 ][ 0 ], view[ 2 ][ 0 ] );
+        glm::vec3 cameraUp = glm::vec3( view[ 0 ][ 1 ], view[ 1 ][ 1 ], view[ 2 ][ 1 ] );
+
+        float panSensitivity = 1;
+
+        glm::vec3 panMovement = cameraRight * ( -delta.x * panSensitivity ) +
+                                cameraUp * ( delta.y * panSensitivity );
+
+        m_navCameraTarget += panMovement;
+
+        m_navLastMousePos = io.MousePos;
+      }
+    }
+    else
+    {
+      if( m_navMousePanning )
+      {
+        m_navMousePanning = false;
+        m_navCameraControlActive = false;
+      }
+    }
+
+    // Handle mouse wheel for zoom
+    if( io.MouseWheel != 0.0f )
+    {
+      glm::vec3 forward = glm::normalize( m_navCameraTarget - m_navCameraPos );
+
+      float moveSpeed = 20.0f;
+      float moveAmount = io.MouseWheel * moveSpeed;
+
+      m_navCameraPos += forward * moveAmount;
+      m_navCameraTarget += forward * moveAmount;
+    }
+  }
+  else
+  {
+    // Reset mouse states when not hovering
+    if( m_navMouseDragging )
+    {
+      m_navMouseDragging = false;
+      m_navCameraControlActive = false;
+    }
+    if( m_navMousePanning )
+    {
+      m_navMousePanning = false;
+      m_navCameraControlActive = false;
+    }
+  }
+
+  // Update camera position
+  updateNavmeshCamera();
+
+  // Display info below the image
+  ImGui::SetCursorPos( ImVec2( cursorPos.x, cursorPos.y + contentRegion.y - 100 ) );
+  ImGui::Text( "Navmesh: %d triangles", m_navmeshIndexCount / 3 );
+  ImGui::Text( "BNPCs: %d 3D markers", m_bnpcMarkerInstanceCount );
+  ImGui::Checkbox( "Show BNPC Markers", &m_showBnpcMarkersInNavmesh );
+  ImGui::Text( "Camera: dist=%.1f yaw=%.1f pitch=%.1f",
+               m_navCameraDistance, m_navCameraYaw, m_navCameraPitch );
+  ImGui::Text( "Target: (%.1f, %.1f, %.1f)",
+               m_navCameraTarget.x, m_navCameraTarget.y, m_navCameraTarget.z );
+  ImGui::Text( "Controls: LMB=rotate, MMB=pan, wheel=zoom, click markers=select" );
+}
+
+
+void ZoneEditor::cleanupBnpcMarkerRendering()
+{
+  if( m_bnpcMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
+    m_bnpcMarkerVAO = 0;
+  }
+
+  if( m_bnpcMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
+    m_bnpcMarkerVBO = 0;
+  }
+
+  if( m_bnpcMarkerInstanceVBO )
+  {
+    glDeleteBuffers( 1, &m_bnpcMarkerInstanceVBO );
+    m_bnpcMarkerInstanceVBO = 0;
+  }
+
+  if( m_bnpcMarkerShader )
+  {
+    glDeleteProgram( m_bnpcMarkerShader );
+    m_bnpcMarkerShader = 0;
+  }
+
+  m_bnpcMarkerInstanceCount = 0;
 }
 
 void ZoneEditor::renderNavmeshToTexture()
@@ -1710,7 +2268,7 @@ void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
     if( closestIndex >= 0 )
     {
       m_selectedBnpcIndex = closestIndex;
-      onSelectionChanged(); // Update any selection-dependent state
+      //onSelectionChanged(); // Update any selection-dependent state
     }
   }
 }
@@ -1760,219 +2318,6 @@ void ZoneEditor::createNavmeshFramebuffer()
   printf( "Created navmesh framebuffer: FBO=%u, Texture=%u, Depth=%u (%dx%d)\n",
           m_navmeshFBO, m_navmeshTexture, m_navmeshDepthBuffer,
           m_navmeshTextureWidth, m_navmeshTextureHeight );
-}
-
-void ZoneEditor::renderNavmesh()
-{
-  if( !m_navmeshTexture )
-  {
-    ImGui::Text( "No navmesh texture available" );
-    return;
-  }
-
-  // Render navmesh to our texture
-  renderNavmeshToTexture();
-
-  // Display the texture in ImGui
-  ImVec2 contentRegion = ImGui::GetContentRegionAvail();
-
-  // Maintain aspect ratio
-  float aspectRatio = ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight;
-  ImVec2 imageSize;
-
-  if( contentRegion.x / aspectRatio <= contentRegion.y )
-  {
-    imageSize.x = contentRegion.x;
-    imageSize.y = contentRegion.x / aspectRatio;
-  }
-  else
-  {
-    imageSize.y = contentRegion.y;
-    imageSize.x = contentRegion.y * aspectRatio;
-  }
-
-  // Center the image
-  ImVec2 cursorPos = ImGui::GetCursorPos();
-  ImVec2 offset = ImVec2( ( contentRegion.x - imageSize.x ) * 0.5f, ( contentRegion.y - imageSize.y ) * 0.5f );
-  ImGui::SetCursorPos( ImVec2( cursorPos.x + offset.x, cursorPos.y + offset.y ) );
-
-  // Get the screen position of the image
-  ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
-
-  // Display the texture
-  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
-
-  // Draw BNPC markers as overlay (alternative to 3D markers)
-  drawBnpcOverlayMarkers( imageScreenPos, imageSize );
-
-  // Handle mouse interaction over the image
-  if( ImGui::IsItemHovered() )
-  {
-    ImGuiIO& io = ImGui::GetIO();
-
-    if( ImGui::IsMouseClicked( 0 ) )
-    {
-      ImVec2 mousePos = ImGui::GetMousePos();
-      mousePos.x -= imageScreenPos.x;
-      mousePos.y -= imageScreenPos.y;
-
-      // Find closest BNPC to the click position
-      float closestDistance = FLT_MAX;
-      int closestIndex = -1;
-
-      for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
-      {
-        CachedBnpc *bnpc = m_filteredBnpcs[ i ];
-
-        // Convert 3D position to screen space
-        glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-        // Calculate distance from mouse to BNPC icon
-        float dx = screenPos.x - mousePos.x;
-        float dy = screenPos.y - mousePos.y;
-        float distance = sqrtf( dx * dx + dy * dy );
-
-        // Check if this is within selection radius and closest so far
-        if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
-        {
-          closestDistance = distance;
-          closestIndex = static_cast< int >( i );
-        }
-      }
-
-      // If we found a close BNPC, select it
-      if( closestIndex >= 0 )
-      {
-        m_selectedBnpcIndex = closestIndex;
-        onSelectionChanged(); // Update any selection-dependent state
-      }
-    }
-
-
-    // Left mouse button - rotate camera
-    if( io.MouseDown[ 0 ] )
-    {
-      if( !m_navMouseDragging )
-      {
-        m_navMouseDragging = true;
-        m_navLastMousePos = io.MousePos;
-        m_navCameraControlActive = true;
-      }
-      else
-      {
-        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
-                               io.MousePos.y - m_navLastMousePos.y );
-
-        m_navCameraYaw += delta.x * 0.5f;
-        m_navCameraPitch -= delta.y * 0.5f;
-
-        // Clamp pitch
-        m_navCameraPitch = glm::clamp( m_navCameraPitch, -89.0f, 89.0f );
-
-        m_navLastMousePos = io.MousePos;
-      }
-    }
-    else
-    {
-      if( m_navMouseDragging )
-      {
-        m_navMouseDragging = false;
-        m_navCameraControlActive = false;
-      }
-    }
-
-    // Middle mouse button - pan camera
-    if( io.MouseDown[ 2 ] )
-    {
-      // Middle mouse button
-      if( !m_navMousePanning )
-      {
-        m_navMousePanning = true;
-        m_navLastMousePos = io.MousePos;
-        m_navCameraControlActive = true;
-      }
-      else
-      {
-        ImVec2 delta = ImVec2( io.MousePos.x - m_navLastMousePos.x,
-                               io.MousePos.y - m_navLastMousePos.y );
-
-        // Convert mouse movement to world space movement
-        glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
-
-        // Get camera right and up vectors
-        glm::vec3 cameraRight = glm::vec3( view[ 0 ][ 0 ], view[ 1 ][ 0 ], view[ 2 ][ 0 ] );
-        glm::vec3 cameraUp = glm::vec3( view[ 0 ][ 1 ], view[ 1 ][ 1 ], view[ 2 ][ 1 ] );
-
-        // Pan sensitivity based on distance
-        float panSensitivity = 1;
-
-        // Move target in camera space
-        glm::vec3 panMovement = cameraRight * ( -delta.x * panSensitivity ) +
-                                cameraUp * ( delta.y * panSensitivity );
-
-        m_navCameraTarget += panMovement;
-
-        m_navLastMousePos = io.MousePos;
-      }
-    }
-    else
-    {
-      if( m_navMousePanning )
-      {
-        m_navMousePanning = false;
-        m_navCameraControlActive = false;
-      }
-    }
-
-    // Handle mouse wheel for zoom
-    if( io.MouseWheel != 0.0f )
-    {
-      // Calculate the direction vector (forward vector)
-      glm::vec3 forward = glm::normalize( m_navCameraTarget - m_navCameraPos );
-
-      // Set a fixed movement speed per scroll unit
-      float moveSpeed = 20.0f;
-      float moveAmount = io.MouseWheel * moveSpeed;
-
-      // Move both the camera AND target along the forward vector
-      // This maintains the same view direction while allowing unlimited movement
-      m_navCameraPos += forward * moveAmount;
-      m_navCameraTarget += forward * moveAmount;
-
-      // We don't need to update m_navCameraDistance since we're
-      // maintaining the same relative position between camera and target
-    }
-  }
-  else
-  {
-    // Reset mouse states when not hovering
-    if( m_navMouseDragging )
-    {
-      m_navMouseDragging = false;
-      m_navCameraControlActive = false;
-    }
-    if( m_navMousePanning )
-    {
-      m_navMousePanning = false;
-      m_navCameraControlActive = false;
-    }
-  }
-
-  // Update camera position
-  updateNavmeshCamera();
-
-  // Display info below the image
-  ImGui::SetCursorPos( ImVec2( cursorPos.x, cursorPos.y + contentRegion.y - 100 ) );
-  ImGui::Text( "Navmesh: %d triangles", m_navmeshIndexCount / 3 );
-  ImGui::Text( "BNPCs: %d markers", m_bnpcMarkerVertexCount );
-  ImGui::Checkbox( "Show BNPC Markers", &m_showBnpcMarkersInNavmesh );
-  static bool showWireframe = false;
-  ImGui::Checkbox( "Wireframe", &showWireframe );
-  ImGui::Text( "Camera: dist=%.1f yaw=%.1f pitch=%.1f",
-               m_navCameraDistance, m_navCameraYaw, m_navCameraPitch );
-  ImGui::Text( "Target: (%.1f, %.1f, %.1f)",
-               m_navCameraTarget.x, m_navCameraTarget.y, m_navCameraTarget.z );
-  ImGui::Text( "Controls: LMB=rotate, MMB=pan, wheel=zoom" );
 }
 
 void ZoneEditor::showNavmeshWindow()
