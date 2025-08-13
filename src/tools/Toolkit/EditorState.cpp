@@ -35,6 +35,7 @@
 #include "Engine/Logger.h"
 
 #include <Navi/NaviMgr.h>
+#include <Config/ConfigMgr.h>
 #include <math.h>
 #include <vector>
 
@@ -55,9 +56,24 @@ using namespace Client;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
-EditorState::EditorState( std::shared_ptr< Engine::ApplicationContext > pContext ) :
-  State( pContext )
+EditorState::EditorState( std::shared_ptr< Engine::ApplicationContext > pContext ) : State( pContext )
 {
+  // Load config defaults from the server config
+  auto executableDir = Sapphire::Common::Util::executableDir();
+  m_configFile = executableDir / "editor_config.txt";
+  auto serverDir = executableDir.parent_path();
+  Sapphire::Common::ConfigMgr configMgr( serverDir / "config" );
+  Sapphire::Common::Config::GlobalConfig globalConfig;
+  if( configMgr.loadGlobalConfig( globalConfig ) )
+  {
+    m_datLocation = globalConfig.general.dataPath;
+    m_mysqlHost = globalConfig.database.host;
+    m_mysqlUser = globalConfig.database.user;
+    m_mysqlPassword = globalConfig.database.password;
+    m_mysqlDatabase = globalConfig.database.database;
+    m_mysqlPort = globalConfig.database.port;
+    m_navMeshPath = configMgr.getValue( "Navigation", "MeshPath", ( serverDir / "navi" ).string() );
+  }
 }
 
 void framebuffer_size_callback( GLFWwindow *window, int width, int height )
@@ -149,7 +165,7 @@ void EditorState::update( double deltaTime )
 
 void EditorState::loadConfig()
 {
-  std::ifstream configFile( CONFIG_FILE );
+  std::ifstream configFile( m_configFile );
   if( !configFile.is_open() )
   {
     // Use default values if config file doesn't exist
@@ -247,7 +263,7 @@ void EditorState::loadConfig()
 
 void EditorState::saveConfig()
 {
-  std::ofstream configFile( CONFIG_FILE );
+  std::ofstream configFile( m_configFile );
   if( !configFile.is_open() )
   {
     // Handle error - could log or show message

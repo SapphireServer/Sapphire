@@ -74,7 +74,7 @@ namespace Client
     // Add these members
     bool m_showSettingsDialog = false;
     char m_datLocationBuffer[ 512 ]; // Buffer for ImGui input
-    static constexpr const char *CONFIG_FILE = "editor_config.txt";
+    std::string m_configFile;
 
     enum EditorMode
     {

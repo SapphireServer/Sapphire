@@ -19,6 +19,8 @@
 
 #include "EditorState.h"
 
+#include <Util/Paths.h>
+
 
 const char *sourceToString( GLenum source )
 {
@@ -334,6 +336,10 @@ void Engine::Application::initImGui(const char* glsl_version)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
+
+  // NOTE: static lifetime to keep string pointer alive
+  static auto imguiIniPath = ( Sapphire::Common::Util::executableDir() / "imgui.ini" ).string();
+  io.IniFilename = imguiIniPath.c_str();
 
   ImGui_ImplGlfw_InitForOpenGL( graphics.getWindowHandle(), true );
   ImGui_ImplOpenGL3_Init( glsl_version );
