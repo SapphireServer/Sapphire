@@ -64,6 +64,8 @@ namespace Client
     void saveConfig();
 
     void showSettingsDialog();
+    void restoreDefaultSettings();
+    void revertSettingsBuffers();
 
 #ifdef _WIN32
     std::string openFolderDialog( const std::string& title );

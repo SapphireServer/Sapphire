@@ -201,6 +201,7 @@ private:
 
   void renderNavmeshToTexture();
 
+
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
 
 public:
