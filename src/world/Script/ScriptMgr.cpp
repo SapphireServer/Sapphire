@@ -266,11 +266,11 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     auto warpNotQualified = warp->_data.UnqualifiedPreTalk;
 
-
     auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
     auto warpCondition = exdData.getRow< Excel::WarpCondition >( warp->_data.WarpCondition );
     auto warpOperator = warpCondition->_data.CompletedQuestOperator;
+    auto warpPrice = warpCondition->_data.Gil;
 
     bool questDone = warpOperator == 1 ? true : false;
 
@@ -299,9 +299,9 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     else
       questDone = true;
 
-    if( questDone )
+    if( questDone && player.getCurrency( Common::CurrencyType::Gil ) >= warpPrice )
     {
-      pEventMgr.playScene( player, eventId, 0, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
+      pEventMgr.playScene( player, eventId, 0, 0x00003000, { player.getLevel(), 0 }, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
         if( result.getResult( 0 ) == 1 )
         {
           auto exdData = Common::Service< Data::ExdData >::ref();
@@ -315,6 +315,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
               eventMgr.eventStart( player, result.actorId, eventId, Event::EventHandler::EventType::Talk, 0, 0, nullptr ); 
             }*/
 
+
           if( warp )
           {
             auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -324,13 +325,15 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
             auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
             auto popRangeInfo = instanceObjectCache.getPopRangeInfo( warp->data().PopRange );
 
+            auto warpCondition = exdData.getRow< Excel::WarpCondition >( warp->_data.WarpCondition );
+
             if( popRangeInfo )
             {
               auto pTeri = teriMgr.getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
               warpMgr.requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
                                             pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
-              
 
+              player.removeCurrency( Common::CurrencyType::Gil, warpCondition->_data.Gil );
             }
           }
         }
