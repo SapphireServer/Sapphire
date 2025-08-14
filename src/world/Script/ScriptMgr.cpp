@@ -257,29 +257,29 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
   if( eventType == Event::EventHandler::EventHandlerType::Warp )
   {
-    World::Manager::PlayerMgr::sendUrgent( player, "Evento Warp: {}", eventId );
-
     auto warp = exdData.getRow< Excel::Warp >( eventId );
 
     if( !warp )
       return false;
 
-    auto warpNotQualified = warp->_data.UnqualifiedPreTalk;
-
     auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
+    auto warpNotQualified = warp->_data.UnqualifiedPreTalk;
+    auto warpConditionGil = warp->_data.UnqualifiedGilPreTalk;
+
     auto warpCondition = exdData.getRow< Excel::WarpCondition >( warp->_data.WarpCondition );
-    auto warpOperator = warpCondition->_data.CompletedQuestOperator;
     auto warpPrice = warpCondition->_data.Gil;
 
-    bool questDone = warpOperator == 1 ? true : false;
+    if( player.getCurrency( Common::CurrencyType::Gil ) < warpPrice && warpConditionGil != 0 )
+    {
+      pEventMgr.eventFinish( player, eventId, 1 );
+      pEventMgr.eventStart( player, actorId, warpConditionGil, Event::EventHandler::EventType::Talk, 0, 0, nullptr );
 
-    /*
-    warpOperator == 1
-      And logic->reset questDone to true and set it to false at first quest not completed yet and exit
-    warpOperator == 2
-      Or logic -> questDone is ok false, at first quest already done, set it to true and exit
-    */
+      return true;
+    }
+
+    auto warpOperator = warpCondition->_data.CompletedQuestOperator;
+    bool questDone = warpOperator == 1 ? true : false;
 
     auto questCondsNotZero = std::any_of( std::begin( warpCondition->_data.CompletedQuest ), std::end( warpCondition->_data.CompletedQuest ), []( uint32_t val ) {
       return val != 0;
@@ -299,22 +299,13 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     else
       questDone = true;
 
-    if( questDone && player.getCurrency( Common::CurrencyType::Gil ) >= warpPrice )
+    if( questDone )
     {
       pEventMgr.playScene( player, eventId, 0, 0x00003000, { player.getLevel(), 0 }, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
         if( result.getResult( 0 ) == 1 )
         {
           auto exdData = Common::Service< Data::ExdData >::ref();
           auto warp = exdData.getRow< Excel::Warp >( result.eventId );
-
-          /* auto eventId = warp->_data.QualifiedPreTalk != 0 ? warp->_data.QualifiedPreTalk : result.eventId;
-            
-            if( eventId != result.eventId )
-            {
-              eventMgr.eventFinish( player, eventId, 1 );
-              eventMgr.eventStart( player, result.actorId, eventId, Event::EventHandler::EventType::Talk, 0, 0, nullptr ); 
-            }*/
-
 
           if( warp )
           {
@@ -349,7 +340,6 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   }
 
   return false;
-
 }
 
 bool Sapphire::Scripting::ScriptMgr::onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
