@@ -277,6 +277,11 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
       return true;
     }
+    else if( player.getLevel() < warpCondition->_data.ClassLevel )
+    {
+      pEventMgr.eventFinish( player, eventId, 1 );
+      pEventMgr.eventStart( player, actorId, warpNotQualified, Event::EventHandler::EventType::Talk, 0, 0, nullptr );
+    }
 
     auto warpOperator = warpCondition->_data.CompletedQuestOperator;
     bool questDone = warpOperator == 1 ? true : false;
@@ -301,7 +306,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     if( questDone )
     {
-      pEventMgr.playScene( player, eventId, 0, 0x00003000, { player.getLevel(), 0 }, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
+      pEventMgr.playScene( player, eventId, 0, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
         if( result.getResult( 0 ) == 1 )
         {
           auto exdData = Common::Service< Data::ExdData >::ref();
