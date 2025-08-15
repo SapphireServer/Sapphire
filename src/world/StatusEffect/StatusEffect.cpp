@@ -50,7 +50,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_sourceActor( sourceActor ),
   m_targetActor( targetActor ),
   m_duration( duration ),
-  m_statusModifiers( {} ),
+  m_modifiers( {} ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
