@@ -22,6 +22,8 @@
 
 #include "StatusEffect.h"
 
+#include <AI/TargetHelper.h>
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -111,28 +113,39 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
 
   if( !hasScript && getFlag() & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && m_groundAOE.vfxId > 0 )
   {
+    // filter by allies
+    static auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
+    static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+
+    if( m_targetActor->getAreaObject() == nullptr )
+      return;
+
     if( auto pAreaObject = m_targetActor->getAreaObject(); pAreaObject->getActionId() == m_groundAOE.actionId )
     {
       auto& statusEffectMgr = Common::Service< World::Manager::StatusEffectMgr >::ref();
-      auto inRange = m_targetActor->getInRangeActors();
+      auto inRange = m_targetActor->getInRangeActors( true );
 
       // todo: probably use selectors
       for( auto& pActor : inRange )
       {
-        // make sure we're only hitting enemies
-        if( !pActor->isBattleNpc() || pActor->getAsBNpc()->getEnemyType() == Common::Friendly )
+        if( !pActor->isChara() )
           continue;
 
         auto pChara = pActor->getAsChara();
 
         const auto& pos = pAreaObject->getPos();
         const auto& potency = pAreaObject->getActionPotency();
-        if( Common::Util::distance( pos, pChara->getPos() ) < 5.f )
+        if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius )
         {
           switch( m_groundAOE.aoeType )
           {
             case Common::GroundAOEType::Damage:
             {
+              // no dots on allies
+              if( pBattalionFilter->isApplicable( m_sourceActor, pChara ) ||
+                pPartyFilter->isApplicable( m_sourceActor, pChara ) || m_sourceActor == pChara )
+                continue;
+
               auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, 1.0f );
               float damageVal = dmg.first;
               Common::CalcResultType damageType = dmg.second;
@@ -142,7 +155,15 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
             }
             case Common::GroundAOEType::Heal:
             {
-              // todo: healing ground AOEs
+              // dont wanna heal enemies
+              if( !pPartyFilter->isApplicable( m_sourceActor, pChara ) )
+                continue;
+
+              auto heal = Math::CalcStats::calcActionHealing( *m_sourceActor, potency, 1.0f );
+              float healVal = heal.first;
+              Common::CalcResultType healType = heal.second;
+
+              statusEffectMgr.heal( m_sourceActor, pChara, static_cast< uint32_t >( healVal ) );
               break;
             }
           }

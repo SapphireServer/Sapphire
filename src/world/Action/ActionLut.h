@@ -11,6 +11,7 @@ namespace Sapphire::World::Action
   {
     uint16_t vfxId;
     uint16_t actionId;
+    float radius;
     Common::GroundAOEType aoeType;
   };
 

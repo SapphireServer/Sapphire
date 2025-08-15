@@ -28,12 +28,15 @@ void StatusEffectMgr::heal( Entity::CharaPtr pSource, Entity::CharaPtr pTarget, 
 {
   pTarget->heal( amount );
   Network::Util::Packet::sendActorControl( pTarget->getInRangePlayerIds( pTarget->isPlayer() ), pTarget->getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
-                                           Common::CalcResultType::TypeDamageHp, amount );
+                                           Common::CalcResultType::TypeRecoverHp, amount );
   Network::Util::Packet::sendHudParam( *pTarget );
 
   int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *pSource, amount, 0.5f );
   auto hateList = pTarget->getHateList();
-  aggro = aggro / hateList.size();
+
+  if( !hateList.empty() )
+    aggro = aggro / hateList.size();
+
   for( auto entry : hateList )
   {
     entry->onActionHostile( pSource, aggro );
@@ -149,7 +152,10 @@ void StatusEffectMgr::replaceStatusEffect( Entity::CharaPtr pTarget, Sapphire::S
 void StatusEffectMgr::splitAggroApplication( Entity::CharaPtr pSource, Entity::CharaPtr pTarget, float aggro )
 {
   auto hateList = pTarget->getHateList();
-  aggro = aggro / hateList.size();
+
+  if( !hateList.empty() )
+    aggro = aggro / hateList.size();
+
   for( auto entry : hateList )
   {
     entry->onActionHostile( pSource, aggro );

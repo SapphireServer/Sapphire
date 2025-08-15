@@ -636,6 +636,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   auto hasSameStatusFromSameCaster = false;
   Sapphire::StatusEffect::StatusEffectPtr referenceStatus = nullptr;
   status.groundAOE.actionId = getId();
+  status.groundAOE.radius = this->getActionData()->data().EffectRange;
 
   for( auto const& entry : statusToSource ? source->getStatusEffectMap() : target->getStatusEffectMap() )
   {
@@ -666,7 +667,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
-      if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
+      if( ( status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster ) || hasSameStatus )
         pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, status.groundAOE );
       else
         pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
