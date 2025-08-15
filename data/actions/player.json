@@ -1820,7 +1820,17 @@
     "targetFilter": 0,
     "aggroModifier": 1.0,
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 249,
+          "duration": 30000,
+          "flag": 16385,
+          "groundAOE": {
+            "vfxId": 196,
+            "aoeType": 0
+          }
+        }
+      ],
       "target": []
     }
   },

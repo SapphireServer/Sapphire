@@ -24,10 +24,11 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-AreaObject::AreaObject( uint32_t actorId, uint32_t actionId, uint32_t vfxId,
+AreaObject::AreaObject( uint32_t actorId, uint32_t actionId, uint32_t actionPotency, uint32_t vfxId,
     float scale, uint32_t ownerId, const Common::FFXIVARR_POSITION3& pos ) :
   GameObject( ObjKind::Area ),
   m_actionId( actionId ),
+  m_actionPotency( actionPotency ),
   m_vfxId( vfxId ),
   m_scale( scale ),
   m_ownerId( ownerId )
@@ -81,4 +82,9 @@ void AreaObject::setOwnerId( uint32_t ownerId )
 uint32_t Sapphire::Entity::AreaObject::getActionId() const
 {
   return m_actionId;
+}
+
+uint32_t Sapphire::Entity::AreaObject::getActionPotency() const
+{
+  return m_actionPotency;
 }

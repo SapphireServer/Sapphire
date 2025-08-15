@@ -301,7 +301,7 @@ namespace Sapphire::Entity
 
     void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
 
-    void spawnAreaObject( uint32_t actionId, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos );
+    void spawnAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos );
     void despawnAreaObject();
     const AreaObjectPtr getAreaObject() const;
   };

@@ -5,6 +5,7 @@
 #include <Exd/ExdData.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
+#include "Common.h"
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -538,6 +539,7 @@ void Action::Action::buildActionResults()
 
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
+    handleStatusEffects();
     scriptMgr.onAfterBuildEffect( *this );
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( m_hitActors );
@@ -633,6 +635,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   auto hasSameStatus = false;
   auto hasSameStatusFromSameCaster = false;
   Sapphire::StatusEffect::StatusEffectPtr referenceStatus = nullptr;
+  status.groundAOE.actionId = getId();
 
   for( auto const& entry : statusToSource ? source->getStatusEffectMap() : target->getStatusEffectMap() )
   {
@@ -658,15 +661,15 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   {
     case Common::StatusRefreshPolicy::Stack:
     {
-      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false, status.groundAOE );
       break;
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
       if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
-        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, status.groundAOE );
       else
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       break;
     }
     case Common::StatusRefreshPolicy::Extend:
@@ -682,7 +685,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
 
       if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       }
       break;
     }
@@ -690,7 +693,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     {
       if( !hasSameStatus )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       }
       else
       {
@@ -725,6 +728,10 @@ void Action::Action::handleStatusEffects()
         applyStatusEffect( true, m_hitActors[ 0 ], m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true ); // statusToSource true
       else if( m_lutEntry.potency == 0 )*/
+      if( status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && status.groundAOE.vfxId > 0 )
+      {
+        m_pSource->spawnAreaObject( getId(), m_lutEntry.potency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
+      }
       applyStatusEffect( true, m_pSource, m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
     }

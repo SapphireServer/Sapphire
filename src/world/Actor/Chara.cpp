@@ -994,7 +994,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }
 
-void Chara::spawnAreaObject( uint32_t actionId, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
+void Chara::spawnAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
 {
   despawnAreaObject();
   removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
@@ -1003,7 +1003,7 @@ void Chara::spawnAreaObject( uint32_t actionId, uint32_t vfxId, float scale, con
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, vfxId, scale, getId(), pos );
+  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId, scale, getId(), pos );
   pTeri->pushActor( m_pAreaObject );
 }
 

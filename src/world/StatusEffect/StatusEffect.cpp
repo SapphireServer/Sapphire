@@ -6,11 +6,17 @@
 #include <algorithm>
 #include <Service.h>
 
-#include "Manager/PlayerMgr.h"
-
+#include "Action/ActionLut.h"
 #include "Actor/Chara.h"
+#include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/GameObject.h"
+#include "Common.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/StatusEffectMgr.h"
+
+#include <Math/CalcStats.h>
+#include "Util/UtilMath.h"
 
 #include "Script/ScriptMgr.h"
 
@@ -21,11 +27,20 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers,
+                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate ) :
+  StatusEffect( id, sourceActor, targetActor, duration, tickRate )
+{
+  m_statusModifiers = modifiers;
+  m_flag = flag;
+}
+
+Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, const World::Action::GroundAOE& groundAOE,
                                                     uint32_t flag, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
   m_statusModifiers = modifiers;
+  m_groundAOE = groundAOE;
   m_flag = flag;
 }
 
@@ -35,7 +50,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_sourceActor( sourceActor ),
   m_targetActor( targetActor ),
   m_duration( duration ),
-  m_modifiers( 0 ),
+  m_statusModifiers( {} ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
@@ -92,7 +107,48 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   m_lastTick = Util::getTimeMs();
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onStatusTick( m_targetActor, *this );
+  bool hasScript = scriptMgr.onStatusTick( m_targetActor, *this );
+
+  if( !hasScript && getFlag() & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && m_groundAOE.vfxId > 0 )
+  {
+    if( auto pAreaObject = m_targetActor->getAreaObject(); pAreaObject->getActionId() == m_groundAOE.actionId )
+    {
+      auto& statusEffectMgr = Common::Service< World::Manager::StatusEffectMgr >::ref();
+      auto inRange = m_targetActor->getInRangeActors();
+
+      // todo: probably use selectors
+      for( auto& pActor : inRange )
+      {
+        // make sure we're only hitting enemies
+        if( !pActor->isBattleNpc() || pActor->getAsBNpc()->getEnemyType() == Common::Friendly )
+          continue;
+
+        auto pChara = pActor->getAsChara();
+
+        const auto& pos = pAreaObject->getPos();
+        const auto& potency = pAreaObject->getActionPotency();
+        if( Common::Util::distance( pos, pChara->getPos() ) < 5.f )
+        {
+          switch( m_groundAOE.aoeType )
+          {
+            case Common::GroundAOEType::Damage:
+            {
+              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, 1.0f );
+              float damageVal = dmg.first;
+              Common::CalcResultType damageType = dmg.second;
+
+              statusEffectMgr.damage( m_sourceActor, pChara, static_cast< int32_t >( damageVal ) );
+            }
+            case Common::GroundAOEType::Heal:
+            {
+              // todo: healing ground AOEs
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
@@ -171,6 +227,12 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
   m_modifiers.clear();
 
   m_targetActor->calculateStats();
+
+  if( auto pAreaObject = m_targetActor->getAreaObject() )
+  {
+    if( pAreaObject->getActionId() == m_groundAOE.actionId )
+      m_targetActor->despawnAreaObject();
+  }
 
   scriptMgr.onStatusTimeOut( m_targetActor, m_id );
 }

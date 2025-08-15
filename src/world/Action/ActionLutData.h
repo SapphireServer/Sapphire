@@ -13,6 +13,12 @@ namespace Sapphire::World::Action
       static std::unordered_map< std::string, Common::ParamModifier > m_modifierStringMap;
   };
 
+  inline void from_json( const nlohmann::json& j, GroundAOE& groundAOE )
+  {
+    groundAOE.vfxId = j.at( "vfxId" );
+    groundAOE.aoeType = j.at( "aoeType" );
+  }
+
   inline void from_json( const nlohmann::json& j, StatusModifier& statusModifier )
   {
     auto stringKey = j.at( "modifier" ).get< std::string >();
@@ -41,6 +47,8 @@ namespace Sapphire::World::Action
       j.at( "flag" ).get_to( statusEntry.flag );
     if( j.contains( "modifiers" ) )
       j.at( "modifiers" ).get_to( statusEntry.modifiers );
+    if( j.contains( "groundAOE" ) )
+      j.at( "groundAOE" ).get_to( statusEntry.groundAOE );
   }
 
   inline void from_json( const nlohmann::json& j, ActionEntry& action )

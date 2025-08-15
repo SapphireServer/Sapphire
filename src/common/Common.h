@@ -961,6 +961,12 @@ namespace Sapphire::Common
     Custom = 255
   };
 
+  enum class GroundAOEType : uint8_t
+  {
+    Damage = 0,
+    Heal = 1
+  };
+
   enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected
