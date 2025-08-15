@@ -7,6 +7,14 @@
 
 namespace Sapphire::World::Action
 {
+  struct GroundAOE
+  {
+    uint16_t vfxId;
+    uint16_t actionId;
+    float radius;
+    Common::GroundAOEType aoeType;
+  };
+
   struct StatusModifier
   {
     Common::ParamModifier modifier;
@@ -21,6 +29,7 @@ namespace Sapphire::World::Action
     uint8_t statusRefreshPolicy;
     uint32_t flag;
     std::vector< StatusModifier > modifiers;
+    GroundAOE groundAOE;
   };
 
   struct StatusEffect

@@ -31,6 +31,12 @@ Sapphire::Data::ExdData g_exdDataGen;
 std::string datLocation( "C:\\Data\\Dev\\ffxiv3.01\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
+struct GroundAOE
+{
+  uint16_t vfxId;
+  Common::GroundAOEType aoeType;
+};
+
 struct StatusModifier
 {
   Common::ParamModifier modifier;
@@ -70,7 +76,15 @@ struct ActionEntry
   StatusEffect statuses;
 };
 
-void to_json( nlohmann::ordered_json& j, const StatusModifier& statusModifier)
+void to_json( nlohmann::ordered_json& j, const GroundAOE& groundAOE )
+{
+  j = nlohmann::ordered_json{
+    { "vfxId", groundAOE.vfxId },
+    { "aoeType", groundAOE.aoeType }
+  };
+}
+
+void to_json( nlohmann::ordered_json& j, const StatusModifier& statusModifier )
 {
   j = nlohmann::ordered_json{
     { "modifier", statusModifier.modifier },

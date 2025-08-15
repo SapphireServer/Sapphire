@@ -35,10 +35,15 @@ namespace Sapphire::World::AI
   {
     bool ret = false;
     // todo: pets, companions, enpc
-    if( pSrc->isPlayer() )
+
+    if( pSrc == pTarget)
+    {
+      ret = true;
+    }
+    else if( pSrc->isPlayer() )
     {
       auto pBNpcTarget = pTarget->getAsBNpc();
-      if( pBNpcTarget && pBNpcTarget->getEnemyType() == 0 )
+      if( pBNpcTarget && pBNpcTarget->getEnemyType() == Common::Friendly )
         ret = true;
       else if( pTarget->isPlayer() )
         ret = true;
@@ -46,7 +51,7 @@ namespace Sapphire::World::AI
     else if( pSrc->isBattleNpc() )
     {
       auto pBNpcTarget = pTarget->getAsBNpc();
-      if( pBNpcTarget && pBNpcTarget->getEnemyType() == 0 )
+      if( pBNpcTarget && pBNpcTarget->getEnemyType() == Common::Friendly )
         ret = true;
       else if( pTarget->isPlayer() )
         ret = true;
@@ -57,7 +62,29 @@ namespace Sapphire::World::AI
 
   bool OwnBattalionFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
-    return false;
+    bool ret = false;
+
+    if( pSrc == pTarget )
+    {
+      ret = true;
+    }
+    // if source is player, all other players or battalion 0 bnpc are valid targets
+    else if( auto pPlayer = pSrc->getAsPlayer() )
+    {
+      if( pTarget->isPlayer() )
+        ret = true;
+      else if( pTarget->isBattleNpc() && pTarget->getAsBNpc()->getEnemyType() == Common::Friendly )
+        ret = true;
+    }
+    // if source is bnpc, players
+    else if( auto pBNpc = pSrc->getAsBNpc() )
+    {
+      if( pTarget->isPlayer() && pBNpc->getEnemyType() == Common::Friendly )
+        ret = true;
+      else if( pTarget->isBattleNpc() && pTarget->getAsBNpc()->getEnemyType() == pBNpc->getEnemyType() )
+        ret = true;
+    }
+    return m_negate ? !ret : ret;
   }
 
   bool TankFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
@@ -133,12 +160,16 @@ namespace Sapphire::World::AI
   bool PartyMemberFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = false;
+    if( pSrc == pTarget )
+    {
+      ret = true;
+    }
     // todo: pets, companions, enpc
-    if( auto pPlayer = pSrc->getAsPlayer() )
+    else if( auto pPlayer = pSrc->getAsPlayer() )
     {
       if( auto pTargetPlayer = pTarget->getAsPlayer() )
       {
-        ret = pPlayer->getPartyId() == pTargetPlayer->getPartyId();
+        ret = pPlayer->getPartyId() != 0 && pPlayer->getPartyId() == pTargetPlayer->getPartyId();
       }
       else if( auto pBNpc = pTarget->getAsBNpc() )
       {
@@ -147,11 +178,7 @@ namespace Sapphire::World::AI
     }
     else if( auto pBNpc = pSrc->getAsBNpc() )
     {
-      if( auto pTargetPlayer = pTarget->getAsPlayer() )
-      {
-        ret = pPlayer->getPartyId() == pTargetPlayer->getPartyId();
-      }
-      else if( auto pTargetBNpc = pTarget->getAsBNpc() )
+      if( auto pTargetBNpc = pTarget->getAsBNpc() )
       {
         ret = pBNpc->getBNpcType() == pTargetBNpc->getEnemyType();
       }

@@ -101,11 +101,11 @@ void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t 
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                                             const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride )
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+                                             uint32_t flag, bool statusToSource, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
-  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro, shouldOverride );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro, shouldOverride, groundAOE );
   addResultToActor( target, nextResult );
 }
 
@@ -117,26 +117,26 @@ void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t dur
 }
 
 void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
-                                                 uint32_t flag, bool shouldOverride )
+                                                 uint32_t flag, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
-  nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, m_applyStatusAggro, shouldOverride );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, m_applyStatusAggro, shouldOverride, groundAOE );
   addResultToActor( m_sourceChara, nextResult );
 }
 
 void ActionResultBuilder::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                                               const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource )
+                                               const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, const World::Action::GroundAOE& groundAOE )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
-  nextResult->replaceStatusEffect( pOldStatus, statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro );
+  nextResult->replaceStatusEffect( pOldStatus, statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro, groundAOE );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, uint32_t duration, uint8_t param,
-                                                   const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag )
+                                                   const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, const World::Action::GroundAOE& groundAOE )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
-  nextResult->replaceStatusEffectSelf( pOldStatus, statusId, duration, param, modifiers, flag, m_applyStatusAggro );
+  nextResult->replaceStatusEffectSelf( pOldStatus, statusId, duration, param, modifiers, flag, m_applyStatusAggro, groundAOE );
   addResultToActor( m_sourceChara, nextResult );
 }
 

@@ -14,6 +14,7 @@
 #include "EventObject.h"
 #include "Player.h"
 #include "BNpc.h"
+#include "AreaObject.h"
 
 #include "WorldServer.h"
 #include "Session.h"
@@ -140,6 +141,11 @@ bool GameObject::isAetheryte() const
   return m_objKind == ObjKind::Aetheryte;
 }
 
+bool GameObject::isArea() const
+{
+  return m_objKind == ObjKind::Area;
+}
+
 
 /*! \return pointer to this instance as GameObjectPtr */
 CharaPtr GameObject::getAsChara()
@@ -171,6 +177,14 @@ BNpcPtr GameObject::getAsBNpc()
   if( !isBattleNpc() )
     return nullptr;
   return std::dynamic_pointer_cast< BNpc, GameObject >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as AreaPtr */
+AreaObjectPtr GameObject::getAsArea()
+{
+  if( !isArea() )
+    return nullptr;
+  return std::dynamic_pointer_cast< AreaObject, GameObject >( shared_from_this() );
 }
 
 /*!
