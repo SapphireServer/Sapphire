@@ -138,6 +138,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
               Common::CalcResultType damageType = dmg.second;
 
               statusEffectMgr.damage( m_sourceActor, pChara, static_cast< int32_t >( damageVal ) );
+              break;
             }
             case Common::GroundAOEType::Heal:
             {
