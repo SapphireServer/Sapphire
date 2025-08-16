@@ -13,76 +13,13 @@
 #include "Engine/GfxApi.h"
 
 // Add Detour includes for navmesh
+#include <complex.h>
+
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+#include "datReader/DatCategories/bg/lgb.h"
 
-struct CachedBnpc
-{
-  uint16_t territoryType;
-  std::string bnpcName;
-  uint32_t instanceId;
-  uint32_t nameOffset;
-  float x;
-  float y;
-  float z;
-  float rotation;
-  uint32_t BaseId;
-  uint32_t PopWeather;
-  uint8_t PopTimeStart;
-  uint8_t PopTimeEnd;
-  uint32_t MoveAI;
-  uint8_t WanderingRange;
-  uint8_t Route;
-  uint16_t EventGroup;
-  uint32_t NameId;
-  uint32_t DropItem;
-  float SenseRangeRate;
-  uint16_t Level;
-  uint8_t ActiveType;
-  uint8_t PopInterval;
-  uint8_t PopRate;
-  uint8_t PopEvent;
-  uint8_t LinkGroup;
-  uint8_t LinkFamily;
-  uint8_t LinkRange;
-  uint8_t LinkCountLimit;
-  int8_t NonpopInitZone;
-  int8_t InvalidRepop;
-  int8_t LinkParent;
-  int8_t LinkOverride;
-  int8_t LinkReply;
-  int8_t Nonpop;
-  float HorizontalPopRange;
-  float VerticalPopRange;
-  int32_t BNpcBaseData;
-  uint8_t RepopId;
-  uint8_t BNPCRankId;
-  uint16_t TerritoryRange;
-  uint32_t BoundInstanceID;
-  uint32_t FateLayoutLabelId;
-  uint32_t NormalAI;
-  uint32_t ServerPathId;
-  uint32_t EquipmentID;
-  uint32_t CustomizeID;
-
-  std::string nameString;
-};
-
-struct CachedZoneInfo
-{
-  uint32_t id;
-  std::string name;
-  std::string lvb;
-  Excel::TerritoryType data;
-
-  std::string placeName;
-
-  // Pre-computed display strings
-  std::string displayText;
-  std::string searchText; // Lowercase for searching
-};
-
-class ZoneEditor
+class LgbViewer
 {
 private:
   // Cached data
@@ -254,6 +191,8 @@ private:
 
   void cleanupNavmeshRendering();
 
+  bool loadLgbData( std::string lgbPath, std::vector< LGB_GROUP >& groups, std::string& name );
+
   void createNavmeshFramebuffer();
 
   void renderNavmeshToTexture();
@@ -262,9 +201,9 @@ private:
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
 
 public:
-  ZoneEditor();
+  LgbViewer();
 
-  ~ZoneEditor();
+  ~LgbViewer();
 
   void init();
 
@@ -324,6 +263,19 @@ public:
   GLuint m_bnpcMarkerShader = 0;
   int m_bnpcMarkerVertexCount = 0;
 
+  std::vector< LGB_GROUP > bgGroups;
+  std::string bgGroupsName;
+  std::vector< LGB_GROUP > planeventGroups;
+  std::string planeventName;
+  std::vector< LGB_GROUP > planliveGroups;
+  std::string planliveName;
+  std::vector< LGB_GROUP > planmapGroups;
+  std::string planmapName;
+  std::vector< LGB_GROUP > plannerGroups;
+  std::string plannerName;
+  glm::vec3 m_focusWorldPos = glm::vec3( 0.0f );
+  bool m_shouldFocusOnMap = false;
+
   // Add these methods
   void initializeBnpcMarkerRendering();
 
@@ -334,6 +286,16 @@ public:
   void cleanupBnpcMarkerRendering();
 
   void drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize );
+
+  void showGroupsWindow();
+
+  std::string getEntryTypeString( LgbEntryType type );
+
+  std::string getEntryName( LgbEntry *entry );
+
+  void onEntrySelected( LgbEntry *entry );
+
+  void focusOn3DPosition( const vec3& position );
 
   glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
 
@@ -359,4 +321,31 @@ private:
   void loadMapTexture( uint32_t mapId );
 
   void clearMapTexture();
+
+  // Add these members for individual entry viewing
+  struct EntryViewWidget
+  {
+    ImGuiID id;
+    std::shared_ptr<LgbEntry> entry;
+    bool isOpen;
+    std::string windowTitle;
+
+    EntryViewWidget(std::shared_ptr<LgbEntry> e) : entry(e), isOpen(true)
+    {
+      id = ImGui::GetID(("EntryView_" + std::to_string(entry->header.instanceId)).c_str());
+      windowTitle = std::to_string(entry->header.instanceId);
+    }
+  };
+
+  std::vector<EntryViewWidget> m_entryViewWidgets;
+
+  // Methods for entry viewing
+  void showEntryViewWidget(EntryViewWidget& widget);
+  void showSGEntryView(LGB_SG_ENTRY* entry);
+  void showEObjEntryView(LGB_EOBJ_ENTRY* entry);
+  void showExitRangeEntryView(LGB_EXIT_RANGE_ENTRY* entry);
+  void showPopRangeEntryView(LGB_POP_RANGE_ENTRY* entry);
+  void showUnimplementedEntryView(LgbEntry* entry);
+  void openEntryViewWidget(std::shared_ptr<LgbEntry> entry);
+
 };

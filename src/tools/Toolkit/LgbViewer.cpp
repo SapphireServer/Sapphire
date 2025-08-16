@@ -35,7 +35,7 @@
 
 #include "Application.h"
 
-#include "ZoneEditor.h"
+#include "LgbViewer.h"
 #include "Service.h"
 #include <algorithm>
 #include <cctype>
@@ -49,15 +49,19 @@
 #include <GL/glew.h>
 
 #include "commonshader.h"
+#include "imgui_internal.h"
+#include "datReader/DatCategories/bg/lgb.h"
+#include "datReader/GameData.h"
+#include "datReaderPs3/DatCategories/bg/LgbTypes.h"
 
 extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
 
-ZoneEditor::ZoneEditor()
+LgbViewer::LgbViewer()
 {
 }
 
-ZoneEditor::~ZoneEditor()
+LgbViewer::~LgbViewer()
 {
   clearMapTexture();
   cleanupNavmeshRendering();
@@ -76,13 +80,13 @@ ZoneEditor::~ZoneEditor()
   }
 }
 
-void ZoneEditor::init()
+void LgbViewer::init()
 {
   initializeCache();
   initializeNavmeshRendering();
 }
 
-void ZoneEditor::initializeCache()
+void LgbViewer::initializeCache()
 {
   auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
 
@@ -122,7 +126,7 @@ void ZoneEditor::initializeCache()
   m_needsRefresh = false;
 }
 
-void ZoneEditor::updateSearchFilter()
+void LgbViewer::updateSearchFilter()
 {
   std::string searchTerm = std::string( m_searchBuffer );
   std::transform( searchTerm.begin(), searchTerm.end(), searchTerm.begin(), ::tolower );
@@ -146,307 +150,8 @@ void ZoneEditor::updateSearchFilter()
   }
 }
 
-void ZoneEditor::updateBnpcSearchFilter()
-{
-  std::string searchTerm = std::string( m_bnpcSearchBuffer );
-  std::transform( searchTerm.begin(), searchTerm.end(), searchTerm.begin(), ::tolower );
-
-  // Only update if search term changed
-  if( searchTerm == m_lastBnpcSearchTerm )
-    return;
-  m_lastBnpcSearchTerm = searchTerm;
-
-  m_filteredBnpcs.clear();
-
-  for( auto& bnpc : m_bnpcs )
-  {
-    if( searchTerm.empty() )
-    {
-      m_filteredBnpcs.push_back( bnpc.get() );
-    }
-    else
-    {
-      // Search in name and other relevant fields
-      std::string bnpcName = bnpc->bnpcName;
-      std::transform( bnpcName.begin(), bnpcName.end(), bnpcName.begin(), ::tolower );
-
-      std::string instanceIdStr = std::to_string( bnpc->instanceId );
-      std::string baseIdStr = std::to_string( bnpc->BaseId );
-
-      if( bnpcName.find( searchTerm ) != std::string::npos ||
-          instanceIdStr.find( searchTerm ) != std::string::npos ||
-          baseIdStr.find( searchTerm ) != std::string::npos )
-      {
-        m_filteredBnpcs.push_back( bnpc.get() );
-      }
-    }
-  }
-}
-
-void ZoneEditor::showBnpcWindow()
-{
-  if( !m_showBnpcWindow ) return;
-
-  ImGui::Begin( "BNPC Information", &m_showBnpcWindow, ImGuiWindowFlags_MenuBar );
-
-  // Menu bar
-  if( ImGui::BeginMenuBar() )
-  {
-    ImGui::Text( "Total BNPCs: %zu | Filtered: %zu", m_bnpcs.size(), m_filteredBnpcs.size() );
-    if( ImGui::Button( "Refresh" ) )
-    {
-      loadBnpcs();
-      updateBnpcSearchFilter();
-    }
-    ImGui::EndMenuBar();
-  }
-
-  // Search input
-  ImGui::Text( "Search BNPCs:" );
-  ImGui::SetNextItemWidth( -1 );
-  if( ImGui::InputText( "##BnpcSearch", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
-  {
-    updateBnpcSearchFilter();
-    m_selectedBnpcIndex = -1; // Clear selection when searching
-  }
-
-  ImGui::Separator();
-
-  // Split into two panes: list on left, details on right
-  if( ImGui::BeginChild( "BnpcList", ImVec2( 350, 0 ), true ) )
-  {
-    // BNPC list
-    for( int i = 0; i < static_cast< int >( m_filteredBnpcs.size() ); ++i )
-    {
-      const auto& bnpc = m_filteredBnpcs[ i ];
-
-
-      // Create display text
-      std::string displayText = fmt::format( "{} - {} (BaseID: {})",
-                                             bnpc->instanceId, bnpc->nameString, bnpc->BaseId );
-
-      bool isSelected = ( m_selectedBnpcIndex == i );
-      if( ImGui::Selectable( displayText.c_str(), isSelected ) )
-      {
-        m_selectedBnpcIndex = i;
-      }
-
-      // Tooltip with basic info
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::EndTooltip();
-      }
-    }
-  }
-  ImGui::EndChild();
-
-  ImGui::SameLine();
-
-  // Details pane
-  if( ImGui::BeginChild( "BnpcDetails", ImVec2( 0, 0 ), true ) )
-  {
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
-    {
-      const auto& bnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
-
-      ImGui::Text( "BNPC Details" );
-      ImGui::Separator();
-
-      // Basic Information
-      if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Name ID: %u", bnpc->NameId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Territory Type: %u", bnpc->territoryType );
-        ImGui::Unindent();
-      }
-
-      // Position & Movement
-      if( ImGui::CollapsingHeader( "Position & Movement", ImGuiTreeNodeFlags_DefaultOpen ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Rotation: %.2f", bnpc->rotation );
-        ImGui::Text( "Move AI: %u", bnpc->MoveAI );
-        ImGui::Text( "Normal AI: %u", bnpc->NormalAI );
-        ImGui::Text( "Wandering Range: %u", bnpc->WanderingRange );
-        ImGui::Text( "Route: %u", bnpc->Route );
-        ImGui::Text( "Server Path ID: %u", bnpc->ServerPathId );
-        ImGui::Unindent();
-      }
-
-      // Spawn Information
-      if( ImGui::CollapsingHeader( "Spawn Information" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Pop Weather: %u", bnpc->PopWeather );
-        ImGui::Text( "Pop Time: %u - %u", bnpc->PopTimeStart, bnpc->PopTimeEnd );
-        ImGui::Text( "Pop Interval: %u", bnpc->PopInterval );
-        ImGui::Text( "Pop Rate: %u", bnpc->PopRate );
-        ImGui::Text( "Pop Event: %u", bnpc->PopEvent );
-        ImGui::Text( "Active Type: %u", bnpc->ActiveType );
-        ImGui::Text( "Repop ID: %u", bnpc->RepopId );
-        ImGui::Text( "Horizontal Pop Range: %.2f", bnpc->HorizontalPopRange );
-        ImGui::Text( "Vertical Pop Range: %.2f", bnpc->VerticalPopRange );
-        ImGui::Unindent();
-      }
-
-      // Combat & Interaction
-      if( ImGui::CollapsingHeader( "Combat & Interaction" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Sense Range Rate: %.2f", bnpc->SenseRangeRate );
-        ImGui::Text( "Drop Item: %u", bnpc->DropItem );
-        ImGui::Text( "Event Group: %u", bnpc->EventGroup );
-        ImGui::Text( "BNPC Rank ID: %u", bnpc->BNPCRankId );
-        ImGui::Text( "Equipment ID: %u", bnpc->EquipmentID );
-        ImGui::Text( "Customize ID: %u", bnpc->CustomizeID );
-        ImGui::Unindent();
-      }
-
-      // Linking & Grouping
-      if( ImGui::CollapsingHeader( "Linking & Grouping" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Link Group: %u", bnpc->LinkGroup );
-        ImGui::Text( "Link Family: %u", bnpc->LinkFamily );
-        ImGui::Text( "Link Range: %u", bnpc->LinkRange );
-        ImGui::Text( "Link Count Limit: %u", bnpc->LinkCountLimit );
-        ImGui::Text( "Link Parent: %d", bnpc->LinkParent );
-        ImGui::Text( "Link Override: %d", bnpc->LinkOverride );
-        ImGui::Text( "Link Reply: %d", bnpc->LinkReply );
-        ImGui::Unindent();
-      }
-
-      // Special Properties
-      if( ImGui::CollapsingHeader( "Special Properties" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Territory Range: %u", bnpc->TerritoryRange );
-        ImGui::Text( "Bound Instance ID: %u", bnpc->BoundInstanceID );
-        ImGui::Text( "Fate Layout Label ID: %u", bnpc->FateLayoutLabelId );
-        ImGui::Text( "Nonpop Init Zone: %d", bnpc->NonpopInitZone );
-        ImGui::Text( "Invalid Repop: %d", bnpc->InvalidRepop );
-        ImGui::Text( "Nonpop: %d", bnpc->Nonpop );
-        ImGui::Unindent();
-      }
-
-      ImGui::Separator();
-
-      // Action buttons
-      if( ImGui::Button( "Show on Map" ) )
-      {
-        // This would highlight the BNPC on the map if map is open
-        if( !m_showMapWindow && m_currentMapId > 0 )
-        {
-          m_showMapWindow = true;
-        }
-        // TODO: Add map marker/highlight functionality
-      }
-      ImGui::SameLine();
-      if( ImGui::Button( "Copy Position" ) )
-      {
-        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::SetClipboardText( posStr.c_str() );
-      }
-    }
-    else
-    {
-      ImGui::TextDisabled( "No BNPC selected - Click on a BNPC from the list" );
-    }
-  }
-  ImGui::EndChild();
-
-  ImGui::End();
-}
-
-void ZoneEditor::loadBnpcs()
-{
-  auto& db = g_charaDb;
-  auto stmt = db.getPreparedStatement( Sapphire::Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
-  stmt->setUInt( 1, m_selectedZoneId );
-  auto res = db.query( stmt );
-
-  m_bnpcs.clear();
-
-  while( res->next() )
-  {
-    auto bnpc = std::make_shared< CachedBnpc >();
-
-    bnpc->territoryType = res->getInt( 1 );
-    bnpc->bnpcName = res->getString( 3 );
-    bnpc->instanceId = res->getInt( 4 );
-    bnpc->x = res->getFloat( 5 );
-    bnpc->y = res->getFloat( 6 );
-    bnpc->z = res->getFloat( 7 );
-    bnpc->BaseId = res->getInt( 8 );
-    bnpc->PopWeather = res->getInt( 9 );
-    bnpc->PopTimeStart = res->getInt( 10 );
-    bnpc->PopTimeEnd = res->getInt( 11 );
-    bnpc->MoveAI = res->getInt( 12 );
-    bnpc->WanderingRange = res->getInt( 13 );
-    bnpc->Route = res->getInt( 14 );
-    bnpc->EventGroup = res->getInt( 15 );
-    bnpc->NameId = res->getInt( 16 );
-    bnpc->DropItem = res->getInt( 17 );
-    bnpc->SenseRangeRate = res->getFloat( 18 );
-    bnpc->Level = res->getInt( 19 );
-    bnpc->ActiveType = res->getInt( 20 );
-    bnpc->PopInterval = res->getInt( 21 );
-    bnpc->PopRate = res->getInt( 22 );
-    bnpc->PopEvent = res->getInt( 23 );
-    bnpc->LinkGroup = res->getInt( 24 );
-    bnpc->LinkFamily = res->getInt( 25 );
-    bnpc->LinkRange = res->getInt( 26 );
-    bnpc->LinkCountLimit = res->getInt( 27 );
-    bnpc->NonpopInitZone = res->getInt( 28 );
-    bnpc->InvalidRepop = res->getInt( 29 );
-    bnpc->LinkParent = res->getInt( 30 );
-    bnpc->LinkOverride = res->getInt( 31 );
-    bnpc->LinkReply = res->getInt( 32 );
-    bnpc->HorizontalPopRange = res->getFloat( 33 );
-    bnpc->VerticalPopRange = res->getFloat( 34 );
-    bnpc->BNpcBaseData = res->getInt( 35 );
-    bnpc->RepopId = res->getInt( 36 );
-    bnpc->BNPCRankId = res->getInt( 37 );
-    bnpc->TerritoryRange = res->getInt( 38 );
-    bnpc->BoundInstanceID = res->getInt( 39 );
-    bnpc->FateLayoutLabelId = res->getInt( 40 );
-    bnpc->NormalAI = res->getInt( 41 );
-    bnpc->ServerPathId = res->getInt( 42 );
-    bnpc->EquipmentID = res->getInt( 43 );
-    bnpc->CustomizeID = res->getInt( 44 );
-    bnpc->rotation = res->getFloat( 45 );
-    bnpc->Nonpop = res->getInt( 46 );
-
-    //int groupId = res->getInt( 47 );
-
-    bnpc->nameString = bnpc->bnpcName;
-    auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
-
-    std::string bnpcName = bnpc->bnpcName;
-    auto bnpcNameEntry = exdD.getRow< Excel::BNpcName >( bnpc->NameId );
-    if( bnpcNameEntry )
-    {
-      bnpc->nameString = bnpcNameEntry->getString( bnpcNameEntry->data().Text.SGL );
-    }
-
-    m_bnpcs.push_back( bnpc );
-  }
-}
-
 // Add a separate method to clean up just the geometry, not the whole rendering system
-void ZoneEditor::cleanupNavmeshGeometry()
+void LgbViewer::cleanupNavmeshGeometry()
 {
   if( m_navmeshVAO )
   {
@@ -472,11 +177,10 @@ void ZoneEditor::cleanupNavmeshGeometry()
   printf( "Cleaned up navmesh geometry\n" );
 }
 
-void ZoneEditor::cleanupNavmeshRendering()
+void LgbViewer::cleanupNavmeshRendering()
 {
   // Clean up geometry
   cleanupNavmeshGeometry();
-  cleanupBnpcMarkerRendering();
 
   // Clean up shader
   if( m_navmeshShader )
@@ -508,7 +212,27 @@ void ZoneEditor::cleanupNavmeshRendering()
 }
 
 
-void ZoneEditor::onSelectionChanged()
+bool LgbViewer::loadLgbData( std::string lgbPath, std::vector< LGB_GROUP >& groups, std::string& name )
+{
+  auto& gameData = Engine::Service< xiv::dat::GameData >::ref();
+
+  std::vector< char > data_section;
+  if( !gameData.doesFileExist( lgbPath ) )
+    return true;
+  auto bg_file = gameData.getFile( lgbPath );
+  data_section = bg_file->access_data_sections().at( 0 );
+
+
+  LGB_FILE bgLgb( &data_section[ 0 ], "bg" );
+  name = bgLgb.m_name;
+  for( auto& group : bgLgb.groups )
+  {
+    groups.push_back( group );
+  }
+  return false;
+}
+
+void LgbViewer::onSelectionChanged()
 {
   if( m_selectedZone )
   {
@@ -521,14 +245,6 @@ void ZoneEditor::onSelectionChanged()
       loadMapTexture( data.Map );
     }
 
-    loadBnpcs();
-    // Reset BNPC window state when zone changes
-    m_selectedBnpcIndex = -1;
-    m_filteredBnpcs.clear();
-    m_lastBnpcSearchTerm = "N/A";
-    memset( m_bnpcSearchBuffer, 0, sizeof( m_bnpcSearchBuffer ) );
-    updateBnpcSearchFilter();
-    m_lastBnpcSearchTerm = "";
 
     auto& naviMgr = Engine::Service< Sapphire::Common::Navi::NaviMgr >::ref();
     auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
@@ -548,12 +264,394 @@ void ZoneEditor::onSelectionChanged()
       }
       else
         m_pNaviProvider = nullptr;
+
+
+      std::string strippedPath;
+      auto pos = lvb.find_last_of( "/" );
+      if( pos != std::string::npos )
+      {
+        strippedPath = lvb.substr( 0, pos + 1 );
+      }
+
+      std::string lgbPath = "bg/" + strippedPath;
+      std::vector< LGB_GROUP > groups;
+
+      try
+      {
+        loadLgbData( lgbPath + "bg.lgb", bgGroups, bgGroupsName );
+        loadLgbData( lgbPath + "planmap.lgb", planmapGroups, planmapName );
+        loadLgbData( lgbPath + "planevent.lgb", planeventGroups, planeventName );
+        loadLgbData( lgbPath + "planlive.lgb", planliveGroups, planliveName );
+        loadLgbData( lgbPath + "planner.lgb", plannerGroups, plannerName );
+      } catch( ... )
+      {
+        return;
+      }
     }
   }
 }
 
+void LgbViewer::showGroupsWindow()
+{
+  ImGui::Begin( "LGB Groups", nullptr, ImGuiWindowFlags_None );
+
+  // Search/filter functionality
+  static char searchBuffer[ 256 ] = "";
+  ImGui::Text( "Search:" );
+  ImGui::SameLine();
+  if( ImGui::InputText( "##GroupSearch", searchBuffer, sizeof( searchBuffer ) ) )
+  {
+    // Update search filter when text changes
+  }
+
+  ImGui::Separator();
+
+  // Statistics summary
+  int totalGroups = bgGroups.size() + planeventGroups.size() +
+                    planliveGroups.size() + planmapGroups.size() + plannerGroups.size();
+  ImGui::Text( "Total Groups: %d", totalGroups );
+
+  ImGui::Separator();
+
+  // Create a child window for scrolling
+  ImGui::BeginChild( "GroupsScrollRegion", ImVec2( 0, 0 ), true );
+
+  // Helper lambda to display a group category
+  auto displayGroupCategory = [&]( const char *categoryName,
+                                   const std::vector< LGB_GROUP >& groups,
+                                   const ImVec4& headerColor,
+                                   std::string& name )
+  {
+    if( groups.empty() ) return;
+
+    ImGui::PushStyleColor( ImGuiCol_Text, headerColor );
+    bool categoryOpen = ImGui::CollapsingHeader(
+      ( name + " (" + std::to_string( groups.size() ) + ")" ).c_str(),
+      ImGuiTreeNodeFlags_DefaultOpen
+    );
+    ImGui::PopStyleColor();
+
+    if( categoryOpen )
+    {
+      ImGui::Indent();
+
+      for( size_t i = 0; i < groups.size(); ++i )
+      {
+        const auto& group = groups[ i ];
+
+        // Filter by search if needed
+        std::string searchStr = searchBuffer;
+        std::transform( searchStr.begin(), searchStr.end(), searchStr.begin(), ::tolower );
+        std::string groupName = group.name;
+        std::transform( groupName.begin(), groupName.end(), groupName.begin(), ::tolower );
+
+        if( !searchStr.empty() && groupName.find( searchStr ) == std::string::npos )
+          continue;
+
+        // Create unique ID for this group
+        ImGui::PushID( ( categoryName + std::to_string( i ) ).c_str() );
+
+        // Group header with entry count
+        std::string groupHeaderText = group.name + " (" +
+                                      std::to_string( group.entries.size() ) + " entries)";
+
+        bool groupOpen = ImGui::TreeNode( groupHeaderText.c_str() );
+
+        // Right-click context menu for group
+        if( ImGui::BeginPopupContextItem() )
+        {
+          if( ImGui::MenuItem( "Copy Group Name" ) )
+          {
+            ImGui::SetClipboardText( group.name.c_str() );
+          }
+          if( ImGui::MenuItem( "Export Group Info" ) )
+          {
+            // Add export functionality
+          }
+          ImGui::EndPopup();
+        }
+
+        if( groupOpen )
+        {
+          ImGui::Indent();
+
+          // Group metadata
+          ImGui::Text( "Group ID: %u", group.header.id );
+          if( group.header.entryCount > 0 )
+          {
+            ImGui::Text( "Layer Set References: %d", ( int ) group.refs.size() );
+
+            // Show layer set info if available
+            if( !group.refs.empty() )
+            {
+              if( ImGui::TreeNode( "Layer Sets" ) )
+              {
+                for( const auto& ref : group.refs )
+                {
+                  ImGui::BulletText( "Layer Set ID: %u", ref.LayerSetID );
+                }
+                ImGui::TreePop();
+              }
+            }
+          }
+
+          ImGui::Separator();
+
+          if( !group.entries.empty() )
+          {
+            ImGui::Text( "Entries (%zu):", group.entries.size() );
+            ImGui::Separator();
+
+            // Create UNIQUE table name using category and group index
+            std::string uniqueTableName = std::string( categoryName ) + "_Group" + std::to_string( i ) +
+                                          "_EntriesTable";
+
+            // Set a minimum height for the table to prevent 1-pixel height issue
+            float tableHeight = ImGui::GetTextLineHeightWithSpacing() *
+                                std::min( ( int ) group.entries.size() + 1, 10 ); // Show max 10 rows + header
+            // Get available space and reserve some minimum height
+            ImVec2 availableSize = ImGui::GetContentRegionAvail();
+            float minTableHeight = 200.0f; // Minimum height for the table
+            float tableHeight1 = std::max(minTableHeight, availableSize.y - 20.0f); // Leave some padding
+
+            // Ensure we have enough space for the table
+            if( availableSize.y < minTableHeight )
+            {
+              tableHeight1 = minTableHeight;
+            }
+
+
+            if( ImGui::BeginTable( "EntriesTable", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable |
+                     ImGuiTableFlags_SizingFixedFit,
+                     ImVec2(0.0f, tableHeight)
+         ) )
+        {
+          // Set up table headers
+          ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+          ImGui::TableSetupColumn( "Name", ImGuiTableColumnFlags_WidthStretch );
+          ImGui::TableSetupColumn( "Type", ImGuiTableColumnFlags_WidthFixed, 120.0f );
+          ImGui::TableSetupColumn( "Position", ImGuiTableColumnFlags_WidthFixed, 180.0f );
+          ImGui::TableSetupColumn( "Focus", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+          ImGui::TableSetupColumn( "View", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+          ImGui::TableHeadersRow();
+
+          // Table content
+          for( size_t i = 0; i < group.entries.size(); ++i )
+          {
+            auto& entry = group.entries[ i ];
+
+            ImGui::TableNextRow();
+
+            // ID column
+            ImGui::TableSetColumnIndex( 0 );
+            ImGui::Text( "%u", entry->header.instanceId );
+
+            // Name column
+            ImGui::TableSetColumnIndex( 1 );
+            ImGui::Text( "%s", getEntryName( entry.get() ).c_str() );
+
+            // Type column
+            ImGui::TableSetColumnIndex( 2 );
+            ImGui::Text( "%s", getEntryTypeString( entry->getType() ).c_str() );
+
+            // Position column
+            ImGui::TableSetColumnIndex( 3 );
+            ImGui::Text( "%.1f, %.1f, %.1f",
+              entry->header.transform.translation.x,
+              entry->header.transform.translation.y,
+              entry->header.transform.translation.z );
+
+            // Focus button column
+            ImGui::TableSetColumnIndex( 4 );
+            std::string focusButtonId = "Focus##" + std::to_string( entry->header.instanceId );
+            if( ImGui::Button( focusButtonId.c_str(), ImVec2( -1, 0 ) ) )
+            {
+              focusOn3DPosition( entry->header.transform.translation );
+            }
+
+            // View button column
+            ImGui::TableSetColumnIndex( 5 );
+            std::string viewButtonId = "View##" + std::to_string( entry->header.instanceId );
+            if( ImGui::Button( viewButtonId.c_str(), ImVec2( -1, 0 ) ) )
+            {
+              openEntryViewWidget( entry );
+            }
+
+            // Handle row selection and context menu
+            if( ImGui::IsItemClicked() || ImGui::TableGetHoveredRow() == (int)i + 1 )
+            {
+              onEntrySelected( entry.get() );
+            }
+
+            // Right-click context menu (keeping existing functionality)
+            if( ImGui::BeginPopupContextItem() )
+            {
+              if( ImGui::MenuItem( "Focus in 3D View" ) )
+              {
+                focusOn3DPosition( entry->header.transform.translation );
+              }
+              if( ImGui::MenuItem( "View Details" ) )
+              {
+                openEntryViewWidget( entry );
+              }
+              ImGui::EndPopup();
+            }
+          }
+
+          ImGui::EndTable();
+        }
+
+          }
+          else
+          {
+            ImGui::TextDisabled( "No entries in this group" );
+          }
+
+          ImGui::Unindent();
+          ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+      }
+
+      ImGui::Unindent();
+    }
+  };
+
+  // Display each category with different colors
+  displayGroupCategory( "BG Groups", bgGroups, ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), bgGroupsName ); // Green
+  displayGroupCategory( "Plan Event Groups", planeventGroups, ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), planeventName ); // Red
+  displayGroupCategory( "Plan Live Groups", planliveGroups, ImVec4( 0.2f, 0.2f, 0.8f, 1.0f ), planliveName ); // Blue
+  displayGroupCategory( "Plan Map Groups", planmapGroups, ImVec4( 0.8f, 0.8f, 0.2f, 1.0f ), planmapName ); // Yellow
+  displayGroupCategory( "Planner Groups", plannerGroups, ImVec4( 0.8f, 0.2f, 0.8f, 1.0f ), plannerName ); // Magenta
+
+  ImGui::EndChild();
+  ImGui::End();
+}
+
+// Helper functions you'll need to implement:
+std::string LgbViewer::getEntryTypeString( LgbEntryType type )
+{
+  switch( type )
+  {
+    case LgbEntryType::BgParts: return "BgParts";
+    case LgbEntryType::Attribute: return "Attribute";
+    case LgbEntryType::Light: return "Light";
+    case LgbEntryType::Vfx: return "Vfx";
+    case LgbEntryType::PositionMarker: return "PositionMarker";
+    case LgbEntryType::SharedGroup: return "SharedGroup";
+    case LgbEntryType::Sound: return "Sound";
+    case LgbEntryType::EventNpc: return "EventNpc";
+    case LgbEntryType::BattleNpc: return "BattleNpc";
+    case LgbEntryType::RoutePath: return "RoutePath";
+    case LgbEntryType::Character: return "Character";
+    case LgbEntryType::Aetheryte: return "Aetheryte";
+    case LgbEntryType::EnvSpace: return "EnvSpace";
+    case LgbEntryType::Gathering: return "Gathering";
+    case LgbEntryType::SharedGroup15: return "SharedGroup15";
+    case LgbEntryType::Treasure: return "Treasure";
+
+    case LgbEntryType::Player: return "Player";
+    case LgbEntryType::Monster: return "Monster";
+    case LgbEntryType::Weapon: return "Weapon";
+    case LgbEntryType::PopRange: return "PopRange";
+    case LgbEntryType::ExitRange: return "ExitRange";
+    case LgbEntryType::LVB: return "LVB";
+    case LgbEntryType::MapRange: return "MapRange";
+    case LgbEntryType::NaviMeshRange: return "NaviMeshRange";
+    case LgbEntryType::EventObject: return "EventObject";
+    case LgbEntryType::DemiHuman: return "DemiHuman";
+    case LgbEntryType::EnvLocation: return "EnvLocation";
+    case LgbEntryType::ControlPoint: return "ControlPoint";
+    case LgbEntryType::EventRange: return "EventRange";
+    case LgbEntryType::RestBonusRange: return "RestBonusRange";
+    case LgbEntryType::QuestMarker: return "QuestMarker";
+    case LgbEntryType::TimeLine: return "TimeLine";
+    case LgbEntryType::ObjectBehaviorSet: return "ObjectBehaviorSet";
+    case LgbEntryType::Movie: return "Movie";
+    case LgbEntryType::ScenarioEXD: return "ScenarioEXD";
+    case LgbEntryType::ScenarioText: return "ScenarioText";
+    case LgbEntryType::CollisionBox: return "CollisionBox";
+    case LgbEntryType::DoorRange: return "DoorRange";
+    case LgbEntryType::LineVfx: return "LineVfx";
+    case LgbEntryType::SoundEnvSet: return "SoundEnvSet";
+    case LgbEntryType::CutActionTimeline: return "CutActionTimeline";
+    case LgbEntryType::CharaScene: return "CharaScene";
+    case LgbEntryType::CutAction: return "CutAction";
+    case LgbEntryType::EquipPreset: return "EquipPreset";
+    case LgbEntryType::ClientPath: return "ClientPath";
+    case LgbEntryType::ServerPath: return "ServerPath";
+    case LgbEntryType::GimmickRange: return "GimmickRange";
+    case LgbEntryType::TargetMarker: return "TargetMarker";
+    case LgbEntryType::ChairMarker: return "ChairMarker";
+    case LgbEntryType::ClickableRange: return "ClickableRange";
+    case LgbEntryType::PrefetchRange: return "PrefetchRange";
+    case LgbEntryType::FateRange: return "FateRange";
+    case LgbEntryType::PartyMember: return "PartyMember";
+    case LgbEntryType::KeepRange: return "KeepRange";
+    case LgbEntryType::SphereCastRange: return "SphereCastRange";
+    case LgbEntryType::IndoorObject: return "IndoorObject";
+    case LgbEntryType::OutdoorObject: return "OutdoorObject";
+    case LgbEntryType::EditGroup: return "EditGroup";
+    case LgbEntryType::StableChocobo: return "StableChocobo";
+    default: return "Unknown(" + std::to_string( static_cast< uint32_t >( type ) ) + ")";
+  }
+}
+
+std::string LgbViewer::getEntryName( LgbEntry *entry )
+{
+  // You'll need to cast to appropriate types and extract names
+  // This depends on your LGB entry structure
+  return "Entry_" + std::to_string( entry->header.instanceId );
+}
+
+void LgbViewer::onEntrySelected( LgbEntry *entry )
+{
+  // Handle when an entry is selected
+  // Update properties panel, focus camera, etc.
+}
+
+void LgbViewer::focusOn3DPosition( const vec3& position )
+{
+  // Focus 3D camera on the given position
+  m_navCameraTarget = glm::vec3( position.x, position.y, position.z );
+
+  // Position the camera at a reasonable distance from the target
+  float distance = 25.0f; // Default viewing distance
+  float pitch = -30.0f * ( 3.1415926f / 180.0f ); // 30 degrees down in radians
+  float yaw = 0.0f; // Facing forward
+
+  // Calculate camera position based on spherical coordinates
+  m_navCameraPos.x = m_navCameraTarget.x + distance * cos( pitch ) * sin( yaw );
+  m_navCameraPos.y = m_navCameraTarget.y + distance * sin( pitch );
+  m_navCameraPos.z = m_navCameraTarget.z + distance * cos( pitch ) * cos( yaw );
+
+  // Update camera parameters
+  m_navCameraDistance = distance;
+  m_navCameraYaw = yaw * ( 180.0f / 3.1415926f ); // Convert back to degrees
+  m_navCameraPitch = -30.0f; // 30 degrees down
+
+  // Ensure navmesh window is visible when focusing
+  m_showNavmeshWindow = true;
+
+  // Also focus the position in the 2D map view
+  m_showMapWindow = true;
+
+  // Convert world position to 2D map coordinates for centering
+  // Using the map scale and offset to center the view on the position
+  float mapCenterX = position.x / ( m_mapScale / 100.0f ) - m_mapOffset.x;
+  float mapCenterY = position.z / ( m_mapScale / 100.0f ) - m_mapOffset.y; // Note: using Z for Y coordinate
+
+  // Store the focus position for the map view to use during rendering
+  m_focusWorldPos = glm::vec3( position.x, position.y, position.z );
+  m_shouldFocusOnMap = true;
+
+  // Set a reasonable zoom level for the map view
+  m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
+}
+
 // First, let's add a method to check for an .obj file alongside the navmesh
-std::string ZoneEditor::getObjFilePath()
+std::string LgbViewer::getObjFilePath()
 {
   if( !m_selectedZone || !m_pNaviProvider )
   {
@@ -577,7 +675,7 @@ std::string ZoneEditor::getObjFilePath()
   return objPath.string();
 }
 
-void ZoneEditor::checkForObjFile()
+void LgbViewer::checkForObjFile()
 {
   // Clean up any existing OBJ data
   cleanupObjModel();
@@ -608,7 +706,7 @@ void ZoneEditor::checkForObjFile()
   }
 }
 
-void ZoneEditor::renderObjModel()
+void LgbViewer::renderObjModel()
 {
   if( !m_objModel.loaded || !m_showObjModel )
   {
@@ -661,7 +759,7 @@ void ZoneEditor::renderObjModel()
   glUseProgram( 0 );
 }
 
-bool ZoneEditor::loadObjModel( const std::string& filepath )
+bool LgbViewer::loadObjModel( const std::string& filepath )
 {
   printf( "Loading OBJ model: %s\n", filepath.c_str() );
 
@@ -853,7 +951,7 @@ void main() {
   return true;
 }
 
-void ZoneEditor::cleanupObjModel()
+void LgbViewer::cleanupObjModel()
 {
   if( m_objModel.vao != 0 )
   {
@@ -873,7 +971,7 @@ void ZoneEditor::cleanupObjModel()
 }
 
 
-void ZoneEditor::updateNavmeshCamera()
+void LgbViewer::updateNavmeshCamera()
 {
   float radYaw = glm::radians( m_navCameraYaw );
   float radPitch = glm::radians( m_navCameraPitch );
@@ -884,20 +982,20 @@ void ZoneEditor::updateNavmeshCamera()
 }
 
 
-void ZoneEditor::onSelectionCleared()
+void LgbViewer::onSelectionCleared()
 {
   clearMapTexture();
   // Clear other loaded data
 }
 
-void ZoneEditor::show()
+void LgbViewer::show()
 {
   if( m_needsRefresh )
   {
     initializeCache();
   }
 
-  ImGui::Begin( "Zone Editor" );
+  ImGui::Begin( "Lgb Viewer" );
 
   showZoneList();
   ImGui::Separator();
@@ -911,19 +1009,30 @@ void ZoneEditor::show()
     showMapWindow();
   }
 
-  if( m_showBnpcWindow )
-  {
-    showBnpcWindow();
-  }
-
   if( m_showNavmeshWindow )
   {
     showNavmeshWindow();
   }
+
+  showGroupsWindow();
+
+  // Render individual entry view widgets
+  for( auto& widget : m_entryViewWidgets )
+  {
+    showEntryViewWidget(widget);
+  }
+
+  // Clean up closed widgets
+  m_entryViewWidgets.erase(
+    std::remove_if(m_entryViewWidgets.begin(), m_entryViewWidgets.end(),
+      [](const EntryViewWidget& widget) { return !widget.isOpen; }),
+    m_entryViewWidgets.end()
+  );
+
 }
 
 
-void ZoneEditor::buildNavmeshGeometry()
+void LgbViewer::buildNavmeshGeometry()
 {
   if( !m_pNaviProvider || !m_selectedZone )
   {
@@ -1111,11 +1220,10 @@ void ZoneEditor::buildNavmeshGeometry()
   {
     printf( "Successfully created navmesh geometry with %d triangles\n", m_navmeshIndexCount / 3 );
   }
-  buildBnpcMarkerGeometry();
 }
 
 // Also add a simplified version for testing
-void ZoneEditor::buildSimpleNavmeshTest()
+void LgbViewer::buildSimpleNavmeshTest()
 {
   // Create a simple test triangle
   std::vector< float > vertices = {
@@ -1168,7 +1276,7 @@ void ZoneEditor::buildSimpleNavmeshTest()
   }
 }
 
-void ZoneEditor::initializeNavmeshRendering()
+void LgbViewer::initializeNavmeshRendering()
 {
   // Create shaders (same as before)
   const char *vertexShaderSource = R"(
@@ -1220,12 +1328,10 @@ void ZoneEditor::initializeNavmeshRendering()
 
   m_navmeshShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
 
-  initializeBnpcMarkerRendering();
-
   // Create framebuffer for rendering to texture
   createNavmeshFramebuffer();
 
-  if( m_navmeshShader && m_navmeshFBO && m_bnpcMarkerShader )
+  if( m_navmeshShader && m_navmeshFBO )
   {
     printf( "Navmesh rendering initialized successfully\n" );
   }
@@ -1235,435 +1341,8 @@ void ZoneEditor::initializeNavmeshRendering()
   }
 }
 
-void ZoneEditor::renderBnpcMarkers()
-{
-  if( !m_showBnpcMarkersInNavmesh || !m_bnpcMarkerShader || !m_bnpcMarkerVAO || m_bnpcMarkerInstanceCount == 0 )
-  {
-    return;
-  }
-
-  // Set up matrices (same as navmesh)
-  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
-  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
-                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
-                                           0.1f, 10000.0f );
-
-  // Enhanced blending for better visibility
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-  // Temporarily disable depth writing but keep depth testing
-  // This prevents markers from being occluded too aggressively
-  glDepthMask( GL_FALSE );
-
-  // Bias depth slightly to ensure markers appear on top
-  glEnable( GL_POLYGON_OFFSET_FILL );
-  glPolygonOffset( -1.0f, -1.0f );
-
-  // Use billboard shader
-  glUseProgram( m_bnpcMarkerShader );
-
-  // Set uniforms
-  GLint viewLoc = glGetUniformLocation( m_bnpcMarkerShader, "view" );
-  if( viewLoc != -1 )
-  {
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
-  }
-
-  GLint projectionLoc = glGetUniformLocation( m_bnpcMarkerShader, "projection" );
-  if( projectionLoc != -1 )
-  {
-    glUniformMatrix4fv( projectionLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
-  }
-
-  // Render instanced billboards
-  glBindVertexArray( m_bnpcMarkerVAO );
-  glDrawArraysInstanced( GL_TRIANGLES, 0, 6, m_bnpcMarkerInstanceCount ); // 6 vertices per quad
-  glBindVertexArray( 0 );
-
-  // Restore OpenGL state
-  glDisable( GL_POLYGON_OFFSET_FILL );
-  glDepthMask( GL_TRUE );
-
-  // Unbind shader
-  glUseProgram( 0 );
-}
-
-void ZoneEditor::initializeBnpcMarkerRendering()
-{
-  // Enhanced billboard vertex shader with world-space rotation
-  const char *vertexShaderSource = R"(
-#version 330 core
-layout (location = 0) in vec3 worldPos;
-layout (location = 1) in vec2 offset;  // -1 to 1 for quad corners
-layout (location = 2) in vec3 color;   // Per-instance color
-layout (location = 3) in float size;   // Per-instance size
-layout (location = 4) in float selected; // 1.0 if selected, 0.0 if not
-layout (location = 5) in float rotation; // Y rotation in radians (π = 180°)
-
-uniform mat4 view;
-uniform mat4 projection;
-
-out vec3 markerColor;
-out vec2 texCoord;
-out float markerAlpha;
-out float isSelected;
-out float distanceFactor;
-out vec2 worldRotationDir; // World-space rotation direction
-
-void main() {
-    // Extract camera right and up vectors from view matrix
-    vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
-    vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
-
-    // Scale up selected markers significantly
-    float finalSize = size * (selected > 0.5 ? 2.0 : 1.0);
-
-    // Create billboard position
-    vec3 billboardPos = worldPos +
-                       cameraRight * offset.x * finalSize +
-                       cameraUp * offset.y * finalSize;
-
-    gl_Position = projection * view * vec4(billboardPos, 1.0);
-
-    // Pass through values
-    markerColor = color;
-    texCoord = offset; // -1 to 1, will be used to create shapes
-    isSelected = selected;
-
-    // Calculate world-space direction from rotation
-    // Convert Y rotation to world-space XZ direction
-    vec3 worldDirection = vec3(sin(rotation), 0.0, cos(rotation));
-
-    // Project world direction onto camera plane to get screen-space direction
-    float dirDotRight = dot(worldDirection, cameraRight);
-    float dirDotUp = dot(worldDirection, cameraUp);
-    worldRotationDir = normalize(vec2(dirDotRight, dirDotUp));
-
-    // Calculate distance for better alpha management
-    vec4 viewPos = view * vec4(worldPos, 1.0);
-    float distance = length(viewPos.xyz);
-    distanceFactor = distance;
-
-    // More visible alpha calculation - higher minimum alpha
-    markerAlpha = clamp(200.0 / distance, 0.7, 1.0);
-}
-)";
-
-  // Enhanced fragment shader with world-space rotation indicator
-  const char *fragmentShaderSource = R"(
-#version 330 core
-in vec3 markerColor;
-in vec2 texCoord;
-in float markerAlpha;
-in float isSelected;
-in float distanceFactor;
-in vec2 worldRotationDir; // Screen-space projection of world rotation
-
-out vec4 FragColor;
-
-void main() {
-    // Create a diamond shape - discard pixels outside the diamond
-    float dist = abs(texCoord.x) + abs(texCoord.y);
-
-    // Hard cutoff for diamond shape
-    if (dist > 0.9) {
-        discard;
-    }
-
-    // Create layers within the diamond
-    float innerCore = 1.0 - smoothstep(0.0, 0.4, dist);
-    float midRing = smoothstep(0.2, 0.5, dist) - smoothstep(0.5, 0.7, dist);
-    float outerRing = smoothstep(0.6, 0.8, dist) - smoothstep(0.8, 0.9, dist);
-
-    // Enhanced colors for better contrast
-    vec3 finalColor = markerColor;
-
-    // Use the world-space rotation direction (already projected to screen space)
-    vec2 rotDir = normalize(worldRotationDir);
-
-    // Check if current pixel is part of the rotation indicator
-    vec2 pixelPos = texCoord;
-
-    // Create an arrow pointing in the world-space rotation direction
-    // Arrow line (from center towards the rotation direction)
-    float lineDistance = abs(dot(pixelPos, vec2(-rotDir.y, rotDir.x))); // Perpendicular distance to line
-    float alongLine = dot(pixelPos, rotDir); // Distance along the line
-
-    // Arrow shaft: thin line from center to near the edge
-    bool isArrowLine = (lineDistance < 0.06) && (alongLine > 0.0) && (alongLine < 0.65) && (dist > 0.15);
-
-    // Arrow head: create a more visible triangle at the tip
-    vec2 arrowTip = rotDir * 0.7;
-    vec2 arrowBase1 = rotDir * 0.5 + vec2(-rotDir.y, rotDir.x) * 0.2;
-    vec2 arrowBase2 = rotDir * 0.5 + vec2(rotDir.y, -rotDir.x) * 0.2;
-
-    // Check if pixel is inside the arrow head triangle using barycentric coordinates
-    vec2 v0 = arrowTip - pixelPos;
-    vec2 v1 = arrowBase1 - pixelPos;
-    vec2 v2 = arrowBase2 - pixelPos;
-
-    float d1 = v0.x * v1.y - v0.y * v1.x;
-    float d2 = v1.x * v2.y - v1.y * v2.x;
-    float d3 = v2.x * v0.y - v2.y * v0.x;
-
-    bool hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-    bool hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-    bool isArrowHead = !(hasNeg && hasPos);
-
-    // Combine rotation indicator elements
-    bool isRotationIndicator = isArrowLine || isArrowHead;
-
-    if (isSelected > 0.5) {
-        // Selected markers: bright white core with colored ring
-        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.8);
-
-        // Add pulsing effect for selected markers
-        float time = gl_FragCoord.x * 0.02 + gl_FragCoord.y * 0.02;
-        float pulse = sin(time) * 0.15 + 1.0;
-        finalColor *= pulse;
-
-        // Boost brightness
-        finalColor *= 1.5;
-
-        // Make rotation indicator very bright for selected
-        if (isRotationIndicator) {
-            finalColor = vec3(1.0, 1.0, 1.0); // Pure white arrow
-        }
-    } else {
-        // Normal markers: brighter colors with white highlights in center
-        finalColor = mix(markerColor, vec3(1.0, 1.0, 1.0), innerCore * 0.4);
-        finalColor *= 1.3; // Make brighter
-
-        // Make rotation indicator contrasting color
-        if (isRotationIndicator) {
-            finalColor = vec3(0.0, 0.0, 0.0); // Black arrow for contrast
-        }
-    }
-
-    // Add black border only at the very edge of the diamond (but not over rotation indicator)
-    if (outerRing > 0.5 && !isRotationIndicator) {
-        finalColor = vec3(0.0, 0.0, 0.0); // Black border
-    }
-
-    // Calculate alpha based on distance from center (for anti-aliasing)
-    float edgeAlpha = 1.0 - smoothstep(0.7, 0.9, dist);
-    float finalAlpha = edgeAlpha * markerAlpha;
-
-    // Boost alpha for rotation indicator
-    if (isRotationIndicator) {
-        finalAlpha = max(finalAlpha, 0.9);
-    }
-
-    // Boost alpha for very distant markers
-    if (distanceFactor > 150.0) {
-        finalAlpha = max(finalAlpha, 0.8);
-    }
-
-    // Minimum visibility threshold
-    finalAlpha = max(finalAlpha, 0.6);
-
-    // Final check - if alpha is too low, discard
-    if (finalAlpha < 0.1) {
-        discard;
-    }
-
-    FragColor = vec4(finalColor, finalAlpha);
-}
-)";
-
-  m_bnpcMarkerShader = createShaderProgram( vertexShaderSource, fragmentShaderSource );
-
-  if( m_bnpcMarkerShader )
-  {
-    printf( "Enhanced BNPC billboard shader with world-space rotation created successfully (ID: %u)\n",
-            m_bnpcMarkerShader );
-  }
-  else
-  {
-    printf( "Failed to create enhanced BNPC billboard shader\n" );
-  }
-}
-
-
-void ZoneEditor::buildBnpcMarkerGeometry()
-{
-  if( !m_selectedZone || m_bnpcs.empty() )
-  {
-    return;
-  }
-
-  // Clean up existing marker buffers
-  if( m_bnpcMarkerVAO )
-  {
-    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
-  }
-  if( m_bnpcMarkerVBO )
-  {
-    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
-  }
-  if( m_bnpcMarkerInstanceVBO )
-  {
-    glDeleteBuffers( 1, &m_bnpcMarkerInstanceVBO );
-  }
-
-  // Create quad template (will be instanced for each BNPC)
-  std::vector< float > quadVertices = {
-    // positions (offset from center)
-    -1.0f, -1.0f, // bottom-left
-    1.0f, -1.0f, // bottom-right
-    1.0f, 1.0f, // top-right
-    -1.0f, -1.0f, // bottom-left
-    1.0f, 1.0f, // top-right
-    -1.0f, 1.0f // top-left
-  };
-
-  // Create instance data for each BNPC (now includes rotation)
-  struct BnpcInstance
-  {
-    glm::vec3 worldPos;
-    glm::vec3 color;
-    float size;
-    float selected;
-    float rotation; // New: Y rotation in radians
-  };
-
-  std::vector< BnpcInstance > instanceData;
-  m_bnpcWorldPositions.clear(); // Clear the cache
-  instanceData.reserve( m_bnpcs.size() );
-
-  // Create a set of filtered BNPC IDs for quick lookup
-  std::unordered_set< uint32_t > filteredBnpcIds;
-  for( auto *bnpc : m_filteredBnpcs )
-  {
-    filteredBnpcIds.insert( bnpc->instanceId );
-  }
-
-  // Get selected BNPC for highlighting
-  CachedBnpc *selectedBnpc = nullptr;
-  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() )
-  {
-    selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
-  }
-
-  for( const auto& bnpc : m_bnpcs )
-  {
-    if( bnpc->territoryType != m_selectedZone->id )
-      continue;
-
-    BnpcInstance instance;
-    instance.worldPos = glm::vec3( bnpc->x, bnpc->y + 3.0f, bnpc->z ); // Higher above ground for visibility
-
-    // Store world position for mouse picking
-    m_bnpcWorldPositions.push_back( { instance.worldPos, bnpc.get() } );
-
-    // Determine if this BNPC is filtered (visible in search results)
-    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
-
-    // Enhanced colors with better contrast
-    if( !isFiltered )
-    {
-      // Darker grey for unfiltered BNPCs but still visible
-      instance.color = glm::vec3( 0.6f, 0.6f, 0.6f );
-    }
-    else
-    {
-      // Brighter, more saturated colors for filtered BNPCs
-      if( bnpc->Level > 50 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.0f, 0.0f ); // Pure red for high level
-      }
-      else if( bnpc->Level > 30 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
-      }
-      else
-      {
-        instance.color = glm::vec3( 0.0f, 1.0f, 0.0f ); // Pure green for low level
-      }
-    }
-
-    // Check if this BNPC is selected
-    instance.selected = ( selectedBnpc && selectedBnpc->instanceId == bnpc->instanceId ) ? 1.0f : 0.0f;
-
-    // Set rotation - the value is already in radians where π = 180°
-    instance.rotation = bnpc->rotation;
-
-    // Larger base sizes for better visibility
-    float baseSize = 2.5f + ( bnpc->Level * 0.03f );
-    if( !isFiltered )
-    {
-      baseSize *= 0.8f; // Slightly smaller for unfiltered but still visible
-    }
-    instance.size = baseSize;
-
-    instanceData.push_back( instance );
-  }
-
-  if( instanceData.empty() )
-  {
-    printf( "No BNPCs found for zone %u\n", m_selectedZone->id );
-    return;
-  }
-
-  // Create VAO and VBOs
-  glGenVertexArrays( 1, &m_bnpcMarkerVAO );
-  glGenBuffers( 1, &m_bnpcMarkerVBO );
-  glGenBuffers( 1, &m_bnpcMarkerInstanceVBO );
-
-  glBindVertexArray( m_bnpcMarkerVAO );
-
-  // Upload quad vertex data (static)
-  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerVBO );
-  glBufferData( GL_ARRAY_BUFFER, quadVertices.size() * sizeof( float ), quadVertices.data(), GL_STATIC_DRAW );
-
-  // Set vertex attributes for quad offsets
-  glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), ( void * ) 0 );
-  glEnableVertexAttribArray( 1 );
-
-  // Upload instance data (per-BNPC data)
-  glBindBuffer( GL_ARRAY_BUFFER, m_bnpcMarkerInstanceVBO );
-  glBufferData( GL_ARRAY_BUFFER, instanceData.size() * sizeof( BnpcInstance ), instanceData.data(), GL_DYNAMIC_DRAW );
-
-  // Set instance attributes
-  // World position (vec3)
-  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
-                         ( void * ) offsetof( BnpcInstance, worldPos ) );
-  glEnableVertexAttribArray( 0 );
-  glVertexAttribDivisor( 0, 1 ); // One per instance
-
-  // Color (vec3)
-  glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ), ( void * ) offsetof( BnpcInstance, color ) );
-  glEnableVertexAttribArray( 2 );
-  glVertexAttribDivisor( 2, 1 ); // One per instance
-
-  // Size (float)
-  glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ), ( void * ) offsetof( BnpcInstance, size ) );
-  glEnableVertexAttribArray( 3 );
-  glVertexAttribDivisor( 3, 1 ); // One per instance
-
-  // Selected (float)
-  glVertexAttribPointer( 4, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
-                         ( void * ) offsetof( BnpcInstance, selected ) );
-  glEnableVertexAttribArray( 4 );
-  glVertexAttribDivisor( 4, 1 ); // One per instance
-
-  // Rotation (float) - NEW
-  glVertexAttribPointer( 5, 1, GL_FLOAT, GL_FALSE, sizeof( BnpcInstance ),
-                         ( void * ) offsetof( BnpcInstance, rotation ) );
-  glEnableVertexAttribArray( 5 );
-  glVertexAttribDivisor( 5, 1 ); // One per instance
-
-  glBindVertexArray( 0 );
-
-  m_bnpcMarkerInstanceCount = instanceData.size();
-
-  printf( "Created %d enhanced BNPC billboard markers with rotation indicators for zone %u\n",
-          m_bnpcMarkerInstanceCount, m_selectedZone->id );
-}
-
 // Helper function to project 3D world position to 2D screen coordinates
-glm::vec2 ZoneEditor::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& imageSize )
+glm::vec2 LgbViewer::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& imageSize )
 {
   // Set up the same matrices as used in 3D rendering
   glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
@@ -1697,145 +1376,7 @@ glm::vec2 ZoneEditor::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& 
   return screenPos;
 }
 
-// New function to handle 3D BNPC tooltips and selection
-void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
-{
-  if( !m_selectedZone || m_bnpcWorldPositions.empty() )
-    return;
-
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  // Handle mouse interaction
-  if( ImGui::IsWindowHovered() )
-  {
-    ImVec2 mousePos = ImGui::GetMousePos();
-    mousePos.x -= imagePos.x;
-    mousePos.y -= imagePos.y;
-
-    // Find the closest BNPC to the mouse cursor
-    float closestDistance = FLT_MAX;
-    int closestIndex = -1;
-    CachedBnpc *hoveredBnpc = nullptr;
-    ImVec2 hoveredScreenPos;
-
-    for( size_t i = 0; i < m_bnpcWorldPositions.size(); i++ )
-    {
-      const auto& entry = m_bnpcWorldPositions[ i ];
-      glm::vec2 screenPos = worldTo3DScreen( entry.worldPos, imageSize );
-
-      // Skip if outside visible area
-      if( screenPos.x < 0 || screenPos.x > imageSize.x ||
-          screenPos.y < 0 || screenPos.y > imageSize.y )
-        continue;
-
-      // Calculate distance from mouse to BNPC
-      float dx = screenPos.x - mousePos.x;
-      float dy = screenPos.y - mousePos.y;
-      float distance = sqrtf( dx * dx + dy * dy );
-
-      // Check if this is within hover radius and closest so far
-      if( distance < 25.0f && distance < closestDistance )
-      {
-        closestDistance = distance;
-        hoveredBnpc = entry.bnpc;
-        hoveredScreenPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-        // Find this BNPC in filtered list for potential selection
-        for( size_t j = 0; j < m_filteredBnpcs.size(); j++ )
-        {
-          if( m_filteredBnpcs[ j ]->instanceId == entry.bnpc->instanceId )
-          {
-            closestIndex = static_cast< int >( j );
-            break;
-          }
-        }
-      }
-    }
-
-    // Handle mouse click for selection
-    if( ImGui::IsMouseClicked( 0 ) && closestIndex >= 0 )
-    {
-      m_selectedBnpcIndex = closestIndex;
-      // Rebuild markers to update selection highlighting
-      buildBnpcMarkerGeometry();
-    }
-
-    // Show tooltip for hovered BNPC
-    if( hoveredBnpc )
-    {
-      ImGui::SetMouseCursor( ImGuiMouseCursor_Hand );
-
-      // Position tooltip near the BNPC but avoid screen edges
-      ImVec2 tooltipPos = hoveredScreenPos;
-      tooltipPos.x += 15;
-      tooltipPos.y -= 10;
-
-      ImGui::SetNextWindowPos( tooltipPos );
-      ImGui::SetNextWindowBgAlpha( 0.9f );
-
-      if( ImGui::Begin( "##BnpcTooltip", nullptr,
-                        ImGuiWindowFlags_Tooltip |
-                        ImGuiWindowFlags_NoInputs |
-                        ImGuiWindowFlags_NoTitleBar |
-                        ImGuiWindowFlags_NoMove |
-                        ImGuiWindowFlags_NoResize |
-                        ImGuiWindowFlags_NoSavedSettings |
-                        ImGuiWindowFlags_AlwaysAutoResize ) )
-      {
-        if( !hoveredBnpc->nameString.empty() )
-          ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
-        ImGui::Separator();
-        ImGui::Text( "ID: %u", hoveredBnpc->instanceId );
-        ImGui::Text( "Level: %u", hoveredBnpc->Level );
-        ImGui::Text( "Position: %.1f, %.1f, %.1f", hoveredBnpc->x, hoveredBnpc->y, hoveredBnpc->z );
-
-        ImGui::End();
-      }
-    }
-  }
-
-  // Draw name for selected BNPC
-  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() )
-  {
-    CachedBnpc *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
-
-    // Find the world position of selected BNPC
-    for( const auto& entry : m_bnpcWorldPositions )
-    {
-      if( entry.bnpc->instanceId == selectedBnpc->instanceId )
-      {
-        glm::vec2 screenPos = worldTo3DScreen( entry.worldPos, imageSize );
-
-        if( screenPos.x >= 0 && screenPos.x <= imageSize.x &&
-            screenPos.y >= 0 && screenPos.y <= imageSize.y )
-        {
-          // Draw name above the selected BNPC
-          ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
-
-          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
-                                                   ? "not set"
-                                                   : selectedBnpc->nameString.c_str() );
-
-          // Center the text horizontally
-          textPos.x -= textSize.x * 0.5f;
-
-          // Draw background
-          drawList->AddRectFilled(
-            ImVec2( textPos.x - 4, textPos.y - 2 ),
-            ImVec2( textPos.x + textSize.x + 4, textPos.y + textSize.y + 2 ),
-            IM_COL32( 0, 0, 0, 200 )
-          );
-
-          if( !selectedBnpc->nameString.empty() )
-            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
-        }
-        break;
-      }
-    }
-  }
-}
-
-void ZoneEditor::renderNavmesh()
+void LgbViewer::renderNavmesh()
 {
   if( !m_navmeshTexture )
   {
@@ -1874,9 +1415,6 @@ void ZoneEditor::renderNavmesh()
 
   // Display the texture
   ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
-
-  // Handle 3D BNPC interaction (replaces the old 2D overlay)
-  handle3DBnpcInteraction( imageScreenPos, imageSize );
 
   // Handle mouse interaction over the image (camera controls only)
   if( ImGui::IsItemHovered() )
@@ -2014,8 +1552,6 @@ void ZoneEditor::renderNavmesh()
   // Display info below the image
   ImGui::SetCursorPos( ImVec2( cursorPos.x, cursorPos.y + contentRegion.y - 100 ) );
   ImGui::Text( "Navmesh: %d triangles", m_navmeshIndexCount / 3 );
-  ImGui::Text( "BNPCs: %d 3D markers", m_bnpcMarkerInstanceCount );
-  ImGui::Checkbox( "Show BNPC Markers", &m_showBnpcMarkersInNavmesh );
   ImGui::Text( "Camera: dist=%.1f yaw=%.1f pitch=%.1f",
                m_navCameraDistance, m_navCameraYaw, m_navCameraPitch );
   ImGui::Text( "Target: (%.1f, %.1f, %.1f)",
@@ -2023,37 +1559,7 @@ void ZoneEditor::renderNavmesh()
   ImGui::Text( "Controls: LMB=rotate, MMB=pan, wheel=zoom, click markers=select" );
 }
 
-
-void ZoneEditor::cleanupBnpcMarkerRendering()
-{
-  if( m_bnpcMarkerVAO )
-  {
-    glDeleteVertexArrays( 1, &m_bnpcMarkerVAO );
-    m_bnpcMarkerVAO = 0;
-  }
-
-  if( m_bnpcMarkerVBO )
-  {
-    glDeleteBuffers( 1, &m_bnpcMarkerVBO );
-    m_bnpcMarkerVBO = 0;
-  }
-
-  if( m_bnpcMarkerInstanceVBO )
-  {
-    glDeleteBuffers( 1, &m_bnpcMarkerInstanceVBO );
-    m_bnpcMarkerInstanceVBO = 0;
-  }
-
-  if( m_bnpcMarkerShader )
-  {
-    glDeleteProgram( m_bnpcMarkerShader );
-    m_bnpcMarkerShader = 0;
-  }
-
-  m_bnpcMarkerInstanceCount = 0;
-}
-
-void ZoneEditor::renderNavmeshToTexture()
+void LgbViewer::renderNavmeshToTexture()
 {
   if( !m_navmeshFBO )
   {
@@ -2153,16 +1659,11 @@ void ZoneEditor::renderNavmeshToTexture()
     //        m_showObjModel, m_objModel.loaded, m_navmeshShader, m_navmeshVAO, m_navmeshIndexCount );
   }
 
-  // Render BNPC markers on top
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  renderBnpcMarkers();
-
   // Unbind framebuffer (back to default)
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize )
+glm::vec2 LgbViewer::worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize )
 {
   // Set up the same matrices as used in rendering
   glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
@@ -2198,147 +1699,7 @@ glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float wo
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
-{
-  if( !m_selectedZone || m_bnpcs.empty() )
-    return;
-
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  // Define colors
-  ImU32 filteredColor = m_bnpcIconColor; // Yellow for filtered BNPCs
-  ImU32 selectedColor = m_selectedBnpcIconColor; // Red for selected BNPC
-  ImU32 unfilteredColor = IM_COL32( 150, 150, 150, 180 ); // Grey for unfiltered BNPCs
-
-  // Keep track of the selected BNPC for special rendering
-  CachedBnpc *selectedBnpc = nullptr;
-  ImVec2 selectedPos;
-
-  // Create a set of filtered BNPC IDs for quick lookup
-  std::unordered_set< uint32_t > filteredBnpcIds;
-  for( auto *bnpc : m_filteredBnpcs )
-  {
-    filteredBnpcIds.insert( bnpc->instanceId );
-  }
-
-  // First pass: Render all BNPCs except the selected one
-  for( const auto& bnpc : m_bnpcs )
-  {
-    // Skip BNPCs from other territories
-    if( bnpc->territoryType != m_selectedZone->id )
-      continue;
-
-    // Convert 3D world position to 2D screen position
-    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-    // Skip if outside visible area
-    if( screenPos.x < 0 || screenPos.x > imageSize.x ||
-        screenPos.y < 0 || screenPos.y > imageSize.y )
-      continue;
-
-    // Add the window position offset
-    ImVec2 pos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-    // Check if this is the selected BNPC
-    bool isSelected = false;
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ]->instanceId == bnpc->instanceId )
-    {
-      isSelected = true;
-      selectedBnpc = bnpc.get();
-      selectedPos = pos;
-      continue; // Skip rendering selected BNPC in first pass
-    }
-
-    // Determine color based on filter status
-    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
-    ImU32 iconColor = isFiltered ? filteredColor : unfilteredColor;
-
-    // Draw the marker
-    float iconSize = m_bnpcIconSize;
-    drawList->AddCircleFilled( pos, iconSize, iconColor );
-    drawList->AddCircle( pos, iconSize, IM_COL32( 0, 0, 0, 255 ) );
-
-    // Show tooltip on hover
-    if( ImGui::IsWindowHovered() &&
-        ImGui::IsMouseHoveringRect(
-          ImVec2( pos.x - iconSize, pos.y - iconSize ),
-          ImVec2( pos.x + iconSize, pos.y + iconSize ) ) )
-    {
-      // Draw a tooltip with BNPC info
-      ImGui::SetTooltip( "%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
-                         bnpc->nameString.c_str(),
-                         bnpc->instanceId,
-                         bnpc->x, bnpc->y, bnpc->z );
-    }
-  }
-
-  // Second pass: Render the selected BNPC on top
-  if( selectedBnpc )
-  {
-    // Draw the selected BNPC with larger size and different color
-    float iconSize = m_bnpcIconSize * 1.5f;
-    drawList->AddCircleFilled( selectedPos, iconSize, selectedColor );
-    drawList->AddCircle( selectedPos, iconSize, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
-
-    // Draw the name above the marker
-    ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
-    // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
-                                             ? "not set"
-                                             : selectedBnpc->nameString.c_str() );
-    drawList->AddRectFilled(
-      ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
-      ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
-      IM_COL32( 0, 0, 0, 180 )
-    );
-    // Center the text
-    textPos.x -= textSize.x / 2;
-    if( !selectedBnpc->nameString.empty() )
-      drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
-  }
-
-  // Handle mouse clicks for selection
-  if( ImGui::IsWindowHovered() && ImGui::IsMouseClicked( 0 ) )
-  {
-    ImVec2 mousePos = ImGui::GetMousePos();
-    mousePos.x -= imagePos.x;
-    mousePos.y -= imagePos.y;
-
-    // Find closest BNPC to the click position
-    float closestDistance = FLT_MAX;
-    int closestIndex = -1;
-
-    for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
-    {
-      CachedBnpc *bnpc = m_filteredBnpcs[ i ];
-
-      // Convert 3D position to screen space
-      glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-      // Calculate distance from mouse to BNPC icon
-      float dx = screenPos.x - mousePos.x;
-      float dy = screenPos.y - mousePos.y;
-      float distance = sqrtf( dx * dx + dy * dy );
-
-      // Check if this is within selection radius and closest so far
-      if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
-      {
-        closestDistance = distance;
-        closestIndex = static_cast< int >( i );
-      }
-    }
-
-    // If we found a close BNPC, select it
-    if( closestIndex >= 0 )
-    {
-      m_selectedBnpcIndex = closestIndex;
-      //onSelectionChanged(); // Update any selection-dependent state
-    }
-  }
-}
-
-void ZoneEditor::createNavmeshFramebuffer()
+void LgbViewer::createNavmeshFramebuffer()
 {
   // Clean up existing framebuffer
   if( m_navmeshFBO )
@@ -2385,7 +1746,7 @@ void ZoneEditor::createNavmeshFramebuffer()
           m_navmeshTextureWidth, m_navmeshTextureHeight );
 }
 
-void ZoneEditor::showNavmeshWindow()
+void LgbViewer::showNavmeshWindow()
 {
   ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar |
                                   ImGuiWindowFlags_NoScrollWithMouse;
@@ -2636,7 +1997,7 @@ void ZoneEditor::showNavmeshWindow()
   }
 }
 
-void ZoneEditor::showZoneList()
+void LgbViewer::showZoneList()
 {
   // Search input
   ImGui::Text( "Search Zones:" );
@@ -2668,8 +2029,6 @@ void ZoneEditor::showZoneList()
         // Only trigger selection changed if it actually changed
         if( oldSelectedId != m_selectedZoneId )
         {
-          m_selectedBnpcIndex = -1;
-          m_bnpcWorldPositions.clear();
           onSelectionChanged();
         }
       }
@@ -2689,7 +2048,7 @@ void ZoneEditor::showZoneList()
   ImGui::EndChild();
 }
 
-void ZoneEditor::showZoneDetails()
+void LgbViewer::showZoneDetails()
 {
   if( !m_selectedZone )
   {
@@ -2802,14 +2161,7 @@ void ZoneEditor::showZoneDetails()
       onSelectionCleared();
     }
     ImGui::SameLine();
-    if( ImGui::Button( "Show BNPCs" ) )
-    {
-      if( !m_bnpcs.empty() )
-      {
-        m_showBnpcWindow = true;
-        updateBnpcSearchFilter();
-      }
-    }
+
     if( ImGui::Button( "Show Navmesh" ) )
     {
       m_showNavmeshWindow = true;
@@ -2819,7 +2171,8 @@ void ZoneEditor::showZoneDetails()
   ImGui::EndChild();
 }
 
-void ZoneEditor::showMapWindow()
+
+void LgbViewer::showMapWindow()
 {
   if( !m_showMapWindow || m_mapTextureId == 0 )
     return;
@@ -2831,14 +2184,6 @@ void ZoneEditor::showMapWindow()
   {
     ImGui::Text( "Map ID: %u | Size: %dx%d", m_currentMapId, m_mapWidth, m_mapHeight );
     ImGui::Separator();
-
-    ImGui::Checkbox( "Show BNPCs", &m_showBnpcIcons );
-
-    if( m_showBnpcIcons )
-    {
-      ImGui::SetNextItemWidth( 100 );
-      ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 4.0f, 20.0f );
-    }
 
     if( ImGui::Button( "Reset Zoom" ) )
     {
@@ -2887,6 +2232,42 @@ void ZoneEditor::showMapWindow()
     float oldScrollY = ImGui::GetScrollY();
     ImVec2 mousePos = ImGui::GetMousePos();
     ImVec2 childPos = ImGui::GetWindowPos();
+
+    // Handle focus request - center view on the focused position
+    if( m_shouldFocusOnMap )
+    {
+      // Convert world position to map coordinates
+      glm::vec2 mapPos = get2dPosFrom3d( m_focusWorldPos.x, m_focusWorldPos.z, m_mapScale );
+
+      // Convert map coordinates to normalized coordinates (0.0 to 1.0)
+      float normalizedX = mapPos.x / 2048.0f;
+      float normalizedY = mapPos.y / 2048.0f;
+
+      // Convert to image pixel coordinates
+      float imagePixelX = normalizedX * imageSize.x;
+      float imagePixelY = normalizedY * imageSize.y;
+
+      // Get the child window content size
+      ImVec2 childContentSize = ImGui::GetContentRegionAvail();
+
+      // Calculate scroll position to center the focus point
+      float targetScrollX = imagePixelX - (childContentSize.x * 0.5f);
+      float targetScrollY = imagePixelY - (childContentSize.y * 0.5f);
+
+      // Clamp scroll values to valid range
+      float maxScrollX = std::max( 0.0f, imageSize.x - childContentSize.x );
+      float maxScrollY = std::max( 0.0f, imageSize.y - childContentSize.y );
+
+      targetScrollX = std::max( 0.0f, std::min( targetScrollX, maxScrollX ) );
+      targetScrollY = std::max( 0.0f, std::min( targetScrollY, maxScrollY ) );
+
+      // Apply the scroll
+      ImGui::SetScrollX( targetScrollX );
+      ImGui::SetScrollY( targetScrollY );
+
+      // Clear the focus flag
+      m_shouldFocusOnMap = false;
+    }
 
     // Handle zoom controls - only when mouse is over the child window
     if( ImGui::IsWindowHovered() )
@@ -2948,10 +2329,40 @@ void ZoneEditor::showMapWindow()
     // Check if mouse is hovering over the image
     bool mouseOverImage = ImGui::IsItemHovered();
 
-    // Draw BNPC icons if enabled
-    if( m_showBnpcIcons && !m_bnpcs.empty() )
+    // Draw focus marker if we have a focus position
+    if( m_focusWorldPos != glm::vec3( 0.0f ) )
     {
-      drawBnpcIcons();
+      // Convert world position to screen position for drawing the marker
+      glm::vec2 mapPos = get2dPosFrom3d( m_focusWorldPos.x, m_focusWorldPos.z, m_mapScale );
+
+      // Convert to normalized coordinates
+      float normalizedX = mapPos.x / 2048.0f;
+      float normalizedY = mapPos.y / 2048.0f;
+
+      // Convert to screen position
+      ImVec2 markerScreenPos = ImVec2(
+        imagePos.x + normalizedX * imageSize.x,
+        imagePos.y + normalizedY * imageSize.y
+      );
+
+      // Draw the focus marker
+      ImDrawList* drawList = ImGui::GetWindowDrawList();
+      float markerSize = 8.0f;
+
+      // Draw a cross marker
+      drawList->AddLine(
+        ImVec2( markerScreenPos.x - markerSize, markerScreenPos.y ),
+        ImVec2( markerScreenPos.x + markerSize, markerScreenPos.y ),
+        IM_COL32( 255, 0, 0, 255 ), 2.0f
+      );
+      drawList->AddLine(
+        ImVec2( markerScreenPos.x, markerScreenPos.y - markerSize ),
+        ImVec2( markerScreenPos.x, markerScreenPos.y + markerSize ),
+        IM_COL32( 255, 0, 0, 255 ), 2.0f
+      );
+
+      // Draw a circle around it
+      drawList->AddCircle( markerScreenPos, markerSize + 2.0f, IM_COL32( 255, 255, 255, 255 ), 12, 2.0f );
     }
 
     // Handle panning (drag to move when zoomed in)
@@ -3114,15 +2525,11 @@ void ZoneEditor::showMapWindow()
     ImGui::Text( "Zoom: Fit to Window" );
   }
   ImGui::Text( "Mouse wheel: Zoom | Left drag: Pan" );
-  if( m_showBnpcIcons )
-  {
-    ImGui::Text( "BNPCs: %zu visible", m_bnpcs.size() );
-  }
 
   ImGui::End();
 }
 
-std::vector< uint8_t > ZoneEditor::decompressDXT1( const uint8_t *compressedData, int width, int height )
+std::vector< uint8_t > LgbViewer::decompressDXT1( const uint8_t *compressedData, int width, int height )
 {
   std::vector< uint8_t > decompressed( width * height * 4 ); // RGBA output
 
@@ -3214,7 +2621,7 @@ std::vector< uint8_t > ZoneEditor::decompressDXT1( const uint8_t *compressedData
   return decompressed;
 }
 
-ImVec2 ZoneEditor::worldToScreenPos( float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize )
+ImVec2 LgbViewer::worldToScreenPos( float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize )
 {
   // Convert 3D world position to 2D map coordinates using your existing function
   glm::vec2 mapPos = get2dPosFrom3d( worldX, worldZ, m_mapScale );
@@ -3232,99 +2639,7 @@ ImVec2 ZoneEditor::worldToScreenPos( float worldX, float worldZ, const ImVec2& i
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcIcons()
-{
-  if( !m_showMapWindow || m_mapTextureId == 0 || m_bnpcs.empty() )
-    return;
-
-  // Get the current image position and size
-  ImVec2 imagePos = ImGui::GetItemRectMin();
-  ImVec2 imageSize = ImGui::GetItemRectSize();
-
-  // Get draw list for drawing on top of the image
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  // Check if we're currently dragging - if so, don't process button clicks
-  bool isDragging = ImGui::IsMouseDragging( ImGuiMouseButton_Left );
-
-  // Draw each BNPC
-  for( size_t i = 0; i < m_bnpcs.size(); ++i )
-  {
-    const auto& bnpc = m_bnpcs[ i ];
-
-    // Convert world position to screen position
-    ImVec2 screenPos = worldToScreenPos( bnpc->x, bnpc->z, imagePos, imageSize );
-
-    // Check if the icon is within the visible image area
-    if( screenPos.x < imagePos.x || screenPos.x > imagePos.x + imageSize.x ||
-        screenPos.y < imagePos.y || screenPos.y > imagePos.y + imageSize.y )
-    {
-      continue; // Skip if outside visible area
-    }
-
-    // Choose color based on selection
-    ImU32 iconColor = m_bnpcIconColor;
-    if( m_selectedBnpcIndex >= 0 &&
-        m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc.get() )
-    {
-      iconColor = m_selectedBnpcIconColor;
-    }
-
-    // Draw diamond shape
-    float halfSize = m_bnpcIconSize * 0.5f;
-    ImVec2 points[ 4 ] = {
-      ImVec2( screenPos.x, screenPos.y - halfSize ), // Top
-      ImVec2( screenPos.x + halfSize, screenPos.y ), // Right
-      ImVec2( screenPos.x, screenPos.y + halfSize ), // Bottom
-      ImVec2( screenPos.x - halfSize, screenPos.y ) // Left
-    };
-
-    // Draw filled diamond
-    drawList->AddConvexPolyFilled( points, 4, iconColor );
-
-    // Draw border
-    drawList->AddPolyline( points, 4, IM_COL32( 0, 0, 0, 255 ), true, 1.0f );
-
-    // Only add invisible button for click detection if we're not dragging
-    if( !isDragging )
-    {
-      ImGui::SetCursorScreenPos( ImVec2( screenPos.x - halfSize, screenPos.y - halfSize ) );
-      ImGui::InvisibleButton( ( "bnpc_" + std::to_string( i ) ).c_str(), ImVec2( m_bnpcIconSize, m_bnpcIconSize ) );
-
-      // Handle click
-      if( ImGui::IsItemClicked() )
-      {
-        // Find this BNPC in filtered list and select it
-        for( int j = 0; j < static_cast< int >( m_filteredBnpcs.size() ); ++j )
-        {
-          if( m_filteredBnpcs[ j ] == bnpc.get() )
-          {
-            m_selectedBnpcIndex = j;
-            m_showBnpcWindow = true; // Show BNPC window when clicked
-            break;
-          }
-        }
-      }
-
-      // Show tooltip on hover
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        if( !bnpc->nameString.empty() )
-          ImGui::Text( "%s", bnpc->nameString.c_str() );
-        ImGui::Text( "BNPC: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "ID: %u", bnpc->instanceId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Position: %.1f, %.1f, %.1f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Separator();
-        ImGui::EndTooltip();
-      }
-    }
-  }
-}
-
-void ZoneEditor::loadMapTexture( uint32_t mapId )
+void LgbViewer::loadMapTexture( uint32_t mapId )
 {
   auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
   auto mapEntry = exdD.getRow< Excel::Map >( mapId );
@@ -3401,7 +2716,7 @@ void ZoneEditor::loadMapTexture( uint32_t mapId )
                         width, height, format, dxtData.size(), decompressedData.size() );
 }
 
-void ZoneEditor::clearMapTexture()
+void LgbViewer::clearMapTexture()
 {
   if( m_mapTextureId != 0 )
   {
@@ -3410,7 +2725,7 @@ void ZoneEditor::clearMapTexture()
   }
 }
 
-void ZoneEditor::refresh()
+void LgbViewer::refresh()
 {
   m_needsRefresh = true;
   m_zoneIds.clear();
@@ -3418,11 +2733,10 @@ void ZoneEditor::refresh()
   m_filteredZones.clear(); // For search results
   initializeCache();
   m_lastSearchTerm = "N/A";
-  m_lastBnpcSearchTerm = "N/A";
 }
 
 // Convert screen coordinates to world ray
-ZoneEditor::Ray ZoneEditor::screenToWorldRay( const ImVec2& screenPos, const ImVec2& imageSize )
+LgbViewer::Ray LgbViewer::screenToWorldRay( const ImVec2& screenPos, const ImVec2& imageSize )
 {
   // Convert screen coordinates to normalized device coordinates (-1 to 1)
   float x = ( 2.0f * screenPos.x ) / imageSize.x - 1.0f;
@@ -3455,8 +2769,8 @@ ZoneEditor::Ray ZoneEditor::screenToWorldRay( const ImVec2& screenPos, const ImV
 }
 
 // Ray-triangle intersection using Möller-Trumbore algorithm with backface culling
-bool ZoneEditor::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
-                                       float& distance, glm::vec3& normal )
+bool LgbViewer::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+                                      float& distance, glm::vec3& normal )
 {
   const float EPSILON = 0.0000001f;
 
@@ -3513,7 +2827,7 @@ bool ZoneEditor::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, cons
 }
 
 // Cast ray to navmesh geometry
-ZoneEditor::RayHit ZoneEditor::castRayToNavmesh( const Ray& ray )
+LgbViewer::RayHit LgbViewer::castRayToNavmesh( const Ray& ray )
 {
   RayHit hit;
 
@@ -3584,7 +2898,7 @@ ZoneEditor::RayHit ZoneEditor::castRayToNavmesh( const Ray& ray )
 }
 
 // Cast ray to OBJ model geometry
-ZoneEditor::RayHit ZoneEditor::castRayToObjModel( const Ray& ray )
+LgbViewer::RayHit LgbViewer::castRayToObjModel( const Ray& ray )
 {
   RayHit hit;
 
@@ -3633,7 +2947,7 @@ ZoneEditor::RayHit ZoneEditor::castRayToObjModel( const Ray& ray )
 }
 
 // Unified ray casting method
-ZoneEditor::RayHit ZoneEditor::castRayToGeometry( const Ray& ray )
+LgbViewer::RayHit LgbViewer::castRayToGeometry( const Ray& ray )
 {
   RayHit bestHit;
 
@@ -3652,7 +2966,7 @@ ZoneEditor::RayHit ZoneEditor::castRayToGeometry( const Ray& ray )
 }
 
 // Add world position marker rendering
-void ZoneEditor::renderWorldMarker( const glm::vec3& worldPos )
+void LgbViewer::renderWorldMarker( const glm::vec3& worldPos )
 {
   if( !m_showClickMarker ) return;
 
@@ -3664,21 +2978,324 @@ void ZoneEditor::renderWorldMarker( const glm::vec3& worldPos )
 }
 
 // Callback for world clicking - implement your editing logic here
-void ZoneEditor::onWorldClick( const RayHit& hit )
+void LgbViewer::onWorldClick( const RayHit& hit )
 {
-  // Example: Create a new BNPC at the clicked position
-  if( m_worldEditingMode )
-  {
-    // This is where you'd implement your BNPC creation logic
-    printf( "Would create BNPC at position: (%.2f, %.2f, %.2f)\n",
-            hit.position.x, hit.position.y, hit.position.z );
+}
 
-    // You can also use the NaviProvider to find the nearest walkable position
-    if( m_pNaviProvider )
+void LgbViewer::openEntryViewWidget(std::shared_ptr<LgbEntry> entry)
+{
+  // Check if this entry is already open
+  for( auto& widget : m_entryViewWidgets )
+  {
+    if( widget.entry->header.instanceId == entry->header.instanceId )
     {
-      auto nearestPos = m_pNaviProvider->findNearestPosition( hit.position.x, hit.position.z );
-      printf( "Nearest walkable position: (%.2f, %.2f, %.2f)\n",
-              nearestPos.x, nearestPos.y, nearestPos.z );
+      // Already open, just focus it
+      widget.isOpen = true;
+      return;
     }
   }
+
+  // Create new widget
+  m_entryViewWidgets.emplace_back(entry);
+}
+
+void LgbViewer::showEntryViewWidget(EntryViewWidget& widget)
+{
+  if( !widget.isOpen )
+    return;
+
+  ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_FirstUseEver);
+
+  if( ImGui::Begin(widget.windowTitle.c_str(), &widget.isOpen, ImGuiWindowFlags_MenuBar) )
+  {
+    // Menu bar with actions
+    if( ImGui::BeginMenuBar() )
+    {
+      if( ImGui::MenuItem("Focus in 3D View") )
+      {
+        focusOn3DPosition(widget.entry->header.transform.translation);
+      }
+      ImGui::EndMenuBar();
+    }
+
+    // Show type-specific view
+    switch( widget.entry->getType() )
+    {
+      case LgbEntryType::SharedGroup:
+        showSGEntryView(static_cast<LGB_SG_ENTRY*>(widget.entry.get()));
+        break;
+      case LgbEntryType::EventObject:
+        showEObjEntryView(static_cast<LGB_EOBJ_ENTRY*>(widget.entry.get()));
+        break;
+      case LgbEntryType::ExitRange:
+        showExitRangeEntryView(static_cast<LGB_EXIT_RANGE_ENTRY*>(widget.entry.get()));
+        break;
+      case LgbEntryType::PopRange:
+        showPopRangeEntryView(static_cast<LGB_POP_RANGE_ENTRY*>(widget.entry.get()));
+        break;
+      default:
+        showUnimplementedEntryView(widget.entry.get());
+        break;
+    }
+  }
+  ImGui::End();
+}
+
+void LgbViewer::showSGEntryView(LGB_SG_ENTRY* entry)
+{
+  ImGui::Text("Shared Group Entry");
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Instance ID: %u", entry->header.instanceId);
+    ImGui::Text("Name: %s", entry->name.c_str());
+    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Position: %.3f, %.3f, %.3f",
+      entry->header.transform.translation.x,
+      entry->header.transform.translation.y,
+      entry->header.transform.translation.z);
+    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
+      entry->header.transform.rotation.x,
+      entry->header.transform.rotation.y,
+      entry->header.transform.rotation.z);
+    ImGui::Text("Scale: %.3f, %.3f, %.3f",
+      entry->header.transform.scale.x,
+      entry->header.transform.scale.y,
+      entry->header.transform.scale.z);
+  }
+
+  // SG-specific data
+  if( ImGui::CollapsingHeader("Shared Group Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Gimmick File: %s", entry->gimmickFileName.c_str());
+    ImGui::Text("Gimmick File Offset: %u", entry->data.AssetPath);
+
+    ImGui::Spacing();
+    ImGui::Text("Extended SGData Fields:");
+    ImGui::Separator();
+
+    // Note: These fields may not be available in the current SGData structure
+    // You'll need to update the SGData struct to include these fields
+
+    // Asset and Door State
+    ImGui::Text("Asset Path: %d", entry->data.AssetPath);
+    ImGui::Text("Initial Door State: %d", (int)entry->data.InitialDoorState);
+
+    // Member Override Information
+    ImGui::Text("Overridden Members: %d", entry->data.OverriddenMembers);
+    ImGui::Text("Overridden Member Count: %d", entry->data.OverriddenMember_Count);
+
+    // State Information
+    ImGui::Text("Initial Rotation State: %d", (int)entry->data.InitialRotationState);
+    ImGui::Text("Initial Transform State: %d", (int)entry->data.InitialTransformState);
+    ImGui::Text("Initial Color State: %d", (int)entry->data.InitialColorState);
+
+    // Timeline and Animation
+    ImGui::Text("Random Timeline Auto Play: %s", entry->data.RandomTimelineAutoPlay ? "Yes" : "No");
+    ImGui::Text("Random Timeline Loop Playback: %s", entry->data.RandomTimelineLoopPlayback ? "Yes" : "No");
+
+    // Collision and Path Settings
+    ImGui::Text("Collision Controllable Without EObj: %s", entry->data.IsCollisionControllableWithoutEObj ? "Yes" : "No");
+    ImGui::Text("Bound Client Path Instance ID: %u", entry->data.BoundClientPathInstanceID);
+    ImGui::Text("Move Path Settings: %d", entry->data.MovePathSettings);
+
+    // Navigation Mesh
+    ImGui::Text("Not Create Navimesh Door: %s", entry->data.NotCreateNavimeshDoor ? "Yes" : "No");
+
+  }
+}
+
+void LgbViewer::showEObjEntryView(LGB_EOBJ_ENTRY* entry)
+{
+  ImGui::Text("Event Object Entry");
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Instance ID: %u", entry->header.instanceId);
+    ImGui::Text("Name: %s", entry->name.c_str());
+    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Position: %.3f, %.3f, %.3f",
+      entry->header.transform.translation.x,
+      entry->header.transform.translation.y,
+      entry->header.transform.translation.z);
+    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
+      entry->header.transform.rotation.x,
+      entry->header.transform.rotation.y,
+      entry->header.transform.rotation.z);
+    ImGui::Text("Scale: %.3f, %.3f, %.3f",
+      entry->header.transform.scale.x,
+      entry->header.transform.scale.y,
+      entry->header.transform.scale.z);
+  }
+
+  // EObj-specific data
+  if( ImGui::CollapsingHeader("Event Object Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Base ID: %u", entry->data.BaseId);
+    ImGui::Text("Bound Instance ID: %u", entry->data.BoundInstanceID);
+    ImGui::Text("Linked Instance ID: %u", entry->data.LinkedInstanceID);
+    ImGui::Text("Reserved 1: %u", entry->data.Reserved1);
+    ImGui::Text("Reserved 2: %u", entry->data.Reserved2);
+  }
+}
+
+void LgbViewer::showExitRangeEntryView(LGB_EXIT_RANGE_ENTRY* entry)
+{
+  ImGui::Text("Exit Range Entry");
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Instance ID: %u", entry->header.instanceId);
+    ImGui::Text("Name: %s", entry->name.c_str());
+    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Position: %.3f, %.3f, %.3f",
+      entry->header.transform.translation.x,
+      entry->header.transform.translation.y,
+      entry->header.transform.translation.z);
+    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
+      entry->header.transform.rotation.x,
+      entry->header.transform.rotation.y,
+      entry->header.transform.rotation.z);
+    ImGui::Text("Scale: %.3f, %.3f, %.3f",
+      entry->header.transform.scale.x,
+      entry->header.transform.scale.y,
+      entry->header.transform.scale.z);
+  }
+
+  // Trigger Box information
+  if( ImGui::CollapsingHeader("Trigger Box", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    const char* shapeNames[] = {"Unknown", "Box", "Sphere", "Cylinder", "Board", "Mesh", "BoardBothSides"};
+    int shapeIndex = (int)entry->data.triggerBoxType.triggerBoxShape;
+    const char* shapeName = (shapeIndex >= 0 && shapeIndex < 7) ? shapeNames[shapeIndex] : "Unknown";
+
+    ImGui::Text("Shape: %s (%d)", shapeName, shapeIndex);
+    ImGui::Text("Priority: %d", entry->data.triggerBoxType.priority);
+    ImGui::Text("Enabled: %s", entry->data.triggerBoxType.enabled ? "Yes" : "No");
+  }
+
+  // Exit-specific data
+  if( ImGui::CollapsingHeader("Exit Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Exit Type: %u", entry->data.exitType);
+    ImGui::Text("Zone ID: %u", entry->data.zoneId);
+    ImGui::Text("Dest Territory Type: %u", entry->data.destTerritoryType);
+    ImGui::Text("Index: %d", entry->data.index);
+    ImGui::Text("Dest Instance Object ID: %u", entry->data.destInstanceObjectId);
+    ImGui::Text("Return Instance Object ID: %u", entry->data.returnInstanceObjectId);
+    ImGui::Text("Direction: %.3f", entry->data.direction);
+  }
+}
+
+void LgbViewer::showPopRangeEntryView(LGB_POP_RANGE_ENTRY* entry)
+{
+  ImGui::Text("Pop Range Entry");
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Instance ID: %u", entry->header.instanceId);
+    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Position: %.3f, %.3f, %.3f",
+      entry->header.transform.translation.x,
+      entry->header.transform.translation.y,
+      entry->header.transform.translation.z);
+    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
+      entry->header.transform.rotation.x,
+      entry->header.transform.rotation.y,
+      entry->header.transform.rotation.z);
+    ImGui::Text("Scale: %.3f, %.3f, %.3f",
+      entry->header.transform.scale.x,
+      entry->header.transform.scale.y,
+      entry->header.transform.scale.z);
+  }
+
+  // Pop Range specific data
+  if( ImGui::CollapsingHeader("Pop Range Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    const char* popTypeNames[] = {"Unknown", "PC", "NPC/BNPC", "Content"};
+    int popTypeIndex = (int)entry->data.popType;
+    const char* popTypeName = (popTypeIndex >= 0 && popTypeIndex < 4) ? popTypeNames[popTypeIndex] : "Unknown";
+
+    ImGui::Text("Pop Type: %s (%u)", popTypeName, (uint32_t)entry->data.popType);
+    ImGui::Text("Inner Radius Ratio: %.3f", entry->data.innerRadiusRatio);
+    ImGui::Text("Index: %u", entry->data.index);
+
+    ImGui::Text("Relative Positions:");
+    ImGui::Indent();
+    ImGui::Text("Position: %d", entry->data.relativePositions.Pos);
+    ImGui::Text("Count: %d", entry->data.relativePositions.PosCount);
+    ImGui::Unindent();
+  }
+}
+
+void LgbViewer::showUnimplementedEntryView(LgbEntry* entry)
+{
+  ImGui::Text("Entry Viewer - Not Implemented");
+  ImGui::Separator();
+
+  // Show warning
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.0f, 1.0f)); // Yellow warning color
+  ImGui::Text("⚠ Warning: Detailed view for this entry type is not yet implemented");
+  ImGui::PopStyleColor();
+
+  ImGui::Spacing();
+
+  // Basic information that's available for all entries
+  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Instance ID: %u", entry->header.instanceId);
+    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+    ImGui::Text("Name Offset: %u", entry->header.nameOffset);
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  {
+    ImGui::Text("Position: %.3f, %.3f, %.3f",
+      entry->header.transform.translation.x,
+      entry->header.transform.translation.y,
+      entry->header.transform.translation.z);
+    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
+      entry->header.transform.rotation.x,
+      entry->header.transform.rotation.y,
+      entry->header.transform.rotation.z);
+    ImGui::Text("Scale: %.3f, %.3f, %.3f",
+      entry->header.transform.scale.x,
+      entry->header.transform.scale.y,
+      entry->header.transform.scale.z);
+  }
+
+  ImGui::Spacing();
+  ImGui::Text("To request implementation for this entry type,");
+  ImGui::Text("please contact the development team with:");
+  ImGui::BulletText("Entry Type: %s", getEntryTypeString(entry->getType()).c_str());
+  ImGui::BulletText("Type ID: %u", (uint32_t)entry->getType());
 }

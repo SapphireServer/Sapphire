@@ -51,6 +51,7 @@
 #include <shlobj.h>
 #endif
 
+#include "commonshader.h"
 
 using namespace Client;
 
@@ -150,6 +151,7 @@ void EditorState::load()
   else
   {
     m_zoneEditor.init();
+    m_lgbViewer.init();
   }
 
   if( !initMySQLConnection() )
@@ -820,6 +822,10 @@ void EditorState::renderMainMenu()
       {
         m_editorMode = EditorMode::ZONES;
       }
+      if( ImGui::MenuItem( "Lgb" ) )
+      {
+        m_editorMode = EditorMode::LGB;
+      }
 
       ImGui::EndMenu();
     }
@@ -850,37 +856,46 @@ void EditorState::render( double deltaTime )
 
   if( m_editorMode == EditorMode::NONE )
   {
+
   }
   if( m_editorMode == EditorMode::ZONES )
   {
     if( m_datLoaded )
       m_zoneEditor.show();
 
-    if( !dockInitialized )
-    {
-      ImGui::DockBuilderAddNode( dockspace_id, ImGuiDockNodeFlags_None );
-      unsigned int right_id;
-      unsigned int right1_id;
-      unsigned int left1_id;
-      unsigned int left_id;
+  }
+  else if( m_editorMode == EditorMode::LGB )
+  {
+    if( m_datLoaded )
+      m_lgbViewer.show();
+  }
 
-      ImGui::DockBuilderSplitNode( dockspace_id, ImGuiDir_Left, 0.2, &left_id, &right_id );
-      ImGui::DockBuilderDockWindow( "Zone Editor", left_id );
+  if( !dockInitialized )
+  {
+    ImGui::DockBuilderAddNode( dockspace_id, ImGuiDockNodeFlags_None );
+    unsigned int right_id;
+    unsigned int right1_id;
+    unsigned int left1_id;
+    unsigned int left_id;
 
-
-      ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.6, &left1_id, &right1_id );
-      ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
-
-      unsigned int top_id;
-      unsigned int down_id;
-
-      ImGui::DockBuilderSplitNode( right1_id, ImGuiDir_Down, 0.6, &top_id, &down_id );
-      ImGui::DockBuilderDockWindow( "Map Viewer", down_id );
-      ImGui::DockBuilderDockWindow( "BNPC Information", top_id );
+    ImGui::DockBuilderSplitNode( dockspace_id, ImGuiDir_Left, 0.2, &left_id, &right_id );
+    ImGui::DockBuilderDockWindow( "Zone Editor", left_id );
+    ImGui::DockBuilderDockWindow( "Lgb Viewer", left_id );
 
 
-      dockInitialized = true;
-    }
+    ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.6, &left1_id, &right1_id );
+    ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
+
+    unsigned int top_id;
+    unsigned int down_id;
+
+    ImGui::DockBuilderSplitNode( right1_id, ImGuiDir_Down, 0.6, &top_id, &down_id );
+    ImGui::DockBuilderDockWindow( "Map Viewer", down_id );
+    ImGui::DockBuilderDockWindow( "BNPC Information", top_id );
+    ImGui::DockBuilderDockWindow( "LGB Groups", top_id );
+
+
+    dockInitialized = true;
   }
 
   ImGui::End();

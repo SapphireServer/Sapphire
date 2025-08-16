@@ -22,6 +22,7 @@
 #include <Database/PreparedStatement.h>
 
 #include <ZoneEditor.h>
+#include <LgbViewer.h>
 
 namespace Client
 {
@@ -81,6 +82,7 @@ namespace Client
     {
       NONE,
       ZONES,
+      LGB,
     } m_editorMode{ ZONES };
 
     std::string m_datLocation{ "F:\\client3.3\\game\\sqpack" };
@@ -88,6 +90,7 @@ namespace Client
     ImGuiID setupDockspace( bool& p_open, ImGuiIO& io ) const;
 
     ZoneEditor m_zoneEditor;
+    LgbViewer m_lgbViewer;
 
     std::string m_mysqlHost{ "localhost" };
     std::string m_mysqlUser{ "root" };
