@@ -152,6 +152,9 @@ void StatusEffectMgr::splitAggroApplication( Entity::CharaPtr pSource, Entity::C
   aggro = aggro / hateList.size();
   for( auto entry : hateList )
   {
-    entry->onActionHostile( pSource, aggro );
+    if( entry && entry->isAlive() )
+    {
+      entry->onActionHostile( pSource, aggro );
+    }
   }
 }

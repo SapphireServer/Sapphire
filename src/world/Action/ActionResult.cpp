@@ -280,6 +280,9 @@ void ActionResult::splitAggroApplication( float aggro )
   aggro = aggro / hateList.size();
   for( auto entry : hateList )
   {
-    entry->onActionHostile( m_source, aggro );
+    if( entry && entry->isAlive() )
+    {
+      entry->onActionHostile( m_source, aggro );
+    }
   }
 }
