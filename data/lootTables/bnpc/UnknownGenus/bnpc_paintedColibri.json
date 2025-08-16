@@ -1,0 +1,37 @@
+{
+  "lootTable": "bnpc_paintedColibri",
+  "pools": [
+    {
+      "name": "Pool #1 (Gil, Gil)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 2,
+        "max": 2
+      },
+      "items": [
+        {
+          "id": 1,
+          "name": "Gil",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 240,
+            "max": 320
+          }
+        },
+        {
+          "id": 1,
+          "name": "Gil",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 240,
+            "max": 320
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

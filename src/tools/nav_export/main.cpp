@@ -438,10 +438,36 @@ int main( int argc, char* argv[] )
             // write files
             switch( pEntry->getType() )
             {
+              case LgbEntryType::NaviMeshRange:
+              {
+                std::cout << "NaviMeshRange\n";
+              }
+              break;
+
+              case LgbEntryType::MapRange:
+              {
+                std::cout << "MapRange\n";
+              }
+              break;
+
+              case LgbEntryType::DoorRange:
+              {
+                std::cout << "DoorRange\n";
+              }
+                break;
+
+              case LgbEntryType::CollisionBox:
+              {
+                std::cout << "CollisionBox\n";
+              }
+                break;
+
               case LgbEntryType::BgParts:
               {
                 auto pBgParts = static_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
                 fileName = pBgParts->collisionFileName;
+                if( !fileName.empty() && pBgParts->header.CollisionType == COLLISION_ATTRIBUTE_TYPE_None )
+                  std::cout << "BgParts -------------------- BIG WTF !!!\n";
                 pcbTransformModel( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
                   &pBgParts->header.translation, exportedGroup );
               }

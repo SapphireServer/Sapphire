@@ -1,0 +1,130 @@
+{
+  "lootTable": "bnpc_fatDodo",
+  "pools": [
+    {
+      "name": "Pool #1 (Animal Hide)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5292,
+          "name": "Animal Hide",
+          "weight": 700,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 300,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Dodo Egg)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 4773,
+          "name": "Dodo Egg",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #3 (Dodo Feather)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5355,
+          "name": "Dodo Feather",
+          "weight": 229,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 771,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #4 (Dodo Tenderloin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 4760,
+          "name": "Dodo Tenderloin",
+          "weight": 286,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 714,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

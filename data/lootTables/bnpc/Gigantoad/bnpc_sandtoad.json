@@ -1,0 +1,37 @@
+{
+  "lootTable": "bnpc_sandtoad",
+  "pools": [
+    {
+      "name": "Pool #1 (Animal Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5291,
+          "name": "Animal Skin",
+          "weight": 640,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 360,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

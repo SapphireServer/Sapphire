@@ -1,0 +1,27 @@
+{
+  "lootTable": "bnpc_patripatan",
+  "pools": [
+    {
+      "name": "Pool #1 (Animal Hide)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5292,
+          "name": "Animal Hide",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

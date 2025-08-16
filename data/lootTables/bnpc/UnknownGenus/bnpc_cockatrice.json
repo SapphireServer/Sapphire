@@ -1,0 +1,37 @@
+{
+  "lootTable": "bnpc_cockatrice",
+  "pools": [
+    {
+      "name": "Pool #1 (Cockatrice Thigh)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12876,
+          "name": "Cockatrice Thigh",
+          "weight": 286,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 714,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

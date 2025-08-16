@@ -70,9 +70,13 @@ namespace Sapphire::Common::Navi
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
     void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning );
+    const dtNavMesh* getNavMesh() const { return m_naviMesh; }
+
+    std::string getNaviPath() const { return m_naviPath; }
 
   protected:
     std::string m_internalName;
+    std::string m_naviPath;
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;

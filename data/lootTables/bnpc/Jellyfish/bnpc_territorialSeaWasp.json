@@ -1,0 +1,68 @@
+{
+  "lootTable": "bnpc_territorialSeaWasp",
+  "pools": [
+    {
+      "name": "Pool #1 (Jellyfish Umbrella)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5557,
+          "name": "Jellyfish Umbrella",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Jellyfish Cnida)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5556,
+          "name": "Jellyfish Cnida",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

@@ -1,0 +1,68 @@
+{
+  "lootTable": "bnpc_mitelingStraggler",
+  "pools": [
+    {
+      "name": "Pool #1 (Diremite Sinew)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5320,
+          "name": "Diremite Sinew",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 500,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Diremite Web)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5345,
+          "name": "Diremite Web",
+          "weight": 375,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 625,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

@@ -1,12 +1,17 @@
 #include "ConfigMgr.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include <filesystem>
 namespace fs = std::filesystem;
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
+
+ConfigMgr::ConfigMgr( std::filesystem::path configFolderRoot )
+    : m_configFolderRoot( std::move( configFolderRoot ) )
+{
+}
 
 /**
  * Loads an ini file and parses it
@@ -16,7 +21,7 @@ using namespace Sapphire::Common;
 bool ConfigMgr::loadConfig( const std::string& configName )
 {
   // get global config
-  auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
+  auto configFile = m_configFolderRoot / configName;
 
   if( !fs::exists( configFile ) )
   {
@@ -34,7 +39,7 @@ bool ConfigMgr::loadConfig( const std::string& configName )
 
 bool ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config, const std::string& configName )
 {
-  auto configFile = fs::path( fs::path( m_configFolderRoot ) / configName );
+  auto configFile = m_configFolderRoot / configName;
 
   if( !fs::exists( configFile ) )
   {
@@ -77,8 +82,7 @@ bool ConfigMgr::loadGlobalConfig( Common::Config::GlobalConfig& config, const st
 
 bool ConfigMgr::copyDefaultConfig( const std::string& configName )
 {
-  fs::path configPath( m_configFolderRoot );
-  configPath /= configName;
+  auto configPath = m_configFolderRoot / configName;
 
   if( !fs::exists( configPath.string() + m_configDefaultSuffix ) )
   {

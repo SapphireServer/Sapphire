@@ -1,0 +1,99 @@
+{
+  "lootTable": "bnpc_stroper",
+  "pools": [
+    {
+      "name": "Pool #1 (Morbol Vine)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5554,
+          "name": "Morbol Vine",
+          "weight": 0,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Morbol Vine)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5554,
+          "name": "Morbol Vine",
+          "weight": 262,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 738,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #3 (Morbol Vine)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5554,
+          "name": "Morbol Vine",
+          "weight": 220,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 780,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

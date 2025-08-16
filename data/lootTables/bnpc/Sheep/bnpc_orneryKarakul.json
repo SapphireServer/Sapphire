@@ -1,0 +1,192 @@
+{
+  "lootTable": "bnpc_orneryKarakul",
+  "pools": [
+    {
+      "name": "Pool #1 (Karakul Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5308,
+          "name": "Karakul Skin",
+          "weight": 307,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 693,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Fleece)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5347,
+          "name": "Fleece",
+          "weight": 616,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 9
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 384,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #3 (Karakul Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5308,
+          "name": "Karakul Skin",
+          "weight": 266,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 734,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #4 (Fleece)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5347,
+          "name": "Fleece",
+          "weight": 408,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 9
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 592,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #5 (Karakul Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5308,
+          "name": "Karakul Skin",
+          "weight": 277,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 723,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #6 (Fleece)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5347,
+          "name": "Fleece",
+          "weight": 528,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 9
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 472,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

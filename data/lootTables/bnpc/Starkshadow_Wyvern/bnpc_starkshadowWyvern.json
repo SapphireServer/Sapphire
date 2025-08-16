@@ -1,0 +1,68 @@
+{
+  "lootTable": "bnpc_starkshadowWyvern",
+  "pools": [
+    {
+      "name": "Pool #1 (Wyvern Wing)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12636,
+          "name": "Wyvern Wing",
+          "weight": 600,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 400,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Wyvern Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 12569,
+          "name": "Wyvern Skin",
+          "weight": 365,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 635,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}

@@ -6,13 +6,14 @@
 #include <string>
 #include <stdint.h>
 #include "ConfigDef.h"
+#include "Util/Paths.h"
 
 namespace Sapphire::Common
 {
     class ConfigMgr
     {
     public:
-      ConfigMgr() = default;
+      explicit ConfigMgr( std::filesystem::path configFolderRoot = Util::executableDir() / "config" );
       ~ConfigMgr() = default;
 
       bool loadConfig( const std::string& configName );
@@ -62,7 +63,7 @@ namespace Sapphire::Common
       std::unique_ptr< INIReader > m_pInih;
 
       const std::string m_globalConfigFile = "global.ini";
-      const std::string m_configFolderRoot = "./config/";
+      const std::filesystem::path m_configFolderRoot;
       const std::string m_configDefaultSuffix = ".default";
   };
 }

@@ -1,0 +1,68 @@
+{
+  "lootTable": "bnpc_territorialRaptor",
+  "pools": [
+    {
+      "name": "Pool #1 (Raptor Sinew, Raptor Sinew)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 2,
+        "max": 2
+      },
+      "items": [
+        {
+          "id": 5322,
+          "name": "Raptor Sinew",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 5322,
+          "name": "Raptor Sinew",
+          "weight": 1000,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool #2 (Raptor Skin)",
+      "enabled": true,
+      "duplicates": false,
+      "pick": {
+        "min": 1,
+        "max": 1
+      },
+      "items": [
+        {
+          "id": 5310,
+          "name": "Raptor Skin",
+          "weight": 333,
+          "isHq": false,
+          "quantity": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": 0,
+          "name": "<none>",
+          "weight": 667,
+          "isHq": false,
+          "quantity": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ]
+    }
+  ],
+  "type": "bNPC"
+}
