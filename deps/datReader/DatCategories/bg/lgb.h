@@ -71,18 +71,18 @@ public:
   };
 };
 
-class LGB_GIMMICK_ENTRY : public LgbEntry
+class LGB_SG_ENTRY : public LgbEntry
 {
 public:
-  GimmickData data;
+  SGData data;
   std::string name;
   std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
+  LGB_SG_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< GimmickData* >( buf + offset );
+    data = *reinterpret_cast< SGData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
+    gimmickFileName = std::string( buf + offset + data.AssetPath );
   };
 };
 
@@ -161,6 +161,22 @@ public:
   };
 };
 
+
+class LGB_BNPC_ENTRY : public LgbEntry
+{
+public:
+  BNPCInstanceObject data;
+  BNpcBaseData baseData;
+  std::string name;
+
+  LGB_BNPC_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  {
+    data = *reinterpret_cast< BNPCInstanceObject* >( buf + offset );
+    name = std::string( buf + offset + header.nameOffset );
+    baseData = *reinterpret_cast< BNpcBaseData* >( buf + offset + data.BNpcBaseData );
+  };
+};
+
 enum LayerSetReferencedType
 {
   All = 0x0,
@@ -230,6 +246,7 @@ struct LGB_GROUP
     entries.reserve( header.entryCount );
 
     const auto entriesOffset = offset + header.entriesOffset;
+
     for( auto i = 0; i < header.entryCount; ++i )
     {
       const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + i * 4 ) );
@@ -244,9 +261,9 @@ struct LGB_GROUP
             entries.emplace_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::Gimmick:
+          case LgbEntryType::SharedGroup:
           {
-            entries.emplace_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< LGB_SG_ENTRY >( buf, entryOffset ) );
             break;
           }
           case LgbEntryType::EventNpc:
@@ -279,6 +296,11 @@ struct LGB_GROUP
             entries.emplace_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
             break;
           }
+          case LgbEntryType::BattleNpc:
+          {
+            entries.emplace_back( std::make_shared< LGB_BNPC_ENTRY >( buf, entryOffset ) );
+            break;
+          }
           default:
           {
             entries.emplace_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
@@ -298,12 +320,12 @@ struct LGB_FILE_HEADER
 {
   char magic[4]; // LGB 1
   uint32_t fileSize;
-  uint32_t unknown;
+  uint32_t totalChunkCount;
   char magic2[4]; // LGP1
-  uint32_t unknown2;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
+  uint32_t chunkSize;
+  uint32_t layerGroupId;
+  uint32_t nameOff;
+  uint32_t groups;
   int32_t groupCount;
 };
 
@@ -315,14 +337,20 @@ struct LGB_FILE
 
   LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
   {
-    m_name = name;
+    m_name = std::string( buf + 20 + header.nameOff );
+   // m_name = name;
   }
 
   LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
+    m_name = std::string( buf + 20 +  header.nameOff );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );
+    if( header.groupCount == 0 )
+    {
+      return;
+    }
 
     constexpr auto baseOffset = sizeof( header );
     for( size_t i = 0; i < header.groupCount; ++i )

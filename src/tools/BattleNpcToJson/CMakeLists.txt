@@ -3,6 +3,6 @@ file( GLOB_RECURSE SOURCES
   *.h
 )
 
-add_executable(bnpc_parserps3 ${SOURCES} )
+add_executable(bnpc_to_json ${SOURCES} )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
-target_link_libraries ( bnpc_parserps3 PRIVATE common xivdatps3 )
+target_link_libraries ( bnpc_to_json PRIVATE common xivdatps3 )

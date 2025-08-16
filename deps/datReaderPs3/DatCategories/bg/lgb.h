@@ -105,23 +105,26 @@ public:
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + data.modelFileOffset );
-    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
+    modelFileName = std::string( buf + offset + data.AssetPath );
+    collisionFileName = std::string( buf + offset + data.CollisionAssetPath );
   };
 };
 
-class LGB_GIMMICK_ENTRY : public LgbEntry
+class LGB_SG_ENTRY : public LgbEntry
 {
 public:
-  GimmickData data;
+  SGData data;
   std::string name;
   std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_SG_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< GimmickData* >( buf + offset );
+    data = *reinterpret_cast< SGData* >( buf + offset );
+    header.nameOffset = xivps3::utils::bparse::byteswap( header.nameOffset );
     name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
+    gimmickFileName = std::string( buf + offset + data.AssetPath );
+
+
   };
 };
 
@@ -188,10 +191,7 @@ public:
     name = std::string( buf + offset + header.nameOffset );
 
     baseData = *reinterpret_cast< BNpcBaseData* >( buf + offset + data.BNpcBaseData );
-
     baseData.TerritoryRange = xivps3::utils::bparse::byteswap( baseData.TerritoryRange );
-
-    std::cout << data.BNpcBaseData << "\n";
 
   };
 };
@@ -318,7 +318,7 @@ struct LGB_GROUP
         {
         //  entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
         }
-        else if( type == LgbEntryType::Gimmick )
+        else if( type == LgbEntryType::SharedGroup )
         {
         //  entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
         }
@@ -400,7 +400,7 @@ struct LGB_FILE
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );
 
-   if( strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0  )
+    if( strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0  )
     {
       throw std::runtime_error( "Invalid LGB file, LGP section not found!" );
       /*     if( strncmp( &header.magic2[ 0 ] + 0x14 , "LGP1", 4 ) == 0 )

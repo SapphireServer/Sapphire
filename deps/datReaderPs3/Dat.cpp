@@ -4,7 +4,8 @@
 
 #include "File.h"
 
-namespace {
+namespace
+{
   const uint32_t model_section_count = 0xB;
 }
 
@@ -15,14 +16,14 @@ namespace xivps3::dat
     uint32_t size;
     FileType entry_type;
     uint32_t total_uncompressed_size;
-    uint32_t unknown[0x2];
+    uint32_t unknown[ 0x2 ];
   };
 
   struct DatBlockRecord
   {
     uint32_t offset;
     uint32_t size;
-    uint32_t unknown[0x4];
+    uint32_t unknown[ 0x4 ];
     SqPackBlockHash block_hash;
   };
 
@@ -44,12 +45,12 @@ namespace xivps3::dat
   struct DatMdlFileBlockInfos
   {
     uint32_t unknown1;
-    uint32_t uncompressed_sizes[::model_section_count];
-    uint32_t compressed_sizes[::model_section_count];
-    uint32_t offsets[::model_section_count];
-    uint16_t block_ids[::model_section_count];
-    uint16_t block_counts[::model_section_count];
-    uint32_t unknown2[0x2];
+    uint32_t uncompressed_sizes[ ::model_section_count ];
+    uint32_t compressed_sizes[ ::model_section_count ];
+    uint32_t offsets[ ::model_section_count ];
+    uint16_t block_ids[ ::model_section_count ];
+    uint16_t block_counts[ ::model_section_count ];
+    uint32_t unknown2[ 0x2 ];
   };
 
   struct DatTexFileBlockInfos
@@ -162,7 +163,6 @@ using xivps3::utils::bparse::extract;
 
 namespace xivps3::dat
 {
-
   Dat::Dat( const std::filesystem::path& i_path, uint32_t i_nb ) :
     SqPack( i_path ),
     m_num( i_nb )
@@ -213,7 +213,7 @@ namespace xivps3::dat
             extractBlock( i_offset + file_header.size + file_block_info.offset, data_section );
           }
         }
-          break;
+        break;
 
         case FileType::model:
         {
@@ -244,7 +244,7 @@ namespace xivps3::dat
             }
           }
         }
-          break;
+        break;
 
         case FileType::texture:
         {
@@ -286,11 +286,11 @@ namespace xivps3::dat
             }
           }
         }
-          break;
+        break;
 
         default:
           throw std::runtime_error(
-            "Invalid entry_type: " + std::to_string( static_cast<uint32_t>(file_header.entry_type) ) );
+            "Invalid entry_type: " + std::to_string( static_cast< uint32_t >( file_header.entry_type ) ) );
       }
     }
 
@@ -319,9 +319,9 @@ namespace xivps3::dat
       std::vector< char > temp_buffer( block_header.compressed_size );
       m_handle.read( temp_buffer.data(), block_header.compressed_size );
 
-      utils::zlib::no_header_decompress( reinterpret_cast<uint8_t*>(temp_buffer.data()),
+      utils::zlib::no_header_decompress( reinterpret_cast< uint8_t * >( temp_buffer.data() ),
                                          temp_buffer.size(),
-                                         reinterpret_cast<uint8_t*>(o_data.data() + data_size),
+                                         reinterpret_cast< uint8_t * >( o_data.data() + data_size ),
                                          block_header.uncompressed_size );
     }
   }
@@ -330,5 +330,4 @@ namespace xivps3::dat
   {
     return m_num;
   }
-
 }

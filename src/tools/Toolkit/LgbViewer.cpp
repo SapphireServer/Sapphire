@@ -412,7 +412,7 @@ void LgbViewer::showGroupsWindow()
             // Get available space and reserve some minimum height
             ImVec2 availableSize = ImGui::GetContentRegionAvail();
             float minTableHeight = 200.0f; // Minimum height for the table
-            float tableHeight1 = std::max(minTableHeight, availableSize.y - 20.0f); // Leave some padding
+            float tableHeight1 = std::max( minTableHeight, availableSize.y - 20.0f ); // Leave some padding
 
             // Ensure we have enough space for the table
             if( availableSize.y < minTableHeight )
@@ -421,86 +421,87 @@ void LgbViewer::showGroupsWindow()
             }
 
 
-            if( ImGui::BeginTable( "EntriesTable", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable |
-                     ImGuiTableFlags_SizingFixedFit,
-                     ImVec2(0.0f, tableHeight)
-         ) )
-        {
-          // Set up table headers
-          ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_WidthFixed, 60.0f );
-          ImGui::TableSetupColumn( "Name", ImGuiTableColumnFlags_WidthStretch );
-          ImGui::TableSetupColumn( "Type", ImGuiTableColumnFlags_WidthFixed, 120.0f );
-          ImGui::TableSetupColumn( "Position", ImGuiTableColumnFlags_WidthFixed, 180.0f );
-          ImGui::TableSetupColumn( "Focus", ImGuiTableColumnFlags_WidthFixed, 60.0f );
-          ImGui::TableSetupColumn( "View", ImGuiTableColumnFlags_WidthFixed, 60.0f );
-          ImGui::TableHeadersRow();
-
-          // Table content
-          for( size_t i = 0; i < group.entries.size(); ++i )
-          {
-            auto& entry = group.entries[ i ];
-
-            ImGui::TableNextRow();
-
-            // ID column
-            ImGui::TableSetColumnIndex( 0 );
-            ImGui::Text( "%u", entry->header.instanceId );
-
-            // Name column
-            ImGui::TableSetColumnIndex( 1 );
-            ImGui::Text( "%s", getEntryName( entry.get() ).c_str() );
-
-            // Type column
-            ImGui::TableSetColumnIndex( 2 );
-            ImGui::Text( "%s", getEntryTypeString( entry->getType() ).c_str() );
-
-            // Position column
-            ImGui::TableSetColumnIndex( 3 );
-            ImGui::Text( "%.1f, %.1f, %.1f",
-              entry->header.transform.translation.x,
-              entry->header.transform.translation.y,
-              entry->header.transform.translation.z );
-
-            // Focus button column
-            ImGui::TableSetColumnIndex( 4 );
-            std::string focusButtonId = "Focus##" + std::to_string( entry->header.instanceId );
-            if( ImGui::Button( focusButtonId.c_str(), ImVec2( -1, 0 ) ) )
+            if( ImGui::BeginTable( "EntriesTable", 6,
+                                   ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                                   ImGuiTableFlags_Resizable |
+                                   ImGuiTableFlags_SizingFixedFit,
+                                   ImVec2( 0.0f, tableHeight )
+            ) )
             {
-              focusOn3DPosition( entry->header.transform.translation );
-            }
+              // Set up table headers
+              ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+              ImGui::TableSetupColumn( "Name", ImGuiTableColumnFlags_WidthStretch );
+              ImGui::TableSetupColumn( "Type", ImGuiTableColumnFlags_WidthFixed, 120.0f );
+              ImGui::TableSetupColumn( "Position", ImGuiTableColumnFlags_WidthFixed, 180.0f );
+              ImGui::TableSetupColumn( "Focus", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+              ImGui::TableSetupColumn( "View", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+              ImGui::TableHeadersRow();
 
-            // View button column
-            ImGui::TableSetColumnIndex( 5 );
-            std::string viewButtonId = "View##" + std::to_string( entry->header.instanceId );
-            if( ImGui::Button( viewButtonId.c_str(), ImVec2( -1, 0 ) ) )
-            {
-              openEntryViewWidget( entry );
-            }
-
-            // Handle row selection and context menu
-            if( ImGui::IsItemClicked() || ImGui::TableGetHoveredRow() == (int)i + 1 )
-            {
-              onEntrySelected( entry.get() );
-            }
-
-            // Right-click context menu (keeping existing functionality)
-            if( ImGui::BeginPopupContextItem() )
-            {
-              if( ImGui::MenuItem( "Focus in 3D View" ) )
+              // Table content
+              for( size_t i = 0; i < group.entries.size(); ++i )
               {
-                focusOn3DPosition( entry->header.transform.translation );
+                auto& entry = group.entries[ i ];
+
+                ImGui::TableNextRow();
+
+                // ID column
+                ImGui::TableSetColumnIndex( 0 );
+                ImGui::Text( "%u", entry->header.instanceId );
+
+                // Name column
+                ImGui::TableSetColumnIndex( 1 );
+                ImGui::Text( "%s", getEntryName( entry.get() ).c_str() );
+
+                // Type column
+                ImGui::TableSetColumnIndex( 2 );
+                ImGui::Text( "%s", getEntryTypeString( entry->getType() ).c_str() );
+
+                // Position column
+                ImGui::TableSetColumnIndex( 3 );
+                ImGui::Text( "%.1f, %.1f, %.1f",
+                             entry->header.transform.translation.x,
+                             entry->header.transform.translation.y,
+                             entry->header.transform.translation.z );
+
+                // Focus button column
+                ImGui::TableSetColumnIndex( 4 );
+                std::string focusButtonId = "Focus##" + std::to_string( entry->header.instanceId );
+                if( ImGui::Button( focusButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                {
+                  focusOn3DPosition( entry->header.transform.translation );
+                }
+
+                // View button column
+                ImGui::TableSetColumnIndex( 5 );
+                std::string viewButtonId = "View##" + std::to_string( entry->header.instanceId );
+                if( ImGui::Button( viewButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                {
+                  openEntryViewWidget( entry );
+                }
+
+                // Handle row selection and context menu
+                if( ImGui::IsItemClicked() || ImGui::TableGetHoveredRow() == ( int ) i + 1 )
+                {
+                  onEntrySelected( entry.get() );
+                }
+
+                // Right-click context menu (keeping existing functionality)
+                if( ImGui::BeginPopupContextItem() )
+                {
+                  if( ImGui::MenuItem( "Focus in 3D View" ) )
+                  {
+                    focusOn3DPosition( entry->header.transform.translation );
+                  }
+                  if( ImGui::MenuItem( "View Details" ) )
+                  {
+                    openEntryViewWidget( entry );
+                  }
+                  ImGui::EndPopup();
+                }
               }
-              if( ImGui::MenuItem( "View Details" ) )
-              {
-                openEntryViewWidget( entry );
-              }
-              ImGui::EndPopup();
+
+              ImGui::EndTable();
             }
-          }
-
-          ImGui::EndTable();
-        }
-
           }
           else
           {
@@ -618,7 +619,7 @@ void LgbViewer::focusOn3DPosition( const vec3& position )
 
   // Position the camera at a reasonable distance from the target
   float distance = 25.0f; // Default viewing distance
-  float pitch = -30.0f * ( 3.1415926f / 180.0f ); // 30 degrees down in radians
+  float pitch = 30.0f * ( 3.1415926f / 180.0f ); // 30 degrees down in radians
   float yaw = 0.0f; // Facing forward
 
   // Calculate camera position based on spherical coordinates
@@ -1019,16 +1020,15 @@ void LgbViewer::show()
   // Render individual entry view widgets
   for( auto& widget : m_entryViewWidgets )
   {
-    showEntryViewWidget(widget);
+    showEntryViewWidget( widget );
   }
 
   // Clean up closed widgets
   m_entryViewWidgets.erase(
-    std::remove_if(m_entryViewWidgets.begin(), m_entryViewWidgets.end(),
-      [](const EntryViewWidget& widget) { return !widget.isOpen; }),
+    std::remove_if( m_entryViewWidgets.begin(), m_entryViewWidgets.end(),
+                    []( const EntryViewWidget& widget ) { return !widget.isOpen; } ),
     m_entryViewWidgets.end()
   );
-
 }
 
 
@@ -2251,8 +2251,8 @@ void LgbViewer::showMapWindow()
       ImVec2 childContentSize = ImGui::GetContentRegionAvail();
 
       // Calculate scroll position to center the focus point
-      float targetScrollX = imagePixelX - (childContentSize.x * 0.5f);
-      float targetScrollY = imagePixelY - (childContentSize.y * 0.5f);
+      float targetScrollX = imagePixelX - ( childContentSize.x * 0.5f );
+      float targetScrollY = imagePixelY - ( childContentSize.y * 0.5f );
 
       // Clamp scroll values to valid range
       float maxScrollX = std::max( 0.0f, imageSize.x - childContentSize.x );
@@ -2346,7 +2346,7 @@ void LgbViewer::showMapWindow()
       );
 
       // Draw the focus marker
-      ImDrawList* drawList = ImGui::GetWindowDrawList();
+      ImDrawList *drawList = ImGui::GetWindowDrawList();
       float markerSize = 8.0f;
 
       // Draw a cross marker
@@ -2982,7 +2982,7 @@ void LgbViewer::onWorldClick( const RayHit& hit )
 {
 }
 
-void LgbViewer::openEntryViewWidget(std::shared_ptr<LgbEntry> entry)
+void LgbViewer::openEntryViewWidget( std::shared_ptr< LgbEntry > entry )
 {
   // Check if this entry is already open
   for( auto& widget : m_entryViewWidgets )
@@ -2996,24 +2996,24 @@ void LgbViewer::openEntryViewWidget(std::shared_ptr<LgbEntry> entry)
   }
 
   // Create new widget
-  m_entryViewWidgets.emplace_back(entry);
+  m_entryViewWidgets.emplace_back( entry );
 }
 
-void LgbViewer::showEntryViewWidget(EntryViewWidget& widget)
+void LgbViewer::showEntryViewWidget( EntryViewWidget& widget )
 {
   if( !widget.isOpen )
     return;
 
-  ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize( ImVec2( 400, 600 ), ImGuiCond_FirstUseEver );
 
-  if( ImGui::Begin(widget.windowTitle.c_str(), &widget.isOpen, ImGuiWindowFlags_MenuBar) )
+  if( ImGui::Begin( widget.windowTitle.c_str(), &widget.isOpen, ImGuiWindowFlags_MenuBar ) )
   {
     // Menu bar with actions
     if( ImGui::BeginMenuBar() )
     {
-      if( ImGui::MenuItem("Focus in 3D View") )
+      if( ImGui::MenuItem( "Focus in 3D View" ) )
       {
-        focusOn3DPosition(widget.entry->header.transform.translation);
+        focusOn3DPosition( widget.entry->header.transform.translation );
       }
       ImGui::EndMenuBar();
     }
@@ -3022,280 +3022,280 @@ void LgbViewer::showEntryViewWidget(EntryViewWidget& widget)
     switch( widget.entry->getType() )
     {
       case LgbEntryType::SharedGroup:
-        showSGEntryView(static_cast<LGB_SG_ENTRY*>(widget.entry.get()));
+        showSGEntryView( static_cast< LGB_SG_ENTRY * >( widget.entry.get() ) );
         break;
       case LgbEntryType::EventObject:
-        showEObjEntryView(static_cast<LGB_EOBJ_ENTRY*>(widget.entry.get()));
+        showEObjEntryView( static_cast< LGB_EOBJ_ENTRY * >( widget.entry.get() ) );
         break;
       case LgbEntryType::ExitRange:
-        showExitRangeEntryView(static_cast<LGB_EXIT_RANGE_ENTRY*>(widget.entry.get()));
+        showExitRangeEntryView( static_cast< LGB_EXIT_RANGE_ENTRY * >( widget.entry.get() ) );
         break;
       case LgbEntryType::PopRange:
-        showPopRangeEntryView(static_cast<LGB_POP_RANGE_ENTRY*>(widget.entry.get()));
+        showPopRangeEntryView( static_cast< LGB_POP_RANGE_ENTRY * >( widget.entry.get() ) );
         break;
       default:
-        showUnimplementedEntryView(widget.entry.get());
+        showUnimplementedEntryView( widget.entry.get() );
         break;
     }
   }
   ImGui::End();
 }
 
-void LgbViewer::showSGEntryView(LGB_SG_ENTRY* entry)
+void LgbViewer::showSGEntryView( LGB_SG_ENTRY *entry )
 {
-  ImGui::Text("Shared Group Entry");
+  ImGui::Text( "Shared Group Entry" );
   ImGui::Separator();
 
   // Basic information
-  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Instance ID: %u", entry->header.instanceId);
-    ImGui::Text("Name: %s", entry->name.c_str());
-    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
   }
 
   // Transform information
-  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Position: %.3f, %.3f, %.3f",
-      entry->header.transform.translation.x,
-      entry->header.transform.translation.y,
-      entry->header.transform.translation.z);
-    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
-      entry->header.transform.rotation.x,
-      entry->header.transform.rotation.y,
-      entry->header.transform.rotation.z);
-    ImGui::Text("Scale: %.3f, %.3f, %.3f",
-      entry->header.transform.scale.x,
-      entry->header.transform.scale.y,
-      entry->header.transform.scale.z);
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
   }
 
   // SG-specific data
-  if( ImGui::CollapsingHeader("Shared Group Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Shared Group Data", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Gimmick File: %s", entry->gimmickFileName.c_str());
-    ImGui::Text("Gimmick File Offset: %u", entry->data.AssetPath);
+    ImGui::Text( "Gimmick File: %s", entry->gimmickFileName.c_str() );
+    ImGui::Text( "Gimmick File Offset: %u", entry->data.AssetPath );
 
     ImGui::Spacing();
-    ImGui::Text("Extended SGData Fields:");
+    ImGui::Text( "Extended SGData Fields:" );
     ImGui::Separator();
 
     // Note: These fields may not be available in the current SGData structure
     // You'll need to update the SGData struct to include these fields
 
     // Asset and Door State
-    ImGui::Text("Asset Path: %d", entry->data.AssetPath);
-    ImGui::Text("Initial Door State: %d", (int)entry->data.InitialDoorState);
+    ImGui::Text( "Asset Path: %d", entry->data.AssetPath );
+    ImGui::Text( "Initial Door State: %d", ( int ) entry->data.InitialDoorState );
 
     // Member Override Information
-    ImGui::Text("Overridden Members: %d", entry->data.OverriddenMembers);
-    ImGui::Text("Overridden Member Count: %d", entry->data.OverriddenMember_Count);
+    ImGui::Text( "Overridden Members: %d", entry->data.OverriddenMembers );
+    ImGui::Text( "Overridden Member Count: %d", entry->data.OverriddenMember_Count );
 
     // State Information
-    ImGui::Text("Initial Rotation State: %d", (int)entry->data.InitialRotationState);
-    ImGui::Text("Initial Transform State: %d", (int)entry->data.InitialTransformState);
-    ImGui::Text("Initial Color State: %d", (int)entry->data.InitialColorState);
+    ImGui::Text( "Initial Rotation State: %d", ( int ) entry->data.InitialRotationState );
+    ImGui::Text( "Initial Transform State: %d", ( int ) entry->data.InitialTransformState );
+    ImGui::Text( "Initial Color State: %d", ( int ) entry->data.InitialColorState );
 
     // Timeline and Animation
-    ImGui::Text("Random Timeline Auto Play: %s", entry->data.RandomTimelineAutoPlay ? "Yes" : "No");
-    ImGui::Text("Random Timeline Loop Playback: %s", entry->data.RandomTimelineLoopPlayback ? "Yes" : "No");
+    ImGui::Text( "Random Timeline Auto Play: %s", entry->data.RandomTimelineAutoPlay ? "Yes" : "No" );
+    ImGui::Text( "Random Timeline Loop Playback: %s", entry->data.RandomTimelineLoopPlayback ? "Yes" : "No" );
 
     // Collision and Path Settings
-    ImGui::Text("Collision Controllable Without EObj: %s", entry->data.IsCollisionControllableWithoutEObj ? "Yes" : "No");
-    ImGui::Text("Bound Client Path Instance ID: %u", entry->data.BoundClientPathInstanceID);
-    ImGui::Text("Move Path Settings: %d", entry->data.MovePathSettings);
+    ImGui::Text( "Collision Controllable Without EObj: %s",
+                 entry->data.IsCollisionControllableWithoutEObj ? "Yes" : "No" );
+    ImGui::Text( "Bound Client Path Instance ID: %u", entry->data.BoundClientPathInstanceID );
+    ImGui::Text( "Move Path Settings: %d", entry->data.MovePathSettings );
 
     // Navigation Mesh
-    ImGui::Text("Not Create Navimesh Door: %s", entry->data.NotCreateNavimeshDoor ? "Yes" : "No");
-
+    ImGui::Text( "Not Create Navimesh Door: %s", entry->data.NotCreateNavimeshDoor ? "Yes" : "No" );
   }
 }
 
-void LgbViewer::showEObjEntryView(LGB_EOBJ_ENTRY* entry)
+void LgbViewer::showEObjEntryView( LGB_EOBJ_ENTRY *entry )
 {
-  ImGui::Text("Event Object Entry");
+  ImGui::Text( "Event Object Entry" );
   ImGui::Separator();
 
   // Basic information
-  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Instance ID: %u", entry->header.instanceId);
-    ImGui::Text("Name: %s", entry->name.c_str());
-    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
   }
 
   // Transform information
-  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Position: %.3f, %.3f, %.3f",
-      entry->header.transform.translation.x,
-      entry->header.transform.translation.y,
-      entry->header.transform.translation.z);
-    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
-      entry->header.transform.rotation.x,
-      entry->header.transform.rotation.y,
-      entry->header.transform.rotation.z);
-    ImGui::Text("Scale: %.3f, %.3f, %.3f",
-      entry->header.transform.scale.x,
-      entry->header.transform.scale.y,
-      entry->header.transform.scale.z);
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
   }
 
   // EObj-specific data
-  if( ImGui::CollapsingHeader("Event Object Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Event Object Data", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Base ID: %u", entry->data.BaseId);
-    ImGui::Text("Bound Instance ID: %u", entry->data.BoundInstanceID);
-    ImGui::Text("Linked Instance ID: %u", entry->data.LinkedInstanceID);
-    ImGui::Text("Reserved 1: %u", entry->data.Reserved1);
-    ImGui::Text("Reserved 2: %u", entry->data.Reserved2);
+    ImGui::Text( "Base ID: %u", entry->data.BaseId );
+    ImGui::Text( "Bound Instance ID: %u", entry->data.BoundInstanceID );
+    ImGui::Text( "Linked Instance ID: %u", entry->data.LinkedInstanceID );
+    ImGui::Text( "Reserved 1: %u", entry->data.Reserved1 );
+    ImGui::Text( "Reserved 2: %u", entry->data.Reserved2 );
   }
 }
 
-void LgbViewer::showExitRangeEntryView(LGB_EXIT_RANGE_ENTRY* entry)
+void LgbViewer::showExitRangeEntryView( LGB_EXIT_RANGE_ENTRY *entry )
 {
-  ImGui::Text("Exit Range Entry");
+  ImGui::Text( "Exit Range Entry" );
   ImGui::Separator();
 
   // Basic information
-  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Instance ID: %u", entry->header.instanceId);
-    ImGui::Text("Name: %s", entry->name.c_str());
-    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
   }
 
   // Transform information
-  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Position: %.3f, %.3f, %.3f",
-      entry->header.transform.translation.x,
-      entry->header.transform.translation.y,
-      entry->header.transform.translation.z);
-    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
-      entry->header.transform.rotation.x,
-      entry->header.transform.rotation.y,
-      entry->header.transform.rotation.z);
-    ImGui::Text("Scale: %.3f, %.3f, %.3f",
-      entry->header.transform.scale.x,
-      entry->header.transform.scale.y,
-      entry->header.transform.scale.z);
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
   }
 
   // Trigger Box information
-  if( ImGui::CollapsingHeader("Trigger Box", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Trigger Box", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    const char* shapeNames[] = {"Unknown", "Box", "Sphere", "Cylinder", "Board", "Mesh", "BoardBothSides"};
-    int shapeIndex = (int)entry->data.triggerBoxType.triggerBoxShape;
-    const char* shapeName = (shapeIndex >= 0 && shapeIndex < 7) ? shapeNames[shapeIndex] : "Unknown";
+    const char *shapeNames[ ] = { "Unknown", "Box", "Sphere", "Cylinder", "Board", "Mesh", "BoardBothSides" };
+    int shapeIndex = ( int ) entry->data.triggerBoxType.triggerBoxShape;
+    const char *shapeName = ( shapeIndex >= 0 && shapeIndex < 7 ) ? shapeNames[ shapeIndex ] : "Unknown";
 
-    ImGui::Text("Shape: %s (%d)", shapeName, shapeIndex);
-    ImGui::Text("Priority: %d", entry->data.triggerBoxType.priority);
-    ImGui::Text("Enabled: %s", entry->data.triggerBoxType.enabled ? "Yes" : "No");
+    ImGui::Text( "Shape: %s (%d)", shapeName, shapeIndex );
+    ImGui::Text( "Priority: %d", entry->data.triggerBoxType.priority );
+    ImGui::Text( "Enabled: %s", entry->data.triggerBoxType.enabled ? "Yes" : "No" );
   }
 
   // Exit-specific data
-  if( ImGui::CollapsingHeader("Exit Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Exit Data", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Exit Type: %u", entry->data.exitType);
-    ImGui::Text("Zone ID: %u", entry->data.zoneId);
-    ImGui::Text("Dest Territory Type: %u", entry->data.destTerritoryType);
-    ImGui::Text("Index: %d", entry->data.index);
-    ImGui::Text("Dest Instance Object ID: %u", entry->data.destInstanceObjectId);
-    ImGui::Text("Return Instance Object ID: %u", entry->data.returnInstanceObjectId);
-    ImGui::Text("Direction: %.3f", entry->data.direction);
+    ImGui::Text( "Exit Type: %u", entry->data.exitType );
+    ImGui::Text( "Zone ID: %u", entry->data.zoneId );
+    ImGui::Text( "Dest Territory Type: %u", entry->data.destTerritoryType );
+    ImGui::Text( "Index: %d", entry->data.index );
+    ImGui::Text( "Dest Instance Object ID: %u", entry->data.destInstanceObjectId );
+    ImGui::Text( "Return Instance Object ID: %u", entry->data.returnInstanceObjectId );
+    ImGui::Text( "Direction: %.3f", entry->data.direction );
   }
 }
 
-void LgbViewer::showPopRangeEntryView(LGB_POP_RANGE_ENTRY* entry)
+void LgbViewer::showPopRangeEntryView( LGB_POP_RANGE_ENTRY *entry )
 {
-  ImGui::Text("Pop Range Entry");
+  ImGui::Text( "Pop Range Entry" );
   ImGui::Separator();
 
   // Basic information
-  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Instance ID: %u", entry->header.instanceId);
-    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
   }
 
   // Transform information
-  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Position: %.3f, %.3f, %.3f",
-      entry->header.transform.translation.x,
-      entry->header.transform.translation.y,
-      entry->header.transform.translation.z);
-    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
-      entry->header.transform.rotation.x,
-      entry->header.transform.rotation.y,
-      entry->header.transform.rotation.z);
-    ImGui::Text("Scale: %.3f, %.3f, %.3f",
-      entry->header.transform.scale.x,
-      entry->header.transform.scale.y,
-      entry->header.transform.scale.z);
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
   }
 
   // Pop Range specific data
-  if( ImGui::CollapsingHeader("Pop Range Data", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Pop Range Data", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    const char* popTypeNames[] = {"Unknown", "PC", "NPC/BNPC", "Content"};
-    int popTypeIndex = (int)entry->data.popType;
-    const char* popTypeName = (popTypeIndex >= 0 && popTypeIndex < 4) ? popTypeNames[popTypeIndex] : "Unknown";
+    const char *popTypeNames[ ] = { "Unknown", "PC", "NPC/BNPC", "Content" };
+    int popTypeIndex = ( int ) entry->data.popType;
+    const char *popTypeName = ( popTypeIndex >= 0 && popTypeIndex < 4 ) ? popTypeNames[ popTypeIndex ] : "Unknown";
 
-    ImGui::Text("Pop Type: %s (%u)", popTypeName, (uint32_t)entry->data.popType);
-    ImGui::Text("Inner Radius Ratio: %.3f", entry->data.innerRadiusRatio);
-    ImGui::Text("Index: %u", entry->data.index);
+    ImGui::Text( "Pop Type: %s (%u)", popTypeName, ( uint32_t ) entry->data.popType );
+    ImGui::Text( "Inner Radius Ratio: %.3f", entry->data.innerRadiusRatio );
+    ImGui::Text( "Index: %u", entry->data.index );
 
-    ImGui::Text("Relative Positions:");
+    ImGui::Text( "Relative Positions:" );
     ImGui::Indent();
-    ImGui::Text("Position: %d", entry->data.relativePositions.Pos);
-    ImGui::Text("Count: %d", entry->data.relativePositions.PosCount);
+    ImGui::Text( "Position: %d", entry->data.relativePositions.Pos );
+    ImGui::Text( "Count: %d", entry->data.relativePositions.PosCount );
     ImGui::Unindent();
   }
 }
 
-void LgbViewer::showUnimplementedEntryView(LgbEntry* entry)
+void LgbViewer::showUnimplementedEntryView( LgbEntry *entry )
 {
-  ImGui::Text("Entry Viewer - Not Implemented");
+  ImGui::Text( "Entry Viewer - Not Implemented" );
   ImGui::Separator();
 
   // Show warning
-  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.0f, 1.0f)); // Yellow warning color
-  ImGui::Text("⚠ Warning: Detailed view for this entry type is not yet implemented");
+  ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 1.0f, 0.8f, 0.0f, 1.0f ) ); // Yellow warning color
+  ImGui::Text( "⚠ Warning: Detailed view for this entry type is not yet implemented" );
   ImGui::PopStyleColor();
 
   ImGui::Spacing();
 
   // Basic information that's available for all entries
-  if( ImGui::CollapsingHeader("Basic Information", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Instance ID: %u", entry->header.instanceId);
-    ImGui::Text("Type: %s", getEntryTypeString(entry->getType()).c_str());
-    ImGui::Text("Name Offset: %u", entry->header.nameOffset);
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
+    ImGui::Text( "Name Offset: %u", entry->header.nameOffset );
   }
 
   // Transform information
-  if( ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen) )
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
-    ImGui::Text("Position: %.3f, %.3f, %.3f",
-      entry->header.transform.translation.x,
-      entry->header.transform.translation.y,
-      entry->header.transform.translation.z);
-    ImGui::Text("Rotation: %.3f, %.3f, %.3f",
-      entry->header.transform.rotation.x,
-      entry->header.transform.rotation.y,
-      entry->header.transform.rotation.z);
-    ImGui::Text("Scale: %.3f, %.3f, %.3f",
-      entry->header.transform.scale.x,
-      entry->header.transform.scale.y,
-      entry->header.transform.scale.z);
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
   }
 
   ImGui::Spacing();
-  ImGui::Text("To request implementation for this entry type,");
-  ImGui::Text("please contact the development team with:");
-  ImGui::BulletText("Entry Type: %s", getEntryTypeString(entry->getType()).c_str());
-  ImGui::BulletText("Type ID: %u", (uint32_t)entry->getType());
+  ImGui::Text( "To request implementation for this entry type," );
+  ImGui::Text( "please contact the development team with:" );
+  ImGui::BulletText( "Entry Type: %s", getEntryTypeString( entry->getType() ).c_str() );
+  ImGui::BulletText( "Type ID: %u", static_cast< uint32_t >( entry->getType() ) );
 }

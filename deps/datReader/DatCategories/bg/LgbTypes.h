@@ -10,8 +10,7 @@ enum class LgbEntryType : uint32_t
   Light = 3,
   Vfx = 4,
   PositionMarker = 5,
-  Gimmick = 6,
-  SharedGroup6 = 6,// secondary variable is set to 2
+  SharedGroup = 6,// secondary variable is set to 2
   Sound = 7,
   EventNpc = 8,
   BattleNpc = 9,
@@ -128,10 +127,53 @@ struct PopRangeData : public InstanceObject
   uint32_t reserved;
 };
 
-struct GimmickData : public InstanceObject
+
+enum eDoorState : __int32
 {
-  uint32_t gimmickFileOffset;
-  char unknownBytes[100];
+  Auto_0 = 0x1,
+  Open = 0x2,
+  Closed = 0x3,
+};
+
+enum eRotationState : __int32
+{
+  Rounding = 0x1,
+  Stopped = 0x2,
+};
+
+enum eTransformState : __int32
+{
+  TransformStatePlay = 0x0,
+  TransformStateStop = 0x1,
+  TransformStateReplay = 0x2,
+  TransformStateReset = 0x3,
+};
+
+enum eColorState : __int32
+{
+  ColorStatePlay = 0x0,
+  ColorStateStop = 0x1,
+  ColorStateReplay = 0x2,
+  ColorStateReset = 0x3,
+};
+
+struct SGData : public InstanceObject
+{
+  int32_t AssetPath;
+  eDoorState InitialDoorState;
+  int32_t OverriddenMembers;
+  int32_t OverriddenMember_Count;
+  eRotationState InitialRotationState;
+  int8_t RandomTimelineAutoPlay;
+  int8_t RandomTimelineLoopPlayback;
+  int8_t IsCollisionControllableWithoutEObj;
+  uint8_t Padding00[1];
+  uint32_t BoundClientPathInstanceID;
+  int32_t MovePathSettings;
+  int8_t NotCreateNavimeshDoor;
+  uint8_t Padding01[3];
+  eTransformState InitialTransformState;
+  eColorState InitialColorState;
 };
 
 struct ENpcData : public InstanceObject
@@ -147,6 +189,75 @@ struct EObjData : public InstanceObject
   uint32_t LinkedInstanceID;
   uint32_t Reserved1;
   uint32_t Reserved2;
+};
+
+struct RelativePositions_
+{
+  int32_t Pos;
+  int32_t PosCount;
+};
+
+struct GameInstanceObject : public InstanceObject
+{
+  uint32_t BaseId;
+};
+
+struct NPCInstanceObject : public GameInstanceObject
+{
+  uint32_t PopWeather;
+  uint8_t PopTimeStart;
+  uint8_t PopTimeEnd;
+  uint8_t Padding00[2];
+  uint32_t MoveAI;
+  uint8_t WanderingRange;
+  uint8_t Route;
+  uint16_t EventGroup;
+  uint32_t Reserved1;
+  uint32_t Reserved2;
+};
+
+
+struct BNpcBaseData
+{
+  uint16_t TerritoryRange;
+  uint8_t Sense[2];
+  uint8_t SenseRange[2];
+};
+
+
+struct BNPCInstanceObject : public NPCInstanceObject
+{
+  uint32_t NameId;
+  uint32_t DropItem;
+  float SenseRangeRate;
+  uint16_t Level;
+  uint8_t ActiveType;
+  uint8_t PopInterval;
+  uint8_t PopRate;
+  uint8_t PopEvent;
+  uint8_t LinkGroup;
+  uint8_t LinkFamily;
+  uint8_t LinkRange;
+  uint8_t LinkCountLimit;
+  int8_t NonpopInitZone;
+  int8_t InvalidRepop;
+  int8_t LinkParent;
+  int8_t LinkOverride;
+  int8_t LinkReply;
+  int8_t Nonpop;
+  RelativePositions_ RelativePositions;
+  float HorizontalPopRange;
+  float VerticalPopRange;
+  int32_t BNpcBaseData;
+  uint8_t RepopId;
+  uint8_t BNPCRankId;
+  uint16_t TerritoryRange;
+  uint32_t BoundInstanceID;
+  uint32_t FateLayoutLabelId;
+  uint32_t NormalAI;
+  uint32_t ServerPathId;
+  uint32_t EquipmentID;
+  uint32_t CustomizeID;
 };
 
 enum TriggerBoxShape : int32_t

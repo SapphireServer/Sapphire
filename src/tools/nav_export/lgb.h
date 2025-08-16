@@ -156,25 +156,25 @@ public:
   };
 };
 
-struct GimmickData :
+struct SGData :
   public InstanceObject
 {
   uint32_t gimmickFileOffset;
   char unknownBytes[100];
 };
 
-class LGB_GIMMICK_ENTRY :
+class LGB_SG_ENTRY :
   public LgbEntry
 {
 public:
-  GimmickData header;
+  SGData header;
   std::string name;
   std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) :
+  LGB_SG_ENTRY( char* buf, uint32_t offset ) :
           LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast<GimmickData*>( buf + offset );
+    header = *reinterpret_cast<SGData*>( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
     //std::cout << "\t " << gimmickFileName << " unknown: " << header.unknown << "\n";
@@ -377,7 +377,7 @@ struct LGB_GROUP
             entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
             break;
           case LgbEntryType::Gimmick:
-            entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            entries.push_back( std::make_shared< LGB_SG_ENTRY >( buf, entryOffset ) );
             break;
           case LgbEntryType::EventObject:
             entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );

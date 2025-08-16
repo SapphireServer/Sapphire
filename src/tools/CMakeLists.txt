@@ -28,6 +28,7 @@ add_subdirectory( "BattleNpcParserPs3" )
 add_subdirectory( "event_object_parser" )
 add_subdirectory( "action_parse" )
 add_subdirectory( "wiki_parse" )
+add_subdirectory( "BattleNpcToJson" )
 
 if( SAPPHIRE_BUILD_TOOLKIT )
   add_subdirectory( "Toolkit" )

@@ -308,7 +308,7 @@ int main( int argc, char* argv[] )
           totalGroups++;
           for( const auto& pEntry : group.entries )
           {
-            auto pGimmick = dynamic_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+            auto pGimmick = dynamic_cast< LGB_SG_ENTRY* >( pEntry.get() );
             auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
             totalGroupEntries++;
 
@@ -334,7 +334,7 @@ int main( int argc, char* argv[] )
                 auto pGObj = pEntry1.get();
                 if( pGObj->getType() == LgbEntryType::Gimmick && pGObj->header.instanceId == pEobj->data.BoundInstanceID )
                 {
-                  auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
+                  auto pGObjR = reinterpret_cast< LGB_SG_ENTRY* >( pGObj );
                   char* dataSection = nullptr;
 
                   auto file = g_gameData->getFile( pGObjR->gimmickFileName );

@@ -10,8 +10,7 @@ enum class LgbEntryType : uint32_t
   Light = 3,
   Vfx = 4,
   PositionMarker = 5,
-  Gimmick = 6,
-  SharedGroup6 = 6,// secondary variable is set to 2
+  SharedGroup = 6,// secondary variable is set to 2
   Sound = 7,
   EventNpc = 8,
   BattleNpc = 9,
@@ -179,16 +178,26 @@ struct BNPCInstanceObject : public NPCInstanceObject
   uint32_t CustomizeID;
 };
 
+enum eModelConfigCollisionType : __int32
+{
+  COLLISION_ATTRIBUTE_TYPE_None = 0x0,
+  COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
+  COLLISION_ATTRIBUTE_TYPE_Box = 0x2,
+};
+
 struct BgPartsData : public InstanceObject
 {
-  uint32_t modelFileOffset;
-  uint32_t collisionFileOffset;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
+  int32_t AssetPath;
+  int32_t CollisionAssetPath;
+  eModelConfigCollisionType CollisionType;
+  uint32_t AttributeMask;
+  uint32_t Attribute;
+  int32_t CollisionConfig;
+  int8_t IsVisible;
+  uint8_t RenderShadowEnabled;
+  uint8_t RenderLightShadowEnabled;
+  uint8_t Padding00[1];
+  float RenderModelClipRange;
 };
 
 
@@ -203,10 +212,52 @@ struct PopRangeData : public InstanceObject
   uint32_t reserved;
 };
 
-struct GimmickData : public InstanceObject
+enum eDoorState : __int32
 {
-  uint32_t gimmickFileOffset;
-  char unknownBytes[100];
+  Auto_0 = 0x1,
+  Open = 0x2,
+  Closed = 0x3,
+};
+
+enum eRotationState : __int32
+{
+  Rounding = 0x1,
+  Stopped = 0x2,
+};
+
+enum eTransformState : __int32
+{
+  TransformStatePlay = 0x0,
+  TransformStateStop = 0x1,
+  TransformStateReplay = 0x2,
+  TransformStateReset = 0x3,
+};
+
+enum eColorState : __int32
+{
+  ColorStatePlay = 0x0,
+  ColorStateStop = 0x1,
+  ColorStateReplay = 0x2,
+  ColorStateReset = 0x3,
+};
+
+struct SGData : public InstanceObject
+{
+  int32_t AssetPath;
+  eDoorState InitialDoorState;
+  int32_t OverriddenMembers;
+  int32_t OverriddenMember_Count;
+  eRotationState InitialRotationState;
+  int8_t RandomTimelineAutoPlay;
+  int8_t RandomTimelineLoopPlayback;
+  int8_t IsCollisionControllableWithoutEObj;
+  uint8_t Padding00[1];
+  uint32_t BoundClientPathInstanceID;
+  int32_t MovePathSettings;
+  int8_t NotCreateNavimeshDoor;
+  uint8_t Padding01[3];
+  eTransformState InitialTransformState;
+  eColorState InitialColorState;
 };
 
 struct ENpcData : public InstanceObject

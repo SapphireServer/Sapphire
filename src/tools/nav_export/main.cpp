@@ -476,7 +476,7 @@ int main( int argc, char* argv[] )
               // gimmick entry
               case LgbEntryType::Gimmick:
               {
-                auto pGimmick = static_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+                auto pGimmick = static_cast< LGB_SG_ENTRY* >( pEntry.get() );
 
                 exportSgbModel( pGimmick->gimmickFileName, pGimmick, exportedGroup );
               }

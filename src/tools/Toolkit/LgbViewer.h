@@ -121,11 +121,11 @@ private:
 
 
   // Camera/view controls for navmesh
-  glm::vec3 m_navCameraPos = glm::vec3( 0.0f, 10.0f, 0.0f );
+  glm::vec3 m_navCameraPos = glm::vec3( 0.0f, 30.0f, 0.0f );
   glm::vec3 m_navCameraTarget = glm::vec3( 0.0f, 0.0f, 0.0f );
   float m_navCameraDistance = 50.0f;
   float m_navCameraYaw = 0.0f;
-  float m_navCameraPitch = -30.0f;
+  float m_navCameraPitch = 30.0f;
   // Mouse interaction state
   bool m_navMouseDragging = false;
   bool m_navMousePanning = false;

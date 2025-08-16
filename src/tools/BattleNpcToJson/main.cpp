@@ -19,6 +19,8 @@
 #include "tex.h"
 #include "tex_decode.h"
 
+#include <nlohmann/json.hpp>
+
 #include <datReaderPs3/GameData.h>
 #include <datReaderPs3/File.h>
 #include <datReaderPs3/DatCat.h>
@@ -336,6 +338,173 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
 
 }
 
+std::unordered_map< uint32_t, nlohmann::json > territoryJsonData;
+
+
+void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::string& path, xivps3::dat::GameData* gameData )
+{
+  std::vector< char > data_section;
+
+  try
+  {
+    if( !gameData->doesFileExist( "bg/" + path ) )
+      return;
+    auto bg_file = gameData->getFile( "bg/" + path );
+    data_section = bg_file->access_data_sections().at( 0 );
+  }
+  catch( ... )
+  {
+    return;
+  }
+
+  std::vector< std::string > stringList;
+
+  try
+  {
+    LGB_FILE bgLgb( &data_section[ 0 ], "bg" );
+
+
+    std::vector< LGB_FILE > lgbList{ bgLgb };
+
+    uint32_t totalGroups = 0;
+    uint32_t totalGroupEntries = 0;
+
+
+    for( const auto& lgb : lgbList )
+    {
+
+      for( const auto& group : lgb.groups )
+      {
+        bool hasBnpc = false;
+        for( auto& entry : group.entries )
+        {
+          if( entry->getType() == LgbEntryType::BattleNpc )
+          {
+            hasBnpc = true;
+            break;
+          }
+        }
+        if( !hasBnpc )
+          continue;
+
+        std::cout << group.name << " " << group.header.id << " ";
+        for( auto ref : group.refs )
+        {
+          std::cout << "layerSet: " << ref.LayerSetID << ", ";
+        }
+        std::cout << group.entries.size() << std::endl;
+        std::cout << "\n";
+        totalGroups++;
+        for( const auto& pEntry : group.entries )
+        {
+          if( pEntry->getType() == LgbEntryType::BattleNpc )
+          {
+            totalGroupEntries++;
+            nlohmann::json jsonEntry;
+
+            auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY* >( pEntry.get() );
+
+            //writeBNPCEntry( zoneName, discoverySql, pEntry.get(), group, layerMap );
+
+
+
+
+
+
+            nlohmann::json popInfo;
+            popInfo[ "repopId" ] = pBNpc->data.RepopId;
+            popInfo[ "invalidRepop" ] = pBNpc->data.InvalidRepop;
+            popInfo[ "nonpopInitZone" ] = pBNpc->data.NonpopInitZone;
+            popInfo[ "nonpop" ] = pBNpc->data.Nonpop;
+            popInfo[ "popWeather" ] = pBNpc->data.PopWeather;
+            popInfo[ "popTimeStart" ] = pBNpc->data.PopTimeStart;
+            popInfo[ "popTimeEnd" ] = pBNpc->data.PopTimeEnd;
+            popInfo[ "popInterval" ] = pBNpc->data.PopInterval;
+            popInfo[ "popRate" ] = pBNpc->data.PopRate;
+            popInfo[ "popEvent" ] = pBNpc->data.PopEvent;
+            popInfo[ "horizontalPopRange" ] = pBNpc->data.HorizontalPopRange;
+            popInfo[ "verticalPopRange" ] = pBNpc->data.VerticalPopRange;
+            jsonEntry[ "popInfo" ] = popInfo;
+
+            nlohmann::json linkEntry;
+            linkEntry[ "linkGroup" ] = pBNpc->data.LinkGroup;
+            linkEntry[ "linkFamily" ] = pBNpc->data.LinkFamily;
+            linkEntry[ "linkRange" ] = pBNpc->data.LinkRange;
+            linkEntry[ "linkCountLimit" ] = pBNpc->data.LinkCountLimit;
+            linkEntry[ "linkParent" ] = pBNpc->data.LinkParent;
+            linkEntry[ "linkOverride" ] = pBNpc->data.LinkOverride;
+            linkEntry[ "linkReply" ] = pBNpc->data.LinkReply;
+            jsonEntry[ "linkData" ] = linkEntry;
+
+            nlohmann::json behaviourEntry;
+            behaviourEntry[ "moveAI" ] = pBNpc->data.MoveAI;
+            behaviourEntry[ "normalAI" ] = pBNpc->data.NormalAI;
+            behaviourEntry[ "wanderingRange" ] = pBNpc->data.WanderingRange;
+            behaviourEntry[ "routeId" ] = pBNpc->data.Route;
+            behaviourEntry[ "territoryRange" ] = pBNpc->data.TerritoryRange;
+            behaviourEntry[ "dropItem" ] = pBNpc->data.DropItem;
+            jsonEntry[ "Behaviour" ] = behaviourEntry;
+
+            nlohmann::json SenseEntry;
+            SenseEntry[ "senseRangeRate" ] = pBNpc->data.SenseRangeRate;
+            SenseEntry[ "territoryRange"] = pBNpc->baseData.TerritoryRange;
+            SenseEntry[ "Sense" ]  = pBNpc->baseData.Sense;
+            SenseEntry[ "SenseRange" ]  = pBNpc->baseData.SenseRange;
+            jsonEntry[ "SenseInfo" ] = SenseEntry;
+
+            nlohmann::json baseInfo;
+            baseInfo[ "instanceId" ] = pBNpc->data.instanceId;
+            baseInfo[ "groupId" ] = group.header.id;
+            baseInfo[ "position" ] = { pBNpc->header.transform.translation.x, pBNpc->header.transform.translation.y, pBNpc->header.transform.translation.z };
+            baseInfo[ "rotation" ] = pBNpc->data.transform.rotation.y;
+            baseInfo[ "baseId" ] = pBNpc->data.BaseId;
+            baseInfo[ "nameId" ] = pBNpc->data.NameId;
+            baseInfo[ "equipmentId" ] = pBNpc->data.EquipmentID;
+            baseInfo[ "customizeId" ] = pBNpc->data.CustomizeID;
+            baseInfo[ "level" ] = pBNpc->data.Level;
+            baseInfo[ "activeType" ] = pBNpc->data.ActiveType;
+            baseInfo[ "boundInstanceId" ] = pBNpc->data.BoundInstanceID;
+            baseInfo[ "fateLayoutLabelId" ] = pBNpc->data.FateLayoutLabelId;
+
+            jsonEntry[ "baseInfo" ] = baseInfo;
+            if( territoryJsonData[zoneId].is_null() )
+              {
+              territoryJsonData[zoneId] = nlohmann::json::object();
+            }
+
+            territoryJsonData[ zoneId ][ std::to_string( pBNpc->data.instanceId ) ] = jsonEntry;
+
+
+          }
+        }
+      }
+    }
+    if( totalGroupEntries > 0 )
+    {
+      std::cout << fmt::format( "[Info] id: {} name: {} file: {} total groups: {} total entities: {}", zoneId, name, path, totalGroups, totalGroupEntries ) << std::endl;
+      std::string filename = name + "_bnpcs.json";
+      std::ofstream jsonFile(filename);
+      if( jsonFile.is_open() )
+      {
+        nlohmann::json finalJson = territoryJsonData[ zoneId ];
+        jsonFile << finalJson.dump(2); // Pretty print with 2-space indentation
+        jsonFile.close();
+
+        std::cout << "Created JSON file: " << filename << " with " << territoryJsonData[ zoneId ].size() << " entries" << std::endl;
+      }
+      else
+      {
+        std::cout << "Failed to create JSON file: " << filename << std::endl;
+      }
+
+
+    }
+  }
+  catch( std::runtime_error& e )
+  {
+    return;
+  }
+}
 
 int main( int argc, char* argv[] )
 {
@@ -344,6 +513,7 @@ int main( int argc, char* argv[] )
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
   zoneName = "s1h1";
+
 
   if( argc > 1 )
   {
@@ -368,10 +538,69 @@ int main( int argc, char* argv[] )
 
   if ( !g_exdDataGen.init( gamePath ) )
   {
-    
+
   }
 
   auto teriIdList = g_exdDataGen.getIdList< Excel::Ps3::TerritoryType >();
+
+  for( const auto& id : teriIdList )
+  {
+    if( id < 100 )
+      continue;
+
+    auto row = g_exdDataGen.getRow< Excel::Ps3::TerritoryType >( id );
+    if( !row )
+      continue;
+
+    std::string zonePath = row->getString( row->data().LVB );
+    std::string name = row->getString( row->data().Name );
+
+    if( zonePath.empty() )
+      continue;
+
+    std::string strippedPath;
+    auto pos = zonePath.find_last_of( "/" );
+    if( pos != std::string::npos )
+    {
+      strippedPath = zonePath.substr( 0, pos + 1 );
+    }
+
+    std::cout << id << " found Path: " << strippedPath << std::endl;
+
+    exportBnpcEntries( id, name, strippedPath + "bg.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planmap.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planevent.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planner.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planlive.lgb", gameData );
+
+    try
+    {
+      std::cout << id << " found Path1: " << std::string("bg/" + zonePath + ".lvb") << std::endl;
+      if( !gameData->doesFileExist( "bg/" + zonePath + ".lvb" ) )
+        continue;
+      auto file = gameData->getFile( "bg/" + zonePath + ".lvb" );
+      auto data_section = file->access_data_sections().at( 0 );
+      LVB_FILE lvb( &data_section[ 0 ], zoneName );
+
+      std::ofstream lvbRawFile("./lvb/" + zoneName + ".lvb", std::ios::trunc );
+      lvbRawFile.write( &data_section[ 0 ], data_section.size() );
+      if( lvbRawFile.good() )
+        lvbRawFile.close();
+
+      int nameIndex = 0;
+      for( const auto& layer : lvb.layers )
+      {
+        layerMap[ layer.LayerSetID ] = {};
+        layerSetToTerritoryIdMap[ layer.LayerSetID ] = layer.TerritoryTypeID;
+      }
+    }
+    catch( ... )
+    {
+      continue;
+    }
+  }
+
+
 
 
   std::string data = std::string("GroupId, GroupName, TerritoryName, name, instanceId, x, y, z, Rotation, BaseId, PopWeather, PopTimeStart, PopTimeEnd, MoveAI, WanderingRange, Route, ") +
@@ -386,6 +615,9 @@ int main( int argc, char* argv[] )
   std::set< std::string > zoneNames;
   for( const auto& id : teriIdList )
   {
+
+    if( id < 100 )
+      continue;
     auto row = g_exdDataGen.getRow< Excel::Ps3::TerritoryType >( id );
     if( !row )
       continue;
@@ -419,60 +651,6 @@ int main( int argc, char* argv[] )
     {
       const auto zonePath = zoneNameToPath( name );
 
-      auto exportBnpcEntries = [ & ]( const std::string& path )
-      {
-        std::vector< char > data_section;
-
-        try
-        {
-          auto bg_file = gameData->getFile( path );
-          data_section = bg_file->access_data_sections().at( 0 );
-        }
-        catch( ... )
-        {
-          return;
-        }
-
-
-
-        std::vector< std::string > stringList;
-
-        uint32_t offset1 = 0x20;
-
-        LGB_FILE bgLgb( &data_section[ 0 ], "bg" );
-
-        std::vector< LGB_FILE > lgbList{ bgLgb };
-        uint32_t max_index = 0;
-
-        std::cout << "[Info] " << "Dumping BNPC data" << "\n";
-        uint32_t totalGroups = 0;
-        uint32_t totalGroupEntries = 0;
-
-        for( const auto& lgb : lgbList )
-        {
-          for( const auto& group : lgb.groups )
-          {
-            totalGroups++;
-            for( const auto& pEntry : group.entries )
-            {
-              if( pEntry->getType() == LgbEntryType::BattleNpc )
-              {
-                totalGroupEntries++;
-                writeBNPCEntry( zoneName, discoverySql, pEntry.get(), group, layerMap );
-              }
-              else if( pEntry->getType() == LgbEntryType::ClientPath )
-              {
-                totalGroupEntries++;
-                totalGroupEntries--;
-              }
-            }
-          }
-        }
-        std::cout << fmt::format(
-          "[Info] file: {} total groups: {} total entries: {}",
-          path, totalGroups, totalGroupEntries ) << std::endl;
-      };
-
       std::cout << zonePath + "/level/" + zoneName + ".lvb\n";
 
       auto file = gameData->getFile( zonePath + "/level/" + zoneName + ".lvb" );
@@ -487,21 +665,16 @@ int main( int argc, char* argv[] )
       int nameIndex = 0;
       for( const auto& layer : lvb.layers )
       {
-//        std::cout << layer.LayerSetID << " " << layer.TerritoryTypeID << " " << lvb.layerNames[ nameIndex++ ] << "\n";
-
-//        std::string layerOut = std::to_string( layer.TerritoryTypeID ) + ", " + std::to_string( layer.LayerSetID ) + ", " + lvb.layerNames[ nameIndex++ ] + "\n";
-//        mapSql.write( layerOut.c_str(), layerOut.size() );
-
         layerMap[ layer.LayerSetID ] = {};
         layerSetToTerritoryIdMap[ layer.LayerSetID ] = layer.TerritoryTypeID;
       }
 
 
-      exportBnpcEntries( zonePath + "/level/bg.lgb" );
-      exportBnpcEntries( zonePath + "/level/planmap.lgb" );
-      exportBnpcEntries( zonePath + "/level/planevent.lgb" );
-      exportBnpcEntries( zonePath + "/level/planner.lgb" );
-      exportBnpcEntries( zonePath + "/level/planlive.lgb" );
+      exportBnpcEntries( 0, "", zonePath + "/level/bg.lgb", gameData );
+      exportBnpcEntries( 0, "", zonePath + "/level/planmap.lgb", gameData );
+      exportBnpcEntries( 0, "", zonePath + "/level/planevent.lgb", gameData );
+      exportBnpcEntries( 0, "", zonePath + "/level/planner.lgb", gameData );
+      exportBnpcEntries( 0, "", zonePath + "/level/planlive.lgb", gameData );
 
       std::cout << "[Success] " << "Exported " << zoneName << " in " <<
                 std::chrono::duration_cast< std::chrono::seconds >(

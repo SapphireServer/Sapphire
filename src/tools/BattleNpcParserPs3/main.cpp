@@ -400,7 +400,7 @@ int main( int argc, char* argv[] )
       zonePath = zonePath.substr( pos + 1 );
     }
 
-    zoneNames.insert( zonePath );
+    zoneNames.insert( row->getString( row->data().Name ) );
 
   }
   for( const auto& name : zoneNames )
@@ -452,6 +452,13 @@ int main( int argc, char* argv[] )
         {
           for( const auto& group : lgb.groups )
           {
+            std::cout << group.name << " " << group.header.id << " ";
+
+            for( auto ref : group.refs )
+            {
+              std::cout << "layerSet: " << ref.LayerSetID << ", ";
+            }
+            std::cout << "\n";
             totalGroups++;
             for( const auto& pEntry : group.entries )
             {
@@ -497,11 +504,11 @@ int main( int argc, char* argv[] )
       }
 
 
-      exportBnpcEntries( zonePath + "/level/bg.lgb" );
-      exportBnpcEntries( zonePath + "/level/planmap.lgb" );
-      exportBnpcEntries( zonePath + "/level/planevent.lgb" );
-      exportBnpcEntries( zonePath + "/level/planner.lgb" );
-      exportBnpcEntries( zonePath + "/level/planlive.lgb" );
+     // exportBnpcEntries( zonePath + "/level/bg.lgb" );
+     // exportBnpcEntries( zonePath + "/level/planmap.lgb" );
+     // exportBnpcEntries( zonePath + "/level/planevent.lgb" );
+     // exportBnpcEntries( zonePath + "/level/planner.lgb" );
+     // exportBnpcEntries( zonePath + "/level/planlive.lgb" );
 
       std::cout << "[Success] " << "Exported " << zoneName << " in " <<
                 std::chrono::duration_cast< std::chrono::seconds >(
