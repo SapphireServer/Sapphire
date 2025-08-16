@@ -48,28 +48,28 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
     {
       oldStatus = effectIt.second;
       effectToApply = WrathII;
-      parry += 2;
+      parry = 4;
       break;
     }
     else if( effectIt.second->getId() == WrathII )
     {
       oldStatus = effectIt.second;
       effectToApply = WrathIII;
-      parry += 2;      
+      parry = 6;      
       break;
     }
     else if( effectIt.second->getId() == WrathIII )
     {
       oldStatus = effectIt.second;
       effectToApply = WrathIV;
-      parry += 2;      
+      parry = 8;      
       break;
     }
     else if( effectIt.second->getId() == WrathIV )
     {
       oldStatus = effectIt.second;
       effectToApply = Infuriated;
-      parry += 2;     
+      parry = 10;     
       break;
     }
   }
