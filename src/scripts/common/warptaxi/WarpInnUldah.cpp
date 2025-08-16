@@ -13,11 +13,13 @@
 
 using namespace Sapphire;
 
-class WarpTaxi : public Sapphire::ScriptAPI::EventScript
+class WarpInnUldah : public Sapphire::ScriptAPI::EventScript
 {
 public:
-  WarpTaxi() :
-    Sapphire::ScriptAPI::EventScript( 0x00020000 )
+  constexpr static auto InnTerritoryType = 179;
+
+  WarpInnUldah() :
+    Sapphire::ScriptAPI::EventScript( 131081 )
   {
   }
 
@@ -31,8 +33,7 @@ public:
 
     auto qualifiedPreResult = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      //eventMgr().playScene( player, result.eventId, 1, HIDE_HOTBAR, { 1 }, nullptr );
-      if( result.getResult( 0 ) == 1 && result.errorCode != Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRRUN )
+      auto warpChoice = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
         auto warp = this->exdData().getRow< Excel::Warp >( result.eventId );
         if( warp )
@@ -45,11 +46,16 @@ public:
                                             pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
           }
         }
-      }
+      };
+
+      eventMgr().playScene( player, result.eventId, 1, HIDE_HOTBAR, { 1 }, warpChoice );
     };
 
-    eventMgr().playScene( player, eventId, 0, HIDE_HOTBAR, { 1 }, qualifiedPreResult );
+    if( player.hasReward( Common::UnlockEntry::InnRoom ) )
+      eventMgr().playScene( player, eventId, 0, HIDE_HOTBAR, { 1 }, qualifiedPreResult );
+    else
+      eventMgr().playScene( player, eventId, 2, HIDE_HOTBAR, { 1 }, nullptr );
   }
 };
 
-EXPOSE_SCRIPT( WarpTaxi );
+EXPOSE_SCRIPT( WarpInnUldah );
