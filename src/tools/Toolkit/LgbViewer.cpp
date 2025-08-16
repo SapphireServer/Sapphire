@@ -630,7 +630,7 @@ void LgbViewer::focusOn3DPosition( const vec3& position )
   // Update camera parameters
   m_navCameraDistance = distance;
   m_navCameraYaw = yaw * ( 180.0f / 3.1415926f ); // Convert back to degrees
-  m_navCameraPitch = -30.0f; // 30 degrees down
+  m_navCameraPitch = 30.0f; // 30 degrees down
 
   // Ensure navmesh window is visible when focusing
   m_showNavmeshWindow = true;
