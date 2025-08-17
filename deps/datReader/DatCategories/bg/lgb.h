@@ -165,13 +165,13 @@ public:
 class LGB_BNPC_ENTRY : public LgbEntry
 {
 public:
-  BNPCInstanceObject data;
+  ::BNPCInstanceObject data;
   BNpcBaseData baseData;
   std::string name;
 
   LGB_BNPC_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< BNPCInstanceObject* >( buf + offset );
+    data = *reinterpret_cast< ::BNPCInstanceObject* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     baseData = *reinterpret_cast< BNpcBaseData* >( buf + offset + data.BNpcBaseData );
   };

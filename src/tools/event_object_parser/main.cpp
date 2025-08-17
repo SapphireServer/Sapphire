@@ -332,7 +332,7 @@ int main( int argc, char* argv[] )
               for( const auto& pEntry1 : group.entries )
               {
                 auto pGObj = pEntry1.get();
-                if( pGObj->getType() == LgbEntryType::Gimmick && pGObj->header.instanceId == pEobj->data.BoundInstanceID )
+                if( pGObj->getType() == LgbEntryType::SharedGroup && pGObj->header.instanceId == pEobj->data.BoundInstanceID )
                 {
                   auto pGObjR = reinterpret_cast< LGB_SG_ENTRY* >( pGObj );
                   char* dataSection = nullptr;

@@ -128,20 +128,20 @@ struct PopRangeData : public InstanceObject
 };
 
 
-enum eDoorState : __int32
+enum eDoorState : int32_t
 {
   Auto_0 = 0x1,
   Open = 0x2,
   Closed = 0x3,
 };
 
-enum eRotationState : __int32
+enum eRotationState : int32_t
 {
   Rounding = 0x1,
   Stopped = 0x2,
 };
 
-enum eTransformState : __int32
+enum eTransformState : int32_t
 {
   TransformStatePlay = 0x0,
   TransformStateStop = 0x1,
@@ -149,7 +149,7 @@ enum eTransformState : __int32
   TransformStateReset = 0x3,
 };
 
-enum eColorState : __int32
+enum eColorState : int32_t
 {
   ColorStatePlay = 0x0,
   ColorStateStop = 0x1,
