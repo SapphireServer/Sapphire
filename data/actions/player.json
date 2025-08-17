@@ -1820,7 +1820,17 @@
     "targetFilter": 0,
     "aggroModifier": 1.0,
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 249,
+          "duration": 30000,
+          "flag": 16385,
+          "groundAOE": {
+            "vfxId": 196,
+            "aoeType": 0
+          }
+        }
+      ],
       "target": []
     }
   },
@@ -2104,7 +2114,7 @@
             {
               "modifier": "EvasionPercent",
               "value": -10
-    }
+            }
           ]
         }
       ]
@@ -2397,7 +2407,7 @@
             {
               "modifier": "TickHeal",
               "value": 50
-    }
+            }
           ]
         }
       ]
@@ -2479,7 +2489,7 @@
             {
               "modifier": "TickHeal",
               "value": 150
-    }
+            }
           ]
         }
       ]
@@ -51099,7 +51109,17 @@
     "targetFilter": 0,
     "aggroModifier": 0.6,
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 739,
+          "duration": 24000,
+          "flag": 16385,
+          "groundAOE": {
+            "vfxId": 378,
+            "aoeType": 1
+          }
+        }
+      ],
       "target": []
     }
   },

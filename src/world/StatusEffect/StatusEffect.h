@@ -2,6 +2,7 @@
 #define _STATUSEFFECT_H_
 
 #include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Action/ActionLut.h"
 
 namespace Sapphire {
@@ -13,6 +14,10 @@ class StatusEffect
 public:
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate );
+
+  StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, const World::Action::GroundAOE& groundAOE,
+                uint32_t flag, uint32_t tickRate );
 
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
@@ -81,7 +86,8 @@ private:
   uint32_t m_flag;
   std::string m_name;
   std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
-  std::vector< World::Action::StatusModifier > m_statusModifiers;
+  std::vector< World::Action::StatusModifier > m_statusModifiers{};
+  World::Action::GroundAOE m_groundAOE{};
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
   uint8_t m_slot;
 

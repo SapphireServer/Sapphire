@@ -88,8 +88,8 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_applyStatusAggro = applyAggro;
 }
 
-void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                      const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride )
+void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, const std::vector< StatusModifier >& modifiers,
+                                      uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -98,7 +98,7 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
     m_result.Flag = static_cast< uint8_t >( ActionResultFlag::EffectOnSource );
 
   m_bShouldOverride = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, groundAOE, flag, 3000 );
   m_pStatus->setParam( param );
 
   m_applyStatusAggro = applyAggro;
@@ -119,7 +119,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
 }
 
 void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
-                                          uint32_t flag, bool applyAggro, bool shouldOverride )
+                                          uint32_t flag, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -127,24 +127,24 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
 
   m_bShouldOverride = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, groundAOE, flag, 3000 );
   m_pStatus->setParam( param );
 
   m_applyStatusAggro = applyAggro;
 }
 
 void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro )
+                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, const World::Action::GroundAOE& groundAOE )
 {
-  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false, applyAggro );
+  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, applyAggro, false, groundAOE );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
 
 void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
-                                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro )
+                                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro, const World::Action::GroundAOE& groundAOE )
 {
-  applyStatusEffectSelf( id, duration, param, modifiers, flag, applyAggro, false );
+  applyStatusEffectSelf( id, duration, param, modifiers, flag, applyAggro, false, groundAOE );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
