@@ -357,8 +357,8 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
               eventMgr.playScene( player, result.eventId, 1001, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result )
               {
-                auto& exdData = Common::Service< Data::ExdData >::ref();
-                auto& warp = exdData.getRow< Excel::Warp >( result.eventId );
+                auto exdData = Common::Service< Data::ExdData >::ref();
+                auto warp = exdData.getRow< Excel::Warp >( result.eventId );
                 auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
                 auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
