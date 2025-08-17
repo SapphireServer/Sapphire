@@ -397,6 +397,15 @@ void Player::calculateStats()
     m_hp = m_maxHp;
 }
 
+float Player::getPhysicalWeaponDamage()
+{
+  return getEquippedWeapon()->getPhysicalDmg();
+}
+
+float Player::getMagicalWeaponDamage()
+{
+  return getEquippedWeapon()->getMagicalDmg();
+}
 
 void Player::setAutoattack( bool mode )
 {

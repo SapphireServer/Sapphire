@@ -476,18 +476,13 @@ void Action::Action::execute()
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
   // todo: what do for npcs?
-  auto wepDmg = 1.f;
+  auto wepDmg = m_pSource->getPhysicalWeaponDamage();
 
   if( auto player = m_pSource->getAsPlayer() )
   {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
     auto role = player->getRole();
     if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-      wepDmg = item->getMagicalDmg();
-    else
-      wepDmg = item->getPhysicalDmg();
+      wepDmg = player->getMagicalWeaponDamage();
 
     // is auto attack
     if( getId() == 7 || getId() == 8 )

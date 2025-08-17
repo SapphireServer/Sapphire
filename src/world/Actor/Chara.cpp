@@ -826,7 +826,13 @@ Common::BaseParam Chara::getPrimaryStat() const
   auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint16_t >( getClass() ) );
   assert( classJob );
 
-  return static_cast< Common::BaseParam >( classJob->data().Role );
+  auto index = classJob->data().Role;
+  if( index == 2 ) // Index for VIT and DEX are swapped in this EXD
+    index = 3;
+  else if( index == 3 )
+    index = 2;
+
+  return static_cast< Common::BaseParam >( index );
 }
 
 uint32_t Chara::getStatValue( Common::BaseParam baseParam ) const
@@ -880,6 +886,16 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
   }
 
   return result;
+}
+
+float Chara::getPhysicalWeaponDamage()
+{
+  return 1.0f;
+}
+
+float Chara::getMagicalWeaponDamage()
+{
+  return 1.0f;
 }
 
 // Compute forward direction based on rotation angle (assuming rotation around Z axis)

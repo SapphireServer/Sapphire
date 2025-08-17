@@ -185,6 +185,10 @@ namespace Sapphire::Entity
 
     float getModifier( Common::ParamModifier paramModifier ) const;
 
+    virtual float getPhysicalWeaponDamage();
+
+    virtual float getMagicalWeaponDamage();
+
     uint32_t getHp() const;
 
     uint32_t getHpPercent() const;
