@@ -265,6 +265,10 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
       pBNpc->setAgentId( agentId );
       pBNpc->setPathingActive( true );
     }
+    else
+    {
+      pBNpc->setPathingActive( false );
+    }
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
     updateCellActivity( cx, cy, 1 );

@@ -64,11 +64,14 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     bnpc.moveTo( *pHatedActor );
   }
 
-  auto pos = pNaviProvider->getMovePos( bnpc.getAgentId() );
-  if( pos.x != bnpc.getPos().x || pos.y != bnpc.getPos().y || pos.z != bnpc.getPos().z )
-    bnpc.setPos( pos );
+  if( bnpc.getAgentId() != -1 )
+  {
+    auto pos = pNaviProvider->getMovePos( bnpc.getAgentId() );
+    if( pos.x != bnpc.getPos().x || pos.y != bnpc.getPos().y || pos.z != bnpc.getPos().z )
+      bnpc.setPos( pos );
+  }
 
-  if( !hasQueuedAction && (distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) || !bnpc.pathingActive() ) )
+  if( !hasQueuedAction && distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
     // todo: dont turn if facing
     if( !bnpc.hasFlag( Entity::TurningDisabled ) )
