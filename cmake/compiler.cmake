@@ -70,6 +70,9 @@ elseif( WIN32 )
 
     # Increase number of sections in .obj file
     add_compile_options( /bigobj )
+
+    # Disable permissive mode
+    add_compile_options( /permissive- )
   endif()
 
   # Visual Studio generator specific flags
