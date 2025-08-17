@@ -250,6 +250,11 @@ bool Action::Action::isWeaponskill() const
   return m_category == ActionCategory::Weaponskill;
 }
 
+bool Action::Action::isSpell() const
+{
+  return m_category == ActionCategory::Spell;
+}
+
 Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
@@ -475,9 +480,33 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
-  // todo: what do for npcs?
-  auto wepDmg = m_pSource->getPhysicalWeaponDamage();
+  Common::BaseParam calcStat;
+  switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
+  {
+    case Common::ClassJob::Conjurer:
+    case Common::ClassJob::Thaumaturge:
+    case Common::ClassJob::Whitemage:
+    case Common::ClassJob::Blackmage:
+    case Common::ClassJob::Arcanist:
+    case Common::ClassJob::Summoner:
+    case Common::ClassJob::Scholar:
+    case Common::ClassJob::Astrologian:
+    {
+      if( isSpell() || isAbility() )
+      {
+        calcStat = Common::BaseParam::Intelligence;
+      }
+      break;
+    }
+    default:
+    {
+      calcStat = Common::BaseParam::Strength;
+    }
+  }
+  if( calcStat == Common::BaseParam::Strength && m_pSource->getPrimaryStat() == Common::BaseParam::Dexterity )
+    calcStat = Common::BaseParam::Dexterity;
 
+  auto wepDmg = m_pSource->getPhysicalWeaponDamage();
   if( auto player = m_pSource->getAsPlayer() )
   {
     auto role = player->getRole();
@@ -486,11 +515,11 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
 
     // is auto attack
     if( getId() == 7 || getId() == 8 )
-      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() );
+      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg );
   }
 
-  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
-}
+  return Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg );
+  }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
 {
