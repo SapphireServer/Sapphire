@@ -306,15 +306,21 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     if( questDone )
     {
-      pEventMgr.playScene( player, eventId, 0, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result ) {
+      pEventMgr.playScene( player, eventId, 0, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result )
+      {
+        auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
         if( result.getResult( 0 ) == 1 )
         {
           auto exdData = Common::Service< Data::ExdData >::ref();
           auto warp = exdData.getRow< Excel::Warp >( result.eventId );
 
-          if( warp )
+          auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
           {
+            auto exdData = Common::Service< Data::ExdData >::ref();
+            auto warp = exdData.getRow< Excel::Warp >( result.eventId );
             auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
             auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
             auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
@@ -331,6 +337,49 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
               player.removeCurrency( Common::CurrencyType::Gil, warpCondition->_data.Gil );
             }
+
+            eventMgr.playScene( player, result.eventId, 1002, 0x00003000, nullptr );
+          };
+
+          if( warp->_data.PreCutScene != 0 && warp->_data.PostCutScene == 0 )
+          {
+            eventMgr.playScene( player, result.eventId, 1000, 0x00003000, callback );
+          }
+          else if( warp->_data.PreCutScene == 0 && warp->_data.PostCutScene != 0 )
+          {
+            eventMgr.playScene( player, result.eventId, 1001, 0x00003000, callback );
+          }
+          else if( warp->_data.PreCutScene != 0 && warp->_data.PostCutScene != 0 )
+          {
+            eventMgr.playScene( player, result.eventId, 1000, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result )
+            {
+              auto eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+              eventMgr.playScene( player, result.eventId, 1001, 0x00003000, [ this ]( Entity::Player& player, const Event::SceneResult& result )
+              {
+                auto& exdData = Common::Service< Data::ExdData >::ref();
+                auto& warp = exdData.getRow< Excel::Warp >( result.eventId );
+                auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+                auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
+                auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+                auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+                auto popRangeInfo = instanceObjectCache.getPopRangeInfo( warp->data().PopRange );
+
+                auto warpCondition = exdData.getRow< Excel::WarpCondition >( warp->_data.WarpCondition );
+
+                if( popRangeInfo )
+                {
+                  auto pTeri = teriMgr.getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
+                  warpMgr.requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
+                                                pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+                  player.removeCurrency( Common::CurrencyType::Gil, warpCondition->_data.Gil );
+                }
+
+                eventMgr.playScene( player, result.eventId, 1002, 0x00003000, nullptr );
+              } );
+            } );
           }
         }
       } );
