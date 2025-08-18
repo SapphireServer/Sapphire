@@ -358,7 +358,7 @@ TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t contentFinderId )
 
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", contentFinderId, name );
 
-  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition, instanceContentData.TerritoryType, getNextInstanceId(), " ", name, pContentFinderCondition->data().InstanceContentId );
+  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition, instanceContentData.TerritoryType, getNextInstanceId(), pTeri->getString( pTeri->data().Name ), name, pContentFinderCondition->data().InstanceContentId );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ pContentFinderCondition->data().InstanceContentId ][ pZone->getGuId() ] = pZone;
