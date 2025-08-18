@@ -268,9 +268,11 @@ struct ENpcData : public InstanceObject
 
 struct EObjData : public InstanceObject
 {
-  uint32_t eobjId;
-  uint32_t levelHierachyId;
-  uint8_t unknown1[0xC];
+  uint32_t BaseId;
+  uint32_t BoundInstanceID;
+  uint32_t LinkedInstanceID;
+  uint32_t Reserved1;
+  uint32_t Reserved2;
 };
 
 enum TriggerBoxShape : uint32_t

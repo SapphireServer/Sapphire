@@ -361,10 +361,10 @@ struct LGB_FILE_HEADER
   uint32_t fileSize;
   uint32_t unknown;
   char magic2[4]; // LGP1
-  uint32_t dataOffset;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
+  uint32_t chunkSize;
+  uint32_t layerGroupId;
+  uint32_t nameOff;
+  uint32_t groups;
   int32_t groupCount;
 };
 
@@ -376,13 +376,14 @@ struct LGB_FILE
 
   LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
   {
-    m_name = name;
+    header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
+    m_name = std::string( buf + 20 + xivps3::utils::bparse::byteswap( header.nameOff ) );
   }
 
   LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
-
+    m_name = std::string( buf + 20 + xivps3::utils::bparse::byteswap( header.nameOff ) );
     header.fileSize = xivps3::utils::bparse::byteswap( header.fileSize );
 
 
@@ -395,7 +396,7 @@ struct LGB_FILE
 
     auto baseOffset = sizeof( header );
 
-    header.dataOffset = xivps3::utils::bparse::byteswap( header.dataOffset );
+    header.chunkSize = xivps3::utils::bparse::byteswap( header.chunkSize );
 
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );

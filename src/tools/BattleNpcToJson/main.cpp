@@ -61,8 +61,8 @@ std::string zoneName;
 
 std::set< std::string > zoneDumpList;
 
-xivps3::dat::GameData* gameData = nullptr;
-xivps3::exd::ExdData* eData = nullptr;
+xivps3::dat::GameData *gameData = nullptr;
+xivps3::exd::ExdData *eData = nullptr;
 
 Data::ExdData g_exdDataGen;
 
@@ -100,7 +100,7 @@ struct DiscoveryMap : std::enable_shared_from_this< DiscoveryMap >
     if( tileX < 0 || tileY < 0 || tileY > img.data.size() - 1 || tileX > img.data[ 0 ].size() - 1 )
     {
       std::cout << "Unable to find tile coord for " << x << " " << y << " mapIndex " << std::to_string( mapIndex )
-                << "\n";
+          << "\n";
       return 0;
     }
 
@@ -233,9 +233,9 @@ void loadEobjNames()
   }
 }
 
-void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
+void writeMapRangeEntry( std::ofstream& out, LgbEntry *pObj )
 {
-  auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pObj );
+  auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY * >( pObj );
   if( !pMapRange->data.discoveryEnabled )
     return;
 
@@ -255,13 +255,13 @@ void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
   );
 
   out.write( outStr.c_str(), outStr.size() );
-
 }
 
 
-void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, const LGB_GROUP& group, LayerSetToGroupIdsMap& layerSetMap )
+void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry *pObj, const LGB_GROUP& group,
+                     LayerSetToGroupIdsMap& layerSetMap )
 {
-  auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY* >( pObj );
+  auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY * >( pObj );
 
   auto subArea = 0;
   auto mapId = -1;
@@ -285,7 +285,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
 
 
   std::string outStr( std::to_string( group.header.id ) + ", " +
-//                      layers + ", " +
+                      //                      layers + ", " +
                       group.name + ", " +
                       name + ", " +
                       pBNpc->name + ", " +
@@ -296,52 +296,63 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
                       std::to_string( pBNpc->data.transform.rotation.y ) + ", " +
                       std::to_string( pBNpc->data.BaseId ) + ", " +
                       std::to_string( pBNpc->data.PopWeather ) + ", " +
-                        std::to_string( pBNpc->data.PopTimeStart ) + ", " +
-                        std::to_string( pBNpc->data.PopTimeEnd ) + ", " +
-                        std::to_string( pBNpc->data.MoveAI ) + ", " +
-                        std::to_string( pBNpc->data.WanderingRange ) + ", " +
-                        std::to_string( pBNpc->data.Route ) + ", " +
-                        std::to_string( pBNpc->data.EventGroup ) + ", " +
-                        std::to_string( pBNpc->data.NameId ) + ", " +
-                        std::to_string( pBNpc->data.DropItem ) + ", " +
-                        std::to_string( pBNpc->data.SenseRangeRate ) + ", " +
-                        std::to_string( pBNpc->data.Level ) + ", " +
-                        std::to_string( pBNpc->data.ActiveType ) + ", " +
-                        std::to_string( pBNpc->data.PopInterval ) + ", " +
-                        std::to_string( pBNpc->data.PopRate ) + ", " +
-                        std::to_string( pBNpc->data.PopEvent ) + ", " +
-                        std::to_string( pBNpc->data.LinkGroup ) + ", " +
-                        std::to_string( pBNpc->data.LinkFamily ) + ", " +
-                        std::to_string( pBNpc->data.LinkRange ) + ", " +
-                        std::to_string( pBNpc->data.LinkCountLimit ) + ", " +
-                        std::to_string( pBNpc->data.NonpopInitZone ) + ", " +
-                        std::to_string( pBNpc->data.InvalidRepop ) + ", " +
-                        std::to_string( pBNpc->data.LinkParent ) + ", " +
-                        std::to_string( pBNpc->data.LinkOverride ) + ", " +
-                        std::to_string( pBNpc->data.LinkReply ) + ", " +
-                        std::to_string( pBNpc->data.Nonpop ) + ", " +
-                        std::to_string( pBNpc->data.HorizontalPopRange ) + ", " +
-                        std::to_string( pBNpc->data.VerticalPopRange ) + ", " +
-                        std::to_string( pBNpc->data.BNpcBaseData ) + ", " +
-                        std::to_string( pBNpc->data.RepopId ) + ", " +
-                        std::to_string( pBNpc->data.BNPCRankId ) + ", " +
-                        std::to_string( pBNpc->data.TerritoryRange ) + ", " +
-                        std::to_string( pBNpc->data.BoundInstanceID ) + ", " +
-                        std::to_string( pBNpc->data.FateLayoutLabelId ) + ", " +
-                        std::to_string( pBNpc->data.NormalAI ) + ", " +
-                        std::to_string( pBNpc->data.ServerPathId ) + ", " +
-                        std::to_string( pBNpc->data.EquipmentID ) + ", " +
-                        std::to_string( pBNpc->data.CustomizeID ) + " " +
+                      std::to_string( pBNpc->data.PopTimeStart ) + ", " +
+                      std::to_string( pBNpc->data.PopTimeEnd ) + ", " +
+                      std::to_string( pBNpc->data.MoveAI ) + ", " +
+                      std::to_string( pBNpc->data.WanderingRange ) + ", " +
+                      std::to_string( pBNpc->data.Route ) + ", " +
+                      std::to_string( pBNpc->data.EventGroup ) + ", " +
+                      std::to_string( pBNpc->data.NameId ) + ", " +
+                      std::to_string( pBNpc->data.DropItem ) + ", " +
+                      std::to_string( pBNpc->data.SenseRangeRate ) + ", " +
+                      std::to_string( pBNpc->data.Level ) + ", " +
+                      std::to_string( pBNpc->data.ActiveType ) + ", " +
+                      std::to_string( pBNpc->data.PopInterval ) + ", " +
+                      std::to_string( pBNpc->data.PopRate ) + ", " +
+                      std::to_string( pBNpc->data.PopEvent ) + ", " +
+                      std::to_string( pBNpc->data.LinkGroup ) + ", " +
+                      std::to_string( pBNpc->data.LinkFamily ) + ", " +
+                      std::to_string( pBNpc->data.LinkRange ) + ", " +
+                      std::to_string( pBNpc->data.LinkCountLimit ) + ", " +
+                      std::to_string( pBNpc->data.NonpopInitZone ) + ", " +
+                      std::to_string( pBNpc->data.InvalidRepop ) + ", " +
+                      std::to_string( pBNpc->data.LinkParent ) + ", " +
+                      std::to_string( pBNpc->data.LinkOverride ) + ", " +
+                      std::to_string( pBNpc->data.LinkReply ) + ", " +
+                      std::to_string( pBNpc->data.Nonpop ) + ", " +
+                      std::to_string( pBNpc->data.HorizontalPopRange ) + ", " +
+                      std::to_string( pBNpc->data.VerticalPopRange ) + ", " +
+                      std::to_string( pBNpc->data.BNpcBaseData ) + ", " +
+                      std::to_string( pBNpc->data.RepopId ) + ", " +
+                      std::to_string( pBNpc->data.BNPCRankId ) + ", " +
+                      std::to_string( pBNpc->data.TerritoryRange ) + ", " +
+                      std::to_string( pBNpc->data.BoundInstanceID ) + ", " +
+                      std::to_string( pBNpc->data.FateLayoutLabelId ) + ", " +
+                      std::to_string( pBNpc->data.NormalAI ) + ", " +
+                      std::to_string( pBNpc->data.ServerPathId ) + ", " +
+                      std::to_string( pBNpc->data.EquipmentID ) + ", " +
+                      std::to_string( pBNpc->data.CustomizeID ) + " " +
                       "\n" );
 
   out.write( outStr.c_str(), outStr.size() );
-
 }
 
 std::unordered_map< uint32_t, nlohmann::json > territoryJsonData;
 
 
-void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::string& path, xivps3::dat::GameData* gameData )
+struct BnpcGroupInfo
+{
+  std::string groupName;
+  uint32_t groupId;
+  uint32_t layerSetId;
+  std::vector< LGB_BNPC_ENTRY * > entries;
+};
+
+void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGroupInfo& groupInfo,
+                      uint32_t& totalEntries );
+
+void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::string& path,
+                        xivps3::dat::GameData *gameData )
 {
   std::vector< char > data_section;
 
@@ -351,162 +362,204 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
       return;
     auto bg_file = gameData->getFile( "bg/" + path );
     data_section = bg_file->access_data_sections().at( 0 );
-  }
-  catch( ... )
+  } catch( ... )
   {
     return;
   }
 
-  std::vector< std::string > stringList;
-
   try
   {
     LGB_FILE bgLgb( &data_section[ 0 ], "bg" );
-
-
     std::vector< LGB_FILE > lgbList{ bgLgb };
 
-    uint32_t totalGroups = 0;
-    uint32_t totalGroupEntries = 0;
-
+    // Group BNPC entries by group info
+    std::unordered_map< std::string, BnpcGroupInfo > groupedBnpcEntries;
 
     for( const auto& lgb : lgbList )
     {
-
       for( const auto& group : lgb.groups )
       {
-        bool hasBnpc = false;
+        // Check if group has any BNPC entries
+        std::vector< LGB_BNPC_ENTRY * > bnpcEntries;
         for( auto& entry : group.entries )
         {
           if( entry->getType() == LgbEntryType::BattleNpc )
           {
-            hasBnpc = true;
-            break;
+            auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY * >( entry.get() );
+            bnpcEntries.push_back( pBNpc );
           }
         }
-        if( !hasBnpc )
+
+        if( bnpcEntries.empty() )
           continue;
 
-        std::cout << group.name << " " << group.header.id << " ";
+        // Group by layerset ID (from group refs)
         for( auto ref : group.refs )
         {
-          std::cout << "layerSet: " << ref.LayerSetID << ", ";
-        }
-        std::cout << group.entries.size() << std::endl;
-        std::cout << "\n";
-        totalGroups++;
-        for( const auto& pEntry : group.entries )
-        {
-          if( pEntry->getType() == LgbEntryType::BattleNpc )
+          // Create unique key combining group name, group ID, and layerset ID
+          std::string groupKey = fmt::format( "{}_{}_{}",
+                                              group.name,
+                                              group.header.id,
+                                              ref.LayerSetID );
+
+          // If this group doesn't exist yet, create it
+          if( groupedBnpcEntries.find( groupKey ) == groupedBnpcEntries.end() )
           {
-            totalGroupEntries++;
-            nlohmann::json jsonEntry;
+            BnpcGroupInfo groupInfo;
+            groupInfo.groupName = group.name;
+            groupInfo.groupId = group.header.id;
+            groupInfo.layerSetId = ref.LayerSetID;
+            groupedBnpcEntries[ groupKey ] = groupInfo;
+          }
 
-            auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY* >( pEntry.get() );
-
-            //writeBNPCEntry( zoneName, discoverySql, pEntry.get(), group, layerMap );
-
-
-
-
-
-
-            nlohmann::json popInfo;
-            popInfo[ "repopId" ] = pBNpc->data.RepopId;
-            popInfo[ "invalidRepop" ] = pBNpc->data.InvalidRepop;
-            popInfo[ "nonpopInitZone" ] = pBNpc->data.NonpopInitZone;
-            popInfo[ "nonpop" ] = pBNpc->data.Nonpop;
-            popInfo[ "popWeather" ] = pBNpc->data.PopWeather;
-            popInfo[ "popTimeStart" ] = pBNpc->data.PopTimeStart;
-            popInfo[ "popTimeEnd" ] = pBNpc->data.PopTimeEnd;
-            popInfo[ "popInterval" ] = pBNpc->data.PopInterval;
-            popInfo[ "popRate" ] = pBNpc->data.PopRate;
-            popInfo[ "popEvent" ] = pBNpc->data.PopEvent;
-            popInfo[ "horizontalPopRange" ] = pBNpc->data.HorizontalPopRange;
-            popInfo[ "verticalPopRange" ] = pBNpc->data.VerticalPopRange;
-            jsonEntry[ "popInfo" ] = popInfo;
-
-            nlohmann::json linkEntry;
-            linkEntry[ "linkGroup" ] = pBNpc->data.LinkGroup;
-            linkEntry[ "linkFamily" ] = pBNpc->data.LinkFamily;
-            linkEntry[ "linkRange" ] = pBNpc->data.LinkRange;
-            linkEntry[ "linkCountLimit" ] = pBNpc->data.LinkCountLimit;
-            linkEntry[ "linkParent" ] = pBNpc->data.LinkParent;
-            linkEntry[ "linkOverride" ] = pBNpc->data.LinkOverride;
-            linkEntry[ "linkReply" ] = pBNpc->data.LinkReply;
-            jsonEntry[ "linkData" ] = linkEntry;
-
-            nlohmann::json behaviourEntry;
-            behaviourEntry[ "moveAI" ] = pBNpc->data.MoveAI;
-            behaviourEntry[ "normalAI" ] = pBNpc->data.NormalAI;
-            behaviourEntry[ "wanderingRange" ] = pBNpc->data.WanderingRange;
-            behaviourEntry[ "routeId" ] = pBNpc->data.Route;
-            behaviourEntry[ "territoryRange" ] = pBNpc->data.TerritoryRange;
-            behaviourEntry[ "dropItem" ] = pBNpc->data.DropItem;
-            jsonEntry[ "Behaviour" ] = behaviourEntry;
-
-            nlohmann::json SenseEntry;
-            SenseEntry[ "senseRangeRate" ] = pBNpc->data.SenseRangeRate;
-            SenseEntry[ "territoryRange"] = pBNpc->baseData.TerritoryRange;
-            SenseEntry[ "Sense" ]  = pBNpc->baseData.Sense;
-            SenseEntry[ "SenseRange" ]  = pBNpc->baseData.SenseRange;
-            jsonEntry[ "SenseInfo" ] = SenseEntry;
-
-            nlohmann::json baseInfo;
-            baseInfo[ "instanceId" ] = pBNpc->data.instanceId;
-            baseInfo[ "groupId" ] = group.header.id;
-            baseInfo[ "position" ] = { pBNpc->header.transform.translation.x, pBNpc->header.transform.translation.y, pBNpc->header.transform.translation.z };
-            baseInfo[ "rotation" ] = pBNpc->data.transform.rotation.y;
-            baseInfo[ "baseId" ] = pBNpc->data.BaseId;
-            baseInfo[ "nameId" ] = pBNpc->data.NameId;
-            baseInfo[ "equipmentId" ] = pBNpc->data.EquipmentID;
-            baseInfo[ "customizeId" ] = pBNpc->data.CustomizeID;
-            baseInfo[ "level" ] = pBNpc->data.Level;
-            baseInfo[ "activeType" ] = pBNpc->data.ActiveType;
-            baseInfo[ "boundInstanceId" ] = pBNpc->data.BoundInstanceID;
-            baseInfo[ "fateLayoutLabelId" ] = pBNpc->data.FateLayoutLabelId;
-
-            jsonEntry[ "baseInfo" ] = baseInfo;
-            if( territoryJsonData[zoneId].is_null() )
-              {
-              territoryJsonData[zoneId] = nlohmann::json::object();
-            }
-
-            territoryJsonData[ zoneId ][ std::to_string( pBNpc->data.instanceId ) ] = jsonEntry;
-
-
+          // Add all BNPC entries from this group to the grouped collection
+          for( auto *bnpcEntry : bnpcEntries )
+          {
+            groupedBnpcEntries[ groupKey ].entries.push_back( bnpcEntry );
           }
         }
       }
     }
+
+    // Export grouped data
+    uint32_t totalGroups = groupedBnpcEntries.size();
+    uint32_t totalGroupEntries = 0;
+
+    for( const auto& [ groupKey, groupInfo ] : groupedBnpcEntries )
+    {
+      exportBnpcGroup( zoneId, name, groupInfo, totalGroupEntries );
+    }
+
     if( totalGroupEntries > 0 )
     {
-      std::cout << fmt::format( "[Info] id: {} name: {} file: {} total groups: {} total entities: {}", zoneId, name, path, totalGroups, totalGroupEntries ) << std::endl;
-      std::string filename = name + "_bnpcs.json";
-      std::ofstream jsonFile(filename);
+      std::cout << fmt::format( "[Info] id: {} name: {} file: {} total groups: {} total entities: {}",
+                                zoneId, name, path, totalGroups, totalGroupEntries ) << std::endl;
+
+      // Create folder structure: bnpcs/zoneName/
+      std::string folderPath = "bnpcs/" + name;
+      std::filesystem::create_directories( folderPath );
+
+      // Export final JSON with proper path structure
+      std::string filename = folderPath + "/" + name + ".json";
+      std::ofstream jsonFile( filename );
       if( jsonFile.is_open() )
       {
         nlohmann::json finalJson = territoryJsonData[ zoneId ];
-        jsonFile << finalJson.dump(2); // Pretty print with 2-space indentation
+        jsonFile << finalJson.dump( 2 );
         jsonFile.close();
-
-        std::cout << "Created JSON file: " << filename << " with " << territoryJsonData[ zoneId ].size() << " entries" << std::endl;
+        std::cout << "Created grouped JSON file: " << filename << " with " << territoryJsonData[ zoneId ].size() <<
+            " entries" << std::endl;
       }
-      else
-      {
-        std::cout << "Failed to create JSON file: " << filename << std::endl;
-      }
-
-
     }
-  }
-  catch( std::runtime_error& e )
+  } catch( std::runtime_error& e )
   {
     return;
   }
 }
 
-int main( int argc, char* argv[] )
+void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGroupInfo& groupInfo,
+                      uint32_t& totalEntries )
+{
+  std::cout << "BNPC Group: " << groupInfo.groupName
+      << " (ID: " << groupInfo.groupId
+      << ", LayerSet: " << groupInfo.layerSetId
+      << ") - " << groupInfo.entries.size() << " entries" << std::endl;
+
+  // Initialize territory JSON if needed
+  if( territoryJsonData[ zoneId ].is_null() )
+  {
+    territoryJsonData[ zoneId ] = nlohmann::json::object();
+  }
+
+  // Create the BnpcGroup structure
+  nlohmann::json bnpcGroupJson;
+  bnpcGroupJson[ "groupId" ] = groupInfo.groupId;
+  bnpcGroupJson[ "groupName" ] = groupInfo.groupName;
+  bnpcGroupJson[ "layerSetId" ] = groupInfo.layerSetId;
+
+  // Create bnpcs object where each key is the instance ID
+  nlohmann::json bnpcsObject = nlohmann::json::object();
+
+  for( const auto& pBNpc : groupInfo.entries )
+  {
+    totalEntries++;
+
+    nlohmann::json jsonEntry;
+
+    // Create all the nested JSON structures as in original code
+    nlohmann::json popInfo;
+    popInfo[ "repopId" ] = pBNpc->data.RepopId;
+    popInfo[ "invalidRepop" ] = pBNpc->data.InvalidRepop;
+    popInfo[ "nonpopInitZone" ] = pBNpc->data.NonpopInitZone;
+    popInfo[ "nonpop" ] = pBNpc->data.Nonpop;
+    popInfo[ "popWeather" ] = pBNpc->data.PopWeather;
+    popInfo[ "popTimeStart" ] = pBNpc->data.PopTimeStart;
+    popInfo[ "popTimeEnd" ] = pBNpc->data.PopTimeEnd;
+    popInfo[ "popInterval" ] = pBNpc->data.PopInterval;
+    popInfo[ "popRate" ] = pBNpc->data.PopRate;
+    popInfo[ "popEvent" ] = pBNpc->data.PopEvent;
+    popInfo[ "horizontalPopRange" ] = pBNpc->data.HorizontalPopRange;
+    popInfo[ "verticalPopRange" ] = pBNpc->data.VerticalPopRange;
+    jsonEntry[ "popInfo" ] = popInfo;
+
+    nlohmann::json linkEntry;
+    linkEntry[ "linkGroup" ] = pBNpc->data.LinkGroup;
+    linkEntry[ "linkFamily" ] = pBNpc->data.LinkFamily;
+    linkEntry[ "linkRange" ] = pBNpc->data.LinkRange;
+    linkEntry[ "linkCountLimit" ] = pBNpc->data.LinkCountLimit;
+    linkEntry[ "linkParent" ] = pBNpc->data.LinkParent;
+    linkEntry[ "linkOverride" ] = pBNpc->data.LinkOverride;
+    linkEntry[ "linkReply" ] = pBNpc->data.LinkReply;
+    jsonEntry[ "linkData" ] = linkEntry;
+
+    nlohmann::json behaviourEntry;
+    behaviourEntry[ "moveAI" ] = pBNpc->data.MoveAI;
+    behaviourEntry[ "normalAI" ] = pBNpc->data.NormalAI;
+    behaviourEntry[ "wanderingRange" ] = pBNpc->data.WanderingRange;
+    behaviourEntry[ "routeId" ] = pBNpc->data.Route;
+    behaviourEntry[ "territoryRange" ] = pBNpc->data.TerritoryRange;
+    behaviourEntry[ "dropItem" ] = pBNpc->data.DropItem;
+    jsonEntry[ "Behaviour" ] = behaviourEntry;
+
+    nlohmann::json SenseEntry;
+    SenseEntry[ "senseRangeRate" ] = pBNpc->data.SenseRangeRate;
+    SenseEntry[ "territoryRange" ] = pBNpc->baseData.TerritoryRange;
+    SenseEntry[ "Sense" ] = pBNpc->baseData.Sense;
+    SenseEntry[ "SenseRange" ] = pBNpc->baseData.SenseRange;
+    jsonEntry[ "SenseInfo" ] = SenseEntry;
+
+    nlohmann::json baseInfo;
+    baseInfo[ "instanceId" ] = pBNpc->data.instanceId;
+    baseInfo[ "groupId" ] = groupInfo.groupId;
+    baseInfo[ "position" ] = {
+      pBNpc->header.transform.translation.x, pBNpc->header.transform.translation.y,
+      pBNpc->header.transform.translation.z
+    };
+    baseInfo[ "rotation" ] = pBNpc->data.transform.rotation.y;
+    baseInfo[ "baseId" ] = pBNpc->data.BaseId;
+    baseInfo[ "nameId" ] = pBNpc->data.NameId;
+    baseInfo[ "equipmentId" ] = pBNpc->data.EquipmentID;
+    baseInfo[ "customizeId" ] = pBNpc->data.CustomizeID;
+    baseInfo[ "level" ] = pBNpc->data.Level;
+    baseInfo[ "activeType" ] = pBNpc->data.ActiveType;
+    baseInfo[ "boundInstanceId" ] = pBNpc->data.BoundInstanceID;
+    baseInfo[ "fateLayoutLabelId" ] = pBNpc->data.FateLayoutLabelId;
+
+    jsonEntry[ "baseInfo" ] = baseInfo;
+
+    // Use instance ID as the key for this BNPC entry
+    bnpcsObject[ std::to_string( pBNpc->data.instanceId ) ] = jsonEntry;
+  }
+
+  // Add the bnpcs object to the group
+  bnpcGroupJson[ "bnpcs" ] = bnpcsObject;
+
+  // Store the group using a unique key
+  std::string groupKey = fmt::format( "{}", groupInfo.groupName );
+  territoryJsonData[ zoneId ][ groupKey ] = bnpcGroupJson;
+}
+
+int main( int argc, char *argv[ ] )
 {
   auto startTime = std::chrono::system_clock::now();
   auto entryStartTime = std::chrono::system_clock::now();
@@ -536,9 +589,8 @@ int main( int argc, char* argv[] )
   zoneDumpList.emplace( "f1d1" );
   zoneDumpList.emplace( "f1f2" );
 
-  if ( !g_exdDataGen.init( gamePath ) )
+  if( !g_exdDataGen.init( gamePath ) )
   {
-
   }
 
   auto teriIdList = g_exdDataGen.getIdList< Excel::Ps3::TerritoryType >();
@@ -575,14 +627,14 @@ int main( int argc, char* argv[] )
 
     try
     {
-      std::cout << id << " found Path1: " << std::string("bg/" + zonePath + ".lvb") << std::endl;
+      std::cout << id << " found Path1: " << std::string( "bg/" + zonePath + ".lvb" ) << std::endl;
       if( !gameData->doesFileExist( "bg/" + zonePath + ".lvb" ) )
         continue;
       auto file = gameData->getFile( "bg/" + zonePath + ".lvb" );
       auto data_section = file->access_data_sections().at( 0 );
       LVB_FILE lvb( &data_section[ 0 ], zoneName );
 
-      std::ofstream lvbRawFile("./lvb/" + zoneName + ".lvb", std::ios::trunc );
+      std::ofstream lvbRawFile( "./lvb/" + zoneName + ".lvb", std::ios::trunc );
       lvbRawFile.write( &data_section[ 0 ], data_section.size() );
       if( lvbRawFile.good() )
         lvbRawFile.close();
@@ -593,21 +645,26 @@ int main( int argc, char* argv[] )
         layerMap[ layer.LayerSetID ] = {};
         layerSetToTerritoryIdMap[ layer.LayerSetID ] = layer.TerritoryTypeID;
       }
-    }
-    catch( ... )
+    } catch( ... )
     {
       continue;
     }
   }
 
 
-
-
-  std::string data = std::string("GroupId, GroupName, TerritoryName, name, instanceId, x, y, z, Rotation, BaseId, PopWeather, PopTimeStart, PopTimeEnd, MoveAI, WanderingRange, Route, ") +
-                     std::string("EventGroup, NameId, DropItem, SenseRangeRate, Level, ActiveType, PopInterval,PopRate, PopEvent, LinkGroup, ") +
-                     std::string("LinkFamily, LinkRange, LinkCountLimit, NonpopInitZone, InvalidRepop, LinkParent, LinkOverride, LinkReply, Nonpop, ") +
-                     std::string("HorizontalPopRange, VerticalPopRange, BNpcBaseData, RepopId, BNPCRankId, TerritoryRange, BoundInstanceID, ") +
-                     std::string("FateLayoutLabelId, NormalAI, ServerPathId, EquipmentID, CustomizeID \n");
+  std::string data = std::string(
+                       "GroupId, GroupName, TerritoryName, name, instanceId, x, y, z, Rotation, BaseId, PopWeather, PopTimeStart, PopTimeEnd, MoveAI, WanderingRange, Route, " )
+                     +
+                     std::string(
+                       "EventGroup, NameId, DropItem, SenseRangeRate, Level, ActiveType, PopInterval,PopRate, PopEvent, LinkGroup, " )
+                     +
+                     std::string(
+                       "LinkFamily, LinkRange, LinkCountLimit, NonpopInitZone, InvalidRepop, LinkParent, LinkOverride, LinkReply, Nonpop, " )
+                     +
+                     std::string(
+                       "HorizontalPopRange, VerticalPopRange, BNpcBaseData, RepopId, BNPCRankId, TerritoryRange, BoundInstanceID, " )
+                     +
+                     std::string( "FateLayoutLabelId, NormalAI, ServerPathId, EquipmentID, CustomizeID \n" );
 
   discoverySql.write( data.c_str(), data.size() );
 
@@ -615,7 +672,6 @@ int main( int argc, char* argv[] )
   std::set< std::string > zoneNames;
   for( const auto& id : teriIdList )
   {
-
     if( id < 100 )
       continue;
     auto row = g_exdDataGen.getRow< Excel::Ps3::TerritoryType >( id );
@@ -633,16 +689,15 @@ int main( int argc, char* argv[] )
     }
 
     zoneNames.insert( row->getString( row->data().Name ) );
-
   }
   for( const auto& name : zoneNames )
   {
-   // auto row = g_exdDataGen.getRow< Excel::TerritoryType >( id );
-   // if( !row )
-   //   continue;
+    // auto row = g_exdDataGen.getRow< Excel::TerritoryType >( id );
+    // if( !row )
+    //   continue;
 
-   if( name.empty() )
-     continue;
+    if( name.empty() )
+      continue;
 
     auto zoneName = name;
     entryStartTime = std::chrono::system_clock::now();
@@ -657,7 +712,7 @@ int main( int argc, char* argv[] )
       auto data_section = file->access_data_sections().at( 0 );
       LVB_FILE lvb( &data_section[ 0 ], zoneName );
 
-      std::ofstream lvbRawFile("./lvb/" + zoneName + ".lvb", std::ios::trunc );
+      std::ofstream lvbRawFile( "./lvb/" + zoneName + ".lvb", std::ios::trunc );
       lvbRawFile.write( &data_section[ 0 ], data_section.size() );
       if( lvbRawFile.good() )
         lvbRawFile.close();
@@ -677,10 +732,9 @@ int main( int argc, char* argv[] )
       exportBnpcEntries( 0, "", zonePath + "/level/planlive.lgb", gameData );
 
       std::cout << "[Success] " << "Exported " << zoneName << " in " <<
-                std::chrono::duration_cast< std::chrono::seconds >(
-                  std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
-    }
-    catch( std::exception& e )
+          std::chrono::duration_cast< std::chrono::seconds >(
+            std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
+    } catch( std::exception& e )
     {
       std::cout << "[Error] " << e.what() << std::endl;
 
@@ -692,8 +746,8 @@ int main( int argc, char* argv[] )
       discoverySql.flush();
   }
   std::cout << "\n[Success] Finished all tasks in " <<
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
-            << " seconds\n";
+      std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
+      << " seconds\n";
 
   std::cout << "dumping layerset -> lgb group" << std::endl;
 
@@ -719,16 +773,16 @@ int main( int argc, char* argv[] )
     for( const auto& groupInfo : groupIds )
     {
       std::string output = std::to_string( territoryId ) + "," +
-        std::to_string( layerSetId ) + "," +
-        std::to_string( std::get< 0 >( groupInfo ) ) + "," +
-        std::get< 1 >( groupInfo ) + "\n";
+                           std::to_string( layerSetId ) + "," +
+                           std::to_string( std::get< 0 >( groupInfo ) ) + "," +
+                           std::get< 1 >( groupInfo ) + "\n";
 
       mapSql.write( output.c_str(), output.size() );
 
-//      std::cout << " - " << std::get< 0 >( groupInfo ) << " " << std::get< 1 >( groupInfo ) << std::endl;
+      //      std::cout << " - " << std::get< 0 >( groupInfo ) << " " << std::get< 1 >( groupInfo ) << std::endl;
     }
 
-//    std::cout << std::endl;
+    //    std::cout << std::endl;
   }
 
   if( mapSql.good() )

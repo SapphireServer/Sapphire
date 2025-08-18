@@ -8,7 +8,7 @@
 #include <string>
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
-
+#include <nlohmann/json.hpp>
 #include "EditorState.h"
 
 #include "Engine/GfxApi.h"
@@ -185,264 +185,267 @@ void ZoneEditor::updateBnpcSearchFilter()
 
 void ZoneEditor::showBnpcWindow()
 {
-  if( !m_showBnpcWindow ) return;
+  if( !m_showBnpcWindow )
+    return;
 
-  ImGui::Begin( "BNPC Information", &m_showBnpcWindow, ImGuiWindowFlags_MenuBar );
+  ImGui::Begin( "BNPC Information", &m_showBnpcWindow );
 
-  // Menu bar
-  if( ImGui::BeginMenuBar() )
-  {
-    ImGui::Text( "Total BNPCs: %zu | Filtered: %zu", m_bnpcs.size(), m_filteredBnpcs.size() );
-    if( ImGui::Button( "Refresh" ) )
-    {
-      loadBnpcs();
-      updateBnpcSearchFilter();
-    }
-    ImGui::EndMenuBar();
-  }
-
-  // Search input
-  ImGui::Text( "Search BNPCs:" );
-  ImGui::SetNextItemWidth( -1 );
-  if( ImGui::InputText( "##BnpcSearch", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
+  // Search filter
+  if( ImGui::InputText( "Search", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
   {
     updateBnpcSearchFilter();
-    m_selectedBnpcIndex = -1; // Clear selection when searching
   }
+
+  // Selection mode toggle
+  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Selection" ) )
+  {
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+  }
+
 
   ImGui::Separator();
 
-  // Split into two panes: list on left, details on right
-  if( ImGui::BeginChild( "BnpcList", ImVec2( 350, 0 ), true ) )
+  // Create a splitter layout with tree view on left, details on right
+  static float splitterWidth = 300.0f;
+  ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+  // Left panel - Tree view
+  ImGui::BeginChild( "BNPCTreeView", ImVec2( splitterWidth, windowSize.y ), true );
+
+  // Group BNPCs by group name for tree display
+  std::map< std::string, std::vector< CachedBnpc * > > groupedBnpcs;
+  for( auto *bnpc : m_filteredBnpcs )
   {
-    // BNPC list
-    for( int i = 0; i < static_cast< int >( m_filteredBnpcs.size() ); ++i )
-    {
-      const auto& bnpc = m_filteredBnpcs[ i ];
-
-
-      // Create display text
-      std::string displayText = fmt::format( "{} - {} (BaseID: {})",
-                                             bnpc->instanceId, bnpc->nameString, bnpc->BaseId );
-
-      bool isSelected = ( m_selectedBnpcIndex == i );
-      if( ImGui::Selectable( displayText.c_str(), isSelected ) )
-      {
-        m_selectedBnpcIndex = i;
-      }
-
-      // Tooltip with basic info
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::EndTooltip();
-      }
-    }
+    groupedBnpcs[ bnpc->bnpcName ].push_back( bnpc );
   }
-  ImGui::EndChild();
 
-  ImGui::SameLine();
-
-  // Details pane
-  if( ImGui::BeginChild( "BnpcDetails", ImVec2( 0, 0 ), true ) )
+  // Display tree view
+  for( const auto& [ groupName, bnpcs ] : groupedBnpcs )
   {
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+    ImGuiTreeNodeFlags groupFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+    // Highlight if this group is selected
+    if( m_groupSelectionMode && m_selectedGroupName == groupName )
     {
-      const auto& bnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+      groupFlags |= ImGuiTreeNodeFlags_Selected;
+    }
 
-      ImGui::Text( "BNPC Details" );
-      ImGui::Separator();
+    // Create unique ID for the group
+    std::string groupNodeId = fmt::format( "{}##group_{}", groupName, groupName );
+    std::string groupDisplayText = fmt::format( "{} ({} BNPCs)", groupName, bnpcs.size() );
 
-      // Basic Information
-      if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+    if( ImGui::TreeNodeEx( groupNodeId.c_str(), groupFlags, "%s", groupDisplayText.c_str() ) )
+    {
+      // Handle group selection
+      if( ImGui::IsItemClicked() && m_groupSelectionMode )
       {
-        ImGui::Indent();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Name ID: %u", bnpc->NameId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Territory Type: %u", bnpc->territoryType );
-        ImGui::Unindent();
-      }
+        m_selectedGroupName = groupName;
+        m_selectedBnpcInstanceIds.clear();
+        m_selectedBnpcIndex = -1;
 
-      // Position & Movement
-      if( ImGui::CollapsingHeader( "Position & Movement", ImGuiTreeNodeFlags_DefaultOpen ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Rotation: %.2f", bnpc->rotation );
-        ImGui::Text( "Move AI: %u", bnpc->MoveAI );
-        ImGui::Text( "Normal AI: %u", bnpc->NormalAI );
-        ImGui::Text( "Wandering Range: %u", bnpc->WanderingRange );
-        ImGui::Text( "Route: %u", bnpc->Route );
-        ImGui::Text( "Server Path ID: %u", bnpc->ServerPathId );
-        ImGui::Unindent();
-      }
-
-      // Spawn Information
-      if( ImGui::CollapsingHeader( "Spawn Information" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Pop Weather: %u", bnpc->PopWeather );
-        ImGui::Text( "Pop Time: %u - %u", bnpc->PopTimeStart, bnpc->PopTimeEnd );
-        ImGui::Text( "Pop Interval: %u", bnpc->PopInterval );
-        ImGui::Text( "Pop Rate: %u", bnpc->PopRate );
-        ImGui::Text( "Pop Event: %u", bnpc->PopEvent );
-        ImGui::Text( "Active Type: %u", bnpc->ActiveType );
-        ImGui::Text( "Repop ID: %u", bnpc->RepopId );
-        ImGui::Text( "Horizontal Pop Range: %.2f", bnpc->HorizontalPopRange );
-        ImGui::Text( "Vertical Pop Range: %.2f", bnpc->VerticalPopRange );
-        ImGui::Unindent();
-      }
-
-      // Combat & Interaction
-      if( ImGui::CollapsingHeader( "Combat & Interaction" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Sense Range Rate: %.2f", bnpc->SenseRangeRate );
-        ImGui::Text( "Drop Item: %u", bnpc->DropItem );
-        ImGui::Text( "Event Group: %u", bnpc->EventGroup );
-        ImGui::Text( "BNPC Rank ID: %u", bnpc->BNPCRankId );
-        ImGui::Text( "Equipment ID: %u", bnpc->EquipmentID );
-        ImGui::Text( "Customize ID: %u", bnpc->CustomizeID );
-        ImGui::Unindent();
-      }
-
-      // Linking & Grouping
-      if( ImGui::CollapsingHeader( "Linking & Grouping" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Link Group: %u", bnpc->LinkGroup );
-        ImGui::Text( "Link Family: %u", bnpc->LinkFamily );
-        ImGui::Text( "Link Range: %u", bnpc->LinkRange );
-        ImGui::Text( "Link Count Limit: %u", bnpc->LinkCountLimit );
-        ImGui::Text( "Link Parent: %d", bnpc->LinkParent );
-        ImGui::Text( "Link Override: %d", bnpc->LinkOverride );
-        ImGui::Text( "Link Reply: %d", bnpc->LinkReply );
-        ImGui::Unindent();
-      }
-
-      // Special Properties
-      if( ImGui::CollapsingHeader( "Special Properties" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Territory Range: %u", bnpc->TerritoryRange );
-        ImGui::Text( "Bound Instance ID: %u", bnpc->BoundInstanceID );
-        ImGui::Text( "Fate Layout Label ID: %u", bnpc->FateLayoutLabelId );
-        ImGui::Text( "Nonpop Init Zone: %d", bnpc->NonpopInitZone );
-        ImGui::Text( "Invalid Repop: %d", bnpc->InvalidRepop );
-        ImGui::Text( "Nonpop: %d", bnpc->Nonpop );
-        ImGui::Unindent();
-      }
-
-      ImGui::Separator();
-
-      // Action buttons
-      if( ImGui::Button( "Show on Map" ) )
-      {
-        // This would highlight the BNPC on the map if map is open
-        if( !m_showMapWindow && m_currentMapId > 0 )
+        // Add all BNPCs in this group to selection
+        for( auto *bnpc : bnpcs )
         {
-          m_showMapWindow = true;
+          m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
         }
-        // TODO: Add map marker/highlight functionality
       }
-      ImGui::SameLine();
-      if( ImGui::Button( "Copy Position" ) )
+
+      // Sort BNPCs within group by instance ID
+      auto sortedBnpcs = bnpcs;
+      std::sort( sortedBnpcs.begin(), sortedBnpcs.end(),
+                 []( CachedBnpc *a, CachedBnpc *b ) { return a->instanceId < b->instanceId; } );
+
+      // Display individual BNPCs
+      for( auto *bnpc : sortedBnpcs )
       {
-        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::SetClipboardText( posStr.c_str() );
+        ImGuiTreeNodeFlags leafFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+        // Highlight if selected
+        if( m_selectedBnpcIndex >= 0 && m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc )
+        {
+          leafFlags |= ImGuiTreeNodeFlags_Selected;
+        }
+
+        std::string bnpcNodeId = fmt::format( "Instance {}##bnpc_{}", bnpc->instanceId, bnpc->instanceId );
+        std::string bnpcDisplayText = fmt::format( "Instance {} (BaseID: {})", bnpc->instanceId, bnpc->BaseId );
+
+        if( ImGui::TreeNodeEx( bnpcNodeId.c_str(), leafFlags, "%s", bnpcDisplayText.c_str() ) )
+        {
+          // Handle individual BNPC selection
+          if( ImGui::IsItemClicked() )
+          {
+            if( m_groupSelectionMode )
+            {
+              // In group mode, clicking individual BNPC selects the whole group
+              m_selectedGroupName = groupName;
+              m_selectedBnpcInstanceIds.clear();
+              for( auto *groupBnpc : bnpcs )
+              {
+                m_selectedBnpcInstanceIds.insert( groupBnpc->instanceId );
+              }
+            }
+            else
+            {
+              // In individual mode, select just this BNPC
+              m_selectedGroupName = "";
+              m_selectedBnpcInstanceIds.clear();
+              m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+
+              // Find this BNPC in filtered list to set selected index
+              for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
+              {
+                if( m_filteredBnpcs[ i ] == bnpc )
+                {
+                  m_selectedBnpcIndex = static_cast< int >( i );
+                  break;
+                }
+              }
+            }
+          }
+        }
       }
+
+      ImGui::TreePop();
     }
     else
     {
-      ImGui::TextDisabled( "No BNPC selected - Click on a BNPC from the list" );
+      // Handle collapsed group selection
+      if( ImGui::IsItemClicked() && m_groupSelectionMode )
+      {
+        m_selectedGroupName = groupName;
+        m_selectedBnpcInstanceIds.clear();
+        m_selectedBnpcIndex = -1;
+
+        // Add all BNPCs in this group to selection
+        for( auto *bnpc : bnpcs )
+        {
+          m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+        }
+      }
     }
   }
+
+  ImGui::EndChild();
+
+  // Splitter
+  ImGui::SameLine();
+  ImGui::Button( "##splitter", ImVec2( 8.0f, windowSize.y ) );
+  if( ImGui::IsItemActive() )
+  {
+    splitterWidth += ImGui::GetIO().MouseDelta.x;
+    splitterWidth = std::max( 200.0f, std::min( splitterWidth, windowSize.x - 200.0f ) );
+  }
+
+  // Right panel - Details view
+  ImGui::SameLine();
+  ImGui::BeginChild( "BNPCDetailsView", ImVec2( 0, windowSize.y ), true );
+
+  // Show details of selected BNPC
+  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+  {
+    auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+
+    ImGui::Text( "BNPC Details" );
+    ImGui::Separator();
+
+    // Basic Info
+    if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+    {
+      ImGui::Text( "Group Name: %s", selectedBnpc->bnpcName.c_str() );
+      ImGui::Text( "Instance ID: %u", selectedBnpc->instanceId );
+      ImGui::Text( "Base ID: %u", selectedBnpc->BaseId );
+      ImGui::Text( "Name ID: %u", selectedBnpc->NameId );
+      ImGui::Text( "Level: %u", selectedBnpc->Level );
+      ImGui::Text( "Active Type: %u", selectedBnpc->ActiveType );
+    }
+
+    // Position Info
+    if( ImGui::CollapsingHeader( "Position", ImGuiTreeNodeFlags_DefaultOpen ) )
+    {
+      ImGui::Text( "Position: %.2f, %.2f, %.2f", selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
+      ImGui::Text( "Rotation: %.2f", selectedBnpc->rotation );
+    }
+
+    // Population Info
+    if( ImGui::CollapsingHeader( "Population" ) )
+    {
+      ImGui::Text( "Pop Weather: %u", selectedBnpc->PopWeather );
+      ImGui::Text( "Pop Time: %u - %u", selectedBnpc->PopTimeStart, selectedBnpc->PopTimeEnd );
+      ImGui::Text( "Pop Interval: %u", selectedBnpc->PopInterval );
+      ImGui::Text( "Pop Rate: %u", selectedBnpc->PopRate );
+      ImGui::Text( "Repop ID: %u", selectedBnpc->RepopId );
+      ImGui::Text( "Non-pop: %d", selectedBnpc->Nonpop );
+      ImGui::Text( "Invalid Repop: %d", selectedBnpc->InvalidRepop );
+      ImGui::Text( "Pop Range: H=%.2f, V=%.2f", selectedBnpc->HorizontalPopRange, selectedBnpc->VerticalPopRange );
+    }
+
+    // AI/Behavior Info
+    if( ImGui::CollapsingHeader( "AI & Behavior" ) )
+    {
+      ImGui::Text( "Move AI: %u", selectedBnpc->MoveAI );
+      ImGui::Text( "Normal AI: %u", selectedBnpc->NormalAI );
+      ImGui::Text( "Wandering Range: %u", selectedBnpc->WanderingRange );
+      ImGui::Text( "Route: %u", selectedBnpc->Route );
+      ImGui::Text( "Territory Range: %u", selectedBnpc->TerritoryRange );
+      ImGui::Text( "Sense Range Rate: %.2f", selectedBnpc->SenseRangeRate );
+    }
+
+    // Link Info
+    if( ImGui::CollapsingHeader( "Linking" ) )
+    {
+      ImGui::Text( "Link Group: %u", selectedBnpc->LinkGroup );
+      ImGui::Text( "Link Family: %u", selectedBnpc->LinkFamily );
+      ImGui::Text( "Link Range: %u", selectedBnpc->LinkRange );
+      ImGui::Text( "Link Count Limit: %u", selectedBnpc->LinkCountLimit );
+      ImGui::Text( "Link Parent: %d", selectedBnpc->LinkParent );
+      ImGui::Text( "Link Override: %d", selectedBnpc->LinkOverride );
+      ImGui::Text( "Link Reply: %d", selectedBnpc->LinkReply );
+    }
+
+    // Equipment & Customization
+    if( ImGui::CollapsingHeader( "Appearance" ) )
+    {
+      ImGui::Text( "Equipment ID: %u", selectedBnpc->EquipmentID );
+      ImGui::Text( "Customize ID: %u", selectedBnpc->CustomizeID );
+      ImGui::Text( "Drop Item: %u", selectedBnpc->DropItem );
+    }
+
+    // Instance Info
+    if( ImGui::CollapsingHeader( "Instance" ) )
+    {
+      ImGui::Text( "Bound Instance ID: %u", selectedBnpc->BoundInstanceID );
+      ImGui::Text( "Fate Layout Label ID: %u", selectedBnpc->FateLayoutLabelId );
+      ImGui::Text( "Event Group: %u", selectedBnpc->EventGroup );
+      ImGui::Text( "Server Path ID: %u", selectedBnpc->ServerPathId );
+    }
+
+    ImGui::Separator();
+
+    // Action buttons
+    if( ImGui::Button( "Focus on Map" ) )
+    {
+      focusOn3DPosition( { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z } );
+    }
+    ImGui::SameLine();
+    if( ImGui::Button( "Copy Coordinates" ) )
+    {
+      std::string coords = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                        selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
+      ImGui::SetClipboardText( coords.c_str() );
+    }
+  }
+  else
+  {
+    ImGui::Text( "Select a BNPC from the tree to view details" );
+  }
+
   ImGui::EndChild();
 
   ImGui::End();
-}
-
-void ZoneEditor::loadBnpcs()
-{
-  auto& db = g_charaDb;
-  auto stmt = db.getPreparedStatement( Sapphire::Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
-  stmt->setUInt( 1, m_selectedZoneId );
-  auto res = db.query( stmt );
-
-  m_bnpcs.clear();
-
-  while( res->next() )
-  {
-    auto bnpc = std::make_shared< CachedBnpc >();
-
-    bnpc->territoryType = res->getInt( 1 );
-    bnpc->bnpcName = res->getString( 3 );
-    bnpc->instanceId = res->getInt( 4 );
-    bnpc->x = res->getFloat( 5 );
-    bnpc->y = res->getFloat( 6 );
-    bnpc->z = res->getFloat( 7 );
-    bnpc->BaseId = res->getInt( 8 );
-    bnpc->PopWeather = res->getInt( 9 );
-    bnpc->PopTimeStart = res->getInt( 10 );
-    bnpc->PopTimeEnd = res->getInt( 11 );
-    bnpc->MoveAI = res->getInt( 12 );
-    bnpc->WanderingRange = res->getInt( 13 );
-    bnpc->Route = res->getInt( 14 );
-    bnpc->EventGroup = res->getInt( 15 );
-    bnpc->NameId = res->getInt( 16 );
-    bnpc->DropItem = res->getInt( 17 );
-    bnpc->SenseRangeRate = res->getFloat( 18 );
-    bnpc->Level = res->getInt( 19 );
-    bnpc->ActiveType = res->getInt( 20 );
-    bnpc->PopInterval = res->getInt( 21 );
-    bnpc->PopRate = res->getInt( 22 );
-    bnpc->PopEvent = res->getInt( 23 );
-    bnpc->LinkGroup = res->getInt( 24 );
-    bnpc->LinkFamily = res->getInt( 25 );
-    bnpc->LinkRange = res->getInt( 26 );
-    bnpc->LinkCountLimit = res->getInt( 27 );
-    bnpc->NonpopInitZone = res->getInt( 28 );
-    bnpc->InvalidRepop = res->getInt( 29 );
-    bnpc->LinkParent = res->getInt( 30 );
-    bnpc->LinkOverride = res->getInt( 31 );
-    bnpc->LinkReply = res->getInt( 32 );
-    bnpc->HorizontalPopRange = res->getFloat( 33 );
-    bnpc->VerticalPopRange = res->getFloat( 34 );
-    bnpc->BNpcBaseData = res->getInt( 35 );
-    bnpc->RepopId = res->getInt( 36 );
-    bnpc->BNPCRankId = res->getInt( 37 );
-    bnpc->TerritoryRange = res->getInt( 38 );
-    bnpc->BoundInstanceID = res->getInt( 39 );
-    bnpc->FateLayoutLabelId = res->getInt( 40 );
-    bnpc->NormalAI = res->getInt( 41 );
-    bnpc->ServerPathId = res->getInt( 42 );
-    bnpc->EquipmentID = res->getInt( 43 );
-    bnpc->CustomizeID = res->getInt( 44 );
-    bnpc->rotation = res->getFloat( 45 );
-    bnpc->Nonpop = res->getInt( 46 );
-
-    //int groupId = res->getInt( 47 );
-
-    bnpc->nameString = bnpc->bnpcName;
-    auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
-
-    std::string bnpcName = bnpc->bnpcName;
-    auto bnpcNameEntry = exdD.getRow< Excel::BNpcName >( bnpc->NameId );
-    if( bnpcNameEntry )
-    {
-      bnpc->nameString = bnpcNameEntry->getString( bnpcNameEntry->data().Text.SGL );
-    }
-
-    m_bnpcs.push_back( bnpc );
-  }
 }
 
 // Add a separate method to clean up just the geometry, not the whole rendering system
@@ -507,6 +510,147 @@ void ZoneEditor::cleanupNavmeshRendering()
   printf( "Cleaned up all navmesh rendering resources\n" );
 }
 
+void ZoneEditor::loadBnpcs()
+{
+  m_bnpcs.clear();
+  m_filteredBnpcs.clear();
+
+  if( !m_selectedZone )
+    return;
+
+  // Load JSON data from bnpcs folder
+  std::string jsonPath = fmt::format( "bnpcs/{}/{}.json", m_selectedZone->name, m_selectedZone->name );
+
+  // Check if JSON file exists
+  if( !std::filesystem::exists( jsonPath ) )
+  {
+    Engine::Logger::debug( "No BNPC JSON file found for zone: {}", m_selectedZone->name );
+    return;
+  }
+
+  try
+  {
+    // Read JSON file
+    std::ifstream jsonFile( jsonPath );
+    if( !jsonFile.is_open() )
+    {
+      Engine::Logger::error( "Failed to open BNPC JSON file: {}", jsonPath );
+      return;
+    }
+
+    nlohmann::json territoryData;
+    jsonFile >> territoryData;
+    jsonFile.close();
+
+    // Iterate through each group in the territory data
+    for( const auto& [ groupName, groupData ] : territoryData.items() )
+    {
+      if( !groupData.contains( "bnpcs" ) || !groupData[ "bnpcs" ].is_object() )
+      {
+        continue;
+      }
+
+      uint32_t groupId = groupData[ "groupId" ].get< uint32_t >();
+      uint32_t layerSetId = groupData[ "layerSetId" ].get< uint32_t >();
+
+      // Iterate through BNPCs in this group
+      for( const auto& [ instanceIdStr, bnpcData ] : groupData[ "bnpcs" ].items() )
+      {
+        auto cachedBnpc = std::make_shared< CachedBnpc >();
+
+        // Extract data from JSON
+        const auto& baseInfo = bnpcData[ "baseInfo" ];
+        const auto& position = baseInfo[ "position" ];
+        const auto& popInfo = bnpcData[ "popInfo" ];
+        const auto& linkData = bnpcData[ "linkData" ];
+        const auto& behaviour = bnpcData[ "Behaviour" ];
+        const auto& senseInfo = bnpcData[ "SenseInfo" ];
+
+        // Fill CachedBnpc structure
+        cachedBnpc->territoryType = m_selectedZone->id;
+        cachedBnpc->bnpcName = groupName;
+        cachedBnpc->instanceId = baseInfo[ "instanceId" ].get< uint32_t >();
+        cachedBnpc->nameOffset = 0; // Not available in JSON, set default
+        cachedBnpc->x = position[ 0 ].get< float >();
+        cachedBnpc->y = position[ 1 ].get< float >();
+        cachedBnpc->z = position[ 2 ].get< float >();
+        cachedBnpc->rotation = baseInfo[ "rotation" ].get< float >();
+        cachedBnpc->BaseId = baseInfo[ "baseId" ].get< uint32_t >();
+        cachedBnpc->NameId = baseInfo[ "nameId" ].get< uint32_t >();
+        cachedBnpc->Level = baseInfo[ "level" ].get< uint16_t >();
+        cachedBnpc->ActiveType = baseInfo[ "activeType" ].get< uint8_t >();
+        cachedBnpc->BoundInstanceID = baseInfo[ "boundInstanceId" ].get< uint32_t >();
+        cachedBnpc->FateLayoutLabelId = baseInfo[ "fateLayoutLabelId" ].get< uint32_t >();
+        cachedBnpc->EquipmentID = baseInfo[ "equipmentId" ].get< uint32_t >();
+        cachedBnpc->CustomizeID = baseInfo[ "customizeId" ].get< uint32_t >();
+
+        // Pop info
+        cachedBnpc->RepopId = popInfo[ "repopId" ].get< uint8_t >();
+        cachedBnpc->InvalidRepop = popInfo[ "invalidRepop" ].get< int8_t >();
+        cachedBnpc->NonpopInitZone = popInfo[ "nonpopInitZone" ].get< int8_t >();
+        cachedBnpc->Nonpop = popInfo[ "nonpop" ].get< int8_t >();
+        cachedBnpc->PopWeather = popInfo[ "popWeather" ].get< uint32_t >();
+        cachedBnpc->PopTimeStart = popInfo[ "popTimeStart" ].get< uint8_t >();
+        cachedBnpc->PopTimeEnd = popInfo[ "popTimeEnd" ].get< uint8_t >();
+        cachedBnpc->PopInterval = popInfo[ "popInterval" ].get< uint8_t >();
+        cachedBnpc->PopRate = popInfo[ "popRate" ].get< uint8_t >();
+        cachedBnpc->PopEvent = popInfo[ "popEvent" ].get< uint8_t >();
+        cachedBnpc->HorizontalPopRange = popInfo[ "horizontalPopRange" ].get< float >();
+        cachedBnpc->VerticalPopRange = popInfo[ "verticalPopRange" ].get< float >();
+
+        // Link data
+        cachedBnpc->LinkGroup = linkData[ "linkGroup" ].get< uint8_t >();
+        cachedBnpc->LinkFamily = linkData[ "linkFamily" ].get< uint8_t >();
+        cachedBnpc->LinkRange = linkData[ "linkRange" ].get< uint8_t >();
+        cachedBnpc->LinkCountLimit = linkData[ "linkCountLimit" ].get< uint8_t >();
+        cachedBnpc->LinkParent = linkData[ "linkParent" ].get< int8_t >();
+        cachedBnpc->LinkOverride = linkData[ "linkOverride" ].get< int8_t >();
+        cachedBnpc->LinkReply = linkData[ "linkReply" ].get< int8_t >();
+
+        // Behavior data
+        cachedBnpc->MoveAI = behaviour[ "moveAI" ].get< uint32_t >();
+        cachedBnpc->NormalAI = behaviour[ "normalAI" ].get< uint32_t >();
+        cachedBnpc->WanderingRange = behaviour[ "wanderingRange" ].get< uint8_t >();
+        cachedBnpc->Route = behaviour[ "routeId" ].get< uint8_t >();
+        cachedBnpc->TerritoryRange = behaviour[ "territoryRange" ].get< uint16_t >();
+        cachedBnpc->DropItem = behaviour[ "dropItem" ].get< uint32_t >();
+
+        // Sense info
+        cachedBnpc->SenseRangeRate = senseInfo[ "senseRangeRate" ].get< float >();
+
+        // Set default values for fields that might not be in JSON
+        cachedBnpc->EventGroup = 0;
+        cachedBnpc->BNpcBaseData = 0;
+        cachedBnpc->BNPCRankId = 0;
+        cachedBnpc->ServerPathId = 0;
+
+        // Generate name string for display (you might want to look up actual names)
+        cachedBnpc->nameString = fmt::format( "{} ({})", groupName, cachedBnpc->instanceId );
+        cachedBnpc->groupName = groupName;
+        m_bnpcs.push_back( cachedBnpc );
+      }
+    }
+
+    // Sort by group name first, then by instance ID for consistent ordering
+    std::sort( m_bnpcs.begin(), m_bnpcs.end(),
+               []( const std::shared_ptr< CachedBnpc >& a, const std::shared_ptr< CachedBnpc >& b )
+               {
+                 if( a->bnpcName != b->bnpcName )
+                 {
+                   return a->bnpcName < b->bnpcName;
+                 }
+                 return a->instanceId < b->instanceId;
+               } );
+
+    // Apply current search filter
+    updateBnpcSearchFilter();
+
+    Engine::Logger::info( "Loaded {} BNPCs for zone {} from JSON", m_bnpcs.size(), m_selectedZone->name );
+  } catch( const std::exception& e )
+  {
+    Engine::Logger::error( "Error loading BNPCs from JSON {}: {}", jsonPath, e.what() );
+  }
+}
 
 void ZoneEditor::onSelectionChanged()
 {
@@ -1568,19 +1712,13 @@ void ZoneEditor::buildBnpcMarkerGeometry()
     }
     else
     {
-      // Brighter, more saturated colors for filtered BNPCs
-      if( bnpc->Level > 50 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.0f, 0.0f ); // Pure red for high level
-      }
-      else if( bnpc->Level > 30 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
-      }
-      else
-      {
-        instance.color = glm::vec3( 0.0f, 1.0f, 0.0f ); // Pure green for low level
-      }
+      auto col = getGroupColor( bnpc->groupName );
+      uint8_t r = static_cast< uint8_t >( ( col & 0xFF0000 ) >> 16 );
+      uint8_t g = static_cast< uint8_t >( ( col & 0x00FF00 ) >> 8 );
+      uint8_t b = static_cast< uint8_t >( col & 0x0000FF );
+      instance.color.r = static_cast< float >( r ) / 255.0f;
+      instance.color.g = static_cast< float >( g ) / 255.0f;
+      instance.color.b = static_cast< float >( b ) / 255.0f;
     }
 
     // Check if this BNPC is selected
@@ -1697,7 +1835,6 @@ glm::vec2 ZoneEditor::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& 
   return screenPos;
 }
 
-// New function to handle 3D BNPC tooltips and selection
 void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
 {
   if( !m_selectedZone || m_bnpcWorldPositions.empty() )
@@ -2198,143 +2335,122 @@ glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float wo
   return screenPos;
 }
 
+void ZoneEditor::focusOn3DPosition( const glm::vec3& position )
+{
+  // Focus 3D camera on the given position
+  m_navCameraTarget = glm::vec3( position.x, position.y, position.z );
+
+  // Position the camera at a reasonable distance from the target
+  float distance = 85.0f; // Default viewing distance
+  float pitch = 30.0f * ( 3.1415926f / 180.0f ); // 30 degrees down in radians
+  float yaw = 0.0f; // Facing forward
+
+  // Calculate camera position based on spherical coordinates
+  m_navCameraPos.x = m_navCameraTarget.x + distance * cos( pitch ) * sin( yaw );
+  m_navCameraPos.y = m_navCameraTarget.y + distance * sin( pitch );
+  m_navCameraPos.z = m_navCameraTarget.z + distance * cos( pitch ) * cos( yaw );
+
+  // Update camera parameters
+  m_navCameraDistance = distance;
+  m_navCameraYaw = yaw * ( 180.0f / 3.1415926f ); // Convert back to degrees
+  m_navCameraPitch = 30.0f; // 30 degrees down
+
+  // Ensure navmesh window is visible when focusing
+  m_showNavmeshWindow = true;
+
+  // Also focus the position in the 2D map view
+  m_showMapWindow = true;
+
+  // Convert world position to 2D map coordinates for centering
+  // Using the map scale and offset to center the view on the position
+  float mapCenterX = position.x / ( m_mapScale / 100.0f ) - m_mapOffset.x;
+  float mapCenterY = position.z / ( m_mapScale / 100.0f ) - m_mapOffset.y; // Note: using Z for Y coordinate
+
+  // Store the focus position for the map view to use during rendering
+  m_focusWorldPos = glm::vec3( position.x, position.y, position.z );
+  m_shouldFocusOnMap = true;
+
+  // Set a reasonable zoom level for the map view
+  m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
+}
+
 void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
 {
-  if( !m_selectedZone || m_bnpcs.empty() )
+  if( !m_showBnpcMarkersInNavmesh || m_bnpcWorldPositions.empty() )
+  {
+    Engine::Logger::debug( "Not drawing overlay markers: show={}, positions={}",
+                           m_showBnpcMarkersInNavmesh, m_bnpcWorldPositions.size() );
     return;
+  }
 
   ImDrawList *drawList = ImGui::GetWindowDrawList();
+  int drawnMarkers = 0;
 
-  // Define colors
-  ImU32 filteredColor = m_bnpcIconColor; // Yellow for filtered BNPCs
-  ImU32 selectedColor = m_selectedBnpcIconColor; // Red for selected BNPC
-  ImU32 unfilteredColor = IM_COL32( 150, 150, 150, 180 ); // Grey for unfiltered BNPCs
-
-  // Keep track of the selected BNPC for special rendering
-  CachedBnpc *selectedBnpc = nullptr;
-  ImVec2 selectedPos;
-
-  // Create a set of filtered BNPC IDs for quick lookup
-  std::unordered_set< uint32_t > filteredBnpcIds;
-  for( auto *bnpc : m_filteredBnpcs )
+  for( const auto& worldPos : m_bnpcWorldPositions )
   {
-    filteredBnpcIds.insert( bnpc->instanceId );
-  }
+    glm::vec2 screenPos = worldToNavmeshScreen( worldPos.worldPos.x,
+                                                worldPos.worldPos.y,
+                                                worldPos.worldPos.z,
+                                                imageSize );
+    ImVec2 finalPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
 
-  // First pass: Render all BNPCs except the selected one
-  for( const auto& bnpc : m_bnpcs )
-  {
-    // Skip BNPCs from other territories
-    if( bnpc->territoryType != m_selectedZone->id )
+    // Skip markers that are outside the visible area
+    if( finalPos.x < imagePos.x - 10 || finalPos.x > imagePos.x + imageSize.x + 10 ||
+        finalPos.y < imagePos.y - 10 || finalPos.y > imagePos.y + imageSize.y + 10 )
+    {
       continue;
+    }
 
-    // Convert 3D world position to 2D screen position
-    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-    // Skip if outside visible area
-    if( screenPos.x < 0 || screenPos.x > imageSize.x ||
-        screenPos.y < 0 || screenPos.y > imageSize.y )
-      continue;
-
-    // Add the window position offset
-    ImVec2 pos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-    // Check if this is the selected BNPC
+    // Check if this BNPC is selected
     bool isSelected = false;
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ]->instanceId == bnpc->instanceId )
+    if( m_groupSelectionMode )
     {
-      isSelected = true;
-      selectedBnpc = bnpc.get();
-      selectedPos = pos;
-      continue; // Skip rendering selected BNPC in first pass
+      isSelected = m_selectedBnpcInstanceIds.count( worldPos.bnpc->instanceId ) > 0;
+    }
+    else
+    {
+      isSelected = ( m_selectedBnpcIndex >= 0 &&
+                     m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
+                     m_filteredBnpcs[ m_selectedBnpcIndex ] == worldPos.bnpc );
     }
 
-    // Determine color based on filter status
-    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
-    ImU32 iconColor = isFiltered ? filteredColor : unfilteredColor;
+    // Get group color and selection color
+    ImU32 groupColor = getGroupColor( worldPos.bnpc->bnpcName );
+    ImU32 selectionColor = IM_COL32( 255, 255, 255, 255 ); // White for selection
 
-    // Draw the marker
-    float iconSize = m_bnpcIconSize;
-    drawList->AddCircleFilled( pos, iconSize, iconColor );
-    drawList->AddCircle( pos, iconSize, IM_COL32( 0, 0, 0, 255 ) );
+    // Adjust color and size based on selection
+    ImU32 markerColor = isSelected ? selectionColor : groupColor;
+    float markerSize = isSelected ? 10.0f : 6.0f;
 
-    // Show tooltip on hover
-    if( ImGui::IsWindowHovered() &&
-        ImGui::IsMouseHoveringRect(
-          ImVec2( pos.x - iconSize, pos.y - iconSize ),
-          ImVec2( pos.x + iconSize, pos.y + iconSize ) ) )
+    // Draw the main marker
+    if( isSelected )
     {
-      // Draw a tooltip with BNPC info
-      ImGui::SetTooltip( "%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
-                         bnpc->nameString.c_str(),
-                         bnpc->instanceId,
-                         bnpc->x, bnpc->y, bnpc->z );
+      // Draw a ring around selected BNPC
+      drawList->AddCircle( finalPos, markerSize + 2.0f, groupColor, 12, 2.0f );
     }
+    drawList->AddCircleFilled( finalPos, markerSize, markerColor );
+
+    // Add tooltip on hover
+    if( ImGui::IsMouseHoveringRect(
+      ImVec2( finalPos.x - markerSize, finalPos.y - markerSize ),
+      ImVec2( finalPos.x + markerSize, finalPos.y + markerSize ) ) )
+    {
+      ImGui::SetTooltip( "Group: %s\nInstance: %u\nBase ID: %u\nLevel: %u\nPos: %.1f, %.1f, %.1f",
+                         worldPos.bnpc->bnpcName.c_str(),
+                         worldPos.bnpc->instanceId,
+                         worldPos.bnpc->BaseId,
+                         worldPos.bnpc->Level,
+                         worldPos.bnpc->x,
+                         worldPos.bnpc->y,
+                         worldPos.bnpc->z );
+    }
+
+    drawnMarkers++;
   }
 
-  // Second pass: Render the selected BNPC on top
-  if( selectedBnpc )
+  if( drawnMarkers == 0 )
   {
-    // Draw the selected BNPC with larger size and different color
-    float iconSize = m_bnpcIconSize * 1.5f;
-    drawList->AddCircleFilled( selectedPos, iconSize, selectedColor );
-    drawList->AddCircle( selectedPos, iconSize, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
-
-    // Draw the name above the marker
-    ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
-    // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
-                                             ? "not set"
-                                             : selectedBnpc->nameString.c_str() );
-    drawList->AddRectFilled(
-      ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
-      ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
-      IM_COL32( 0, 0, 0, 180 )
-    );
-    // Center the text
-    textPos.x -= textSize.x / 2;
-    if( !selectedBnpc->nameString.empty() )
-      drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
-  }
-
-  // Handle mouse clicks for selection
-  if( ImGui::IsWindowHovered() && ImGui::IsMouseClicked( 0 ) )
-  {
-    ImVec2 mousePos = ImGui::GetMousePos();
-    mousePos.x -= imagePos.x;
-    mousePos.y -= imagePos.y;
-
-    // Find closest BNPC to the click position
-    float closestDistance = FLT_MAX;
-    int closestIndex = -1;
-
-    for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
-    {
-      CachedBnpc *bnpc = m_filteredBnpcs[ i ];
-
-      // Convert 3D position to screen space
-      glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-      // Calculate distance from mouse to BNPC icon
-      float dx = screenPos.x - mousePos.x;
-      float dy = screenPos.y - mousePos.y;
-      float distance = sqrtf( dx * dx + dy * dy );
-
-      // Check if this is within selection radius and closest so far
-      if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
-      {
-        closestDistance = distance;
-        closestIndex = static_cast< int >( i );
-      }
-    }
-
-    // If we found a close BNPC, select it
-    if( closestIndex >= 0 )
-    {
-      m_selectedBnpcIndex = closestIndex;
-      //onSelectionChanged(); // Update any selection-dependent state
-    }
+    Engine::Logger::debug( "No overlay markers drawn - all outside visible area or other issue" );
   }
 }
 
@@ -2394,6 +2510,24 @@ void ZoneEditor::showNavmeshWindow()
   {
     ImGui::End();
     return;
+  }
+  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Selection" ) )
+  {
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+  }
+  // Show selection info
+  if( m_groupSelectionMode && !m_selectedGroupName.empty() )
+  {
+    ImGui::Text( "Selected Group: %s (%zu BNPCs)",
+                 m_selectedGroupName.c_str(), m_selectedBnpcInstanceIds.size() );
+  }
+  else if( !m_groupSelectionMode && !m_selectedBnpcInstanceIds.empty() )
+  {
+    ImGui::Text( "Selected BNPC: Instance %u", *m_selectedBnpcInstanceIds.begin() );
   }
 
   // Auto-build navmesh when window is opened and zone is selected
@@ -3234,95 +3368,84 @@ ImVec2 ZoneEditor::worldToScreenPos( float worldX, float worldZ, const ImVec2& i
 
 void ZoneEditor::drawBnpcIcons()
 {
-  if( !m_showMapWindow || m_mapTextureId == 0 || m_bnpcs.empty() )
+  if( !m_showBnpcIcons || !m_selectedZone )
     return;
 
-  // Get the current image position and size
+  ImDrawList *drawList = ImGui::GetWindowDrawList();
   ImVec2 imagePos = ImGui::GetItemRectMin();
   ImVec2 imageSize = ImGui::GetItemRectSize();
 
-  // Get draw list for drawing on top of the image
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  // Check if we're currently dragging - if so, don't process button clicks
-  bool isDragging = ImGui::IsMouseDragging( ImGuiMouseButton_Left );
-
-  // Draw each BNPC
-  for( size_t i = 0; i < m_bnpcs.size(); ++i )
+  for( const auto& bnpc : m_bnpcs )
   {
-    const auto& bnpc = m_bnpcs[ i ];
-
-    // Convert world position to screen position
     ImVec2 screenPos = worldToScreenPos( bnpc->x, bnpc->z, imagePos, imageSize );
 
-    // Check if the icon is within the visible image area
-    if( screenPos.x < imagePos.x || screenPos.x > imagePos.x + imageSize.x ||
-        screenPos.y < imagePos.y || screenPos.y > imagePos.y + imageSize.y )
+    // Check if this BNPC is selected
+    bool isSelected = false;
+    if( m_groupSelectionMode )
     {
-      continue; // Skip if outside visible area
+      isSelected = m_selectedBnpcInstanceIds.count( bnpc->instanceId ) > 0;
+    }
+    else
+    {
+      isSelected = ( m_selectedBnpcIndex >= 0 &&
+                     m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
+                     m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc.get() );
     }
 
     // Choose color based on selection
-    ImU32 iconColor = m_bnpcIconColor;
-    if( m_selectedBnpcIndex >= 0 &&
-        m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc.get() )
+    ImU32 iconColor = isSelected ? m_selectedBnpcIconColor : m_bnpcIconColor;
+
+    // Draw larger icon if selected
+    float iconSize = isSelected ? m_bnpcIconSize * 1.5f : m_bnpcIconSize;
+
+    drawList->AddCircleFilled( screenPos, iconSize, iconColor );
+
+    // Add border for selected items
+    if( isSelected )
     {
-      iconColor = m_selectedBnpcIconColor;
-    }
-
-    // Draw diamond shape
-    float halfSize = m_bnpcIconSize * 0.5f;
-    ImVec2 points[ 4 ] = {
-      ImVec2( screenPos.x, screenPos.y - halfSize ), // Top
-      ImVec2( screenPos.x + halfSize, screenPos.y ), // Right
-      ImVec2( screenPos.x, screenPos.y + halfSize ), // Bottom
-      ImVec2( screenPos.x - halfSize, screenPos.y ) // Left
-    };
-
-    // Draw filled diamond
-    drawList->AddConvexPolyFilled( points, 4, iconColor );
-
-    // Draw border
-    drawList->AddPolyline( points, 4, IM_COL32( 0, 0, 0, 255 ), true, 1.0f );
-
-    // Only add invisible button for click detection if we're not dragging
-    if( !isDragging )
-    {
-      ImGui::SetCursorScreenPos( ImVec2( screenPos.x - halfSize, screenPos.y - halfSize ) );
-      ImGui::InvisibleButton( ( "bnpc_" + std::to_string( i ) ).c_str(), ImVec2( m_bnpcIconSize, m_bnpcIconSize ) );
-
-      // Handle click
-      if( ImGui::IsItemClicked() )
-      {
-        // Find this BNPC in filtered list and select it
-        for( int j = 0; j < static_cast< int >( m_filteredBnpcs.size() ); ++j )
-        {
-          if( m_filteredBnpcs[ j ] == bnpc.get() )
-          {
-            m_selectedBnpcIndex = j;
-            m_showBnpcWindow = true; // Show BNPC window when clicked
-            break;
-          }
-        }
-      }
-
-      // Show tooltip on hover
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        if( !bnpc->nameString.empty() )
-          ImGui::Text( "%s", bnpc->nameString.c_str() );
-        ImGui::Text( "BNPC: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "ID: %u", bnpc->instanceId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Position: %.1f, %.1f, %.1f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Separator();
-        ImGui::EndTooltip();
-      }
+      drawList->AddCircle( screenPos, iconSize + 2.0f, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
     }
   }
 }
+
+
+ImU32 ZoneEditor::getGroupColor( const std::string& groupName )
+{
+  // If we already have a color for this group, return it
+  if( m_groupColorMap.find( groupName ) != m_groupColorMap.end() )
+  {
+    return m_groupColorMap[ groupName ];
+  }
+
+  // Generate a consistent color based on group name hash
+  std::hash< std::string > hasher;
+  uint32_t hash = static_cast< uint32_t >( hasher( groupName ) );
+
+  // Use the hash to generate RGB values with good saturation and brightness
+  uint8_t r = static_cast< uint8_t >( ( hash & 0xFF0000 ) >> 16 );
+  uint8_t g = static_cast< uint8_t >( ( hash & 0x00FF00 ) >> 8 );
+  uint8_t b = static_cast< uint8_t >( hash & 0x0000FF );
+
+  // Ensure minimum brightness and saturation
+  r = std::max( r, static_cast< uint8_t >( 80 ) );
+  g = std::max( g, static_cast< uint8_t >( 80 ) );
+  b = std::max( b, static_cast< uint8_t >( 80 ) );
+
+  // Ensure at least one component is bright
+  uint8_t maxComponent = std::max( { r, g, b } );
+  if( maxComponent < 200 )
+  {
+    float scale = 200.0f / maxComponent;
+    r = static_cast< uint8_t >( std::min( 255.0f, r * scale ) );
+    g = static_cast< uint8_t >( std::min( 255.0f, g * scale ) );
+    b = static_cast< uint8_t >( std::min( 255.0f, b * scale ) );
+  }
+
+  ImU32 color = IM_COL32( r, g, b, 255 );
+  m_groupColorMap[ groupName ] = color;
+  return color;
+}
+
 
 void ZoneEditor::loadMapTexture( uint32_t mapId )
 {

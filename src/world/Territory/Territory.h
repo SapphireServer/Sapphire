@@ -78,7 +78,7 @@ namespace Sapphire
 
     float m_inRangeDistance;
 
-    TimelinePack m_timelinePack;
+    //TimelinePack m_timelinePack;
 
   public:
     Territory();

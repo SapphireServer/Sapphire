@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-
+#include <set>
 #include "commonshader.h"
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
@@ -66,6 +66,7 @@ struct CachedBnpc
   uint32_t CustomizeID;
 
   std::string nameString;
+  std::string groupName;
 };
 
 struct CachedZoneInfo
@@ -138,6 +139,16 @@ private:
     glm::vec3 worldPos;
     CachedBnpc *bnpc;
   };
+
+  glm::vec3 m_focusWorldPos = glm::vec3( 0.0f );
+  bool m_shouldFocusOnMap = false;
+
+  // Add these new members for group color coding
+  std::unordered_map< std::string, ImU32 > m_groupColorMap;
+
+  // Helper method to generate group colors
+  ImU32 getGroupColor( const std::string& groupName );
+
 
   std::vector< BnpcWorldPos > m_bnpcWorldPositions;
 
@@ -220,6 +231,10 @@ private:
   bool m_showObjModel = false;
   std::string m_currentObjPath;
 
+  std::string m_selectedGroupName = "";
+  std::set< uint32_t > m_selectedBnpcInstanceIds; // Store instance IDs of selected BNPCs
+  bool m_groupSelectionMode = true; // Toggle between group and individual selection
+
   // Methods for OBJ model support
   bool loadObjModel( const std::string& filepath );
 
@@ -237,6 +252,8 @@ private:
 
   // Add these methods
   void showBnpcWindow();
+
+  void showBnpcWindow2();
 
   void updateBnpcSearchFilter();
 
@@ -336,6 +353,7 @@ public:
   void drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize );
 
   glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
+  void focusOn3DPosition( const glm::vec3& position );
 
 private:
   void initializeCache();
