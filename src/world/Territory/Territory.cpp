@@ -946,7 +946,7 @@ bool Territory::loadBNpcs()
 
         // Base info
         const auto& baseInfo = bnpcData[ "baseInfo" ];
-        auto position = baseInfo[ "position" ];
+        const auto& position = baseInfo[ "position" ];
         bnpc->territoryType = getTerritoryTypeId();
         bnpc->bnpcName = groupName; // or extract from JSON if available
         bnpc->instanceId = baseInfo[ "instanceId" ].get< uint32_t >();
