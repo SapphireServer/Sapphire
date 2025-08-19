@@ -400,8 +400,6 @@ public:
 
   void cleanupBnpcMarkerRendering();
 
-  void drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize );
-
   glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
   void focusOn3DPosition( const glm::vec3& position );
   void showGambitEditor();

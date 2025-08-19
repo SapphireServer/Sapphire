@@ -3102,6 +3102,7 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
     {
       m_selectedBnpcIndex = closestIndex;
       // Rebuild markers to update selection highlighting
+      handleBnpcSelection( m_filteredBnpcs[ m_selectedBnpcIndex ]->groupName, m_filteredBnpcs[ m_selectedBnpcIndex ], {} );
       buildBnpcMarkerGeometry();
     }
 
