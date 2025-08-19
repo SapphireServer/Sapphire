@@ -11,6 +11,7 @@ namespace Sapphire
   class House
   {
   public:
+    // TODO: this is constructed wit ha 64-bit houseId in getNextHouseId
     House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, std::string  estateName,
            std::string  estateComment );
     virtual ~House();
@@ -47,7 +48,7 @@ namespace Sapphire
   private:
     uint32_t m_landSetId;
     Common::LandIdent m_landIdent;
-    uint32_t m_houseId;
+    uint32_t m_houseId;// TODO: should this be uint64_t?
 
     uint64_t m_buildTime{};
     bool m_hasAetheryte{};
