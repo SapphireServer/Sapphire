@@ -522,8 +522,20 @@ void ZoneEditor::showBnpcWindowHeader()
     updateBnpcSearchFilter();
   }
 
-  // Selection mode toggle
-  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
+  // Selection info and clear button
+  if( !m_selectedGroupName.empty() )
+  {
+    ImGui::Text( "Group Selected: %s (%zu BNPCs)", m_selectedGroupName.c_str(), m_selectedBnpcInstanceIds.size() );
+  }
+  else if( m_selectedBnpcIndex >= 0 )
+  {
+    ImGui::Text( "BNPC Selected: %s", m_filteredBnpcs[ m_selectedBnpcIndex ]->bnpcName.c_str() );
+  }
+  else
+  {
+    ImGui::Text( "No selection" );
+  }
+
   ImGui::SameLine();
   if( ImGui::Button( "Clear Selection" ) )
   {
@@ -534,6 +546,7 @@ void ZoneEditor::showBnpcWindowHeader()
 
   ImGui::Separator();
 }
+
 
 void ZoneEditor::showBnpcTreeView( float splitterWidth, const ImVec2& windowSize )
 {
@@ -586,12 +599,14 @@ void ZoneEditor::showBnpcGroupNode( const std::string& groupName, const std::vec
 
 void ZoneEditor::handleGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
 {
-  if( ImGui::IsItemClicked() && m_groupSelectionMode )
+  if( ImGui::IsItemClicked() )
   {
+    // Always select the group when clicking on a group node
     m_selectedGroupName = groupName;
     m_selectedBnpcInstanceIds.clear();
     m_selectedBnpcIndex = -1;
 
+    // Add all BNPCs in this group to selection
     for( auto *bnpc : bnpcs )
     {
       m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
@@ -601,18 +616,21 @@ void ZoneEditor::handleGroupSelection( const std::string& groupName, const std::
 
 void ZoneEditor::handleCollapsedGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
 {
-  if( ImGui::IsItemClicked() && m_groupSelectionMode )
+  if( ImGui::IsItemClicked() )
   {
+    // Always select the group when clicking on a collapsed group node
     m_selectedGroupName = groupName;
     m_selectedBnpcInstanceIds.clear();
     m_selectedBnpcIndex = -1;
 
+    // Add all BNPCs in this group to selection
     for( auto *bnpc : bnpcs )
     {
       m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
     }
   }
 }
+
 
 void ZoneEditor::showGroupContextMenu( const std::string& groupName, const std::string& contextIdPrefix )
 {
@@ -673,36 +691,22 @@ void ZoneEditor::showBnpcNode( const std::string& groupName, CachedBnpc *bnpc,
   }
 }
 
-void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc *bnpc,
-                                      const std::vector< CachedBnpc * >& groupBnpcs )
+void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs )
 {
   if( ImGui::IsItemClicked() )
   {
-    if( m_groupSelectionMode )
-    {
-      // In group mode, clicking individual BNPC selects the whole group
-      m_selectedGroupName = groupName;
-      m_selectedBnpcInstanceIds.clear();
-      for( auto *groupBnpc : groupBnpcs )
-      {
-        m_selectedBnpcInstanceIds.insert( groupBnpc->instanceId );
-      }
-    }
-    else
-    {
-      // In individual mode, select just this BNPC
-      m_selectedGroupName = "";
-      m_selectedBnpcInstanceIds.clear();
-      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+    // Always select just this individual BNPC when clicking on it
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
 
-      // Find this BNPC in filtered list to set selected index
-      for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
+    // Find this BNPC in filtered list to set selected index
+    for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
+    {
+      if( m_filteredBnpcs[ i ] == bnpc )
       {
-        if( m_filteredBnpcs[ i ] == bnpc )
-        {
-          m_selectedBnpcIndex = static_cast< int >( i );
-          break;
-        }
+        m_selectedBnpcIndex = static_cast< int >( i );
+        break;
       }
     }
   }
@@ -3566,17 +3570,13 @@ void ZoneEditor::focusOn3DPosition( const glm::vec3& position )
   // Also focus the position in the 2D map view
   m_showMapWindow = true;
 
-  // Convert world position to 2D map coordinates for centering
-  // Using the map scale and offset to center the view on the position
-  float mapCenterX = position.x / ( m_mapScale / 100.0f ) - m_mapOffset.x;
-  float mapCenterY = position.z / ( m_mapScale / 100.0f ) - m_mapOffset.y; // Note: using Z for Y coordinate
-
   // Store the focus position for the map view to use during rendering
+  // The map view should handle the coordinate conversion internally
   m_focusWorldPos = glm::vec3( position.x, position.y, position.z );
   m_shouldFocusOnMap = true;
 
   // Set a reasonable zoom level for the map view
-  m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
+  //m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
 }
 
 void ZoneEditor::createNavmeshFramebuffer()
@@ -3922,6 +3922,7 @@ void ZoneEditor::showZoneList()
         m_selectedIndex = i;
         m_selectedZoneId = zone->id;
         m_selectedZone = zone;
+        m_zoomLevel = -1;
 
         // Only trigger selection changed if it actually changed
         if( oldSelectedId != m_selectedZoneId )

@@ -75,6 +75,10 @@ EditorState::EditorState( std::shared_ptr< Engine::ApplicationContext > pContext
     m_mysqlPort = globalConfig.database.port;
     m_navMeshPath = configMgr.getValue( "Navigation", "MeshPath", ( serverDir / "navi" ).string() );
   }
+
+  m_bnpcJsonPath = "./bnpcs/";
+  strncpy( m_bnpcJsonPathBuffer, m_bnpcJsonPath.c_str(), sizeof( m_bnpcJsonPathBuffer ) - 1 );
+  m_bnpcJsonPathBuffer[ sizeof( m_bnpcJsonPathBuffer ) - 1 ] = '\0';
 }
 
 void framebuffer_size_callback( GLFWwindow *window, int width, int height )
@@ -325,477 +329,501 @@ std::string EditorState::openFolderDialog( const std::string& title )
 
 void EditorState::showSettingsDialog()
 {
-    if (!m_showSettingsDialog) return;
+  if( !m_showSettingsDialog ) return;
 
-    ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Settings", &m_showSettingsDialog, ImGuiWindowFlags_NoCollapse);
+  ImGui::SetNextWindowSize( ImVec2( 600, 500 ), ImGuiCond_FirstUseEver );
+  ImGui::Begin( "Settings", &m_showSettingsDialog, ImGuiWindowFlags_NoCollapse );
 
-    static bool hasUnsavedChanges = false;
-    static bool showConfirmDialog = false;
+  static bool hasUnsavedChanges = false;
+  static bool showConfirmDialog = false;
 
-    if (ImGui::BeginTabBar("SettingsTabs", ImGuiTabBarFlags_None))
+  if( ImGui::BeginTabBar( "SettingsTabs", ImGuiTabBarFlags_None ) )
+  {
+    // Game Data Tab
+    if( ImGui::BeginTabItem( "Game Data" ) )
     {
-        // Game Data Tab
-        if (ImGui::BeginTabItem("Game Data"))
-        {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
-            ImGui::TextWrapped("Configure the path to your FFXIV game data files (sqpack folder).");
-            ImGui::PopStyleColor();
-            ImGui::Separator();
+      ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.9f, 0.9f, 0.9f, 1.0f ) );
+      ImGui::TextWrapped( "Configure the path to your FFXIV game data files (sqpack folder)." );
+      ImGui::PopStyleColor();
+      ImGui::Separator();
 
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Game Data Path:");
-            ImGui::SetNextItemWidth(-120.0f);
-            if (ImGui::InputText("##DatLocation", m_datLocationBuffer, sizeof(m_datLocationBuffer)))
-            {
-                hasUnsavedChanges = true;
-            }
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Game Data Path:" );
+      ImGui::SetNextItemWidth( -120.0f );
+      if( ImGui::InputText( "##DatLocation", m_datLocationBuffer, sizeof( m_datLocationBuffer ) ) )
+      {
+        hasUnsavedChanges = true;
+      }
 
-            ImGui::SameLine();
-            if (ImGui::Button("Browse...##GameData"))
-            {
+      ImGui::SameLine();
+      if( ImGui::Button( "Browse...##GameData" ) )
+      {
 #ifdef _WIN32
-                std::string selectedPath = openFolderDialog("Select Game Data Directory (containing 'sqpack' folder)");
-                if (!selectedPath.empty())
-                {
-                    strncpy(m_datLocationBuffer, selectedPath.c_str(), sizeof(m_datLocationBuffer) - 1);
-                    m_datLocationBuffer[sizeof(m_datLocationBuffer) - 1] = '\0';
-                    hasUnsavedChanges = true;
-                }
+        std::string selectedPath = openFolderDialog( "Select Game Data Directory (containing 'sqpack' folder)" );
+        if( !selectedPath.empty() )
+        {
+          strncpy( m_datLocationBuffer, selectedPath.c_str(), sizeof( m_datLocationBuffer ) - 1 );
+          m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
+          hasUnsavedChanges = true;
+        }
 #endif
-            }
+      }
 
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Separator();
+      ImGui::Spacing();
 
-            // Status display
-            if (m_datLoaded)
-            {
-                ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Status: Loaded Successfully");
-                ImGui::TextWrapped("Current path: %s", m_datLocation.c_str());
-            }
-            else
-            {
-                ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Status: Not Loaded or Failed");
-                if (!m_datLocation.empty())
-                {
-                    ImGui::TextWrapped("Failed to load from: %s", m_datLocation.c_str());
-                    ImGui::TextColored(ImVec4(0.8f, 0.6f, 0.2f, 1.0f), "Make sure the path contains the 'sqpack' folder.");
-                }
-            }
+      // Status display
+      if( m_datLoaded )
+      {
+        ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Status: Loaded Successfully" );
+        ImGui::TextWrapped( "Current path: %s", m_datLocation.c_str() );
+      }
+      else
+      {
+        ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Status: Not Loaded or Failed" );
+        if( !m_datLocation.empty() )
+        {
+          ImGui::TextWrapped( "Failed to load from: %s", m_datLocation.c_str() );
+          ImGui::TextColored( ImVec4( 0.8f, 0.6f, 0.2f, 1.0f ), "Make sure the path contains the 'sqpack' folder." );
+        }
+      }
 
-            ImGui::Spacing();
-            if (ImGui::Button("Reload Game Data"))
-            {
-                m_datLocation = std::string(m_datLocationBuffer);
-                initGameData();
-            }
+      ImGui::Spacing();
+      if( ImGui::Button( "Reload Game Data" ) )
+      {
+        m_datLocation = std::string( m_datLocationBuffer );
+        initGameData();
+      }
 
-            ImGui::EndTabItem();
+      ImGui::EndTabItem();
+    }
+
+    // Database Tab
+    if( ImGui::BeginTabItem( "Database" ) )
+    {
+      ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.9f, 0.9f, 0.9f, 1.0f ) );
+      ImGui::TextWrapped( "Configure MySQL database connection settings." );
+      ImGui::PopStyleColor();
+      ImGui::Separator();
+
+      ImGui::Columns( 2, "DatabaseColumns", false );
+      ImGui::SetColumnWidth( 0, 120 );
+
+      // Host
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Host:" );
+      ImGui::NextColumn();
+      ImGui::SetNextItemWidth( -1.0f );
+      if( ImGui::InputText( "##MySQLHost", m_mysqlHostBuffer, sizeof( m_mysqlHostBuffer ) ) )
+      {
+        hasUnsavedChanges = true;
+      }
+      ImGui::NextColumn();
+
+      // Port
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Port:" );
+      ImGui::NextColumn();
+      ImGui::SetNextItemWidth( -1.0f );
+      if( ImGui::InputInt( "##MySQLPort", &m_mysqlPortBuffer ) )
+      {
+        hasUnsavedChanges = true;
+        // Clamp port to valid range
+        if( m_mysqlPortBuffer < 1 ) m_mysqlPortBuffer = 1;
+        if( m_mysqlPortBuffer > 65535 ) m_mysqlPortBuffer = 65535;
+      }
+      ImGui::NextColumn();
+
+      // Username
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Username:" );
+      ImGui::NextColumn();
+      ImGui::SetNextItemWidth( -1.0f );
+      if( ImGui::InputText( "##MySQLUser", m_mysqlUserBuffer, sizeof( m_mysqlUserBuffer ) ) )
+      {
+        hasUnsavedChanges = true;
+      }
+      ImGui::NextColumn();
+
+      // Password
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Password:" );
+      ImGui::NextColumn();
+      ImGui::SetNextItemWidth( -1.0f );
+      if( ImGui::InputText( "##MySQLPassword", m_mysqlPasswordBuffer, sizeof( m_mysqlPasswordBuffer ),
+                            ImGuiInputTextFlags_Password ) )
+      {
+        hasUnsavedChanges = true;
+      }
+      ImGui::NextColumn();
+
+      // Database
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "Database:" );
+      ImGui::NextColumn();
+      ImGui::SetNextItemWidth( -1.0f );
+      if( ImGui::InputText( "##MySQLDatabase", m_mysqlDatabaseBuffer, sizeof( m_mysqlDatabaseBuffer ) ) )
+      {
+        hasUnsavedChanges = true;
+      }
+
+      ImGui::Columns( 1 );
+      ImGui::Spacing();
+      ImGui::Separator();
+      ImGui::Spacing();
+
+      // Connection test and status
+      if( ImGui::Button( "Test Connection" ) )
+      {
+        // Store current values
+        std::string tempHost = m_mysqlHost;
+        std::string tempUser = m_mysqlUser;
+        std::string tempPassword = m_mysqlPassword;
+        std::string tempDatabase = m_mysqlDatabase;
+        int tempPort = m_mysqlPort;
+
+        // Apply test values
+        m_mysqlHost = std::string( m_mysqlHostBuffer );
+        m_mysqlUser = std::string( m_mysqlUserBuffer );
+        m_mysqlPassword = std::string( m_mysqlPasswordBuffer );
+        m_mysqlDatabase = std::string( m_mysqlDatabaseBuffer );
+        m_mysqlPort = m_mysqlPortBuffer;
+
+        bool testResult = initMySQLConnection();
+
+        // Restore original values
+        m_mysqlHost = tempHost;
+        m_mysqlUser = tempUser;
+        m_mysqlPassword = tempPassword;
+        m_mysqlDatabase = tempDatabase;
+        m_mysqlPort = tempPort;
+
+        // Show result
+        ImGui::OpenPopup( "Connection Test Result" );
+      }
+
+      // Connection test popup
+      if( ImGui::BeginPopupModal( "Connection Test Result", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
+      {
+        if( m_mysqlConnected )
+        {
+          ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Connection successful!" );
+        }
+        else
+        {
+          ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Connection failed!" );
+          ImGui::TextWrapped( "Please check your connection settings and ensure the MySQL server is running." );
         }
 
-        // Database Tab
-        if (ImGui::BeginTabItem("Database"))
+        ImGui::Spacing();
+        if( ImGui::Button( "Close" ) )
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
-            ImGui::TextWrapped("Configure MySQL database connection settings.");
-            ImGui::PopStyleColor();
-            ImGui::Separator();
-
-            ImGui::Columns(2, "DatabaseColumns", false);
-            ImGui::SetColumnWidth(0, 120);
-
-            // Host
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Host:");
-            ImGui::NextColumn();
-            ImGui::SetNextItemWidth(-1.0f);
-            if (ImGui::InputText("##MySQLHost", m_mysqlHostBuffer, sizeof(m_mysqlHostBuffer)))
-            {
-                hasUnsavedChanges = true;
-            }
-            ImGui::NextColumn();
-
-            // Port
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Port:");
-            ImGui::NextColumn();
-            ImGui::SetNextItemWidth(-1.0f);
-            if (ImGui::InputInt("##MySQLPort", &m_mysqlPortBuffer))
-            {
-                hasUnsavedChanges = true;
-                // Clamp port to valid range
-                if (m_mysqlPortBuffer < 1) m_mysqlPortBuffer = 1;
-                if (m_mysqlPortBuffer > 65535) m_mysqlPortBuffer = 65535;
-            }
-            ImGui::NextColumn();
-
-            // Username
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Username:");
-            ImGui::NextColumn();
-            ImGui::SetNextItemWidth(-1.0f);
-            if (ImGui::InputText("##MySQLUser", m_mysqlUserBuffer, sizeof(m_mysqlUserBuffer)))
-            {
-                hasUnsavedChanges = true;
-            }
-            ImGui::NextColumn();
-
-            // Password
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Password:");
-            ImGui::NextColumn();
-            ImGui::SetNextItemWidth(-1.0f);
-            if (ImGui::InputText("##MySQLPassword", m_mysqlPasswordBuffer, sizeof(m_mysqlPasswordBuffer),
-                               ImGuiInputTextFlags_Password))
-            {
-                hasUnsavedChanges = true;
-            }
-            ImGui::NextColumn();
-
-            // Database
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Database:");
-            ImGui::NextColumn();
-            ImGui::SetNextItemWidth(-1.0f);
-            if (ImGui::InputText("##MySQLDatabase", m_mysqlDatabaseBuffer, sizeof(m_mysqlDatabaseBuffer)))
-            {
-                hasUnsavedChanges = true;
-            }
-
-            ImGui::Columns(1);
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
-
-            // Connection test and status
-            if (ImGui::Button("Test Connection"))
-            {
-                // Store current values
-                std::string tempHost = m_mysqlHost;
-                std::string tempUser = m_mysqlUser;
-                std::string tempPassword = m_mysqlPassword;
-                std::string tempDatabase = m_mysqlDatabase;
-                int tempPort = m_mysqlPort;
-
-                // Apply test values
-                m_mysqlHost = std::string(m_mysqlHostBuffer);
-                m_mysqlUser = std::string(m_mysqlUserBuffer);
-                m_mysqlPassword = std::string(m_mysqlPasswordBuffer);
-                m_mysqlDatabase = std::string(m_mysqlDatabaseBuffer);
-                m_mysqlPort = m_mysqlPortBuffer;
-
-                bool testResult = initMySQLConnection();
-
-                // Restore original values
-                m_mysqlHost = tempHost;
-                m_mysqlUser = tempUser;
-                m_mysqlPassword = tempPassword;
-                m_mysqlDatabase = tempDatabase;
-                m_mysqlPort = tempPort;
-
-                // Show result
-                ImGui::OpenPopup("Connection Test Result");
-            }
-
-            // Connection test popup
-            if (ImGui::BeginPopupModal("Connection Test Result", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                if (m_mysqlConnected)
-                {
-                    ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Connection successful!");
-                }
-                else
-                {
-                    ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Connection failed!");
-                    ImGui::TextWrapped("Please check your connection settings and ensure the MySQL server is running.");
-                }
-
-                ImGui::Spacing();
-                if (ImGui::Button("Close"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Reset to Defaults"))
-            {
-                strcpy(m_mysqlHostBuffer, "localhost");
-                strcpy(m_mysqlUserBuffer, "root");
-                strcpy(m_mysqlPasswordBuffer, "");
-                strcpy(m_mysqlDatabaseBuffer, "sapphire");
-                m_mysqlPortBuffer = 3306;
-                hasUnsavedChanges = true;
-            }
-
-            ImGui::Spacing();
-            // Status display
-            if (m_mysqlConnected)
-            {
-                ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Status: Connected");
-                ImGui::TextWrapped("Connected to: %s@%s:%d/%s", m_mysqlUser.c_str(), m_mysqlHost.c_str(), m_mysqlPort, m_mysqlDatabase.c_str());
-            }
-            else
-            {
-                ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Status: Disconnected");
-            }
-
-            ImGui::EndTabItem();
+          ImGui::CloseCurrentPopup();
         }
+        ImGui::EndPopup();
+      }
 
-        // Navigation Mesh Tab
-        if (ImGui::BeginTabItem("Navigation"))
-        {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
-            ImGui::TextWrapped("Configure the path to navigation mesh files used for pathfinding.");
-            ImGui::PopStyleColor();
-            ImGui::Separator();
+      ImGui::SameLine();
+      if( ImGui::Button( "Reset to Defaults" ) )
+      {
+        strcpy( m_mysqlHostBuffer, "localhost" );
+        strcpy( m_mysqlUserBuffer, "root" );
+        strcpy( m_mysqlPasswordBuffer, "" );
+        strcpy( m_mysqlDatabaseBuffer, "sapphire" );
+        m_mysqlPortBuffer = 3306;
+        hasUnsavedChanges = true;
+      }
 
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("NavMesh Path:");
-            ImGui::SetNextItemWidth(-120.0f);
-            if (ImGui::InputText("##NavMeshPath", m_navMeshPathBuffer, sizeof(m_navMeshPathBuffer)))
-            {
-                hasUnsavedChanges = true;
-            }
+      ImGui::Spacing();
+      // Status display
+      if( m_mysqlConnected )
+      {
+        ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Status: Connected" );
+        ImGui::TextWrapped( "Connected to: %s@%s:%d/%s", m_mysqlUser.c_str(), m_mysqlHost.c_str(), m_mysqlPort,
+                            m_mysqlDatabase.c_str() );
+      }
+      else
+      {
+        ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Status: Disconnected" );
+      }
 
-            ImGui::SameLine();
-            if (ImGui::Button("Browse...##NavMesh"))
-            {
+      ImGui::EndTabItem();
+    }
+
+    // Navigation Mesh Tab
+    if( ImGui::BeginTabItem( "Navigation" ) )
+    {
+      ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.9f, 0.9f, 0.9f, 1.0f ) );
+      ImGui::TextWrapped( "Configure the path to navigation mesh files used for pathfinding." );
+      ImGui::PopStyleColor();
+      ImGui::Separator();
+
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text( "NavMesh Path:" );
+      ImGui::SetNextItemWidth( -120.0f );
+      if( ImGui::InputText( "##NavMeshPath", m_navMeshPathBuffer, sizeof( m_navMeshPathBuffer ) ) )
+      {
+        hasUnsavedChanges = true;
+      }
+
+      ImGui::SameLine();
+      if( ImGui::Button( "Browse...##NavMesh" ) )
+      {
 #ifdef _WIN32
-                std::string selectedPath = openFolderDialog("Select Navigation Mesh Directory");
-                if (!selectedPath.empty())
-                {
-                    strncpy(m_navMeshPathBuffer, selectedPath.c_str(), sizeof(m_navMeshPathBuffer) - 1);
-                    m_navMeshPathBuffer[sizeof(m_navMeshPathBuffer) - 1] = '\0';
-                    hasUnsavedChanges = true;
-                }
+        std::string selectedPath = openFolderDialog( "Select Navigation Mesh Directory" );
+        if( !selectedPath.empty() )
+        {
+          strncpy( m_navMeshPathBuffer, selectedPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+          m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
+          hasUnsavedChanges = true;
+        }
 #else
-                ImGui::OpenPopup("NavMesh Browse Help");
+        ImGui::OpenPopup( "NavMesh Browse Help" );
 #endif
-            }
+      }
 
-            if (ImGui::BeginPopup("NavMesh Browse Help"))
-            {
-                ImGui::TextWrapped("Please manually enter the path to the directory containing navigation mesh files.");
-                ImGui::TextWrapped("Expected structure: <path>/<zone_internal_name>/<zone_internal_name>.nav");
-                ImGui::EndPopup();
-            }
+      if( ImGui::BeginPopup( "NavMesh Browse Help" ) )
+      {
+        ImGui::TextWrapped( "Please manually enter the path to the directory containing navigation mesh files." );
+        ImGui::TextWrapped( "Expected structure: <path>/<zone_internal_name>/<zone_internal_name>.nav" );
+        ImGui::EndPopup();
+      }
 
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
+      ImGui::Spacing();
+      ImGui::Separator();
+      ImGui::Spacing();
 
-            // Path information
-            ImGui::TextWrapped("Current Path: %s", m_navMeshPath.c_str());
+      // Path information
+      ImGui::TextWrapped( "Current Path: %s", m_navMeshPath.c_str() );
 
-            if (!m_navMeshPath.empty())
-            {
-                // You could add directory validation here
-                ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Path configured");
+      if( !m_navMeshPath.empty() )
+      {
+        // You could add directory validation here
+        ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Path configured" );
 
-                ImGui::Spacing();
-                ImGui::TextColored(ImVec4(0.6f, 0.6f, 1.0f, 1.0f), "File Structure:");
-                ImGui::BulletText("Each zone should have its own folder");
-                ImGui::BulletText("Navigation files should be named '<internal_name>.nav'");
-                ImGui::BulletText("This path should point to the parent directory");
-            }
-            else
-            {
-                ImGui::TextColored(ImVec4(0.8f, 0.6f, 0.2f, 1.0f), "⚠ No path configured");
-            }
+        ImGui::Spacing();
+        ImGui::TextColored( ImVec4( 0.6f, 0.6f, 1.0f, 1.0f ), "File Structure:" );
+        ImGui::BulletText( "Each zone should have its own folder" );
+        ImGui::BulletText( "Navigation files should be named '<internal_name>.nav'" );
+        ImGui::BulletText( "This path should point to the parent directory" );
+      }
+      else
+      {
+        ImGui::TextColored( ImVec4( 0.8f, 0.6f, 0.2f, 1.0f ), "⚠ No path configured" );
+      }
 
-            ImGui::EndTabItem();
+      ImGui::Separator();
+      ImGui::Text( "BNPC JSON Files Path:" );
+      if( ImGui::InputText( "##BnpcJsonPath", m_bnpcJsonPathBuffer, sizeof( m_bnpcJsonPathBuffer ) ) )
+      {
+        m_bnpcJsonPath = m_bnpcJsonPathBuffer;
+      }
+      ImGui::SameLine();
+      if( ImGui::Button( "Browse##BnpcJson" ) )
+      {
+#ifdef _WIN32
+        std::string selectedPath = openFolderDialog( "BNPC JSON Directory" );
+        if( !selectedPath.empty() )
+        {
+          strncpy( m_bnpcJsonPathBuffer, selectedPath.c_str(), sizeof( m_bnpcJsonPathBuffer ) - 1 );
+          m_bnpcJsonPathBuffer[ sizeof( m_bnpcJsonPathBuffer ) - 1 ] = '\0';
+          hasUnsavedChanges = true;
         }
+#else
+        ImGui::OpenPopup( "BNPC JSON Browse Help" );
+#endif
+      }
 
-        ImGui::EndTabBar();
+
+      ImGui::EndTabItem();
     }
 
-    ImGui::Separator();
+    ImGui::EndTabBar();
+  }
+
+  ImGui::Separator();
+  ImGui::Spacing();
+
+  // Unsaved changes indicator
+  if( hasUnsavedChanges )
+  {
+    ImGui::TextColored( ImVec4( 1.0f, 0.6f, 0.2f, 1.0f ), "⚠ You have unsaved changes" );
     ImGui::Spacing();
+  }
 
-    // Unsaved changes indicator
-    if (hasUnsavedChanges)
+  // Bottom buttons
+  ImGui::BeginGroup();
+  if( ImGui::Button( "Apply Settings", ImVec2( 120, 0 ) ) )
+  {
+    // Apply all changes
+    bool needsRestart = false;
+
+    // Check and apply DAT location changes
+    std::string newDatLocation = std::string( m_datLocationBuffer );
+    if( newDatLocation != m_datLocation )
     {
-        ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "⚠ You have unsaved changes");
-        ImGui::Spacing();
+      m_datLocation = newDatLocation;
+      needsRestart = true;
     }
 
-    // Bottom buttons
-    ImGui::BeginGroup();
-    if (ImGui::Button("Apply Settings", ImVec2(120, 0)))
+    // Check and apply MySQL settings changes
+    std::string newHost = std::string( m_mysqlHostBuffer );
+    std::string newUser = std::string( m_mysqlUserBuffer );
+    std::string newPassword = std::string( m_mysqlPasswordBuffer );
+    std::string newDatabase = std::string( m_mysqlDatabaseBuffer );
+    int newPort = m_mysqlPortBuffer;
+
+    if( newHost != m_mysqlHost || newUser != m_mysqlUser ||
+        newPassword != m_mysqlPassword || newDatabase != m_mysqlDatabase ||
+        newPort != m_mysqlPort )
     {
-        // Apply all changes
-        bool needsRestart = false;
-
-        // Check and apply DAT location changes
-        std::string newDatLocation = std::string(m_datLocationBuffer);
-        if (newDatLocation != m_datLocation)
-        {
-            m_datLocation = newDatLocation;
-            needsRestart = true;
-        }
-
-        // Check and apply MySQL settings changes
-        std::string newHost = std::string(m_mysqlHostBuffer);
-        std::string newUser = std::string(m_mysqlUserBuffer);
-        std::string newPassword = std::string(m_mysqlPasswordBuffer);
-        std::string newDatabase = std::string(m_mysqlDatabaseBuffer);
-        int newPort = m_mysqlPortBuffer;
-
-        if (newHost != m_mysqlHost || newUser != m_mysqlUser ||
-            newPassword != m_mysqlPassword || newDatabase != m_mysqlDatabase ||
-            newPort != m_mysqlPort)
-        {
-            m_mysqlHost = newHost;
-            m_mysqlUser = newUser;
-            m_mysqlPassword = newPassword;
-            m_mysqlDatabase = newDatabase;
-            m_mysqlPort = newPort;
-            needsRestart = true;
-        }
-
-        // Check and apply nav mesh path changes
-        std::string newNavMeshPath = std::string(m_navMeshPathBuffer);
-        if (newNavMeshPath != m_navMeshPath)
-        {
-            m_navMeshPath = newNavMeshPath;
-            needsRestart = true;
-        }
-
-        if (needsRestart)
-        {
-            saveConfig();
-            hasUnsavedChanges = false;
-            ImGui::OpenPopup("Settings Applied");
-        }
-        else
-        {
-            hasUnsavedChanges = false;
-        }
+      m_mysqlHost = newHost;
+      m_mysqlUser = newUser;
+      m_mysqlPassword = newPassword;
+      m_mysqlDatabase = newDatabase;
+      m_mysqlPort = newPort;
+      needsRestart = true;
     }
 
+    // Check and apply nav mesh path changes
+    std::string newNavMeshPath = std::string( m_navMeshPathBuffer );
+    if( newNavMeshPath != m_navMeshPath )
+    {
+      m_navMeshPath = newNavMeshPath;
+      needsRestart = true;
+    }
+
+    if( needsRestart )
+    {
+      saveConfig();
+      hasUnsavedChanges = false;
+      ImGui::OpenPopup( "Settings Applied" );
+    }
+    else
+    {
+      hasUnsavedChanges = false;
+    }
+  }
+
+  ImGui::SameLine();
+  if( ImGui::Button( "Cancel", ImVec2( 120, 0 ) ) )
+  {
+    if( hasUnsavedChanges )
+    {
+      showConfirmDialog = true;
+      ImGui::OpenPopup( "Discard Changes?" );
+    }
+    else
+    {
+      m_showSettingsDialog = false;
+    }
+  }
+
+  ImGui::SameLine();
+  ImGui::Dummy( ImVec2( 10, 0 ) );
+  ImGui::SameLine();
+
+  if( ImGui::Button( "Restore Defaults", ImVec2( 120, 0 ) ) )
+  {
+    ImGui::OpenPopup( "Restore Defaults?" );
+  }
+  ImGui::EndGroup();
+
+  // Confirmation dialogs
+  if( ImGui::BeginPopupModal( "Settings Applied", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
+  {
+    ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Settings have been saved successfully!" );
+    ImGui::TextWrapped( "Some changes may require restarting the application to take effect." );
+    ImGui::Spacing();
+    if( ImGui::Button( "OK" ) )
+    {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+
+  if( ImGui::BeginPopupModal( "Discard Changes?", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
+  {
+    ImGui::Text( "You have unsaved changes. Are you sure you want to discard them?" );
+    ImGui::Spacing();
+    if( ImGui::Button( "Yes, Discard" ) )
+    {
+      // Revert all buffers to current values
+      revertSettingsBuffers();
+      hasUnsavedChanges = false;
+      m_showSettingsDialog = false;
+      ImGui::CloseCurrentPopup();
+    }
     ImGui::SameLine();
-    if (ImGui::Button("Cancel", ImVec2(120, 0)))
+    if( ImGui::Button( "Cancel" ) )
     {
-        if (hasUnsavedChanges)
-        {
-            showConfirmDialog = true;
-            ImGui::OpenPopup("Discard Changes?");
-        }
-        else
-        {
-            m_showSettingsDialog = false;
-        }
+      ImGui::CloseCurrentPopup();
     }
+    ImGui::EndPopup();
+  }
 
+  if( ImGui::BeginPopupModal( "Restore Defaults?", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
+  {
+    ImGui::Text( "This will reset all settings to their default values." );
+    ImGui::Text( "Are you sure you want to continue?" );
+    ImGui::Spacing();
+    if( ImGui::Button( "Yes, Restore Defaults" ) )
+    {
+      restoreDefaultSettings();
+      hasUnsavedChanges = true;
+      ImGui::CloseCurrentPopup();
+    }
     ImGui::SameLine();
-    ImGui::Dummy(ImVec2(10, 0));
-    ImGui::SameLine();
-
-    if (ImGui::Button("Restore Defaults", ImVec2(120, 0)))
+    if( ImGui::Button( "Cancel" ) )
     {
-        ImGui::OpenPopup("Restore Defaults?");
+      ImGui::CloseCurrentPopup();
     }
-    ImGui::EndGroup();
+    ImGui::EndPopup();
+  }
 
-    // Confirmation dialogs
-    if (ImGui::BeginPopupModal("Settings Applied", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Settings have been saved successfully!");
-        ImGui::TextWrapped("Some changes may require restarting the application to take effect.");
-        ImGui::Spacing();
-        if (ImGui::Button("OK"))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::BeginPopupModal("Discard Changes?", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("You have unsaved changes. Are you sure you want to discard them?");
-        ImGui::Spacing();
-        if (ImGui::Button("Yes, Discard"))
-        {
-            // Revert all buffers to current values
-            revertSettingsBuffers();
-            hasUnsavedChanges = false;
-            m_showSettingsDialog = false;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel"))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::BeginPopupModal("Restore Defaults?", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("This will reset all settings to their default values.");
-        ImGui::Text("Are you sure you want to continue?");
-        ImGui::Spacing();
-        if (ImGui::Button("Yes, Restore Defaults"))
-        {
-            restoreDefaultSettings();
-            hasUnsavedChanges = true;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel"))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-
-    ImGui::End();
+  ImGui::End();
 }
 
 // Helper method to revert settings buffers
 void EditorState::revertSettingsBuffers()
 {
-    strncpy(m_datLocationBuffer, m_datLocation.c_str(), sizeof(m_datLocationBuffer) - 1);
-    m_datLocationBuffer[sizeof(m_datLocationBuffer) - 1] = '\0';
+  strncpy( m_datLocationBuffer, m_datLocation.c_str(), sizeof( m_datLocationBuffer ) - 1 );
+  m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
 
-    strncpy(m_mysqlHostBuffer, m_mysqlHost.c_str(), sizeof(m_mysqlHostBuffer) - 1);
-    m_mysqlHostBuffer[sizeof(m_mysqlHostBuffer) - 1] = '\0';
+  strncpy( m_mysqlHostBuffer, m_mysqlHost.c_str(), sizeof( m_mysqlHostBuffer ) - 1 );
+  m_mysqlHostBuffer[ sizeof( m_mysqlHostBuffer ) - 1 ] = '\0';
 
-    strncpy(m_mysqlUserBuffer, m_mysqlUser.c_str(), sizeof(m_mysqlUserBuffer) - 1);
-    m_mysqlUserBuffer[sizeof(m_mysqlUserBuffer) - 1] = '\0';
+  strncpy( m_mysqlUserBuffer, m_mysqlUser.c_str(), sizeof( m_mysqlUserBuffer ) - 1 );
+  m_mysqlUserBuffer[ sizeof( m_mysqlUserBuffer ) - 1 ] = '\0';
 
-    strncpy(m_mysqlPasswordBuffer, m_mysqlPassword.c_str(), sizeof(m_mysqlPasswordBuffer) - 1);
-    m_mysqlPasswordBuffer[sizeof(m_mysqlPasswordBuffer) - 1] = '\0';
+  strncpy( m_mysqlPasswordBuffer, m_mysqlPassword.c_str(), sizeof( m_mysqlPasswordBuffer ) - 1 );
+  m_mysqlPasswordBuffer[ sizeof( m_mysqlPasswordBuffer ) - 1 ] = '\0';
 
-    strncpy(m_mysqlDatabaseBuffer, m_mysqlDatabase.c_str(), sizeof(m_mysqlDatabaseBuffer) - 1);
-    m_mysqlDatabaseBuffer[sizeof(m_mysqlDatabaseBuffer) - 1] = '\0';
+  strncpy( m_mysqlDatabaseBuffer, m_mysqlDatabase.c_str(), sizeof( m_mysqlDatabaseBuffer ) - 1 );
+  m_mysqlDatabaseBuffer[ sizeof( m_mysqlDatabaseBuffer ) - 1 ] = '\0';
 
-    m_mysqlPortBuffer = m_mysqlPort;
+  m_mysqlPortBuffer = m_mysqlPort;
 
-    strncpy(m_navMeshPathBuffer, m_navMeshPath.c_str(), sizeof(m_navMeshPathBuffer) - 1);
-    m_navMeshPathBuffer[sizeof(m_navMeshPathBuffer) - 1] = '\0';
+  strncpy( m_navMeshPathBuffer, m_navMeshPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+  m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
 }
 
 // Helper method to restore default settings
 void EditorState::restoreDefaultSettings()
 {
-    // Game Data defaults
-    strcpy(m_datLocationBuffer, "");
+  // Game Data defaults
+  strcpy( m_datLocationBuffer, "" );
 
-    // MySQL defaults
-    strcpy(m_mysqlHostBuffer, "localhost");
-    strcpy(m_mysqlUserBuffer, "root");
-    strcpy(m_mysqlPasswordBuffer, "");
-    strcpy(m_mysqlDatabaseBuffer, "sapphire");
-    m_mysqlPortBuffer = 3306;
+  // MySQL defaults
+  strcpy( m_mysqlHostBuffer, "localhost" );
+  strcpy( m_mysqlUserBuffer, "root" );
+  strcpy( m_mysqlPasswordBuffer, "" );
+  strcpy( m_mysqlDatabaseBuffer, "sapphire" );
+  m_mysqlPortBuffer = 3306;
 
-    // Navigation defaults
-    strcpy(m_navMeshPathBuffer, "navi");
+  // Navigation defaults
+  strcpy( m_navMeshPathBuffer, "navi" );
 }
 
 void EditorState::renderMainMenu()
@@ -856,13 +884,11 @@ void EditorState::render( double deltaTime )
 
   if( m_editorMode == EditorMode::NONE )
   {
-
   }
   if( m_editorMode == EditorMode::ZONES )
   {
     if( m_datLoaded )
       m_zoneEditor.show();
-
   }
   else if( m_editorMode == EditorMode::LGB )
   {
@@ -891,8 +917,6 @@ void EditorState::render( double deltaTime )
 
     ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.4, &left1_id, &right1_id );
     ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
-
-
 
 
     ImGui::DockBuilderDockWindow( "BNPC Editor", right1_id );
@@ -940,7 +964,6 @@ ImGuiID EditorState::setupDockspace( bool& p_open, ImGuiIO& io ) const
   {
     ImGui::DockSpace( dockspace_id, ImVec2( 0.0f, 0.0f ), dockspace_flags );
   }
-
 
 
   return dockspace_id;
