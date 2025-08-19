@@ -577,7 +577,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     uint8_t speed{ 20 };
     float x{ 0 }, y{ 0 }, z{ 0 };
 
-    sscanf( params.c_str(), "%u %u %u %d %d %d", &animationType, &animationState, &speed, &x, &y, &z );
+    sscanf( params.c_str(), "%" SCNu8 " %" SCNu8 " %" SCNu8 " %f %f %f", &animationType, &animationState, &speed, &x, &y, &z );
     auto targetId = static_cast< uint32_t >( player.getTargetId() );
     auto actorMovePacket = makeZonePacket< FFXIVIpcActorMove >( targetId, player.getId() );
 

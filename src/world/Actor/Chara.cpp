@@ -1052,6 +1052,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   }
   pTeri->updateActorPosition( *this );
   // todo: send the correct knockback packet to player
+  // TODO: the head rotation might not be rounded here correctly
   server().queueForPlayers( getInRangePlayerIds(),
                             std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }

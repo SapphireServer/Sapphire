@@ -474,6 +474,7 @@ void Action::Action::execute()
   }
 }
 
+// TODO: the damage is not rounded here nicely?
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
   // todo: what do for npcs?
@@ -1091,7 +1092,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( chara->isAlive() && ( m_lutEntry.curePotency > 0 || m_canTargetFriendly ) && m_pSource->isFriendly( *chara ) )
     return actorApplicable;
 
-  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) > 0 && m_pSource->isHostile( *chara ) )
+  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) && m_pSource->isHostile( *chara ) )
     return actorApplicable;
 
   return false;

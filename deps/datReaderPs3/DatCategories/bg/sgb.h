@@ -135,7 +135,7 @@ struct SGB_MODEL_ENTRY : public SGB_GROUP_ENTRY
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
+  SGB_MODEL_ENTRY( char* buf, size_t offset, SgbGroupEntryType type )
   {
     this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
@@ -152,7 +152,7 @@ struct SGB_GROUP
   SGB_FILE* parent;
   std::vector< std::shared_ptr< SGB_GROUP_ENTRY > > entries;
 
-  SGB_GROUP( char* buf, SGB_FILE* file, uint32_t fileSize, uint32_t offset )
+  SGB_GROUP( char* buf, SGB_FILE* file, uint32_t fileSize, size_t offset )
   {
     parent = file;
     header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );

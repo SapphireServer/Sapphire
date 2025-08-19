@@ -1446,7 +1446,7 @@ void LgbViewer::renderNavmesh()
   ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
 
   // Display the texture
-  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+  ImGui::Image( ImTextureRef( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
 
   // Handle mouse interaction over the image (camera controls only)
   if( ImGui::IsItemHovered() )

@@ -627,7 +627,7 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
   // used for item obtain notification
   uint32_t originalQuantity = quantity;
 
-  std::pair< uint16_t, uint8_t > freeBagSlot;
+  std::pair< uint16_t, uint16_t > freeBagSlot;
   bool foundFreeSlot = false;
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };

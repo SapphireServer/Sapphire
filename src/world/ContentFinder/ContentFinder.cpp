@@ -57,7 +57,7 @@ void World::ContentFinder::update()
           // uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
 
           auto finishContentMatchPacket = makeFinishContentMatchToClient( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
-                                                                          queuedPlayer->m_classJob, content->m_players.size(), dutyProgress, content->m_flags );
+                                                                          queuedPlayer->m_classJob, ( uint8_t ) content->m_players.size(), dutyProgress, content->m_flags );
           server.queueForPlayer( queuedPlayer->getCharacterId(), finishContentMatchPacket );
         }
 
