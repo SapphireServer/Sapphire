@@ -879,20 +879,24 @@ void EditorState::render( double deltaTime )
     unsigned int left_id;
 
     ImGui::DockBuilderSplitNode( dockspace_id, ImGuiDir_Left, 0.2, &left_id, &right_id );
-    ImGui::DockBuilderDockWindow( "Zone Editor", left_id );
-    ImGui::DockBuilderDockWindow( "Lgb Viewer", left_id );
 
-
-    ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.6, &left1_id, &right1_id );
-    ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
 
     unsigned int top_id;
     unsigned int down_id;
+    ImGui::DockBuilderSplitNode( left_id, ImGuiDir_Down, 0.4, &top_id, &down_id );
+    ImGui::DockBuilderDockWindow( "Zone Editor", down_id );
+    ImGui::DockBuilderDockWindow( "Lgb Viewer", top_id );
+    ImGui::DockBuilderDockWindow( "Map Viewer", top_id );
 
-    ImGui::DockBuilderSplitNode( right1_id, ImGuiDir_Down, 0.6, &top_id, &down_id );
-    ImGui::DockBuilderDockWindow( "Map Viewer", down_id );
-    ImGui::DockBuilderDockWindow( "BNPC Information", top_id );
-    ImGui::DockBuilderDockWindow( "LGB Groups", top_id );
+
+    ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.4, &left1_id, &right1_id );
+    ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
+
+
+
+
+    ImGui::DockBuilderDockWindow( "BNPC Editor", right1_id );
+    ImGui::DockBuilderDockWindow( "LGB Groups", right1_id );
 
 
     dockInitialized = true;

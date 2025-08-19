@@ -120,6 +120,43 @@ void ZoneEditor::initializeCache()
   // Initialize filtered list with all zones
   updateSearchFilter();
   m_needsRefresh = false;
+
+  // Get all zone IDs once
+  auto nameIds = exdD.getIdList< Excel::BNpcName >();
+  {
+    for( const auto& id : nameIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcName >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcNameCache[ id ] = { nameRow->getString( nameRow->data().Text.SGL ), nameRow->data() };
+    }
+  }
+
+  auto baseIds = exdD.getIdList< Excel::BNpcBase >();
+  {
+    for( const auto& id : baseIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcBase >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcBaseCache[ id ] = { nameRow->data() };
+    }
+  }
+
+  auto customizeIds = exdD.getIdList< Excel::BNpcCustomize >();
+  {
+    for( const auto& id : customizeIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcCustomize >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcCustomizeCache[ id ] = { nameRow->data() };
+    }
+  }
 }
 
 void ZoneEditor::updateSearchFilter()
@@ -183,6 +220,7 @@ void ZoneEditor::updateBnpcSearchFilter()
   }
 }
 
+/*
 void ZoneEditor::showBnpcWindow()
 {
   if( !m_showBnpcWindow )
@@ -220,7 +258,7 @@ void ZoneEditor::showBnpcWindow()
   std::map< std::string, std::vector< CachedBnpc * > > groupedBnpcs;
   for( auto *bnpc : m_filteredBnpcs )
   {
-    groupedBnpcs[ bnpc->bnpcName ].push_back( bnpc );
+    groupedBnpcs[ bnpc->groupName ].push_back( bnpc );
   }
 
   // Display tree view
@@ -270,8 +308,8 @@ void ZoneEditor::showBnpcWindow()
           leafFlags |= ImGuiTreeNodeFlags_Selected;
         }
 
-        std::string bnpcNodeId = fmt::format( "Instance {}##bnpc_{}", bnpc->instanceId, bnpc->instanceId );
-        std::string bnpcDisplayText = fmt::format( "Instance {} (BaseID: {})", bnpc->instanceId, bnpc->BaseId );
+        std::string bnpcNodeId = fmt::format( "{} {}##bnpc_{}", bnpc->bnpcName, bnpc->instanceId, bnpc->instanceId );
+        std::string bnpcDisplayText = fmt::format( "{} {} (BaseID: {})", bnpc->bnpcName, bnpc->instanceId, bnpc->BaseId );
 
         if( ImGui::TreeNodeEx( bnpcNodeId.c_str(), leafFlags, "%s", bnpcDisplayText.c_str() ) )
         {
@@ -355,10 +393,17 @@ void ZoneEditor::showBnpcWindow()
     // Basic Info
     if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
     {
-      ImGui::Text( "Group Name: %s", selectedBnpc->bnpcName.c_str() );
+      std::string bnpcName;
+      auto it = m_bnpcNameCache.find(selectedBnpc->NameId);
+      if (it != m_bnpcNameCache.end())
+      {
+        bnpcName = it->second.name;  // Use cached name
+      }
+
+      ImGui::Text( "Group Name: %s", selectedBnpc->groupName.c_str() );
       ImGui::Text( "Instance ID: %u", selectedBnpc->instanceId );
       ImGui::Text( "Base ID: %u", selectedBnpc->BaseId );
-      ImGui::Text( "Name ID: %u", selectedBnpc->NameId );
+      ImGui::Text( "Name: %s (%u)", bnpcName.c_str(), selectedBnpc->NameId );
       ImGui::Text( "Level: %u", selectedBnpc->Level );
       ImGui::Text( "Active Type: %u", selectedBnpc->ActiveType );
     }
@@ -371,7 +416,7 @@ void ZoneEditor::showBnpcWindow()
     }
 
     // Population Info
-    if( ImGui::CollapsingHeader( "Population" ) )
+    if( ImGui::CollapsingHeader( "Pop Settings" ) )
     {
       ImGui::Text( "Pop Weather: %u", selectedBnpc->PopWeather );
       ImGui::Text( "Pop Time: %u - %u", selectedBnpc->PopTimeStart, selectedBnpc->PopTimeEnd );
@@ -390,6 +435,7 @@ void ZoneEditor::showBnpcWindow()
       ImGui::Text( "Normal AI: %u", selectedBnpc->NormalAI );
       ImGui::Text( "Wandering Range: %u", selectedBnpc->WanderingRange );
       ImGui::Text( "Route: %u", selectedBnpc->Route );
+      ImGui::Text( "Server Path ID: %u", selectedBnpc->ServerPathId );
       ImGui::Text( "Territory Range: %u", selectedBnpc->TerritoryRange );
       ImGui::Text( "Sense Range Rate: %.2f", selectedBnpc->SenseRangeRate );
     }
@@ -419,8 +465,6 @@ void ZoneEditor::showBnpcWindow()
     {
       ImGui::Text( "Bound Instance ID: %u", selectedBnpc->BoundInstanceID );
       ImGui::Text( "Fate Layout Label ID: %u", selectedBnpc->FateLayoutLabelId );
-      ImGui::Text( "Event Group: %u", selectedBnpc->EventGroup );
-      ImGui::Text( "Server Path ID: %u", selectedBnpc->ServerPathId );
     }
 
     ImGui::Separator();
@@ -446,6 +490,1044 @@ void ZoneEditor::showBnpcWindow()
   ImGui::EndChild();
 
   ImGui::End();
+}
+*/
+
+void ZoneEditor::showBnpcWindow()
+{
+  if( !m_showBnpcWindow )
+    return;
+
+  ImGui::Begin( "BNPC Editor", &m_showBnpcWindow );
+
+  showBnpcWindowHeader();
+
+  static float splitterWidth = 300.0f;
+  ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+  showBnpcTreeView( splitterWidth, windowSize );
+  showBnpcSplitter( splitterWidth, windowSize );
+  showBnpcDetailsView( windowSize );
+
+  showBnpcSelectors();
+
+  ImGui::End();
+}
+
+void ZoneEditor::showBnpcWindowHeader()
+{
+  // Search filter
+  if( ImGui::InputText( "Search", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
+  {
+    updateBnpcSearchFilter();
+  }
+
+  // Selection mode toggle
+  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Selection" ) )
+  {
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+  }
+
+  ImGui::Separator();
+}
+
+void ZoneEditor::showBnpcTreeView( float splitterWidth, const ImVec2& windowSize )
+{
+  ImGui::BeginChild( "BNPCTreeView", ImVec2( splitterWidth, windowSize.y ), true );
+
+  // Group BNPCs by group name for tree display
+  std::map< std::string, std::vector< CachedBnpc * > > groupedBnpcs;
+  for( auto *bnpc : m_filteredBnpcs )
+  {
+    groupedBnpcs[ bnpc->groupName ].push_back( bnpc );
+  }
+
+  // Display tree view
+  for( const auto& [ groupName, bnpcs ] : groupedBnpcs )
+  {
+    showBnpcGroupNode( groupName, bnpcs );
+  }
+
+  showBnpcTreeContextMenu();
+
+  ImGui::EndChild();
+}
+
+void ZoneEditor::showBnpcGroupNode( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  ImGuiTreeNodeFlags groupFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+  // Highlight if this group is selected
+  if( m_groupSelectionMode && m_selectedGroupName == groupName )
+  {
+    groupFlags |= ImGuiTreeNodeFlags_Selected;
+  }
+
+  std::string groupNodeId = fmt::format( "{}##group_{}", groupName, groupName );
+  std::string groupDisplayText = fmt::format( "{} ({} BNPCs)", groupName, bnpcs.size() );
+
+  if( ImGui::TreeNodeEx( groupNodeId.c_str(), groupFlags, "%s", groupDisplayText.c_str() ) )
+  {
+    handleGroupSelection( groupName, bnpcs );
+    showGroupContextMenu( groupName, "GroupContextExpanded_" );
+    showBnpcNodesInGroup( groupName, bnpcs );
+    ImGui::TreePop();
+  }
+  else
+  {
+    handleCollapsedGroupSelection( groupName, bnpcs );
+    showGroupContextMenu( groupName, "GroupContextCollapsed_" );
+  }
+}
+
+void ZoneEditor::handleGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  if( ImGui::IsItemClicked() && m_groupSelectionMode )
+  {
+    m_selectedGroupName = groupName;
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+
+    for( auto *bnpc : bnpcs )
+    {
+      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+    }
+  }
+}
+
+void ZoneEditor::handleCollapsedGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  if( ImGui::IsItemClicked() && m_groupSelectionMode )
+  {
+    m_selectedGroupName = groupName;
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+
+    for( auto *bnpc : bnpcs )
+    {
+      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+    }
+  }
+}
+
+void ZoneEditor::showGroupContextMenu( const std::string& groupName, const std::string& contextIdPrefix )
+{
+  std::string contextId = fmt::format( "{}{}", contextIdPrefix, groupName );
+  if( ImGui::BeginPopupContextItem( contextId.c_str() ) )
+  {
+    if( ImGui::MenuItem( "Create Group" ) )
+    {
+      // TODO: Implement create group functionality
+    }
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    if( ImGui::MenuItem( "Rename Group" ) )
+    {
+      // TODO: Implement rename group functionality
+    }
+    if( ImGui::MenuItem( "Delete Group" ) )
+    {
+      // TODO: Implement delete group functionality with confirmation
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void ZoneEditor::showBnpcNodesInGroup( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  // Sort BNPCs within group by instance ID
+  auto sortedBnpcs = bnpcs;
+  std::sort( sortedBnpcs.begin(), sortedBnpcs.end(),
+             []( CachedBnpc *a, CachedBnpc *b ) { return a->instanceId < b->instanceId; } );
+
+  for( auto *bnpc : sortedBnpcs )
+  {
+    showBnpcNode( groupName, bnpc, bnpcs );
+  }
+}
+
+void ZoneEditor::showBnpcNode( const std::string& groupName, CachedBnpc *bnpc,
+                               const std::vector< CachedBnpc * >& groupBnpcs )
+{
+  ImGuiTreeNodeFlags leafFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+  // Highlight if selected
+  if( m_selectedBnpcIndex >= 0 && m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc )
+  {
+    leafFlags |= ImGuiTreeNodeFlags_Selected;
+  }
+
+  std::string bnpcNodeId = fmt::format( "{} {}##bnpc_{}", bnpc->bnpcName, bnpc->instanceId, bnpc->instanceId );
+  std::string bnpcDisplayText = fmt::format( "{} {} (BaseID: {})", bnpc->bnpcName, bnpc->instanceId, bnpc->BaseId );
+
+  if( ImGui::TreeNodeEx( bnpcNodeId.c_str(), leafFlags, "%s", bnpcDisplayText.c_str() ) )
+  {
+    handleBnpcSelection( groupName, bnpc, groupBnpcs );
+    showBnpcContextMenu( bnpc );
+  }
+}
+
+void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc *bnpc,
+                                      const std::vector< CachedBnpc * >& groupBnpcs )
+{
+  if( ImGui::IsItemClicked() )
+  {
+    if( m_groupSelectionMode )
+    {
+      // In group mode, clicking individual BNPC selects the whole group
+      m_selectedGroupName = groupName;
+      m_selectedBnpcInstanceIds.clear();
+      for( auto *groupBnpc : groupBnpcs )
+      {
+        m_selectedBnpcInstanceIds.insert( groupBnpc->instanceId );
+      }
+    }
+    else
+    {
+      // In individual mode, select just this BNPC
+      m_selectedGroupName = "";
+      m_selectedBnpcInstanceIds.clear();
+      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+
+      // Find this BNPC in filtered list to set selected index
+      for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
+      {
+        if( m_filteredBnpcs[ i ] == bnpc )
+        {
+          m_selectedBnpcIndex = static_cast< int >( i );
+          break;
+        }
+      }
+    }
+  }
+}
+
+void ZoneEditor::showBnpcContextMenu( CachedBnpc *bnpc )
+{
+  std::string bnpcContextId = fmt::format( "BnpcContext_{}", bnpc->instanceId );
+  if( ImGui::BeginPopupContextItem( bnpcContextId.c_str() ) )
+  {
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    if( ImGui::MenuItem( "Copy BNPC" ) )
+    {
+      // TODO: Implement copy BNPC functionality
+    }
+    if( ImGui::MenuItem( "Delete BNPC" ) )
+    {
+      // TODO: Implement delete BNPC functionality with confirmation
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void ZoneEditor::showBnpcTreeContextMenu()
+{
+  if( ImGui::BeginPopupContextWindow( "EmptySpaceContext",
+                                      ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight ) )
+  {
+    if( ImGui::MenuItem( "Create Group" ) )
+    {
+      // TODO: Implement create group functionality
+    }
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void ZoneEditor::showBnpcSplitter( float& splitterWidth, const ImVec2& windowSize )
+{
+  ImGui::SameLine();
+  ImGui::Button( "##splitter", ImVec2( 8.0f, windowSize.y ) );
+  if( ImGui::IsItemActive() )
+  {
+    splitterWidth += ImGui::GetIO().MouseDelta.x;
+    splitterWidth = std::max( 200.0f, std::min( splitterWidth, windowSize.x - 200.0f ) );
+  }
+}
+
+void ZoneEditor::showBnpcDetailsView( const ImVec2& windowSize )
+{
+  ImGui::SameLine();
+  ImGui::BeginChild( "BNPCDetailsView", ImVec2( 0, windowSize.y ), true );
+
+  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+  {
+    auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+    bool hasChanges = false;
+
+    ImGui::Text( "BNPC Editor - Instance ID: %u", selectedBnpc->instanceId );
+    ImGui::Separator();
+
+    hasChanges |= showBnpcBasicInfo( selectedBnpc );
+    hasChanges |= showBnpcPositionInfo( selectedBnpc );
+    hasChanges |= showBnpcPopulationInfo( selectedBnpc );
+    hasChanges |= showBnpcAIBehaviorInfo( selectedBnpc );
+    hasChanges |= showBnpcLinkInfo( selectedBnpc );
+    hasChanges |= showBnpcAppearanceInfo( selectedBnpc );
+    hasChanges |= showBnpcInstanceInfo( selectedBnpc );
+
+    showBnpcActionButtons( selectedBnpc );
+
+    if( hasChanges )
+    {
+      ImGui::SameLine();
+      ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), "Modified" );
+      buildBnpcMarkerGeometry();
+    }
+  }
+  else
+  {
+    ImGui::Text( "Select a BNPC from the tree to edit" );
+  }
+
+  ImGui::EndChild();
+}
+
+bool ZoneEditor::showBnpcBasicInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Instance ID: %u", selectedBnpc->instanceId );
+
+    // Base ID (editable with selector)
+    ImGui::Text( "Base ID: %u", selectedBnpc->BaseId );
+    ImGui::SameLine();
+    if( ImGui::SmallButton( "Select##base" ) )
+    {
+      m_showBnpcBaseSelector = true;
+      m_baseSearchBuffer[ 0 ] = '\0';
+    }
+
+    // Name ID with name selector
+    std::string bnpcName;
+    auto it = m_bnpcNameCache.find( selectedBnpc->NameId );
+    if( it != m_bnpcNameCache.end() )
+    {
+      bnpcName = it->second.name;
+    }
+
+    ImGui::Text( "Name: %s (%u)", bnpcName.c_str(), selectedBnpc->NameId );
+    ImGui::SameLine();
+    if( ImGui::SmallButton( "Select##name" ) )
+    {
+      m_showBnpcNameSelector = true;
+      m_nameSearchBuffer[ 0 ] = '\0';
+    }
+
+    // Level (editable)
+    int level = static_cast< int >( selectedBnpc->Level );
+    if( ImGui::InputInt( "Level", &level, 1, 10 ) )
+    {
+      if( level >= 1 && level <= 90 )
+      {
+        selectedBnpc->Level = static_cast< uint8_t >( level );
+        hasChanges = true;
+      }
+    }
+
+    // Active Type (editable with combo)
+    const char *activeTypes[ ] = { "Passive", "Aggressive", "Defensive" };
+    int currentActiveType = selectedBnpc->ActiveType;
+    if( currentActiveType >= 0 && currentActiveType < 3 )
+    {
+      if( ImGui::Combo( "Active Type", &currentActiveType, activeTypes, 3 ) )
+      {
+        selectedBnpc->ActiveType = static_cast< uint8_t >( currentActiveType );
+        hasChanges = true;
+      }
+    }
+    else
+    {
+      // Fallback for unknown values
+      int activeTypeInt = static_cast< int >( selectedBnpc->ActiveType );
+      if( ImGui::InputInt( "Active Type", &activeTypeInt, 1, 1 ) )
+      {
+        if( activeTypeInt >= 0 && activeTypeInt <= 255 )
+        {
+          selectedBnpc->ActiveType = static_cast< uint8_t >( activeTypeInt );
+          hasChanges = true;
+        }
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcPositionInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Position", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    float pos[ 3 ] = { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z };
+    if( ImGui::DragFloat3( "Position", pos, 0.1f, -10000.0f, 10000.0f, "%.2f" ) )
+    {
+      selectedBnpc->x = pos[ 0 ];
+      selectedBnpc->y = pos[ 1 ];
+      selectedBnpc->z = pos[ 2 ];
+      hasChanges = true;
+    }
+
+    float rotation = selectedBnpc->rotation;
+    if( ImGui::SliderAngle( "Rotation", &rotation, 0.0f, 360.0f ) )
+    {
+      selectedBnpc->rotation = rotation;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcPopulationInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Pop Settings" ) )
+  {
+    int popWeather = static_cast< int >( selectedBnpc->PopWeather );
+    if( ImGui::InputInt( "Pop Weather", &popWeather, 1, 10 ) )
+    {
+      if( popWeather >= 0 && popWeather <= 255 )
+      {
+        selectedBnpc->PopWeather = static_cast< uint8_t >( popWeather );
+        hasChanges = true;
+      }
+    }
+
+    int popTimeStart = static_cast< int >( selectedBnpc->PopTimeStart );
+    int popTimeEnd = static_cast< int >( selectedBnpc->PopTimeEnd );
+
+    if( ImGui::InputInt( "Pop Time Start", &popTimeStart, 1, 100 ) )
+    {
+      if( popTimeStart >= 0 && popTimeStart <= 2359 )
+      {
+        selectedBnpc->PopTimeStart = static_cast< uint16_t >( popTimeStart );
+        hasChanges = true;
+      }
+    }
+
+    if( ImGui::InputInt( "Pop Time End", &popTimeEnd, 1, 100 ) )
+    {
+      if( popTimeEnd >= 0 && popTimeEnd <= 2359 )
+      {
+        selectedBnpc->PopTimeEnd = static_cast< uint16_t >( popTimeEnd );
+        hasChanges = true;
+      }
+    }
+
+    int popInterval = static_cast< int >( selectedBnpc->PopInterval );
+    if( ImGui::InputInt( "Pop Interval", &popInterval, 1, 100 ) )
+    {
+      if( popInterval >= 0 )
+      {
+        selectedBnpc->PopInterval = static_cast< uint32_t >( popInterval );
+        hasChanges = true;
+      }
+    }
+
+    int popRate = static_cast< int >( selectedBnpc->PopRate );
+    if( ImGui::InputInt( "Pop Rate", &popRate, 1, 10 ) )
+    {
+      if( popRate >= 0 && popRate <= 255 )
+      {
+        selectedBnpc->PopRate = static_cast< uint8_t >( popRate );
+        hasChanges = true;
+      }
+    }
+
+    int repopId = static_cast< int >( selectedBnpc->RepopId );
+    if( ImGui::InputInt( "Repop ID", &repopId, 1, 100 ) )
+    {
+      if( repopId >= 0 )
+      {
+        selectedBnpc->RepopId = static_cast< uint32_t >( repopId );
+        hasChanges = true;
+      }
+    }
+
+    bool nonpop = selectedBnpc->Nonpop != 0;
+    if( ImGui::Checkbox( "Non-pop", &nonpop ) )
+    {
+      selectedBnpc->Nonpop = nonpop ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool invalidRepop = selectedBnpc->InvalidRepop != 0;
+    if( ImGui::Checkbox( "Invalid Repop", &invalidRepop ) )
+    {
+      selectedBnpc->InvalidRepop = invalidRepop ? 1 : 0;
+      hasChanges = true;
+    }
+
+    float popRange[ 2 ] = { selectedBnpc->HorizontalPopRange, selectedBnpc->VerticalPopRange };
+    if( ImGui::DragFloat2( "Pop Range (H/V)", popRange, 0.1f, 0.0f, 1000.0f, "%.2f" ) )
+    {
+      selectedBnpc->HorizontalPopRange = popRange[ 0 ];
+      selectedBnpc->VerticalPopRange = popRange[ 1 ];
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcAIBehaviorInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "AI & Behavior" ) )
+  {
+    int moveAI = static_cast< int >( selectedBnpc->MoveAI );
+    if( ImGui::InputInt( "Move AI", &moveAI, 1, 10 ) )
+    {
+      if( moveAI >= 0 )
+      {
+        selectedBnpc->MoveAI = static_cast< uint32_t >( moveAI );
+        hasChanges = true;
+      }
+    }
+
+    int normalAI = static_cast< int >( selectedBnpc->NormalAI );
+    if( ImGui::InputInt( "Normal AI", &normalAI, 1, 10 ) )
+    {
+      if( normalAI >= 0 )
+      {
+        selectedBnpc->NormalAI = static_cast< uint32_t >( normalAI );
+        hasChanges = true;
+      }
+    }
+
+    int wanderingRange = static_cast< int >( selectedBnpc->WanderingRange );
+    if( ImGui::InputInt( "Wandering Range", &wanderingRange, 1, 10 ) )
+    {
+      if( wanderingRange >= 0 )
+      {
+        selectedBnpc->WanderingRange = static_cast< uint32_t >( wanderingRange );
+        hasChanges = true;
+      }
+    }
+
+    int route = static_cast< int >( selectedBnpc->Route );
+    if( ImGui::InputInt( "Route", &route, 1, 10 ) )
+    {
+      if( route >= 0 )
+      {
+        selectedBnpc->Route = static_cast< uint32_t >( route );
+        hasChanges = true;
+      }
+    }
+
+    int serverPathId = static_cast< int >( selectedBnpc->ServerPathId );
+    if( ImGui::InputInt( "Server Path ID", &serverPathId, 1, 10 ) )
+    {
+      if( serverPathId >= 0 )
+      {
+        selectedBnpc->ServerPathId = static_cast< uint32_t >( serverPathId );
+        hasChanges = true;
+      }
+    }
+
+    int territoryRange = static_cast< int >( selectedBnpc->TerritoryRange );
+    if( ImGui::InputInt( "Territory Range", &territoryRange, 1, 10 ) )
+    {
+      if( territoryRange >= 0 )
+      {
+        selectedBnpc->TerritoryRange = static_cast< uint32_t >( territoryRange );
+        hasChanges = true;
+      }
+    }
+
+    float senseRangeRate = selectedBnpc->SenseRangeRate;
+    if( ImGui::DragFloat( "Sense Range Rate", &senseRangeRate, 0.01f, 0.0f, 10.0f, "%.2f" ) )
+    {
+      selectedBnpc->SenseRangeRate = senseRangeRate;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcLinkInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Linking" ) )
+  {
+    int linkGroup = static_cast< int >( selectedBnpc->LinkGroup );
+    if( ImGui::InputInt( "Link Group", &linkGroup, 1, 10 ) )
+    {
+      if( linkGroup >= 0 )
+      {
+        selectedBnpc->LinkGroup = static_cast< uint32_t >( linkGroup );
+        hasChanges = true;
+      }
+    }
+
+    int linkFamily = static_cast< int >( selectedBnpc->LinkFamily );
+    if( ImGui::InputInt( "Link Family", &linkFamily, 1, 10 ) )
+    {
+      if( linkFamily >= 0 )
+      {
+        selectedBnpc->LinkFamily = static_cast< uint32_t >( linkFamily );
+        hasChanges = true;
+      }
+    }
+
+    int linkRange = static_cast< int >( selectedBnpc->LinkRange );
+    if( ImGui::InputInt( "Link Range", &linkRange, 1, 10 ) )
+    {
+      if( linkRange >= 0 )
+      {
+        selectedBnpc->LinkRange = static_cast< uint32_t >( linkRange );
+        hasChanges = true;
+      }
+    }
+
+    int linkCountLimit = static_cast< int >( selectedBnpc->LinkCountLimit );
+    if( ImGui::InputInt( "Link Count Limit", &linkCountLimit, 1, 10 ) )
+    {
+      if( linkCountLimit >= 0 )
+      {
+        selectedBnpc->LinkCountLimit = static_cast< uint32_t >( linkCountLimit );
+        hasChanges = true;
+      }
+    }
+
+    bool linkParent = selectedBnpc->LinkParent != 0;
+    if( ImGui::Checkbox( "Link Parent", &linkParent ) )
+    {
+      selectedBnpc->LinkParent = linkParent ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool linkOverride = selectedBnpc->LinkOverride != 0;
+    if( ImGui::Checkbox( "Link Override", &linkOverride ) )
+    {
+      selectedBnpc->LinkOverride = linkOverride ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool linkReply = selectedBnpc->LinkReply != 0;
+    if( ImGui::Checkbox( "Link Reply", &linkReply ) )
+    {
+      selectedBnpc->LinkReply = linkReply ? 1 : 0;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcAppearanceInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Appearance" ) )
+  {
+    int equipmentID = static_cast< int >( selectedBnpc->EquipmentID );
+    if( ImGui::InputInt( "Equipment ID", &equipmentID, 1, 100 ) )
+    {
+      if( equipmentID >= 0 )
+      {
+        selectedBnpc->EquipmentID = static_cast< uint32_t >( equipmentID );
+        hasChanges = true;
+      }
+    }
+
+    int customizeID = static_cast< int >( selectedBnpc->CustomizeID );
+    if( ImGui::InputInt( "Customize ID", &customizeID, 1, 100 ) )
+    {
+      if( customizeID >= 0 )
+      {
+        selectedBnpc->CustomizeID = static_cast< uint32_t >( customizeID );
+        hasChanges = true;
+      }
+    }
+
+    int dropItem = static_cast< int >( selectedBnpc->DropItem );
+    if( ImGui::InputInt( "Drop Item", &dropItem, 1, 100 ) )
+    {
+      if( dropItem >= 0 )
+      {
+        selectedBnpc->DropItem = static_cast< uint32_t >( dropItem );
+        hasChanges = true;
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcInstanceInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Instance" ) )
+  {
+    int boundInstanceID = static_cast< int >( selectedBnpc->BoundInstanceID );
+    if( ImGui::InputInt( "Bound Instance ID", &boundInstanceID, 1, 100 ) )
+    {
+      if( boundInstanceID >= 0 )
+      {
+        selectedBnpc->BoundInstanceID = static_cast< uint32_t >( boundInstanceID );
+        hasChanges = true;
+      }
+    }
+
+    int fateLayoutLabelId = static_cast< int >( selectedBnpc->FateLayoutLabelId );
+    if( ImGui::InputInt( "Fate Layout Label ID", &fateLayoutLabelId, 1, 100 ) )
+    {
+      if( fateLayoutLabelId >= 0 )
+      {
+        selectedBnpc->FateLayoutLabelId = static_cast< uint32_t >( fateLayoutLabelId );
+        hasChanges = true;
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+void ZoneEditor::showBnpcActionButtons( CachedBnpc *selectedBnpc )
+{
+  ImGui::Separator();
+
+  if( ImGui::Button( "Focus on Map" ) )
+  {
+    focusOn3DPosition( { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z } );
+  }
+  ImGui::SameLine();
+  if( ImGui::Button( "Copy Coordinates" ) )
+  {
+    std::string coords = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                      selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
+    ImGui::SetClipboardText( coords.c_str() );
+  }
+}
+
+void ZoneEditor::showBnpcSelectors()
+{
+  // BNPC Name Selector Window
+  if( m_showBnpcNameSelector )
+  {
+    showBnpcNameSelector();
+  }
+
+  // BNPC Base Selector Window
+  if( m_showBnpcBaseSelector )
+  {
+    showBnpcBaseSelector();
+  }
+}
+
+void ZoneEditor::showBnpcNameSelector()
+{
+  ImGui::SetNextWindowSize( ImVec2( 600, 400 ), ImGuiCond_FirstUseEver );
+
+  bool open = true;
+  if( ImGui::Begin( "BNPC Name Selector", &open ) )
+  {
+    // Search filter
+    ImGui::InputText( "Search Names", m_nameSearchBuffer, sizeof( m_nameSearchBuffer ) );
+
+    ImGui::Separator();
+
+    if( ImGui::BeginChild( "NameList", ImVec2( 0, -30 ) ) )
+    {
+      std::string searchTerm = std::string( m_nameSearchBuffer );
+      std::transform( searchTerm.begin(), searchTerm.end(), searchTerm.begin(), ::tolower );
+
+      // Create sorted vector of name entries by ID
+      std::vector< std::pair< uint32_t, std::reference_wrapper< const BnpcNameCacheEntry > > > sortedNames;
+      for( const auto& [ nameId, nameData ] : m_bnpcNameCache )
+      {
+        // Filter by search term if provided
+        if( !searchTerm.empty() )
+        {
+          std::string lowerName = nameData.name;
+          std::transform( lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower );
+          std::string lowerIdStr = std::to_string( nameId );
+          std::transform( lowerIdStr.begin(), lowerIdStr.end(), lowerIdStr.begin(), ::tolower );
+
+          if( lowerName.find( searchTerm ) == std::string::npos &&
+              lowerIdStr.find( searchTerm ) == std::string::npos )
+            continue;
+        }
+
+        sortedNames.emplace_back( nameId, std::cref( nameData ) );
+      }
+
+      // Sort by ID
+      std::sort( sortedNames.begin(), sortedNames.end(),
+                 []( const auto& a, const auto& b )
+                 {
+                   return a.first < b.first;
+                 } );
+
+      for( const auto& [ nameId, nameData ] : sortedNames )
+      {
+        std::string displayText = fmt::format( "{} - {} (ID: {})", nameId, nameData.get().name, nameId );
+
+        if( ImGui::Selectable( displayText.c_str() ) )
+        {
+          // Apply selection to current BNPC
+          if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+          {
+            auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+            selectedBnpc->NameId = nameId;
+            selectedBnpc->bnpcName = nameData.get().name; // Update cached name too
+          }
+          m_showBnpcNameSelector = false;
+          break;
+        }
+      }
+    }
+    ImGui::EndChild();
+
+    ImGui::Separator();
+    if( ImGui::Button( "Cancel" ) )
+    {
+      m_showBnpcNameSelector = false;
+    }
+  }
+  ImGui::End();
+
+  if( !open )
+  {
+    m_showBnpcNameSelector = false;
+  }
+}
+
+void ZoneEditor::showBnpcBaseSelector()
+{
+  ImGui::SetNextWindowSize( ImVec2( 900, 600 ), ImGuiCond_FirstUseEver );
+
+  bool open = true;
+  if( ImGui::Begin( "BNPC Base Selector", &open ) )
+  {
+    // Search filter
+    ImGui::InputText( "Search Base ID", m_baseSearchBuffer, sizeof( m_baseSearchBuffer ) );
+
+    ImGui::Separator();
+
+    if( ImGui::BeginChild( "BaseDataGrid", ImVec2( 0, -30 ) ) )
+    {
+      // Create a table for the BNpcBase data
+      if( ImGui::BeginTable( "BNpcBaseTable", 14,
+                             ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable | ImGuiTableFlags_ScrollY |
+                             ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH ) )
+      {
+        // Setup columns
+        ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Scale", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Event Handler", ImGuiTableColumnFlags_WidthFixed, 100.0f );
+        ImGui::TableSetupColumn( "Normal AI", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Model", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Customize", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Equipment", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "SE Pack", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Battalion", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Link Race", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Rank", ImGuiTableColumnFlags_WidthFixed, 50.0f );
+        ImGui::TableSetupColumn( "Special", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Parts", ImGuiTableColumnFlags_WidthFixed, 50.0f );
+        ImGui::TableSetupColumn( "Flags", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+
+        ImGui::TableSetupScrollFreeze( 1, 1 ); // Freeze first column and header
+        ImGui::TableHeadersRow();
+
+        std::string searchTerm = std::string( m_baseSearchBuffer );
+
+        // Create sorted vector of base entries by ID
+        std::vector< std::pair< uint32_t, std::reference_wrapper< const Excel::BNpcBase > > > sortedBases;
+        for( const auto& [ baseId, baseData ] : m_bnpcBaseCache )
+        {
+          // Filter by search term if provided
+          if( !searchTerm.empty() )
+          {
+            if( std::to_string( baseId ).find( searchTerm ) == std::string::npos )
+              continue;
+          }
+          sortedBases.emplace_back( baseId, std::cref( baseData ) );
+        }
+
+        // Sort by ID (default ascending)
+        std::sort( sortedBases.begin(), sortedBases.end(),
+                   []( const auto& a, const auto& b )
+                   {
+                     return a.first < b.first;
+                   } );
+
+        // Handle table sorting
+        if( ImGuiTableSortSpecs *sortSpecs = ImGui::TableGetSortSpecs() )
+        {
+          if( sortSpecs->SpecsDirty && sortSpecs->SpecsCount > 0 )
+          {
+            const ImGuiTableColumnSortSpecs& spec = sortSpecs->Specs[ 0 ];
+            bool ascending = spec.SortDirection == ImGuiSortDirection_Ascending;
+
+            switch( spec.ColumnIndex )
+            {
+              case 0: // ID
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending ? a.first < b.first : a.first > b.first;
+                           } );
+                break;
+              case 1: // Scale
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Scale < b.second.get().Scale
+                                      : a.second.get().Scale > b.second.get().Scale;
+                           } );
+                break;
+              case 3: // Normal AI
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().NormalAI < b.second.get().NormalAI
+                                      : a.second.get().NormalAI > b.second.get().NormalAI;
+                           } );
+                break;
+              case 4: // Model
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Model < b.second.get().Model
+                                      : a.second.get().Model > b.second.get().Model;
+                           } );
+                break;
+              case 8: // Battalion
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Battalion < b.second.get().Battalion
+                                      : a.second.get().Battalion > b.second.get().Battalion;
+                           } );
+                break;
+                // Add more sorting cases as needed for other columns
+            }
+            sortSpecs->SpecsDirty = false;
+          }
+        }
+
+        // Display data rows
+        for( const auto& [ baseId, baseData ] : sortedBases )
+        {
+          ImGui::TableNextRow();
+
+          // ID column - clickable
+          ImGui::TableNextColumn();
+          if( ImGui::Selectable( std::to_string( baseId ).c_str(), false, ImGuiSelectableFlags_SpanAllColumns ) )
+          {
+            // Apply selection to current BNPC
+            if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+            {
+              auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+              selectedBnpc->BaseId = baseId;
+            }
+            m_showBnpcBaseSelector = false;
+            break;
+          }
+
+          // Scale
+          ImGui::TableNextColumn();
+          ImGui::Text( "%.2f", baseData.get().Scale );
+
+          // Event Handler
+          ImGui::TableNextColumn();
+          ImGui::Text( "%d", baseData.get().EventHandler );
+
+          // Normal AI
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().NormalAI );
+
+          // Model
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Model );
+
+          // Customize
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Customize );
+
+          // Equipment
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Equipment );
+
+          // SE Pack
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().SEPack );
+
+          // Battalion
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Battalion );
+
+          // Link Race
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().LinkRace );
+
+          // Rank
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Rank );
+
+          // Special
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Special );
+
+          // Parts
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Parts );
+
+          // Flags
+          ImGui::TableNextColumn();
+          std::string flagsStr = "";
+          if( baseData.get().IsTargetLine ) flagsStr += "T";
+          if( baseData.get().IsDisplayLevel ) flagsStr += "L";
+          ImGui::Text( "%s", flagsStr.c_str() );
+        }
+
+        ImGui::EndTable();
+      }
+    }
+    ImGui::EndChild();
+
+    ImGui::Separator();
+    ImGui::Text( "T = IsTargetLine, L = IsDisplayLevel" );
+    ImGui::SameLine();
+    if( ImGui::Button( "Cancel" ) )
+    {
+      m_showBnpcBaseSelector = false;
+    }
+  }
+  ImGui::End();
+
+  if( !open )
+  {
+    m_showBnpcBaseSelector = false;
+  }
 }
 
 // Add a separate method to clean up just the geometry, not the whole rendering system
@@ -510,6 +1592,118 @@ void ZoneEditor::cleanupNavmeshRendering()
   printf( "Cleaned up all navmesh rendering resources\n" );
 }
 
+void ZoneEditor::showGambitEditor()
+{
+  return;
+  ImGui::Begin( "Gambit Editor" );
+  static int currentPackType = 0; // 0 = None, 1 = RuleSetPack, 2 = TimeLinePack
+  static std::vector< nlohmann::json > gambitRules; // Store rules for RuleSetPack or TimeLinePack
+  static char actionBuffer[ 256 ] = ""; // Buffer for the selected action
+  static int cooldown = 0; // Cooldown for actions
+  static int targetType = 0; // Type of TargetCondition
+  static int hpThreshold = 0; // HP threshold for specific conditions like HPSelfPctLessThanTargetCondition
+
+  ImGui::Text( "Gambit Editor" );
+
+  // Select Gambit Pack Type
+  const char *packTypes[ ] = { "None", "RuleSetPack", "TimeLinePack" };
+  ImGui::Combo( "Select Gambit Pack Type", &currentPackType, packTypes, IM_ARRAYSIZE( packTypes ) );
+  ImGui::Separator();
+
+  // Instructions
+  ImGui::TextDisabled( "Drag and drop or reorder Gambits to prioritize rules." );
+
+  if( currentPackType == 1 || currentPackType == 2 ) // RuleSetPack or TimeLinePack
+  {
+    // Add New Gambit Rule
+    ImGui::Text( "New Gambit Rule" );
+
+    // Target Condition (Dropdown)
+    const char *conditions[ ] = { "Top Aggro", "HP < % (Self)", "HP < % (Ally)" };
+    ImGui::Combo( "Condition (IF)", &targetType, conditions, IM_ARRAYSIZE( conditions ) );
+
+    // If condition needs details (e.g., HP%), add input
+    if( targetType == 1 || targetType == 2 ) // Conditions requiring HP threshold
+    {
+      ImGui::InputInt( "HP Threshold", &hpThreshold );
+    }
+
+    // Action Input
+    ImGui::InputText( "Action (THEN)", actionBuffer, IM_ARRAYSIZE( actionBuffer ) );
+    ImGui::InputInt( "Cooldown (ms)", &cooldown );
+
+    if( ImGui::Button( "Add Rule" ) )
+    {
+      nlohmann::json newRule = {
+        { "Condition", conditions[ targetType ] },
+        { "Action", std::string( actionBuffer ) },
+        { "Cooldown", cooldown }
+      };
+
+      if( targetType == 1 || targetType == 2 ) // Add HP threshold if applicable
+      {
+        newRule[ "ConditionDetails" ] = { { "HPThreshold", hpThreshold } };
+      }
+
+      gambitRules.push_back( newRule );
+      memset( actionBuffer, 0, sizeof( actionBuffer ) );
+      cooldown = 0;
+      hpThreshold = 0;
+    }
+
+    ImGui::Separator();
+
+    // Existing Gambit Rules
+    ImGui::Text( "Current Gambit Rules" );
+    for( size_t i = 0; i < gambitRules.size(); ++i )
+    {
+      ImGui::PushID( static_cast< int >( i ) );
+      ImGui::Text( "Rule %zu:", i + 1 );
+      ImGui::BulletText( "IF %s", gambitRules[ i ][ "Condition" ].get< std::string >().c_str() );
+      ImGui::BulletText( "THEN %s", gambitRules[ i ][ "Action" ].get< std::string >().c_str() );
+      ImGui::Text( "Cooldown: %d ms", gambitRules[ i ][ "Cooldown" ].get< int >() );
+
+      // Priority Reordering
+      if( i > 0 && ImGui::ArrowButton( "Move Up", ImGuiDir_Up ) )
+      {
+        std::swap( gambitRules[ i ], gambitRules[ i - 1 ] );
+      }
+      ImGui::SameLine();
+      if( i < gambitRules.size() - 1 && ImGui::ArrowButton( "Move Down", ImGuiDir_Down ) )
+      {
+        std::swap( gambitRules[ i ], gambitRules[ i + 1 ] );
+      }
+      ImGui::SameLine();
+      if( ImGui::Button( "Remove" ) )
+      {
+        gambitRules.erase( gambitRules.begin() + i );
+      }
+      ImGui::PopID();
+    }
+
+    ImGui::Separator();
+
+    // Export Gambits as JSON
+    if( ImGui::Button( "Export to JSON" ) )
+    {
+      nlohmann::json exportData = {
+        { "PackType", packTypes[ currentPackType ] },
+        { "GambitRules", gambitRules }
+      };
+
+      std::ofstream file( "gambit_pack.json" );
+      file << exportData.dump( 4 ); // Pretty print JSON
+      file.close();
+    }
+
+    if( ImGui::Button( "Clear Rules" ) )
+    {
+      gambitRules.clear();
+    }
+  }
+  ImGui::End();
+}
+
 void ZoneEditor::loadBnpcs()
 {
   m_bnpcs.clear();
@@ -566,9 +1760,10 @@ void ZoneEditor::loadBnpcs()
         const auto& behaviour = bnpcData[ "Behaviour" ];
         const auto& senseInfo = bnpcData[ "SenseInfo" ];
 
+
         // Fill CachedBnpc structure
         cachedBnpc->territoryType = m_selectedZone->id;
-        cachedBnpc->bnpcName = groupName;
+
         cachedBnpc->instanceId = baseInfo[ "instanceId" ].get< uint32_t >();
         cachedBnpc->nameOffset = 0; // Not available in JSON, set default
         cachedBnpc->x = position[ 0 ].get< float >();
@@ -577,6 +1772,13 @@ void ZoneEditor::loadBnpcs()
         cachedBnpc->rotation = baseInfo[ "rotation" ].get< float >();
         cachedBnpc->BaseId = baseInfo[ "baseId" ].get< uint32_t >();
         cachedBnpc->NameId = baseInfo[ "nameId" ].get< uint32_t >();
+
+        auto it = m_bnpcNameCache.find( cachedBnpc->NameId );
+        if( it != m_bnpcNameCache.end() )
+        {
+          cachedBnpc->bnpcName = it->second.name; // Use cached name
+        }
+
         cachedBnpc->Level = baseInfo[ "level" ].get< uint16_t >();
         cachedBnpc->ActiveType = baseInfo[ "activeType" ].get< uint8_t >();
         cachedBnpc->BoundInstanceID = baseInfo[ "boundInstanceId" ].get< uint32_t >();
@@ -635,9 +1837,9 @@ void ZoneEditor::loadBnpcs()
     std::sort( m_bnpcs.begin(), m_bnpcs.end(),
                []( const std::shared_ptr< CachedBnpc >& a, const std::shared_ptr< CachedBnpc >& b )
                {
-                 if( a->bnpcName != b->bnpcName )
+                 if( a->groupName != b->groupName )
                  {
-                   return a->bnpcName < b->bnpcName;
+                   return a->groupName < b->groupName;
                  }
                  return a->instanceId < b->instanceId;
                } );
@@ -1064,6 +2266,8 @@ void ZoneEditor::show()
   {
     showNavmeshWindow();
   }
+
+  showGambitEditor();
 }
 
 
@@ -1920,7 +3124,7 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
                         ImGuiWindowFlags_AlwaysAutoResize ) )
       {
         if( !hoveredBnpc->nameString.empty() )
-          ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
+          ImGui::Text( "%s %s", hoveredBnpc->nameString.c_str(), hoveredBnpc->bnpcName.c_str() );
         ImGui::Separator();
         ImGui::Text( "ID: %u", hoveredBnpc->instanceId );
         ImGui::Text( "Level: %u", hoveredBnpc->Level );
@@ -1949,9 +3153,10 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
           // Draw name above the selected BNPC
           ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
 
-          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
+          std::string nameLabel = fmt::format( "{} {}", selectedBnpc->groupName, selectedBnpc->bnpcName );
+          ImVec2 textSize = ImGui::CalcTextSize( nameLabel.empty()
                                                    ? "not set"
-                                                   : selectedBnpc->nameString.c_str() );
+                                                   : nameLabel.c_str() );
 
           // Center the text horizontally
           textPos.x -= textSize.x * 0.5f;
@@ -1963,8 +3168,8 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
             IM_COL32( 0, 0, 0, 200 )
           );
 
-          if( !selectedBnpc->nameString.empty() )
-            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
+          if( !nameLabel.empty() )
+            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), nameLabel.c_str() );
         }
         break;
       }
@@ -2374,86 +3579,6 @@ void ZoneEditor::focusOn3DPosition( const glm::vec3& position )
   m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
-{
-  if( !m_showBnpcMarkersInNavmesh || m_bnpcWorldPositions.empty() )
-  {
-    Engine::Logger::debug( "Not drawing overlay markers: show={}, positions={}",
-                           m_showBnpcMarkersInNavmesh, m_bnpcWorldPositions.size() );
-    return;
-  }
-
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-  int drawnMarkers = 0;
-
-  for( const auto& worldPos : m_bnpcWorldPositions )
-  {
-    glm::vec2 screenPos = worldToNavmeshScreen( worldPos.worldPos.x,
-                                                worldPos.worldPos.y,
-                                                worldPos.worldPos.z,
-                                                imageSize );
-    ImVec2 finalPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-    // Skip markers that are outside the visible area
-    if( finalPos.x < imagePos.x - 10 || finalPos.x > imagePos.x + imageSize.x + 10 ||
-        finalPos.y < imagePos.y - 10 || finalPos.y > imagePos.y + imageSize.y + 10 )
-    {
-      continue;
-    }
-
-    // Check if this BNPC is selected
-    bool isSelected = false;
-    if( m_groupSelectionMode )
-    {
-      isSelected = m_selectedBnpcInstanceIds.count( worldPos.bnpc->instanceId ) > 0;
-    }
-    else
-    {
-      isSelected = ( m_selectedBnpcIndex >= 0 &&
-                     m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
-                     m_filteredBnpcs[ m_selectedBnpcIndex ] == worldPos.bnpc );
-    }
-
-    // Get group color and selection color
-    ImU32 groupColor = getGroupColor( worldPos.bnpc->bnpcName );
-    ImU32 selectionColor = IM_COL32( 255, 255, 255, 255 ); // White for selection
-
-    // Adjust color and size based on selection
-    ImU32 markerColor = isSelected ? selectionColor : groupColor;
-    float markerSize = isSelected ? 10.0f : 6.0f;
-
-    // Draw the main marker
-    if( isSelected )
-    {
-      // Draw a ring around selected BNPC
-      drawList->AddCircle( finalPos, markerSize + 2.0f, groupColor, 12, 2.0f );
-    }
-    drawList->AddCircleFilled( finalPos, markerSize, markerColor );
-
-    // Add tooltip on hover
-    if( ImGui::IsMouseHoveringRect(
-      ImVec2( finalPos.x - markerSize, finalPos.y - markerSize ),
-      ImVec2( finalPos.x + markerSize, finalPos.y + markerSize ) ) )
-    {
-      ImGui::SetTooltip( "Group: %s\nInstance: %u\nBase ID: %u\nLevel: %u\nPos: %.1f, %.1f, %.1f",
-                         worldPos.bnpc->bnpcName.c_str(),
-                         worldPos.bnpc->instanceId,
-                         worldPos.bnpc->BaseId,
-                         worldPos.bnpc->Level,
-                         worldPos.bnpc->x,
-                         worldPos.bnpc->y,
-                         worldPos.bnpc->z );
-    }
-
-    drawnMarkers++;
-  }
-
-  if( drawnMarkers == 0 )
-  {
-    Engine::Logger::debug( "No overlay markers drawn - all outside visible area or other issue" );
-  }
-}
-
 void ZoneEditor::createNavmeshFramebuffer()
 {
   // Clean up existing framebuffer
@@ -2567,8 +3692,8 @@ void ZoneEditor::showNavmeshWindow()
 
   // Add some debug info
   ImGui::Separator();
-  ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
-  ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
+  //ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
+  //ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
   ImGui::Text( "NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No" );
 
   // Add OBJ model info with more detailed status
@@ -2589,7 +3714,7 @@ void ZoneEditor::showNavmeshWindow()
   {
     ImGui::Separator();
     ImGui::Text( "Visualization Mode:" );
-
+    ImGui::SameLine();
     // Store old state to detect changes
     bool oldShowObj = m_showObjModel;
 
@@ -2611,52 +3736,52 @@ void ZoneEditor::showNavmeshWindow()
     }
 
     // Add a refresh button
-    if( ImGui::Button( "Refresh Visualization" ) )
-    {
-      // Force rebuild of the appropriate geometry
-      if( m_showObjModel )
+    /*  if( ImGui::Button( "Refresh Visualization" ) )
       {
-        cleanupObjModel();
-        checkForObjFile();
-      }
-      else
-      {
-        cleanupNavmeshGeometry();
-        buildNavmeshGeometry();
-      }
-    }
+        // Force rebuild of the appropriate geometry
+        if( m_showObjModel )
+        {
+          cleanupObjModel();
+          checkForObjFile();
+        }
+        else
+        {
+          cleanupNavmeshGeometry();
+          buildNavmeshGeometry();
+        }
+      }*/
   }
 
   // Add world editing controls
-  if( ImGui::CollapsingHeader( "World Editing" ) )
-  {
-    ImGui::Checkbox( "World Editing Mode", &m_worldEditingMode );
-
-    if( m_showClickMarker )
+  /*  if( ImGui::CollapsingHeader( "World Editing" ) )
     {
-      ImGui::Text( "Last click: (%.2f, %.2f, %.2f)",
-                   m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+      ImGui::Checkbox( "World Editing Mode", &m_worldEditingMode );
 
-      if( ImGui::Button( "Clear Marker" ) )
+      if( m_showClickMarker )
       {
-        m_showClickMarker = false;
+        ImGui::Text( "Last click: (%.2f, %.2f, %.2f)",
+                     m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+
+        if( ImGui::Button( "Clear Marker" ) )
+        {
+          m_showClickMarker = false;
+        }
+
+        ImGui::SameLine();
+        if( ImGui::Button( "Copy Position" ) )
+        {
+          std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                            m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+          ImGui::SetClipboardText( posStr.c_str() );
+        }
       }
 
-      ImGui::SameLine();
-      if( ImGui::Button( "Copy Position" ) )
-      {
-        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
-                                          m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
-        ImGui::SetClipboardText( posStr.c_str() );
-      }
-    }
-
-    ImGui::Text( "Right-click on geometry to get world position" );
-  }
+      ImGui::Text( "Right-click on geometry to get world position" );
+    }*/
 
 
   // Camera controls - only update sliders if not actively using mouse controls
-  if( ImGui::CollapsingHeader( "Camera Controls" ) )
+  /*if( ImGui::CollapsingHeader( "Camera Controls" ) )
   {
     // Disable sliders when mouse controls are active
     if( m_navCameraControlActive )
@@ -2742,8 +3867,7 @@ void ZoneEditor::showNavmeshWindow()
       // Half second delay
       m_navCameraControlActive = false;
     }
-  }
-
+  }*/
   // Get available content region
   ImVec2 contentRegion = ImGui::GetContentRegionAvail();
   if( contentRegion.x > 0 && contentRegion.y > 0 )
@@ -2971,7 +4095,7 @@ void ZoneEditor::showMapWindow()
     if( m_showBnpcIcons )
     {
       ImGui::SetNextItemWidth( 100 );
-      ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 4.0f, 20.0f );
+      ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 2.0f, 10.0f );
     }
 
     if( ImGui::Button( "Reset Zoom" ) )
@@ -2981,6 +4105,12 @@ void ZoneEditor::showMapWindow()
     if( ImGui::Button( "Fit to Window" ) )
     {
       m_zoomLevel = -1.0f;
+    }
+    if( ImGui::Button( "Center Map" ) )
+    {
+      // Force centering by resetting scroll position
+      ImGui::SetScrollX( 0.0f );
+      ImGui::SetScrollY( 0.0f );
     }
     ImGui::EndMenuBar();
   }
@@ -3016,6 +4146,9 @@ void ZoneEditor::showMapWindow()
 
   if( ImGui::BeginChild( "MapScrollRegion", contentRegion, false, childFlags ) )
   {
+    // Get child window content region for proper centering calculations
+    ImVec2 childContentRegion = ImGui::GetContentRegionAvail();
+
     // Store the current scroll position for zoom centering
     float oldScrollX = ImGui::GetScrollX();
     float oldScrollY = ImGui::GetScrollY();
@@ -3059,18 +4192,21 @@ void ZoneEditor::showMapWindow()
       }
     }
 
-    // Center the image if it's smaller than the content region
-    ImVec2 availableSize = ImGui::GetContentRegionAvail();
-    ImVec2 cursorPos = ImGui::GetCursorPos();
+    // Calculate centering offsets
+    ImVec2 centeringOffset = ImVec2( 0.0f, 0.0f );
+    if( imageSize.x < childContentRegion.x )
+    {
+      centeringOffset.x = ( childContentRegion.x - imageSize.x ) * 0.5f;
+    }
+    if( imageSize.y < childContentRegion.y )
+    {
+      centeringOffset.y = ( childContentRegion.y - imageSize.y ) * 0.5f;
+    }
 
-    if( imageSize.x < availableSize.x )
-    {
-      cursorPos.x += ( availableSize.x - imageSize.x ) * 0.5f;
-    }
-    if( imageSize.y < availableSize.y )
-    {
-      cursorPos.y += ( availableSize.y - imageSize.y ) * 0.5f;
-    }
+    // Apply centering by setting cursor position
+    ImVec2 cursorPos = ImGui::GetCursorPos();
+    cursorPos.x += centeringOffset.x;
+    cursorPos.y += centeringOffset.y;
     ImGui::SetCursorPos( cursorPos );
 
     // Store image position for BNPC icon drawing

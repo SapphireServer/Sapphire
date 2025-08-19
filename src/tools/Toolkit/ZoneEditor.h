@@ -275,8 +275,58 @@ private:
 
   void renderNavmeshToTexture();
 
+  struct BnpcNameCacheEntry
+  {
+    std::string name;
+    Excel::BNpcName data;
+  };
 
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
+  std::unordered_map< uint32_t, Excel::BNpcBase > m_bnpcBaseCache;
+  std::unordered_map< uint32_t, BnpcNameCacheEntry > m_bnpcNameCache;
+  std::unordered_map< uint32_t, Excel::BNpcCustomize > m_bnpcCustomizeCache;
+
+  // Add these to ZoneEditor.h in the private section:
+  bool m_showBnpcNameSelector = false;
+  bool m_showBnpcBaseSelector = false;
+  char m_nameSearchBuffer[256] = "";
+  char m_baseSearchBuffer[256] = "";
+
+  // Add these method declarations to the public section:
+  void showBnpcNameSelector();
+  void showBnpcBaseSelector();
+  // BNPC Window UI Functions
+  void showBnpcWindowHeader();
+  void showBnpcTreeView( float splitterWidth, const ImVec2& windowSize );
+  void showBnpcSplitter( float& splitterWidth, const ImVec2& windowSize );
+  void showBnpcDetailsView( const ImVec2& windowSize );
+  void showBnpcSelectors();
+
+  // BNPC Tree View Functions
+  void showBnpcGroupNode( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void showBnpcNodesInGroup( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void showBnpcNode( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs );
+
+  // BNPC Selection Handling Functions
+  void handleGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void handleCollapsedGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void handleBnpcSelection( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs );
+
+  // BNPC Context Menu Functions
+  void showGroupContextMenu( const std::string& groupName, const std::string& contextIdPrefix );
+  void showBnpcContextMenu( CachedBnpc* bnpc );
+  void showBnpcTreeContextMenu();
+
+  // BNPC Details Panel Functions
+  bool showBnpcBasicInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcPositionInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcPopulationInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcAIBehaviorInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcLinkInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcAppearanceInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcInstanceInfo( CachedBnpc* selectedBnpc );
+  void showBnpcActionButtons( CachedBnpc* selectedBnpc );
+
 
 public:
   ZoneEditor();
@@ -322,7 +372,7 @@ public:
   }
 
   bool m_showBnpcIcons = true;
-  float m_bnpcIconSize = 8.0f;
+  float m_bnpcIconSize = 2.0f;
   ImU32 m_bnpcIconColor = IM_COL32( 255, 255, 0, 255 ); // Yellow
   ImU32 m_selectedBnpcIconColor = IM_COL32( 255, 0, 0, 255 ); // Red for selected
   float m_mapScale = 100.0f; // You'll need to get this from the map data
@@ -354,7 +404,7 @@ public:
 
   glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
   void focusOn3DPosition( const glm::vec3& position );
-
+  void showGambitEditor();
 private:
   void initializeCache();
 
