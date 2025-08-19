@@ -286,6 +286,10 @@ Sets hp/mp/tp, sets status, plays animation and fires onDeath event
 */
 void Chara::die()
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
   m_status = ActorStatus::Dead;
   m_hp = 0;
   m_mp = 0;
@@ -400,8 +404,12 @@ magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
-void Chara::takeDamage( uint32_t damage )
+void Chara::takeDamage( uint32_t damage, bool broadcastUpdate )
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
   if( damage >= m_hp )
   {
     switch( m_invincibilityType )
@@ -422,6 +430,13 @@ void Chara::takeDamage( uint32_t damage )
   }
   else
     m_hp -= damage;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeDamageHp, damage );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 /*!
@@ -431,7 +446,7 @@ in range
 
 \param amount of hp to be healed
 */
-void Chara::heal( uint32_t amount )
+void Chara::heal( uint32_t amount, bool broadcastUpdate )
 {
   if( ( m_hp + amount ) > getMaxHp() )
   {
@@ -439,6 +454,13 @@ void Chara::heal( uint32_t amount )
   }
   else
     m_hp += amount;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeRecoverHp, amount );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 void Chara::restoreMP( uint32_t amount )
@@ -497,7 +519,7 @@ void Chara::autoAttack( CharaPtr pTarget )
 
     server().queueForPlayers( getInRangePlayerIds(), effectPacket );
 
-    pTarget->takeDamage( damage );
+    pTarget->takeDamage( damage, false );
   }
 }
 
@@ -944,19 +966,11 @@ void Chara::onTick()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeDamageHp, thisTickDmg );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickHeal );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeRecoverMp, thisTickHeal );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 }
 

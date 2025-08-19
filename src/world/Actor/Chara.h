@@ -266,9 +266,9 @@ namespace Sapphire::Entity
 
     virtual uint8_t getLevel() const;
 
-    virtual void takeDamage( uint32_t damage );
+    virtual void takeDamage( uint32_t damage, bool broadcastUpdate = true );
 
-    virtual void heal( uint32_t amount );
+    virtual void heal( uint32_t amount, bool broadcastUpdate = true );
 
     virtual void restoreMP( uint32_t amount );
 

@@ -118,6 +118,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
     // filter by allies
     static auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
     static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+    static auto pDeadFilter = std::make_shared< World::AI::IsDeadFilter >();
 
     if( m_targetActor->getAreaObject() == nullptr )
       return;
@@ -135,6 +136,11 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
 
         auto pChara = pActor->getAsChara();
 
+        // dont hit dead targets
+        // todo: are there puddles which revive actors?
+        if( pDeadFilter->isApplicable( m_sourceActor, pChara ) )
+          continue;
+        
         const auto& pos = pAreaObject->getPos();
         const auto& potency = pAreaObject->getActionPotency();
         if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius )
