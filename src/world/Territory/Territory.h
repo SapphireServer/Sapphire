@@ -7,7 +7,6 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
-#include <Encounter/TimelinePack.h>
 #include "ForwardsZone.h"
 
 #include <set>
@@ -77,8 +76,6 @@ namespace Sapphire
     Common::TerritoryIdent m_ident;
 
     float m_inRangeDistance;
-
-    //TimelinePack m_timelinePack;
 
   public:
     Territory();

@@ -43,6 +43,8 @@
 #include <Navi/NaviMgr.h>
 #include "Math/CalcStats.h"
 
+#include <nlohmann/json.hpp>
+
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;

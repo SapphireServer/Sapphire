@@ -58,6 +58,7 @@ public:
       {
         //Logger::debug( "Setting duty state to failed!" );
         pEncounter->setStatus( EncounterStatus::SUCCESS );
+        instance.setState( InstanceContentState::DutyFinished );
       }
     }
   }
