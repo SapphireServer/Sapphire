@@ -26,7 +26,8 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.addEObj( "Entrance", 2000182, 4177874, 4177871, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0);
-    auto pEncounter = std::make_shared< Encounter >( std::dynamic_pointer_cast< InstanceContent, Territory >( instance.shared_from_this() ), "IfritNormal" );
+    auto pEncounter = std::make_shared< Encounter >( instance.shared_from_this()->getAsInstanceContent(),
+      std::static_pointer_cast< Event::Director >( instance.shared_from_this()->getAsInstanceContent() ), "IfritNormal" );
     setupEncounter( instance, pEncounter );
     //instance.setEncounterTimeline(  );
     instance.setEncounter( pEncounter );

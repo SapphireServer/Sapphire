@@ -574,9 +574,7 @@ namespace Sapphire
 
         // todo: this does not always need to be a director, and can also be an eventhandler
         //       needs further investigation
-        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
-        if( pDirector == nullptr )
-          pDirector = pTeri->getAsQuestBattle();
+        Event::DirectorPtr pDirector = pEncounter->getDirector();
 
         if( pDirector )
           handlerId = pDirector->getDirectorId();
@@ -604,9 +602,7 @@ namespace Sapphire
         uint32_t param = 0;
 
         // todo: expand for fates
-        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
-        if( pDirector == nullptr )
-          pDirector = pTeri->getAsQuestBattle();
+        Event::DirectorPtr pDirector = pEncounter->getDirector();
 
         // todo: this should never not be set?
         // todo: probably should use ContentDirector
