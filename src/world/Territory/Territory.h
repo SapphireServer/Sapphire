@@ -7,7 +7,7 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
-#include <Encounter/EncounterTimeline.h>
+#include <Encounter/TimelinePack.h>
 #include "ForwardsZone.h"
 
 #include <set>

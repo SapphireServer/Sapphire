@@ -2,8 +2,6 @@
 #include <Territory/InstanceContent.h>
 #include <Encounter/Encounter.h>
 
-#include <Encounter/EncounterTimeline.h>
-
 using namespace Sapphire;
 
 class TheBowlofEmbers : public Sapphire::ScriptAPI::InstanceContentScript

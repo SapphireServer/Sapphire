@@ -1,6 +1,6 @@
 #include "Timepoint.h"
 #include "TimelineActor.h"
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
 #include "Encounter.h"
 
 #include <Action/Action.h>

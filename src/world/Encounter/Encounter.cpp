@@ -12,7 +12,7 @@ namespace Sapphire
 
   void Encounter::init()
   {
-    m_pTimeline = EncounterTimeline::createTimelinePack( m_timelineName );
+    m_pTimeline = TimelinePack::createTimelinePack( m_timelineName );
     m_pTimeline->setEncounter( shared_from_this() );
     m_status = EncounterStatus::IDLE;
     m_startTime = 0;
