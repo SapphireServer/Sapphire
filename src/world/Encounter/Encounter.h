@@ -5,81 +5,11 @@
 #include <Logging/Logger.h>
 #include <Actor/BNpc.h>
 
+#include "Network/PacketDef/ServerIpcs.h"
+
+
 namespace Sapphire
 {
-  using EncounterCallback = std::function< void( EncounterPtr, EncounterState ) >;
-
-  class EncounterState
-  {
-  public:
-    using EncounterStatePtr = std::shared_ptr< EncounterState >;
-    using StateStack = std::stack< EncounterStatePtr >;
-    using StateStackPtr = std::shared_ptr< StateStack >;
-
-  protected:
-    bool m_bShouldFinish{ false };
-    StateStackPtr m_stateStack;
-    std::shared_ptr< Encounter > m_pEncounter;
-    uint64_t m_startTime{ 0 };
-    uint64_t m_currTime{ 0 };
-
-    EncounterCallback m_onInitCb;
-    EncounterCallback m_onUpdateCb;
-    EncounterCallback m_onFinishCb;
-
-  public:
-    EncounterState( std::shared_ptr< Encounter > pEncounter ) :
-      m_pEncounter( pEncounter )
-    {
-    };
-
-    bool shouldFinish() const { return m_bShouldFinish; };
-
-    void setFinishFlag() { m_bShouldFinish = true; };
-
-    uint64_t getStartTime() const { return m_startTime; };
-    uint64_t getCurrTime() const { return m_currTime; };
-    uint64_t getElapsedTime() const { return m_currTime - m_startTime; };
-
-    void init()
-    {
-      if( m_onInitCb )
-        m_onInitCb( m_pEncounter, *this );
-    }
-
-    void update( uint64_t currTime )
-    {
-      if( m_startTime == 0 )
-        m_startTime = currTime;
-
-      m_currTime = currTime;
-
-      if( m_onUpdateCb )
-        m_onUpdateCb( m_pEncounter, *this );
-    }
-
-    void finish()
-    {
-      if( m_onFinishCb )
-        m_onFinishCb( m_pEncounter, *this );
-    }
-
-    void setOnInitCallback( EncounterCallback cb )
-    {
-      m_onInitCb = cb;
-    }
-
-    void setOnUpdateCallback( EncounterCallback cb )
-    {
-      m_onUpdateCb = cb;
-    }
-
-    void setOnFinishCallback( EncounterCallback cb )
-    {
-      m_onFinishCb = cb;
-    }
-  };
-
   enum class EncounterStatus
   {
     UNINITIALIZED,
@@ -92,99 +22,48 @@ namespace Sapphire
   class Encounter : public std::enable_shared_from_this< Encounter >
   {
   public:
-    Encounter( TerritoryPtr pInstance, const std::string& timelineName ) :
-            m_pTeri( pInstance ),
-            m_timelineName( timelineName ),
-            m_status( EncounterStatus::UNINITIALIZED )
-    {
-    };
+    Encounter( TerritoryPtr pInstance,
+               Event::DirectorPtr pDirector,
+               const std::string& timelineName );
 
     virtual ~Encounter() = default;
 
-    void init()
-    {
-      m_pTimeline = EncounterTimeline::createTimelinePack( m_timelineName );
-      m_pTimeline->setEncounter( shared_from_this() );
-      m_status = EncounterStatus::IDLE;
-      m_startTime = 0;
-    };
+    void init();
 
-    virtual void start() { m_status = EncounterStatus::ACTIVE; };
-    virtual void update( uint64_t currTime )
-    {
-      m_pTimeline->update( currTime );
-    }
+    virtual void start();
 
-    void reset()
-    {
-      removeBNpcs();
-      m_pTimeline->reset( shared_from_this() );
-      init();
-    }
+    virtual void update( uint64_t currTime );
 
-    void removeBNpcs()
-    {
-      for (auto it = m_bnpcs.begin(); it != m_bnpcs.end(); )
-      {
-        m_pTeri->removeActor( it->second);
-        it = m_bnpcs.erase(it);
-      }
-    }
+    void reset();
 
-    void setStartTime( uint64_t startTime )
-    {
-      m_startTime = startTime;
-    }
+    void removeBNpcs();
 
-    void addState( EncounterState::EncounterStatePtr pState, bool initState = true )
-    {
-      m_stateStack->push( pState );
-      if( initState )
-        pState->init();
-    }
+    void setStartTime( uint64_t startTime );
 
-    EncounterStatus getStatus() const
-    {
-      return m_status;
-    }
+    EncounterStatus getStatus() const;
 
-    void setStatus( EncounterStatus status )
-    {
-      m_status = status;
-    }
+    void setStatus( EncounterStatus status );
 
-    void addBNpc( Entity::BNpcPtr pBNpc )
-    {
-      m_bnpcs[ pBNpc->getLayoutId() ] = pBNpc;
-    }
+    void addBNpc( Entity::BNpcPtr pBNpc );
 
-    Entity::BNpcPtr getBNpc( uint32_t layoutId ) const
-    {
-      auto bnpc = m_bnpcs.find( layoutId );
-      if( bnpc != std::end( m_bnpcs ) )
-        return bnpc->second;
+    Entity::BNpcPtr getBNpc( uint32_t layoutId ) const;
 
-      return nullptr;
-    }
+    void removeBNpc( uint32_t layoutId );
 
-    void removeBNpc( uint32_t layoutId )
-    {
-      m_bnpcs.erase( layoutId );
-    }
+    TerritoryPtr getTeriPtr();
 
-    TerritoryPtr getTeriPtr()
-    {
-      return m_pTeri;
-    }
+    Event::DirectorPtr getDirector();
 
   protected:
     uint64_t m_startTime{ 0 };
     std::string m_timelineName;
-    EncounterState::StateStackPtr m_stateStack;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
     TerritoryPtr m_pTeri;
     EncounterStatus m_status{ EncounterStatus::IDLE };
     std::shared_ptr< TimelinePack > m_pTimeline;
+    Event::DirectorPtr m_pDirector;
   };
+
+
 }

@@ -87,6 +87,9 @@ namespace Client
 
     std::string m_datLocation{ "F:\\client3.3\\game\\sqpack" };
 
+    std::string m_bnpcJsonPath;
+    char m_bnpcJsonPathBuffer[ 512 ];
+
     ImGuiID setupDockspace( bool& p_open, ImGuiIO& io ) const;
 
     ZoneEditor m_zoneEditor;

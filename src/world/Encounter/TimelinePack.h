@@ -32,6 +32,7 @@ namespace Sapphire
   // todo: actually handle solo stuff properly (or tie to zone director/content director at least)
   class TimelinePack
   {
+    using TimeLinePackPtr = std::shared_ptr< TimelinePack >;
     TimelinePackType m_type{ TimelinePackType::EncounterFight };
     std::vector< TimelineActor > m_timelineActors;
     std::string m_name;
@@ -89,13 +90,11 @@ namespace Sapphire
     bool valid();
 
     void setEncounter( std::shared_ptr< Encounter > pEncounter );
-  };
 
-  class EncounterTimeline
-  {
-  public:
-
-    static std::shared_ptr< TimelinePack > createTimelinePack( const std::string& name );
+    static TimeLinePackPtr createTimelinePack( const std::string& name );
     static TimelinePack getEncounterPack( const std::string& name, bool reload = false );
   };
+
+
+
 }// namespace Sapphire

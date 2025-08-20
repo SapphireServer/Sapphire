@@ -163,7 +163,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
 
       if( m_pEntranceEObj )
         m_pEntranceEObj->setPermissionInvisibility( 1 );
-      m_state = InstanceContentState::DutyInProgress;
+      setState( InstanceContentState::DutyInProgress );
 
       break;
     }
@@ -234,7 +234,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       m_pEntranceEObj->setPermissionInvisibility( 1 );
       sendForward();
 
-      m_state = InstanceContentState::DutyInProgress;
+      setState( InstanceContentState::DutyInProgress );
 
       m_instanceResetTime = 0;
       m_instanceResetFinishTime = 0;
@@ -254,12 +254,6 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
         m_instanceTerminate = true;
 
       updateBNpcs( tickCount );
-
-      if( m_pEncounter->getStatus() == EncounterStatus::FAIL )
-        m_state = InstanceContentState::DutyReset;
-
-      if( m_pEncounter->getStatus() == EncounterStatus::SUCCESS )
-        m_state = InstanceContentState::DutyFinished;
 
       break;
     }
@@ -313,14 +307,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  auto oldState = m_state;
   updateState( tickCount );
-
-  if( oldState != m_state )
-  {
-    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
-  }
-
   scriptMgr.onInstanceUpdate( *this, tickCount );
 
   if( m_pEncounter )
@@ -576,6 +563,17 @@ Sapphire::InstanceContentState Sapphire::InstanceContent::getState() const
   return m_state;
 }
 
+void Sapphire::InstanceContent::setState( InstanceContentState state )
+{
+  auto oldState = m_state;
+  m_state = state;
+  if( oldState != m_state )
+  {
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
+  }
+}
+
 void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -790,7 +788,7 @@ void Sapphire::InstanceContent::terminate( uint8_t reason )
     sendDutyFailed( false );
 
   m_instanceTerminateTime = Util::getTimeMs();
-  m_state = InstanceContentState::Terminate;
+  setState( InstanceContentState::Terminate );
 }
 
 bool Sapphire::InstanceContent::isTerminationReady() const

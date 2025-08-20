@@ -176,6 +176,8 @@ namespace Sapphire
 
     InstanceContentState getState() const;
 
+    void setState( InstanceContentState state );
+
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > getInstanceConfiguration() const;
 
     uint32_t getInstanceContentId() const;

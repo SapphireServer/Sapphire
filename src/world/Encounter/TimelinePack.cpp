@@ -1,4 +1,6 @@
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
+
+#include "TimelinePack.h"
 #include "Encounter.h"
 
 #include "Timepoint.h"
@@ -96,7 +98,7 @@ namespace Sapphire
   // parsing stuff below
   //
 
-  TimelinePack EncounterTimeline::getEncounterPack( const std::string& name, bool reload )
+  TimelinePack TimelinePack::getEncounterPack( const std::string& name, bool reload )
   {
     static std::unordered_map< std::string, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionType > conditionMap =
@@ -306,7 +308,7 @@ namespace Sapphire
     return pack;
   }
 
-  std::shared_ptr< TimelinePack > EncounterTimeline::createTimelinePack( const std::string& name )
+  std::shared_ptr< TimelinePack > TimelinePack::createTimelinePack( const std::string& name )
   {
     const static std::unordered_map< std::string, ConditionType > conditionMap =
     {

@@ -1,7 +1,7 @@
 #include "ScheduleCondition.h"
 
 #include "Encounter.h"
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
 #include "TimelineActor.h"
 #include "TimelineActorState.h"
 
