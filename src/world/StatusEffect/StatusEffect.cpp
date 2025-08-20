@@ -276,7 +276,7 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
   if( auto pAreaObject = m_targetActor->getAreaObject() )
   {
     if( pAreaObject->getActionId() == m_groundAOE.actionId )
-      m_targetActor->despawnAreaObject();
+      m_targetActor->removeAreaObject();
   }
 
   scriptMgr.onStatusTimeOut( m_targetActor, m_id );

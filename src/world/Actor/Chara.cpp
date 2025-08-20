@@ -298,6 +298,8 @@ void Chara::die()
   // fire onDeath event
   onDeath();
 
+  removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnDeath );
+
   // if the actor is a player, the update needs to be send to himself too
   bool selfNeedsUpdate = isPlayer();
   Network::Util::Packet::sendActorControl( getInRangePlayerIds( selfNeedsUpdate ), getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
@@ -1008,25 +1010,27 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }
 
-void Chara::spawnAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
+void Chara::createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
 {
-  despawnAreaObject();
+  removeAreaObject();
   removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
 
   // todo: delay spawning the ground target til action shows hit effect
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId, scale, getId(), pos );
+  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId, scale, shared_from_this(), pos );
+
   pTeri->pushActor( m_pAreaObject );
 }
 
-void Chara::despawnAreaObject()
+void Chara::removeAreaObject()
 {
   if( m_pAreaObject )
   {
     auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
     pTeri->removeActor( m_pAreaObject );
 
     m_pAreaObject = nullptr;
