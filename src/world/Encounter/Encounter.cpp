@@ -1,5 +1,7 @@
 #include "Encounter.h"
 
+#include "TimelinePack.h"
+
 namespace Sapphire
 {
   Encounter::Encounter( TerritoryPtr pInstance, std::shared_ptr< Event::Director > pDirector, const std::string& timelineName ) :
