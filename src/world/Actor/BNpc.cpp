@@ -72,7 +72,8 @@ BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone ) : Npc( ObjKind::BattleNpc )
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone ) : Npc(
+  ObjKind::BattleNpc )
 {
   m_id = id;
   m_pInfo = pInfo;
@@ -154,7 +155,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
     if( bnpcCustom )
     {
-      memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
+      memcpy( m_customize, reinterpret_cast< char * >( &bnpcCustom->data() ), sizeof( m_customize ) );
     }
   }
 
@@ -165,7 +166,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
     {
       m_weaponMain = bnpcEquip->data().WeaponModel;
       m_weaponSub = bnpcEquip->data().SubWeaponModel;
-      memcpy( m_modelEquip, reinterpret_cast< char* >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
+      memcpy( m_modelEquip, reinterpret_cast< char * >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
     }
   }
 
@@ -186,10 +187,10 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
 
   //if( m_bnpcType == BNpcType::Friendly )
   //  m_maxHp *= 5;
-
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone, uint32_t hp,
+            Common::BNpcType type ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
@@ -265,7 +266,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
     if( bnpcCustom )
     {
-      memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
+      memcpy( m_customize, reinterpret_cast< char * >( &bnpcCustom->data() ), sizeof( m_customize ) );
     }
   }
 
@@ -276,7 +277,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
     {
       m_weaponMain = bnpcEquip->data().WeaponModel;
       m_weaponSub = bnpcEquip->data().SubWeaponModel;
-      memcpy( m_modelEquip, reinterpret_cast< char* >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
+      memcpy( m_modelEquip, reinterpret_cast< char * >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
     }
   }
 
@@ -408,7 +409,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 bool BNpc::moveTo( const Chara& targetChara )
 {
-
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
@@ -537,18 +537,19 @@ void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
 {
   if( hateAmount > 0 )
   {
-  auto hateEntry = std::make_shared< HateListEntry >();
+    auto hateEntry = std::make_shared< HateListEntry >();
     hateEntry->m_hateAmount = hateAmount;
-  hateEntry->m_pChara = pChara;
+    hateEntry->m_pChara = pChara;
 
-  m_hateList.insert( hateEntry );
-  if( pChara->isPlayer() )
-  {
-    auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( *this );
-      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+    m_hateList.insert( hateEntry );
+    if( pChara->isPlayer() )
+    {
+      auto pPlayer = pChara->getAsPlayer();
+      pPlayer->hateListAdd( *this );
+      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount,
+                                            hateAmount );
+    }
   }
-}
 }
 
 void BNpc::hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount )
@@ -576,7 +577,8 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
       if( auto player = pChara->getAsPlayer() )
       {
         player->hateListLetterUpdate( *this );
-        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount,
+                                              hateAmount );
       }
       break;
     }
@@ -588,7 +590,7 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   }
 
   hateListUpdatePlayers();
-    }
+}
 
 void BNpc::hateListRemove( const CharaPtr& pChara )
 {
@@ -667,7 +669,7 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle, 1 );
 
   changeTarget( pChara->getId() );
-  }
+}
 
 void BNpc::deaggro( const CharaPtr& pChara )
 {
@@ -689,12 +691,12 @@ void BNpc::deaggro( const CharaPtr& pChara )
     notifyPlayerDeaggro( pChara );
 }
 
-void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
+void BNpc::notifyPlayerDeaggro( const CharaPtr& pChara )
 {
   if( m_hateList.empty() )
   {
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
   }
 
   PlayerPtr tmpPlayer = pChara->getAsPlayer();
@@ -807,9 +809,149 @@ void BNpc::checkAggro()
 
   CharaPtr pClosestChara = getClosestChara();
 
+  auto calculateAdjustedRange = []( float baseRange, int targetLevel, int sourceLevel ) -> float
+  {
+    auto levelDiff = std::abs( targetLevel - sourceLevel );
+
+    if( levelDiff >= 10 )
+      return 0.0f;
+    else
+      return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+  };
+
+
+  bool hasAggro = false;
+  for( uint32_t i = 0; i < 2; ++i )
+  {
+    float senseRange = m_senseData.SenseRange[ i ];
+
+    switch( m_senseData.Sense[ i ] )
+    {
+      case SenseType::HEARING:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          // TODO: handle friendly bnpcs such as guards
+          if( !actor->isPlayer() )
+            continue;
+
+          auto pPlayer = actor->getAsPlayer();
+          if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+            continue;
+
+          // diminish sense range if required.
+          senseRange = calculateAdjustedRange( senseRange, pPlayer->getLevel(), getLevel() );
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+          if( distance < senseRange )
+          {
+            aggro( pClosestChara );
+            hasAggro = true;
+            break;
+          }
+        }
+        break;
+      }
+
+      case SenseType::VISION:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          if( !actor->isChara() )
+            continue;
+
+          if( getBNpcType() == Common::BNpcType::Friendly )
+          {
+            if( actor->isBattleNpc() && actor->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+              continue;
+          }
+
+          if( !actor->getAsChara()->isAlive() )
+            continue;
+
+          // Check if player is within sense range first (distance check)
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+
+          // Diminish sense range if required
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, actor->getAsChara()->getLevel(), getLevel() );
+
+          if( distance > adjustedSenseRange )
+            continue; // Too far away
+
+          // Vision cone check
+          // Calculate vector from BNPC to player
+          const auto& bnpcPos = getPos();
+          const auto& playerPos = actor->getPos();
+
+          float deltaX = playerPos.x - bnpcPos.x;
+          float deltaZ = playerPos.z - bnpcPos.z;
+
+          // Calculate angle from BNPC to player
+          float angleToPlayer = atan2( deltaX, deltaZ );
+
+          // Get BNPC's facing direction (rotation)
+          float bnpcRotation = getRot();
+
+          // Calculate the difference between BNPC rotation and angle to player
+          float angleDiff = angleToPlayer - bnpcRotation;
+
+          const float M_PI = 3.14159265358979323846f; // PI
+          // Normalize angle difference to [-PI, PI]
+          while( angleDiff > M_PI ) angleDiff -= 2.0f * M_PI;
+          while( angleDiff < -M_PI ) angleDiff += 2.0f * M_PI;
+
+          // Check if player is within the 75-degree vision cone (37.5 degrees on each side)
+          float halfConeAngle = ( 75.0f * M_PI / 180.0f ) / 2.0f;
+
+          if( abs( angleDiff ) <= halfConeAngle )
+          {
+            // Player is within vision cone, check for line of sight if needed
+            // TODO: Add line of sight check using navmesh/collision mesh raycast if required
+
+            aggro( actor->getAsChara() );
+            hasAggro = true;
+            break;
+          }
+        }
+        break;
+      }
+
+
+      case SenseType::PRESENCE:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          if( !actor->isPlayer() )
+            continue;
+
+          auto pPlayer = actor->getAsPlayer();
+          if( !pPlayer->isAlive() )
+            continue;
+
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+          if( distance < senseRange )
+          {
+            aggro( pPlayer );
+            hasAggro = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      default:
+        break;
+    }
+    if( hasAggro )
+      break;
+  }
+/*
+  //legacy code
   if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
   {
-
     // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
     float range = 14.f;
 
@@ -860,7 +1002,7 @@ void BNpc::checkAggro()
     {
       aggro( pClosestChara );
     }
-  }
+  }*/
 }
 
 void BNpc::setOwner( const CharaPtr& m_pChara )
@@ -910,7 +1052,7 @@ void BNpc::resetFlags( uint32_t flags )
     pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
-  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile &&
            ( m_flags & Entity::Immobile ) != Entity::Immobile )
   {
     Logger::debug( "{} Pathing activated", m_id );
@@ -942,8 +1084,8 @@ void BNpc::setFlag( uint32_t flag )
     pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
-  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
-             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
   {
     Logger::debug( "{} Pathing activated", m_id );
     auto pNaviProvider = pZone->getNaviProvider();
@@ -1023,7 +1165,6 @@ void BNpc::calculateStats()
   setStatValue( BaseParam::AttackPower, str );
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
-
 }
 
 void BNpc::updateAggroTarget()

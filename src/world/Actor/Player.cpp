@@ -1664,6 +1664,17 @@ bool Player::isFalling() const
   return m_falling;
 }
 
+void Entity::Player::setRunning( bool isRunning )
+{
+  m_running = isRunning;
+}
+
+bool Entity::Player::isRunning() const
+{
+  return m_running;
+}
+
+
 void Player::setLastPcSearchResult( std::vector< uint32_t > result )
 {
   m_lastPcSearch = std::move( result );

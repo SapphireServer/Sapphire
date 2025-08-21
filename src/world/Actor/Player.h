@@ -699,6 +699,9 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void initInventory();
 
+    void setRunning( bool isRunning );
+    bool isRunning() const;
+
     using InvSlotPair = std::pair< uint16_t, int8_t >;
     using InvSlotPairVec = std::vector< InvSlotPair >;
 
@@ -811,6 +814,9 @@ namespace Sapphire::Entity
 
     // falling logic
     bool m_falling;
+
+    // keep track of movement state of player
+    bool m_running{false};
     Common::FFXIVARR_POSITION3 m_initialFallPos{};
 
     bool m_markedForRemoval;
