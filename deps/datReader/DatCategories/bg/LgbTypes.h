@@ -98,8 +98,8 @@ enum eModelConfigCollisionType : int32_t
 
 struct BgPartsData : public InstanceObject
 {
-  uint32_t modelFileOffset;
-  uint32_t collisionFileOffset;
+  int32_t AssetPath;
+  int32_t CollisionAssetPath;
   eModelConfigCollisionType CollisionType;
   uint32_t AttributeMask;
   uint32_t Attribute;

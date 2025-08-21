@@ -65,8 +65,8 @@ public:
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + data.modelFileOffset );
-    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
+    modelFileName = std::string( buf + offset + data.AssetPath );
+    collisionFileName = std::string( buf + offset + data.CollisionAssetPath );
   };
 };
 

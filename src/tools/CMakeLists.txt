@@ -32,4 +32,5 @@ add_subdirectory( "BattleNpcToJson" )
 
 if( SAPPHIRE_BUILD_TOOLKIT )
   add_subdirectory( "Toolkit" )
+  add_subdirectory( "ToolkitPs3" )
 endif()

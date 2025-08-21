@@ -84,7 +84,7 @@ namespace Client
       LGB,
     } m_editorMode{ ZONES };
 
-    std::string m_datLocation{ "F:\\client3.3\\game\\sqpack" };
+    std::string m_datLocation{ "E:\XIV_Patches\monitor\USRDIR\game\sqpack" };
 
     ImGuiID setupDockspace( bool& p_open, ImGuiIO& io ) const;
 

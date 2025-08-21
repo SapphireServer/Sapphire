@@ -59,7 +59,7 @@ EditorState::EditorState( std::shared_ptr< Engine::ApplicationContext > pContext
 {
   // Load config defaults from the server config
   auto executableDir = Sapphire::Common::Util::executableDir();
-  m_configFile = executableDir / "editor_config.txt";
+  m_configFile = executableDir / "editor_config_ps3.txt";
   auto serverDir = executableDir.parent_path();
   Sapphire::Common::ConfigMgr configMgr( serverDir / "config" );
   Sapphire::Common::Config::GlobalConfig globalConfig;
