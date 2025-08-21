@@ -1977,6 +1977,20 @@ namespace Sapphire::Common
     uint32_t CustomizeID;
   };
 
+  enum SenseType : uint8_t
+  {
+    NONE = 0,
+    VISION = 1,
+    HEARING = 2,
+    PRESENCE = 3,
+    VITALITY = 4,
+    MAGIC = 5,
+    ABILITIE = 6,
+    WEAPON_SKILL = 7,
+    POISON = 8,
+    SENSE_COUNT
+  };
+
   struct BNpcCacheEntry : BNPCInstanceObject
   {
     BNpcBaseData baseData;

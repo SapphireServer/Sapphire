@@ -222,6 +222,9 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
     }
   }
 
+  if( animationSpeed == MoveSpeed::Run )
+    player.setRunning( true );
+
   if( animColType == MoveState::EnterCollision )
   {
     animationType = 2;

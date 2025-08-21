@@ -656,6 +656,21 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   auto& pRNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
+
+  if( !hateListHasActor( pChara ) )
+  {
+    hateListAdd( pChara, 1000 );
+    if( getTargetId() == pChara->getId() )
+    {
+      updateAggroTarget();
+      hateListUpdatePlayers();
+    }
+    if( m_pOwner == pChara )
+    {
+      setOwner( hateListGetHighest() );
+    }
+  }
+
   if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )
   {
     m_pGambitPack->getAsTimeLine()->start();
@@ -723,6 +738,7 @@ void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
 
+  checkAggro();
   // removed check for now, replaced by position check to last position
   //if( m_dirtyFlag & DirtyFlag::Position )
   sendPositionUpdate();
@@ -807,7 +823,10 @@ void BNpc::checkAggro()
   if( m_aggressionMode == 1 )
     return;
 
-  CharaPtr pClosestChara = getClosestChara();
+  if( !getHateList().empty() )
+  {
+    return;
+  }
 
   auto calculateAdjustedRange = []( float baseRange, int targetLevel, int sourceLevel ) -> float
   {
@@ -845,7 +864,7 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
-            aggro( pClosestChara );
+            aggro( actor->getAsChara() );
             hasAggro = true;
             break;
           }
@@ -864,6 +883,12 @@ void BNpc::checkAggro()
           if( getBNpcType() == Common::BNpcType::Friendly )
           {
             if( actor->isBattleNpc() && actor->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+              continue;
+          }
+
+          if( getBNpcType() == Common::BNpcType::Enemy )
+          {
+            if( actor->isBattleNpc() && actor->getAsBNpc()->getBNpcType() == Common::BNpcType::Enemy )
               continue;
           }
 
@@ -933,7 +958,7 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
-            aggro( pPlayer );
+            aggro( actor->getAsChara() );
             hasAggro = true;
             break;
           }

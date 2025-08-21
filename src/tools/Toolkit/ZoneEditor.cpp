@@ -3488,7 +3488,7 @@ void ZoneEditor::buildSenseRangeGeometry()
     if( selectedBnpc->baseData.Sense[ i ] == CachedBnpc::SenseType::VISION )
     {
       // Create cone for vision
-      vertices = createConeVertices( range, 3.1415926 * 0.75f, 32 ); // 135-degree cone
+      vertices = createConeVertices( range, 3.1415926f * ( 75.0f / 180.0f ), 32 ); // 75-degree cone
     }
     else
     {
