@@ -67,6 +67,26 @@ struct CachedBnpc
 
   std::string nameString;
   std::string groupName;
+
+  enum SenseType : uint8_t
+  {
+    NONE = 0,
+    VISION = 1,
+    HEARING = 2,
+    PRESENCE = 3,
+    VITALITY = 4,
+    MAGIC = 5,
+    ABILITIE = 6,
+    WEAPON_SKILL = 7,
+    POISON = 8,
+    SENSE_COUNT
+  };
+  struct BNpcBaseData
+  {
+    uint16_t TerritoryRange;
+    SenseType Sense[2];
+    uint8_t SenseRange[2];
+  } baseData;
 };
 
 struct CachedZoneInfo
@@ -326,6 +346,25 @@ private:
   bool showBnpcAppearanceInfo( CachedBnpc* selectedBnpc );
   bool showBnpcInstanceInfo( CachedBnpc* selectedBnpc );
   void showBnpcActionButtons( CachedBnpc* selectedBnpc );
+  bool showBnpcBaseDataInfo( CachedBnpc* selectedBnpc );
+
+
+  // Add these new members for sense range rendering
+  GLuint m_senseRangeVAO = 0;
+  GLuint m_senseRangeVBO = 0;
+  GLuint m_senseRangeShader = 0;
+  int m_senseRangeVertexCount = 0;
+  bool m_showSenseRanges = true;
+
+  // Add these methods
+  void initializeSenseRangeRendering();
+  void buildSenseRangeGeometry();
+  void renderSenseRanges();
+  void cleanupSenseRangeRendering();
+
+  // Helper methods for geometry creation
+  std::vector<float> createCircleVertices(float radius, int segments = 64);
+  std::vector<float> createConeVertices(float radius, float angle, int segments = 32);
 
 
 public:

@@ -450,7 +450,7 @@ void LgbViewer::showGroupsWindow()
 
                 // Name column
                 ImGui::TableSetColumnIndex( 1 );
-                ImGui::Text( "%s", getEntryName( entry.get() ).c_str() );
+                ImGui::Text( "%s", entry->name.c_str() );
 
                 // Type column
                 ImGui::TableSetColumnIndex( 2 );

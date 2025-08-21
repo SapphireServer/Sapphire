@@ -62,6 +62,7 @@ ZoneEditor::~ZoneEditor()
   clearMapTexture();
   cleanupNavmeshRendering();
   cleanupObjModel();
+  cleanupSenseRangeRendering();
 
   if( m_navmeshShader )
   {
@@ -219,279 +220,6 @@ void ZoneEditor::updateBnpcSearchFilter()
     }
   }
 }
-
-/*
-void ZoneEditor::showBnpcWindow()
-{
-  if( !m_showBnpcWindow )
-    return;
-
-  ImGui::Begin( "BNPC Information", &m_showBnpcWindow );
-
-  // Search filter
-  if( ImGui::InputText( "Search", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
-  {
-    updateBnpcSearchFilter();
-  }
-
-  // Selection mode toggle
-  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
-  ImGui::SameLine();
-  if( ImGui::Button( "Clear Selection" ) )
-  {
-    m_selectedGroupName = "";
-    m_selectedBnpcInstanceIds.clear();
-    m_selectedBnpcIndex = -1;
-  }
-
-
-  ImGui::Separator();
-
-  // Create a splitter layout with tree view on left, details on right
-  static float splitterWidth = 300.0f;
-  ImVec2 windowSize = ImGui::GetContentRegionAvail();
-
-  // Left panel - Tree view
-  ImGui::BeginChild( "BNPCTreeView", ImVec2( splitterWidth, windowSize.y ), true );
-
-  // Group BNPCs by group name for tree display
-  std::map< std::string, std::vector< CachedBnpc * > > groupedBnpcs;
-  for( auto *bnpc : m_filteredBnpcs )
-  {
-    groupedBnpcs[ bnpc->groupName ].push_back( bnpc );
-  }
-
-  // Display tree view
-  for( const auto& [ groupName, bnpcs ] : groupedBnpcs )
-  {
-    ImGuiTreeNodeFlags groupFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-
-    // Highlight if this group is selected
-    if( m_groupSelectionMode && m_selectedGroupName == groupName )
-    {
-      groupFlags |= ImGuiTreeNodeFlags_Selected;
-    }
-
-    // Create unique ID for the group
-    std::string groupNodeId = fmt::format( "{}##group_{}", groupName, groupName );
-    std::string groupDisplayText = fmt::format( "{} ({} BNPCs)", groupName, bnpcs.size() );
-
-    if( ImGui::TreeNodeEx( groupNodeId.c_str(), groupFlags, "%s", groupDisplayText.c_str() ) )
-    {
-      // Handle group selection
-      if( ImGui::IsItemClicked() && m_groupSelectionMode )
-      {
-        m_selectedGroupName = groupName;
-        m_selectedBnpcInstanceIds.clear();
-        m_selectedBnpcIndex = -1;
-
-        // Add all BNPCs in this group to selection
-        for( auto *bnpc : bnpcs )
-        {
-          m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
-        }
-      }
-
-      // Sort BNPCs within group by instance ID
-      auto sortedBnpcs = bnpcs;
-      std::sort( sortedBnpcs.begin(), sortedBnpcs.end(),
-                 []( CachedBnpc *a, CachedBnpc *b ) { return a->instanceId < b->instanceId; } );
-
-      // Display individual BNPCs
-      for( auto *bnpc : sortedBnpcs )
-      {
-        ImGuiTreeNodeFlags leafFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-
-        // Highlight if selected
-        if( m_selectedBnpcIndex >= 0 && m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc )
-        {
-          leafFlags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        std::string bnpcNodeId = fmt::format( "{} {}##bnpc_{}", bnpc->bnpcName, bnpc->instanceId, bnpc->instanceId );
-        std::string bnpcDisplayText = fmt::format( "{} {} (BaseID: {})", bnpc->bnpcName, bnpc->instanceId, bnpc->BaseId );
-
-        if( ImGui::TreeNodeEx( bnpcNodeId.c_str(), leafFlags, "%s", bnpcDisplayText.c_str() ) )
-        {
-          // Handle individual BNPC selection
-          if( ImGui::IsItemClicked() )
-          {
-            if( m_groupSelectionMode )
-            {
-              // In group mode, clicking individual BNPC selects the whole group
-              m_selectedGroupName = groupName;
-              m_selectedBnpcInstanceIds.clear();
-              for( auto *groupBnpc : bnpcs )
-              {
-                m_selectedBnpcInstanceIds.insert( groupBnpc->instanceId );
-              }
-            }
-            else
-            {
-              // In individual mode, select just this BNPC
-              m_selectedGroupName = "";
-              m_selectedBnpcInstanceIds.clear();
-              m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
-
-              // Find this BNPC in filtered list to set selected index
-              for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
-              {
-                if( m_filteredBnpcs[ i ] == bnpc )
-                {
-                  m_selectedBnpcIndex = static_cast< int >( i );
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      ImGui::TreePop();
-    }
-    else
-    {
-      // Handle collapsed group selection
-      if( ImGui::IsItemClicked() && m_groupSelectionMode )
-      {
-        m_selectedGroupName = groupName;
-        m_selectedBnpcInstanceIds.clear();
-        m_selectedBnpcIndex = -1;
-
-        // Add all BNPCs in this group to selection
-        for( auto *bnpc : bnpcs )
-        {
-          m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
-        }
-      }
-    }
-  }
-
-  ImGui::EndChild();
-
-  // Splitter
-  ImGui::SameLine();
-  ImGui::Button( "##splitter", ImVec2( 8.0f, windowSize.y ) );
-  if( ImGui::IsItemActive() )
-  {
-    splitterWidth += ImGui::GetIO().MouseDelta.x;
-    splitterWidth = std::max( 200.0f, std::min( splitterWidth, windowSize.x - 200.0f ) );
-  }
-
-  // Right panel - Details view
-  ImGui::SameLine();
-  ImGui::BeginChild( "BNPCDetailsView", ImVec2( 0, windowSize.y ), true );
-
-  // Show details of selected BNPC
-  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
-  {
-    auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
-
-    ImGui::Text( "BNPC Details" );
-    ImGui::Separator();
-
-    // Basic Info
-    if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
-    {
-      std::string bnpcName;
-      auto it = m_bnpcNameCache.find(selectedBnpc->NameId);
-      if (it != m_bnpcNameCache.end())
-      {
-        bnpcName = it->second.name;  // Use cached name
-      }
-
-      ImGui::Text( "Group Name: %s", selectedBnpc->groupName.c_str() );
-      ImGui::Text( "Instance ID: %u", selectedBnpc->instanceId );
-      ImGui::Text( "Base ID: %u", selectedBnpc->BaseId );
-      ImGui::Text( "Name: %s (%u)", bnpcName.c_str(), selectedBnpc->NameId );
-      ImGui::Text( "Level: %u", selectedBnpc->Level );
-      ImGui::Text( "Active Type: %u", selectedBnpc->ActiveType );
-    }
-
-    // Position Info
-    if( ImGui::CollapsingHeader( "Position", ImGuiTreeNodeFlags_DefaultOpen ) )
-    {
-      ImGui::Text( "Position: %.2f, %.2f, %.2f", selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
-      ImGui::Text( "Rotation: %.2f", selectedBnpc->rotation );
-    }
-
-    // Population Info
-    if( ImGui::CollapsingHeader( "Pop Settings" ) )
-    {
-      ImGui::Text( "Pop Weather: %u", selectedBnpc->PopWeather );
-      ImGui::Text( "Pop Time: %u - %u", selectedBnpc->PopTimeStart, selectedBnpc->PopTimeEnd );
-      ImGui::Text( "Pop Interval: %u", selectedBnpc->PopInterval );
-      ImGui::Text( "Pop Rate: %u", selectedBnpc->PopRate );
-      ImGui::Text( "Repop ID: %u", selectedBnpc->RepopId );
-      ImGui::Text( "Non-pop: %d", selectedBnpc->Nonpop );
-      ImGui::Text( "Invalid Repop: %d", selectedBnpc->InvalidRepop );
-      ImGui::Text( "Pop Range: H=%.2f, V=%.2f", selectedBnpc->HorizontalPopRange, selectedBnpc->VerticalPopRange );
-    }
-
-    // AI/Behavior Info
-    if( ImGui::CollapsingHeader( "AI & Behavior" ) )
-    {
-      ImGui::Text( "Move AI: %u", selectedBnpc->MoveAI );
-      ImGui::Text( "Normal AI: %u", selectedBnpc->NormalAI );
-      ImGui::Text( "Wandering Range: %u", selectedBnpc->WanderingRange );
-      ImGui::Text( "Route: %u", selectedBnpc->Route );
-      ImGui::Text( "Server Path ID: %u", selectedBnpc->ServerPathId );
-      ImGui::Text( "Territory Range: %u", selectedBnpc->TerritoryRange );
-      ImGui::Text( "Sense Range Rate: %.2f", selectedBnpc->SenseRangeRate );
-    }
-
-    // Link Info
-    if( ImGui::CollapsingHeader( "Linking" ) )
-    {
-      ImGui::Text( "Link Group: %u", selectedBnpc->LinkGroup );
-      ImGui::Text( "Link Family: %u", selectedBnpc->LinkFamily );
-      ImGui::Text( "Link Range: %u", selectedBnpc->LinkRange );
-      ImGui::Text( "Link Count Limit: %u", selectedBnpc->LinkCountLimit );
-      ImGui::Text( "Link Parent: %d", selectedBnpc->LinkParent );
-      ImGui::Text( "Link Override: %d", selectedBnpc->LinkOverride );
-      ImGui::Text( "Link Reply: %d", selectedBnpc->LinkReply );
-    }
-
-    // Equipment & Customization
-    if( ImGui::CollapsingHeader( "Appearance" ) )
-    {
-      ImGui::Text( "Equipment ID: %u", selectedBnpc->EquipmentID );
-      ImGui::Text( "Customize ID: %u", selectedBnpc->CustomizeID );
-      ImGui::Text( "Drop Item: %u", selectedBnpc->DropItem );
-    }
-
-    // Instance Info
-    if( ImGui::CollapsingHeader( "Instance" ) )
-    {
-      ImGui::Text( "Bound Instance ID: %u", selectedBnpc->BoundInstanceID );
-      ImGui::Text( "Fate Layout Label ID: %u", selectedBnpc->FateLayoutLabelId );
-    }
-
-    ImGui::Separator();
-
-    // Action buttons
-    if( ImGui::Button( "Focus on Map" ) )
-    {
-      focusOn3DPosition( { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z } );
-    }
-    ImGui::SameLine();
-    if( ImGui::Button( "Copy Coordinates" ) )
-    {
-      std::string coords = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
-                                        selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
-      ImGui::SetClipboardText( coords.c_str() );
-    }
-  }
-  else
-  {
-    ImGui::Text( "Select a BNPC from the tree to view details" );
-  }
-
-  ImGui::EndChild();
-
-  ImGui::End();
-}
-*/
 
 void ZoneEditor::showBnpcWindow()
 {
@@ -691,7 +419,8 @@ void ZoneEditor::showBnpcNode( const std::string& groupName, CachedBnpc *bnpc,
   }
 }
 
-void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs )
+void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc *bnpc,
+                                      const std::vector< CachedBnpc * >& groupBnpcs )
 {
   if( ImGui::IsItemClicked() )
   {
@@ -750,6 +479,103 @@ void ZoneEditor::showBnpcTreeContextMenu()
   }
 }
 
+// ... existing code ...
+
+bool ZoneEditor::showBnpcBaseDataInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Base Data", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Indent();
+
+    // Territory Range
+    ImGui::Text( "Territory Range:" );
+    ImGui::SameLine( 150 );
+    if( ImGui::InputScalar( "##territoryRange", ImGuiDataType_U16, &selectedBnpc->baseData.TerritoryRange ) )
+    {
+      hasChanges = true;
+    }
+
+    ImGui::Separator();
+
+    // Sense Types and Ranges
+    ImGui::Text( "Sense Configuration:" );
+
+    // Helper lambda for sense type combo
+    auto showSenseCombo = [&]( const char *label, CachedBnpc::SenseType& senseType, uint8_t& senseRange ) -> bool
+    {
+      bool changed = false;
+
+      ImGui::Text( "%s:", label );
+      ImGui::SameLine( 150 );
+
+      // Sense Type dropdown
+      const char *senseTypeNames[ ] = {
+        "NONE", "VISION", "HEARING", "PRESENCE",
+        "VITALITY", "MAGIC", "ABILITY", "WEAPON_SKILL", "POISON"
+      };
+
+      int currentType = static_cast< int >( senseType );
+      if( ImGui::Combo( ( "##senseType" + std::string( label ) ).c_str(), &currentType, senseTypeNames,
+                        CachedBnpc::SENSE_COUNT ) )
+      {
+        senseType = static_cast< CachedBnpc::SenseType >( currentType );
+        changed = true;
+      }
+      ImGui::SameLine();
+      ImGui::Text( "(%u)", senseType );
+
+      // Sense Range input (only show if sense type is not NONE)
+      if( senseType != CachedBnpc::SenseType::NONE )
+      {
+        ImGui::Text( "Range:" );
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth( 80.0f );
+        if( ImGui::InputScalar( ( "##senseRange" + std::string( label ) ).c_str(), ImGuiDataType_U8, &senseRange ) )
+        {
+          changed = true;
+        }
+      }
+      else
+      {
+        // Reset range to 0 when sense type is NONE
+        if( senseRange != 0 )
+        {
+          senseRange = 0;
+          changed = true;
+        }
+      }
+
+      return changed;
+    };
+
+    // Primary Sense
+    if( showSenseCombo( "Primary Sense", selectedBnpc->baseData.Sense[ 0 ], selectedBnpc->baseData.SenseRange[ 0 ] ) )
+    {
+      hasChanges = true;
+    }
+
+    // Secondary Sense
+    if( showSenseCombo( "Secondary Sense", selectedBnpc->baseData.Sense[ 1 ], selectedBnpc->baseData.SenseRange[ 1 ] ) )
+    {
+      hasChanges = true;
+    }
+
+    // Optional: Add tooltips for better UX
+    if( ImGui::IsItemHovered() )
+    {
+      ImGui::SetTooltip( "Configure the NPC's detection capabilities and ranges" );
+    }
+
+    ImGui::Unindent();
+  }
+
+  return hasChanges;
+}
+
+// ... existing code ...
+
 void ZoneEditor::showBnpcSplitter( float& splitterWidth, const ImVec2& windowSize )
 {
   ImGui::SameLine();
@@ -776,6 +602,7 @@ void ZoneEditor::showBnpcDetailsView( const ImVec2& windowSize )
 
     hasChanges |= showBnpcBasicInfo( selectedBnpc );
     hasChanges |= showBnpcPositionInfo( selectedBnpc );
+    hasChanges |= showBnpcBaseDataInfo( selectedBnpc );
     hasChanges |= showBnpcPopulationInfo( selectedBnpc );
     hasChanges |= showBnpcAIBehaviorInfo( selectedBnpc );
     hasChanges |= showBnpcLinkInfo( selectedBnpc );
@@ -789,6 +616,7 @@ void ZoneEditor::showBnpcDetailsView( const ImVec2& windowSize )
       ImGui::SameLine();
       ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), "Modified" );
       buildBnpcMarkerGeometry();
+      buildSenseRangeGeometry();
     }
   }
   else
@@ -844,15 +672,17 @@ bool ZoneEditor::showBnpcBasicInfo( CachedBnpc *selectedBnpc )
     }
 
     // Active Type (editable with combo)
-    const char *activeTypes[ ] = { "Passive", "Aggressive", "Defensive" };
+    const char *activeTypes[ ] = { "Agressive", "Passive" };
     int currentActiveType = selectedBnpc->ActiveType;
-    if( currentActiveType >= 0 && currentActiveType < 3 )
+    if( currentActiveType >= 0 && currentActiveType < 2 )
     {
-      if( ImGui::Combo( "Active Type", &currentActiveType, activeTypes, 3 ) )
+      if( ImGui::Combo( "Active Type", &currentActiveType, activeTypes, 2 ) )
       {
         selectedBnpc->ActiveType = static_cast< uint8_t >( currentActiveType );
         hasChanges = true;
       }
+      ImGui::SameLine();
+      ImGui::Text( "(%u)", selectedBnpc->ActiveType );
     }
     else
     {
@@ -1824,6 +1654,14 @@ void ZoneEditor::loadBnpcs()
         // Sense info
         cachedBnpc->SenseRangeRate = senseInfo[ "senseRangeRate" ].get< float >();
 
+        cachedBnpc->baseData.Sense[ 0 ] = static_cast< CachedBnpc::SenseType >( senseInfo[ "Sense" ][ 0 ].get<
+          uint8_t >() );
+        cachedBnpc->baseData.Sense[ 1 ] = static_cast< CachedBnpc::SenseType >( senseInfo[ "Sense" ][ 1 ].get<
+          uint8_t >() );
+        cachedBnpc->baseData.SenseRange[ 0 ] = senseInfo[ "SenseRange" ][ 0 ].get< uint8_t >();
+        cachedBnpc->baseData.SenseRange[ 1 ] = senseInfo[ "SenseRange" ][ 1 ].get< uint8_t >();
+        cachedBnpc->baseData.TerritoryRange = senseInfo[ "territoryRange" ].get< uint32_t >();
+
         // Set default values for fields that might not be in JSON
         cachedBnpc->EventGroup = 0;
         cachedBnpc->BNpcBaseData = 0;
@@ -2464,6 +2302,7 @@ void ZoneEditor::buildNavmeshGeometry()
     printf( "Successfully created navmesh geometry with %d triangles\n", m_navmeshIndexCount / 3 );
   }
   buildBnpcMarkerGeometry();
+  buildSenseRangeGeometry();
 }
 
 // Also add a simplified version for testing
@@ -3102,8 +2941,10 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
     {
       m_selectedBnpcIndex = closestIndex;
       // Rebuild markers to update selection highlighting
-      handleBnpcSelection( m_filteredBnpcs[ m_selectedBnpcIndex ]->groupName, m_filteredBnpcs[ m_selectedBnpcIndex ], {} );
+      handleBnpcSelection( m_filteredBnpcs[ m_selectedBnpcIndex ]->groupName, m_filteredBnpcs[ m_selectedBnpcIndex ],
+                           {} );
       buildBnpcMarkerGeometry();
+      buildSenseRangeGeometry();
     }
 
     // Show tooltip for hovered BNPC
@@ -3503,11 +3344,310 @@ void ZoneEditor::renderNavmeshToTexture()
   // Render BNPC markers on top
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  renderSenseRanges();
   renderBnpcMarkers();
 
   // Unbind framebuffer (back to default)
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
+
+void ZoneEditor::renderSenseRanges()
+{
+  if( !m_showSenseRanges || m_senseRangeVAO == 0 || m_senseRangeVertexCount == 0 )
+  {
+    return;
+  }
+
+  // Check if we still have a valid selection
+  if( m_selectedBnpcIndex < 0 || m_selectedBnpcIndex >= m_filteredBnpcs.size() )
+  {
+    return;
+  }
+
+  if( m_senseRangeShader == 0 )
+  {
+    return;
+  }
+
+  glUseProgram( m_senseRangeShader );
+
+  // Set view and projection matrices (use the same as your navmesh rendering)
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+
+  GLint viewLoc = glGetUniformLocation( m_senseRangeShader, "view" );
+  GLint projLoc = glGetUniformLocation( m_senseRangeShader, "projection" );
+
+  if( viewLoc != -1 )
+  {
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, &view[ 0 ][ 0 ] );
+  }
+  if( projLoc != -1 )
+  {
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, &projection[ 0 ][ 0 ] );
+  }
+
+  glBindVertexArray( m_senseRangeVAO );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glLineWidth( 3.0f );
+
+  // Render as line strips/loops
+  glDrawArrays( GL_LINE_LOOP, 0, m_senseRangeVertexCount );
+
+  glDisable( GL_BLEND );
+  glBindVertexArray( 0 );
+  glUseProgram( 0 );
+}
+
+void ZoneEditor::initializeSenseRangeRendering()
+{
+  if( m_senseRangeVAO != 0 )
+  {
+    return; // Already initialized
+  }
+
+  glGenVertexArrays( 1, &m_senseRangeVAO );
+  glGenBuffers( 1, &m_senseRangeVBO );
+
+  // Simpler shader without instancing
+  const char *vertexShader = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 vertColor;
+
+void main()
+{
+    gl_Position = projection * view * vec4(aPos, 1.0);
+    vertColor = aColor;
+}
+)";
+
+  const char *fragmentShader = R"(
+#version 330 core
+in vec3 vertColor;
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(vertColor, 0.8);
+}
+)";
+
+  m_senseRangeShader = createShaderProgram( vertexShader, fragmentShader );
+}
+
+void ZoneEditor::buildSenseRangeGeometry()
+{
+  if( m_senseRangeVAO == 0 )
+  {
+    initializeSenseRangeRendering();
+  }
+
+  // Check if we have a valid selection
+  if( m_selectedBnpcIndex < 0 || m_selectedBnpcIndex >= m_filteredBnpcs.size() )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  CachedBnpc *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+  if( !selectedBnpc )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  std::vector< float > allVertices;
+  std::vector< float > allColors;
+  int totalVertices = 0;
+
+  // Process both sense types of the selected BNPC
+  for( int i = 0; i < 2; ++i )
+  {
+    if( selectedBnpc->baseData.Sense[ i ] == CachedBnpc::SenseType::NONE )
+    {
+      continue;
+    }
+
+    float range = selectedBnpc->baseData.SenseRange[ i ];
+    if( range <= 0.0f ) continue;
+
+    std::vector< float > vertices;
+
+    // Create different geometry based on sense type
+    if( selectedBnpc->baseData.Sense[ i ] == CachedBnpc::SenseType::VISION )
+    {
+      // Create cone for vision
+      vertices = createConeVertices( range, 3.1415926 * 0.75f, 32 ); // 135-degree cone
+    }
+    else
+    {
+      // Create circle for other senses
+      vertices = createCircleVertices( range, 64 );
+    }
+
+    // Transform vertices to world position and apply rotation
+    for( size_t v = 0; v < vertices.size(); v += 3 )
+    {
+      float x = vertices[ v ];
+      float y = vertices[ v + 1 ];
+      float z = vertices[ v + 2 ];
+
+      // Apply rotation around Y axis
+      float cosR = cos( -selectedBnpc->rotation );
+      float sinR = sin( -selectedBnpc->rotation );
+      float rotatedX = x * cosR - z * sinR;
+      float rotatedZ = x * sinR + z * cosR;
+
+      // Add to world position
+      allVertices.push_back( rotatedX + selectedBnpc->x );
+      allVertices.push_back( y + selectedBnpc->y );
+      allVertices.push_back( rotatedZ + selectedBnpc->z );
+
+      // Add color based on sense type
+      switch( selectedBnpc->baseData.Sense[ i ] )
+      {
+        case CachedBnpc::SenseType::VISION:
+          allColors.insert( allColors.end(), { 1.0f, 1.0f, 0.0f } ); // Yellow
+          break;
+        case CachedBnpc::SenseType::HEARING:
+          allColors.insert( allColors.end(), { 0.0f, 1.0f, 0.0f } ); // Green
+          break;
+        case CachedBnpc::SenseType::PRESENCE:
+          allColors.insert( allColors.end(), { 0.0f, 0.0f, 1.0f } ); // Blue
+          break;
+        case CachedBnpc::SenseType::VITALITY:
+          allColors.insert( allColors.end(), { 1.0f, 0.0f, 0.0f } ); // Red
+          break;
+        case CachedBnpc::SenseType::MAGIC:
+          allColors.insert( allColors.end(), { 1.0f, 0.0f, 1.0f } ); // Magenta
+          break;
+        case CachedBnpc::SenseType::ABILITIE:
+          allColors.insert( allColors.end(), { 0.0f, 1.0f, 1.0f } ); // Cyan
+          break;
+        case CachedBnpc::SenseType::WEAPON_SKILL:
+          allColors.insert( allColors.end(), { 1.0f, 0.5f, 0.0f } ); // Orange
+          break;
+        case CachedBnpc::SenseType::POISON:
+          allColors.insert( allColors.end(), { 0.5f, 1.0f, 0.0f } ); // Lime
+          break;
+        default:
+          allColors.insert( allColors.end(), { 0.5f, 0.5f, 0.5f } ); // Gray
+          break;
+      }
+      totalVertices++;
+    }
+  }
+
+  if( allVertices.empty() )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  glBindVertexArray( m_senseRangeVAO );
+
+  // Upload vertices and colors
+  glBindBuffer( GL_ARRAY_BUFFER, m_senseRangeVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                ( allVertices.size() + allColors.size() ) * sizeof( float ),
+                nullptr, GL_STATIC_DRAW );
+
+  // Upload position data
+  glBufferSubData( GL_ARRAY_BUFFER, 0,
+                   allVertices.size() * sizeof( float ),
+                   allVertices.data() );
+
+  // Upload color data
+  glBufferSubData( GL_ARRAY_BUFFER,
+                   allVertices.size() * sizeof( float ),
+                   allColors.size() * sizeof( float ),
+                   allColors.data() );
+
+  // Set up vertex attributes
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ),
+                         ( void * ) ( allVertices.size() * sizeof( float ) ) );
+  glEnableVertexAttribArray( 1 );
+
+  m_senseRangeVertexCount = totalVertices;
+  glBindVertexArray( 0 );
+
+  printf( "Built sense range geometry for BNPC '%s': %d vertices\n",
+          selectedBnpc->nameString.c_str(), m_senseRangeVertexCount );
+}
+
+std::vector< float > ZoneEditor::createCircleVertices( float radius, int segments )
+{
+  std::vector< float > vertices;
+
+  // Create line loop for circle outline
+  for( int i = 0; i <= segments; ++i )
+  {
+    float angle = 2.0f * 3.1415926f * i / segments;
+    float x = radius * cos( angle );
+    float z = radius * sin( angle );
+    vertices.insert( vertices.end(), { x, 0.2f, z } );
+  }
+
+  return vertices;
+}
+
+std::vector< float > ZoneEditor::createConeVertices( float radius, float angle, int segments )
+{
+  std::vector< float > vertices;
+  float halfAngle = angle * 0.5f;
+
+  // Start from center
+  vertices.insert( vertices.end(), { 0.0f, 0.0f, 0.0f } );
+
+  // Add arc points
+  for( int i = 0; i <= segments; ++i )
+  {
+    float currentAngle = -halfAngle + ( angle * i / segments );
+    float x = radius * sin( currentAngle );
+    float z = radius * cos( currentAngle );
+    vertices.insert( vertices.end(), { x, 0.2f, z } );
+  }
+
+  // Close back to center
+  vertices.insert( vertices.end(), { 0.0f, 0.2f, 0.0f } );
+
+  return vertices;
+}
+
+
+void ZoneEditor::cleanupSenseRangeRendering()
+{
+  if( m_senseRangeVAO != 0 )
+  {
+    glDeleteVertexArrays( 1, &m_senseRangeVAO );
+    m_senseRangeVAO = 0;
+  }
+  if( m_senseRangeVBO != 0 )
+  {
+    glDeleteBuffers( 1, &m_senseRangeVBO );
+    m_senseRangeVBO = 0;
+  }
+  if( m_senseRangeShader != 0 )
+  {
+    glDeleteProgram( m_senseRangeShader );
+    m_senseRangeShader = 0;
+  }
+}
+
 
 glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize )
 {
