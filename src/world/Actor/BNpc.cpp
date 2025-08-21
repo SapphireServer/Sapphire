@@ -72,7 +72,7 @@ BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone ) : Npc( ObjKind::BattleNpc )
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone ) : Npc( ObjKind::BattleNpc )
 {
   m_id = id;
   m_pInfo = pInfo;
@@ -100,7 +100,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
-
+  m_senseData = pInfo->baseData;
 
   // Striking Dummy
   if( pInfo->NameId == 541 )
@@ -189,7 +189,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
@@ -217,6 +217,8 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_boundInstanceId = pInfo->BoundInstanceID;
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
+
+  m_senseData = pInfo->baseData;
 
   m_territoryTypeId = zone.getTerritoryTypeId();
   m_territoryId = zone.getGuId();
@@ -317,6 +319,11 @@ uint64_t BNpc::getWeaponMain() const
 uint64_t BNpc::getWeaponSub() const
 {
   return m_weaponSub;
+}
+
+const BNpcBaseData& BNpc::getSenseData() const
+{
+  return m_senseData;
 }
 
 uint16_t BNpc::getModelChara() const

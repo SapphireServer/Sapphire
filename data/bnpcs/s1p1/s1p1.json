@@ -25,6 +25,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 901,
+          "bnpcRankId": 0,
           "boundInstanceId": 4833610,
           "customizeId": 0,
           "equipmentId": 0,
@@ -88,6 +89,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 901,
+          "bnpcRankId": 0,
           "boundInstanceId": 4833612,
           "customizeId": 0,
           "equipmentId": 0,
@@ -151,6 +153,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 901,
+          "bnpcRankId": 0,
           "boundInstanceId": 4833609,
           "customizeId": 0,
           "equipmentId": 0,
@@ -214,6 +217,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 901,
+          "bnpcRankId": 0,
           "boundInstanceId": 4833611,
           "customizeId": 0,
           "equipmentId": 0,

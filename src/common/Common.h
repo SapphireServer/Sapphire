@@ -6,6 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
+#include "datReader/DatCategories/bg/LgbTypes.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -1964,7 +1965,7 @@ namespace Sapphire::Common
     int8_t Nonpop;
     float HorizontalPopRange;
     float VerticalPopRange;
-    int32_t BNpcBaseData;
+    int32_t BNpcBaseDataId;
     uint8_t RepopId;
     uint8_t BNPCRankId;
     uint16_t TerritoryRange;
@@ -1974,6 +1975,11 @@ namespace Sapphire::Common
     uint32_t ServerPathId;
     uint32_t EquipmentID;
     uint32_t CustomizeID;
+  };
+
+  struct BNpcCacheEntry : BNPCInstanceObject
+  {
+    BNpcBaseData baseData;
   };
 
   /*

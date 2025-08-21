@@ -31,7 +31,7 @@ namespace Sapphire
   struct SpawnInfo
   {
     std::shared_ptr< Entity::BNpc > bnpcPtr;
-    std::shared_ptr< Common::BNPCInstanceObject > infoPtr;
+    std::shared_ptr< Common::BNpcCacheEntry > infoPtr;
     uint32_t lastSpawn;
     uint32_t timeOfDeath;
   };
@@ -50,7 +50,7 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bNpcMap;
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventObjects;
 
-    std::unordered_map< uint32_t, std::shared_ptr< Common::BNPCInstanceObject > > m_bNpcBaseMap;
+    std::unordered_map< uint32_t, std::shared_ptr< Common::BNpcCacheEntry > > m_bNpcBaseMap;
 
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;

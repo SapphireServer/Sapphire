@@ -25,6 +25,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1418,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -95,6 +96,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1232,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -165,6 +167,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1233,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -235,6 +238,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1194,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -305,6 +309,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1155,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -375,6 +380,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1216,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -438,6 +444,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1192,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -501,6 +508,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -571,6 +579,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -634,6 +643,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -697,6 +707,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -760,6 +771,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -823,6 +835,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -886,6 +899,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -949,6 +963,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1012,6 +1027,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1405,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1082,6 +1098,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1234,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1152,6 +1169,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1235,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1222,6 +1240,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1289,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1285,6 +1304,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1217,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1355,6 +1375,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1154,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1425,6 +1446,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2145,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1495,6 +1517,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1155,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1565,6 +1588,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2146,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1635,6 +1659,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2147,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1705,6 +1730,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2116,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1775,6 +1801,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2159,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1845,6 +1872,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2508,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1915,6 +1943,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2950,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -1978,6 +2007,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2951,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2041,6 +2071,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2952,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2104,6 +2135,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2953,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2167,6 +2199,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2954,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2230,6 +2263,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2291,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2300,6 +2334,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2370,6 +2405,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2291,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2433,6 +2469,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2086,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2503,6 +2540,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2566,6 +2604,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2629,6 +2668,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2692,6 +2732,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2755,6 +2796,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2818,6 +2860,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2881,6 +2924,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -2944,6 +2988,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3007,6 +3052,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 138,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3070,6 +3116,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3133,6 +3180,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3196,6 +3244,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3259,6 +3308,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3322,6 +3372,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3385,6 +3436,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3448,6 +3500,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3511,6 +3564,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3574,6 +3628,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3637,6 +3692,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3700,6 +3756,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3763,6 +3820,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 22,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3826,6 +3884,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3889,6 +3948,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -3952,6 +4012,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4015,6 +4076,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4078,6 +4140,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4141,6 +4204,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4204,6 +4268,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4267,6 +4332,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4330,6 +4396,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4393,6 +4460,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4456,6 +4524,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4519,6 +4588,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4582,6 +4652,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 205,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4645,6 +4716,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 348,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4708,6 +4780,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 349,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4771,6 +4844,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 349,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4834,6 +4908,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 348,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4897,6 +4972,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 349,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -4960,6 +5036,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 348,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5023,6 +5100,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 348,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5086,6 +5164,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 349,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5149,6 +5228,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5212,6 +5292,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5275,6 +5356,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5338,6 +5420,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5401,6 +5484,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5464,6 +5548,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5527,6 +5612,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5590,6 +5676,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5653,6 +5740,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5716,6 +5804,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5779,6 +5868,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5842,6 +5932,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5905,6 +5996,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -5968,6 +6060,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6031,6 +6124,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6094,6 +6188,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6157,6 +6252,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 135,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6220,6 +6316,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 135,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6283,6 +6380,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 135,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6346,6 +6444,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 135,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6409,6 +6508,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 135,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6479,6 +6579,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6542,6 +6643,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6605,6 +6707,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6668,6 +6771,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6731,6 +6835,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6794,6 +6899,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6857,6 +6963,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6920,6 +7027,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -6983,6 +7091,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7046,6 +7155,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7109,6 +7219,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7172,6 +7283,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7235,6 +7347,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7298,6 +7411,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7361,6 +7475,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7424,6 +7539,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7487,6 +7603,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7550,6 +7667,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7613,6 +7731,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7676,6 +7795,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7739,6 +7859,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7802,6 +7923,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7865,6 +7987,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7928,6 +8051,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -7991,6 +8115,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8054,6 +8179,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8117,6 +8243,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8180,6 +8307,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8243,6 +8371,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8306,6 +8435,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 306,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8369,6 +8499,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8432,6 +8563,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8495,6 +8627,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8558,6 +8691,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8621,6 +8755,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8684,6 +8819,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8747,6 +8883,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8810,6 +8947,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8873,6 +9011,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8936,6 +9075,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -8999,6 +9139,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9062,6 +9203,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9125,6 +9267,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9188,6 +9331,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9251,6 +9395,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 769,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9314,6 +9459,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9377,6 +9523,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9440,6 +9587,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9503,6 +9651,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9566,6 +9715,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9629,6 +9779,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9692,6 +9843,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9755,6 +9907,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9818,6 +9971,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9881,6 +10035,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -9944,6 +10099,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10007,6 +10163,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10070,6 +10227,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10133,6 +10291,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10196,6 +10355,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10259,6 +10419,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10322,6 +10483,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 206,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10385,6 +10547,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10448,6 +10611,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10511,6 +10675,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 38,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10574,6 +10739,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10637,6 +10803,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10700,6 +10867,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 341,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10763,6 +10931,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10826,6 +10995,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 181,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10896,6 +11066,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -10959,6 +11130,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11022,6 +11194,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11085,6 +11258,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11148,6 +11322,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11211,6 +11386,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11274,6 +11450,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11337,6 +11514,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11400,6 +11578,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11463,6 +11642,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11526,6 +11706,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11589,6 +11770,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11652,6 +11834,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11715,6 +11898,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11778,6 +11962,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11841,6 +12026,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11904,6 +12090,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -11967,6 +12154,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12030,6 +12218,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12093,6 +12282,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12156,6 +12346,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12219,6 +12410,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12282,6 +12474,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12345,6 +12538,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 59,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12408,6 +12602,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12471,6 +12666,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12534,6 +12730,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 774,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12597,6 +12794,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 774,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12660,6 +12858,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12723,6 +12922,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12786,6 +12986,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 774,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12849,6 +13050,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12912,6 +13114,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -12975,6 +13178,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13038,6 +13242,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 774,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13101,6 +13306,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13164,6 +13370,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13227,6 +13434,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13290,6 +13498,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13353,6 +13562,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13416,6 +13626,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13479,6 +13690,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13542,6 +13754,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13605,6 +13818,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13668,6 +13882,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 312,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13731,6 +13946,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13794,6 +14010,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13857,6 +14074,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13920,6 +14138,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -13983,6 +14202,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14046,6 +14266,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14109,6 +14330,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14172,6 +14394,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2835,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14235,6 +14458,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2835,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14298,6 +14522,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2835,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14361,6 +14586,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2835,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14424,6 +14650,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2835,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14487,6 +14714,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14550,6 +14778,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14613,6 +14842,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14676,6 +14906,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14739,6 +14970,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14809,6 +15041,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14872,6 +15105,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14935,6 +15169,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -14998,6 +15233,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15061,6 +15297,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15124,6 +15361,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15187,6 +15425,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15250,6 +15489,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15313,6 +15553,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15376,6 +15617,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15439,6 +15681,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15502,6 +15745,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15565,6 +15809,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15628,6 +15873,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15691,6 +15937,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15754,6 +16001,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15817,6 +16065,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15880,6 +16129,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -15943,6 +16193,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16006,6 +16257,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16069,6 +16321,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16132,6 +16385,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16195,6 +16449,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16258,6 +16513,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16321,6 +16577,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16384,6 +16641,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16447,6 +16705,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16510,6 +16769,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16573,6 +16833,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16636,6 +16897,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16699,6 +16961,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16762,6 +17025,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 139,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16825,6 +17089,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16888,6 +17153,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -16951,6 +17217,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17014,6 +17281,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17077,6 +17345,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17140,6 +17409,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17203,6 +17473,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2836,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17266,6 +17537,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2836,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17329,6 +17601,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2836,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17392,6 +17665,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2836,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17455,6 +17729,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 2836,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17518,6 +17793,7 @@
         "baseInfo": {
           "activeType": 2,
           "baseId": 2837,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17581,6 +17857,7 @@
         "baseInfo": {
           "activeType": 2,
           "baseId": 2837,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17644,6 +17921,7 @@
         "baseInfo": {
           "activeType": 2,
           "baseId": 2837,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17707,6 +17985,7 @@
         "baseInfo": {
           "activeType": 2,
           "baseId": 2837,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17770,6 +18049,7 @@
         "baseInfo": {
           "activeType": 2,
           "baseId": 2837,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17833,6 +18113,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17896,6 +18177,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -17959,6 +18241,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18022,6 +18305,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18085,6 +18369,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18148,6 +18433,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18211,6 +18497,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18274,6 +18561,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18337,6 +18625,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18400,6 +18689,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18463,6 +18753,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18533,6 +18824,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18596,6 +18888,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18659,6 +18952,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18722,6 +19016,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18785,6 +19080,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18848,6 +19144,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18911,6 +19208,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -18974,6 +19272,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19037,6 +19336,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19100,6 +19400,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19163,6 +19464,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19226,6 +19528,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19289,6 +19592,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19352,6 +19656,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 403,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19415,6 +19720,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19478,6 +19784,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19541,6 +19848,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19604,6 +19912,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19667,6 +19976,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19730,6 +20040,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19793,6 +20104,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 20,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19856,6 +20168,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 396,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19919,6 +20232,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -19982,6 +20296,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20045,6 +20360,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20108,6 +20424,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20171,6 +20488,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20234,6 +20552,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20297,6 +20616,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20360,6 +20680,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20423,6 +20744,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20486,6 +20808,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20549,6 +20872,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20612,6 +20936,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20675,6 +21000,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20738,6 +21064,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20801,6 +21128,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20864,6 +21192,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20927,6 +21256,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -20990,6 +21320,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21053,6 +21384,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21116,6 +21448,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21179,6 +21512,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21242,6 +21576,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21305,6 +21640,7 @@
         "baseInfo": {
           "activeType": 1,
           "baseId": 46,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21375,6 +21711,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21438,6 +21775,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21501,6 +21839,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21564,6 +21903,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21627,6 +21967,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21690,6 +22031,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21753,6 +22095,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21816,6 +22159,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21879,6 +22223,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -21942,6 +22287,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22005,6 +22351,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22068,6 +22415,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 383,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22131,6 +22479,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22194,6 +22543,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22257,6 +22607,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22320,6 +22671,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22383,6 +22735,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -22446,6 +22799,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22509,6 +22863,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22572,6 +22927,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22635,6 +22991,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22698,6 +23055,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22761,6 +23119,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22824,6 +23183,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22887,6 +23247,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -22950,6 +23311,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -23013,6 +23375,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 776,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -23076,6 +23439,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23139,6 +23503,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23202,6 +23567,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23265,6 +23631,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23328,6 +23695,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23391,6 +23759,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23454,6 +23823,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23517,6 +23887,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23580,6 +23951,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23643,6 +24015,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23706,6 +24079,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2832,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23769,6 +24143,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -23832,6 +24207,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -23895,6 +24271,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -23958,6 +24335,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24021,6 +24399,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24084,6 +24463,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24147,6 +24527,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24210,6 +24591,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24273,6 +24655,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 773,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24336,6 +24719,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24399,6 +24783,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24462,6 +24847,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24525,6 +24911,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24588,6 +24975,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24651,6 +25039,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 768,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -24714,6 +25103,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24777,6 +25167,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24840,6 +25231,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24903,6 +25295,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 775,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 282,
           "equipmentId": 0,
@@ -24966,6 +25359,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25029,6 +25423,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25092,6 +25487,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25155,6 +25551,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 765,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25225,6 +25622,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 783,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25288,6 +25686,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 785,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25351,6 +25750,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 784,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25414,6 +25814,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 786,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25477,6 +25878,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 787,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25547,6 +25949,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25610,6 +26013,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25673,6 +26077,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25736,6 +26141,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25799,6 +26205,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25862,6 +26269,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25925,6 +26333,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 997,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -25988,6 +26397,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26051,6 +26461,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26114,6 +26525,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26177,6 +26589,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26240,6 +26653,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 995,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26303,6 +26717,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26366,6 +26781,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26429,6 +26845,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26492,6 +26909,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26555,6 +26973,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 998,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26618,6 +27037,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 996,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26688,6 +27108,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26751,6 +27172,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26814,6 +27236,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1648,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26877,6 +27300,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1649,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -26940,6 +27364,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1649,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27003,6 +27428,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1632,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27066,6 +27492,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27129,6 +27556,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1648,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27192,6 +27620,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1649,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27255,6 +27684,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2200,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27318,6 +27748,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2200,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27381,6 +27812,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27444,6 +27876,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1649,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27507,6 +27940,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27570,6 +28004,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1648,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27633,6 +28068,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1649,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27696,6 +28132,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1648,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27759,6 +28196,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1647,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27822,6 +28260,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2202,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27885,6 +28324,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1633,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -27948,6 +28388,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1633,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28011,6 +28452,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1634,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28074,6 +28516,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2201,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28144,6 +28587,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 906,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28207,6 +28651,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28270,6 +28715,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28333,6 +28779,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28396,6 +28843,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 910,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28459,6 +28907,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28522,6 +28971,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28585,6 +29035,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28648,6 +29099,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28711,6 +29163,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 911,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28774,6 +29227,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 912,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28837,6 +29291,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28900,6 +29355,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -28963,6 +29419,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29026,6 +29483,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29089,6 +29547,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 914,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29152,6 +29611,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 915,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29215,6 +29675,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 916,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29278,6 +29739,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 917,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29341,6 +29803,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 918,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29404,6 +29867,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 913,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29467,6 +29931,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1247,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29530,6 +29995,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1078,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29593,6 +30059,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1247,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29656,6 +30123,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1078,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29719,6 +30187,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1248,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29782,6 +30251,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1079,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29845,6 +30315,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1249,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29908,6 +30379,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1080,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -29971,6 +30443,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1249,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -30034,6 +30507,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1079,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -30104,6 +30578,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 3120,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 214,
           "equipmentId": 831,
@@ -30167,6 +30642,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 3121,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 832,
@@ -30237,6 +30713,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2867,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -30300,6 +30777,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2868,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -30363,6 +30841,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2869,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -30433,6 +30912,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2902,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -30503,6 +30983,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -30566,6 +31047,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -30629,6 +31111,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -30692,6 +31175,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -30755,6 +31239,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -30825,6 +31310,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -30888,6 +31374,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -30951,6 +31438,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -31014,6 +31502,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -31077,6 +31566,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -31140,6 +31630,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -31203,6 +31694,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 767,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -31273,6 +31765,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2842,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31336,6 +31829,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2842,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31399,6 +31893,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2842,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31462,6 +31957,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2842,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31525,6 +32021,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2842,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31595,6 +32092,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31658,6 +32156,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31721,6 +32220,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31784,6 +32284,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31847,6 +32348,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31910,6 +32412,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2874,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -31980,6 +32483,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2886,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -32050,6 +32554,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -32113,6 +32618,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -32176,6 +32682,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -32239,6 +32746,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -32302,6 +32810,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2839,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -32372,6 +32881,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2903,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -32435,6 +32945,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2903,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -32498,6 +33009,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2903,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -32561,6 +33073,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2903,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -32631,6 +33144,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2889,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -32701,6 +33215,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2843,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 50,
           "equipmentId": 635,
@@ -32764,6 +33279,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 284,
           "equipmentId": 636,
@@ -32827,6 +33343,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2843,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 50,
           "equipmentId": 635,
@@ -32890,6 +33407,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 284,
           "equipmentId": 636,
@@ -32953,6 +33471,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 284,
           "equipmentId": 636,
@@ -33023,6 +33542,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2904,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -33086,6 +33606,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33149,6 +33670,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33212,6 +33734,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2906,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -33275,6 +33798,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2904,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -33338,6 +33862,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33401,6 +33926,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33464,6 +33990,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2906,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -33527,6 +34054,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2904,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -33590,6 +34118,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33653,6 +34182,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33716,6 +34246,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2906,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -33779,6 +34310,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33842,6 +34374,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2905,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -33905,6 +34438,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2906,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -33968,6 +34502,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2904,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -34038,6 +34573,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2949,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34101,6 +34637,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2949,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34164,6 +34701,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2949,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34227,6 +34765,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2949,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34290,6 +34829,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2949,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34360,6 +34900,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34423,6 +34964,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34486,6 +35028,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34549,6 +35092,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -34619,6 +35163,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 315,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 283,
           "equipmentId": 634,
@@ -34682,6 +35227,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 317,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 51,
           "equipmentId": 636,
@@ -34745,6 +35291,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 315,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 283,
           "equipmentId": 634,
@@ -34808,6 +35355,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 317,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 51,
           "equipmentId": 636,
@@ -34871,6 +35419,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 315,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 283,
           "equipmentId": 634,
@@ -34934,6 +35483,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 317,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 51,
           "equipmentId": 636,
@@ -35004,6 +35554,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2887,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -35067,6 +35618,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2886,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -35130,6 +35682,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2888,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -35200,6 +35753,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 4,
@@ -35263,6 +35817,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 4,
@@ -35326,6 +35881,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 4,
@@ -35389,6 +35945,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 4,
@@ -35452,6 +36009,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2844,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 213,
           "equipmentId": 4,
@@ -35522,6 +36080,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -35585,6 +36144,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -35648,6 +36208,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -35711,6 +36272,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -35774,6 +36336,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -35837,6 +36400,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -35900,6 +36464,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -35963,6 +36528,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -36033,6 +36599,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2878,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 49,
           "equipmentId": 634,
@@ -36096,6 +36663,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2879,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 52,
           "equipmentId": 637,
@@ -36159,6 +36727,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2880,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 51,
           "equipmentId": 636,
@@ -36229,6 +36798,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36292,6 +36862,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36355,6 +36926,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36418,6 +36990,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36481,6 +37054,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2907,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36544,6 +37118,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36607,6 +37182,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36670,6 +37246,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36733,6 +37310,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36796,6 +37374,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36859,6 +37438,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36922,6 +37502,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -36985,6 +37566,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37048,6 +37630,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2908,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37111,6 +37694,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2909,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37181,6 +37765,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2910,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 53,
           "equipmentId": 636,
@@ -37251,6 +37836,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2847,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -37314,6 +37900,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2847,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -37377,6 +37964,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2847,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -37440,6 +38028,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2847,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -37510,6 +38099,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 317,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37573,6 +38163,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 318,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37643,6 +38234,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 28,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37713,6 +38305,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37776,6 +38369,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37839,6 +38433,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37902,6 +38497,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 12,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -37972,6 +38568,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1916,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38042,6 +38639,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2095,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38105,6 +38703,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2096,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38168,6 +38767,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2095,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38238,6 +38838,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2102,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38308,6 +38909,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2098,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38371,6 +38973,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2101,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38434,6 +39037,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2098,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38497,6 +39101,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2101,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38560,6 +39165,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2101,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38623,6 +39229,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2098,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -38693,6 +39300,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -38756,6 +39364,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -38819,6 +39428,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 766,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -38882,6 +39492,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2858,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -38945,6 +39556,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2859,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -39015,6 +39627,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2861,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 51,
           "equipmentId": 388,
@@ -39078,6 +39691,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2862,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 50,
           "equipmentId": 387,
@@ -39141,6 +39755,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2863,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 52,
           "equipmentId": 389,
@@ -39211,6 +39826,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2890,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -39274,6 +39890,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2891,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -39337,6 +39954,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2890,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -39400,6 +40018,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2891,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -39463,6 +40082,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2892,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -39526,6 +40146,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2893,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -39589,6 +40210,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2894,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -39652,6 +40274,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2895,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -39715,6 +40338,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2892,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -39778,6 +40402,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2893,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 337,
@@ -39841,6 +40466,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2894,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 341,
@@ -39904,6 +40530,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2895,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -39967,6 +40594,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2896,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 339,
@@ -40030,6 +40658,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2897,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 340,
@@ -40093,6 +40722,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2898,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 49,
           "equipmentId": 386,
@@ -40163,6 +40793,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40226,6 +40857,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 397,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40296,6 +40928,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 17,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40366,6 +40999,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40429,6 +41063,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40492,6 +41127,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40555,6 +41191,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40618,6 +41255,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40681,6 +41319,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40744,6 +41383,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40807,6 +41447,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 340,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40877,6 +41518,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 1390,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -40947,6 +41589,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2447,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -41010,6 +41653,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 2447,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -41080,6 +41724,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 339,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,
@@ -41143,6 +41788,7 @@
         "baseInfo": {
           "activeType": 0,
           "baseId": 339,
+          "bnpcRankId": 0,
           "boundInstanceId": 0,
           "customizeId": 0,
           "equipmentId": 0,

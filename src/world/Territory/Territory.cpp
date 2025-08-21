@@ -944,7 +944,7 @@ bool Territory::loadBNpcs()
         uint32_t instanceId = std::stoul( instanceIdStr );
 
         // Create BNPCInstanceObject from JSON data
-        auto bnpc = std::make_shared< Common::BNPCInstanceObject >();
+        auto bnpc = std::make_shared< Common::BNpcCacheEntry >();
 
         // Base info
         const auto& baseInfo = bnpcData[ "baseInfo" ];
@@ -964,6 +964,7 @@ bool Territory::loadBNpcs()
         bnpc->FateLayoutLabelId = baseInfo[ "fateLayoutLabelId" ].get< uint32_t >();
         bnpc->EquipmentID = baseInfo[ "equipmentId" ].get< uint32_t >();
         bnpc->CustomizeID = baseInfo[ "customizeId" ].get< uint32_t >();
+        bnpc->BNPCRankId = baseInfo[ "bnpcRankId" ].get< uint32_t >();
 
         // Population info
         const auto& popInfo = bnpcData[ "popInfo" ];
@@ -1002,11 +1003,14 @@ bool Territory::loadBNpcs()
         // Sense info
         const auto& senseInfo = bnpcData[ "SenseInfo" ];
         bnpc->SenseRangeRate = senseInfo[ "senseRangeRate" ].get< float >();
+        bnpc->baseData.TerritoryRange = senseInfo[ "territoryRange" ].get< float >();
+        bnpc->baseData.SenseRange[ 0 ] = senseInfo[ "SenseRange" ][ 0 ].get< float >();
+        bnpc->baseData.SenseRange[ 1 ] = senseInfo[ "SenseRange" ][ 1 ].get< float >();
+        bnpc->baseData.Sense[ 0 ] = senseInfo[ "Sense" ][ 0 ].get< float >();
+        bnpc->baseData.Sense[ 1 ] = senseInfo[ "Sense" ][ 1 ].get< float >();
 
         // Additional fields that might not be in JSON but are expected by the system
         bnpc->EventGroup = 0; // Set default or extract from JSON if available
-        bnpc->BNpcBaseData = 0; // Set default or extract from JSON if available
-        bnpc->BNPCRankId = 0; // Set default or extract from JSON if available
         bnpc->ServerPathId = 0; // Set default or extract from JSON if available
 
         // Store in the base map

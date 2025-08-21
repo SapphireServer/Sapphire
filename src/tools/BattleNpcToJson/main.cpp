@@ -545,6 +545,8 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
     baseInfo[ "boundInstanceId" ] = pBNpc->data.BoundInstanceID;
     baseInfo[ "fateLayoutLabelId" ] = pBNpc->data.FateLayoutLabelId;
 
+    baseInfo[ "bnpcRankId" ] = pBNpc->data.BNPCRankId;
+
     jsonEntry[ "baseInfo" ] = baseInfo;
 
     // Use instance ID as the key for this BNPC entry

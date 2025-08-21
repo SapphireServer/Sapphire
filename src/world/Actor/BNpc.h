@@ -70,8 +70,8 @@ namespace Sapphire::Entity
   public:
     BNpc();
 
-    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone );
-    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type );
 
     virtual ~BNpc() override;
 
@@ -90,6 +90,8 @@ namespace Sapphire::Entity
 
     uint64_t getWeaponMain() const;
     uint64_t getWeaponSub() const;
+
+    const BNpcBaseData& getSenseData() const;
 
     uint8_t getAggressionMode() const;
 
@@ -206,6 +208,8 @@ namespace Sapphire::Entity
     uint32_t m_triggerOwnerId;
 
     uint32_t m_flags;
+
+    BNpcBaseData m_senseData;
 
     Common::BNpcType m_bnpcType;
 

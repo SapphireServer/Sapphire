@@ -26,7 +26,7 @@ public:
   char* m_buf;
   uint32_t m_offset;
   InstanceObject header;
-
+  std::string name;
   LgbEntry()
   {
     m_buf = nullptr;
@@ -56,7 +56,6 @@ class LGB_BGPARTS_ENTRY : public LgbEntry
 {
 public:
   BgPartsData data;
-  std::string name;
   std::string modelFileName;
   std::string collisionFileName;
 
@@ -75,7 +74,7 @@ class LGB_SG_ENTRY : public LgbEntry
 {
 public:
   SGData data;
-  std::string name;
+
   std::string gimmickFileName;
 
   LGB_SG_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
@@ -90,7 +89,6 @@ struct LGB_ENPC_ENTRY : public LgbEntry
 {
 public:
   ENpcData data;
-  std::string name;
 
   LGB_ENPC_ENTRY( char* buf, size_t offset ) :
     LgbEntry( buf, offset )
@@ -104,7 +102,6 @@ struct LGB_EOBJ_ENTRY : public LgbEntry
 {
 public:
   EObjData data;
-  std::string name;
 
   LGB_EOBJ_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
@@ -117,7 +114,6 @@ struct LGB_MAP_RANGE_ENTRY : public LgbEntry
 {
 public:
   MapRangeData data;
-  std::string name;
 
   LGB_MAP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
@@ -130,7 +126,6 @@ struct LGB_EXIT_RANGE_ENTRY : public LgbEntry
 {
 public:
   ExitRangeData data;
-  std::string name;
 
   LGB_EXIT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
@@ -167,7 +162,6 @@ class LGB_BNPC_ENTRY : public LgbEntry
 public:
   ::BNPCInstanceObject data;
   BNpcBaseData baseData;
-  std::string name;
 
   LGB_BNPC_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
