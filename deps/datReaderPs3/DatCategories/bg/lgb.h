@@ -104,6 +104,9 @@ public:
   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
+    data.CollisionAssetPath = xivps3::utils::bparse::byteswap( data.CollisionAssetPath );
+    data.AssetPath = xivps3::utils::bparse::byteswap( data.AssetPath );
+    data.nameOffset = xivps3::utils::bparse::byteswap( data.nameOffset );
     name = std::string( buf + offset + header.nameOffset );
     modelFileName = std::string( buf + offset + data.AssetPath );
     collisionFileName = std::string( buf + offset + data.CollisionAssetPath );
@@ -120,9 +123,8 @@ public:
   LGB_SG_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< SGData* >( buf + offset );
-    header.nameOffset = xivps3::utils::bparse::byteswap( header.nameOffset );
     name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.AssetPath );
+    gimmickFileName = std::string( buf + offset + xivps3::utils::bparse::byteswap( data.AssetPath ) );
 
 
   };
@@ -138,7 +140,7 @@ public:
     LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ENpcData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset +  header.nameOffset );
   };
 };
 
@@ -316,27 +318,27 @@ struct LGB_GROUP
         const auto type =  xivps3::utils::bparse::byteswap( *reinterpret_cast< LgbEntryType* >( buf + entryOffset ) );
         if( type == LgbEntryType::BgParts )
         {
-        //  entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::SharedGroup )
         {
-        //  entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_SG_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::EventNpc )
         {
-        //  entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::EventObject )
         {
-        //  entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::ExitRange )
         {
-        //  entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::MapRange )
         {
-        //  entries.push_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::BattleNpc )
         {
@@ -344,7 +346,7 @@ struct LGB_GROUP
         }
         else
         {
-       //   entries.push_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
         }
       }
       catch( std::exception& e )

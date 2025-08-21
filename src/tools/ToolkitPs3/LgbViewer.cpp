@@ -214,6 +214,7 @@ void LgbViewer::cleanupNavmeshRendering()
 
 bool LgbViewer::loadLgbData( std::string lgbPath, std::vector< LGB_GROUP >& groups, std::string& name )
 {
+  groups.clear();
   auto& gameData = Engine::Service< xivps3::dat::GameData >::ref();
 
   std::vector< char > data_section;
@@ -238,6 +239,7 @@ void LgbViewer::onSelectionChanged()
   {
     // Load heavy data here
     const auto& data = m_selectedZone->data;
+
 
     // Load map texture if available
     if( data.Map > 0 )
@@ -2641,6 +2643,8 @@ ImVec2 LgbViewer::worldToScreenPos( float worldX, float worldZ, const ImVec2& im
 
 void LgbViewer::loadMapTexture( uint32_t mapId )
 {
+  return;
+
   auto& exdD = Engine::Service< Data::ExdData >::ref();
   auto mapEntry = exdD.getRow< Excel::Ps3::Map >( mapId );
   if( !mapEntry )
@@ -2655,7 +2659,6 @@ void LgbViewer::loadMapTexture( uint32_t mapId )
 
   auto& gameData = Engine::Service< xivps3::dat::GameData >::ref();
 
-  return;
   auto mapFile = gameData.getFile( "ui/map/" + mapPath + "/" + file );
   if( !mapFile )
     return;
@@ -2667,6 +2670,7 @@ void LgbViewer::loadMapTexture( uint32_t mapId )
   if( headerData.size() < 16 || dxtData.empty() )
     return;
 
+  std::cout <<"Test1"<< std::endl;
   const uint8_t *header = reinterpret_cast< const uint8_t * >( headerData.data() );
 
   // Parse header information (adjust these offsets based on your actual header format)
@@ -2674,6 +2678,7 @@ void LgbViewer::loadMapTexture( uint32_t mapId )
   uint32_t height = *reinterpret_cast< const uint16_t * >( header + 10 );
   uint32_t format = *reinterpret_cast< const uint32_t * >( header + 12 ); // Should indicate DXT1
 
+  std::cout << width << "x" << height << " " << format << std::endl;
   // Validate dimensions
   if( width == 0 || height == 0 || width > 4096 || height > 4096 )
     return;
