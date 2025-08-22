@@ -16,6 +16,14 @@
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 
+
+struct CachedServerPath
+{
+  vec3 position;
+  uint32_t instanceId;
+  std::vector< PathControlPoint > points;
+};
+
 struct CachedBnpc
 {
   uint16_t territoryType;
@@ -212,6 +220,20 @@ private:
   bool m_worldEditingMode = false;
   glm::vec3 m_lastClickWorldPos = glm::vec3( 0.0f );
   bool m_showClickMarker = false;
+  bool m_showServerPathWindow = true;
+  uint32_t m_selectedServerPathId = 0;
+  GLuint m_serverPathVAO = 0;
+  GLuint m_serverPathVBO = 0;
+  int m_serverPathVertexCount = 0;
+
+  void initializeServerPathShader();
+
+  void initializeServerPathRendering();
+  void buildServerPathGeometry();
+  bool m_showServerPathsInNavmesh = true;
+  GLuint m_serverPathShader = 0;
+
+  void renderServerPaths();
 
 
   // Camera/view controls for navmesh
@@ -266,14 +288,13 @@ private:
 
   std::string getObjFilePath();
 
-
-  // Add these methods
   void cleanupNavmeshGeometry(); // Separate from full cleanup
 
-  // Add these methods
   void showBnpcWindow();
 
   void showBnpcWindow2();
+
+  void showServerPathWindow();
 
   void updateBnpcSearchFilter();
 
@@ -303,6 +324,7 @@ private:
 
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
   std::unordered_map< uint32_t, Excel::BNpcBase > m_bnpcBaseCache;
+  std::unordered_map< uint32_t, CachedServerPath > m_serverPathCache;
   std::unordered_map< uint32_t, BnpcNameCacheEntry > m_bnpcNameCache;
   std::unordered_map< uint32_t, Excel::BNpcCustomize > m_bnpcCustomizeCache;
 
@@ -448,6 +470,8 @@ private:
   void updateSearchFilter();
 
   void loadBnpcs();
+
+  void loadServerPaths();
 
   void onSelectionChanged();
 

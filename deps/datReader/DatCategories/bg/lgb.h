@@ -229,6 +229,8 @@ struct LGB_GROUP
     header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.groupNameOffset );
 
+    std::cout << name << " groups: " << header.entryCount << " " << header.entriesOffset << std::endl;
+
     layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
 
     if( layerSetReferencedList.LayerSetCount > 0 )
@@ -343,6 +345,7 @@ struct LGB_FILE
       throw std::runtime_error( "Invalid LGB file!" );
     if( header.groupCount == 0 )
     {
+      std::cout << "No groups found for " << m_name << std::endl;
       return;
     }
 

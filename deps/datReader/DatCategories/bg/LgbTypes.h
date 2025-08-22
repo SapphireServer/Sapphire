@@ -127,6 +127,21 @@ struct PopRangeData : public InstanceObject
   uint32_t reserved;
 };
 
+struct PathControlPoint
+{
+  vec3 Translation;
+  uint16_t PointID;
+  int8_t Selected;
+  uint8_t Padding00[1];
+};
+
+struct ServerPathData : public InstanceObject
+{
+  int32_t ControlPoints;
+  int32_t ControlPoint_Count;
+  uint32_t Reserved1;
+  uint32_t Reserved2;
+};
 
 enum eDoorState : int32_t
 {

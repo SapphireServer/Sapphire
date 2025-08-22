@@ -3005,6 +3005,211 @@ void LgbViewer::openEntryViewWidget( std::shared_ptr< LgbEntry > entry )
   m_entryViewWidgets.emplace_back( entry );
 }
 
+void LgbViewer::showBnpcEntryView( LGB_BNPC_ENTRY *entry )
+{
+  ImGui::Text( "Battle NPC Entry" );
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
+    ImGui::Text( "Base ID: %u", entry->data.BaseId );
+    ImGui::Text( "Name ID: %u", entry->data.NameId );
+    ImGui::Text( "Level: %u", entry->data.Level );
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
+  }
+
+  // Population Information
+  if( ImGui::CollapsingHeader( "Population Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Pop Weather: %u", entry->data.PopWeather );
+    ImGui::Text( "Pop Time Start: %u", entry->data.PopTimeStart );
+    ImGui::Text( "Pop Time End: %u", entry->data.PopTimeEnd );
+    ImGui::Text( "Pop Interval: %u", entry->data.PopInterval );
+    ImGui::Text( "Pop Rate: %u", entry->data.PopRate );
+    ImGui::Text( "Pop Event: %u", entry->data.PopEvent );
+    ImGui::Text( "Active Type: %u", entry->data.ActiveType );
+    ImGui::Text( "Nonpop Init Zone: %d", entry->data.NonpopInitZone );
+    ImGui::Text( "Invalid Repop: %d", entry->data.InvalidRepop );
+    ImGui::Text( "Nonpop: %d", entry->data.Nonpop );
+    ImGui::Text( "Repop ID: %u", entry->data.RepopId );
+  }
+
+  // AI and Behavior
+  if( ImGui::CollapsingHeader( "AI & Behavior", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Move AI: %u", entry->data.MoveAI );
+    ImGui::Text( "Normal AI: %u", entry->data.NormalAI );
+    ImGui::Text( "Wandering Range: %u", entry->data.WanderingRange );
+    ImGui::Text( "Route: %u", entry->data.Route );
+    ImGui::Text( "Event Group: %u", entry->data.EventGroup );
+    ImGui::Text( "Server Path ID: %u", entry->data.ServerPathId );
+  }
+
+  // Link Information
+  if( ImGui::CollapsingHeader( "Link Information" ) )
+  {
+    ImGui::Text( "Link Group: %u", entry->data.LinkGroup );
+    ImGui::Text( "Link Family: %u", entry->data.LinkFamily );
+    ImGui::Text( "Link Range: %u", entry->data.LinkRange );
+    ImGui::Text( "Link Count Limit: %u", entry->data.LinkCountLimit );
+    ImGui::Text( "Link Parent: %d", entry->data.LinkParent );
+    ImGui::Text( "Link Override: %d", entry->data.LinkOverride );
+    ImGui::Text( "Link Reply: %d", entry->data.LinkReply );
+  }
+
+  // Sense Information
+  if( ImGui::CollapsingHeader( "Sense Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Sense Range Rate: %.3f", entry->data.SenseRangeRate );
+    ImGui::Text( "Territory Range: %u", entry->data.TerritoryRange );
+
+    ImGui::Spacing();
+    ImGui::Text( "Base Data Senses:" );
+    ImGui::Separator();
+    ImGui::Text( "Territory Range: %u", entry->baseData.TerritoryRange );
+
+    for( int i = 0; i < 2; ++i )
+    {
+      ImGui::Text( "Sense %d - Type: %u, Range: %u",
+                   i, entry->baseData.Sense[i], entry->baseData.SenseRange[i] );
+    }
+  }
+
+  // Range Information
+  if( ImGui::CollapsingHeader( "Range Information" ) )
+  {
+    ImGui::Text( "Horizontal Pop Range: %.3f", entry->data.HorizontalPopRange );
+    ImGui::Text( "Vertical Pop Range: %.3f", entry->data.VerticalPopRange );
+  }
+
+  // Appearance Information
+  if( ImGui::CollapsingHeader( "Appearance Information" ) )
+  {
+    ImGui::Text( "Equipment ID: %u", entry->data.EquipmentID );
+    ImGui::Text( "Customize ID: %u", entry->data.CustomizeID );
+    ImGui::Text( "BNPC Rank ID: %u", entry->data.BNPCRankId );
+    ImGui::Text( "Drop Item: %u", entry->data.DropItem );
+  }
+
+  // Instance Information
+  if( ImGui::CollapsingHeader( "Instance Information" ) )
+  {
+    ImGui::Text( "Bound Instance ID: %u", entry->data.BoundInstanceID );
+    ImGui::Text( "Fate Layout Label ID: %u", entry->data.FateLayoutLabelId );
+    ImGui::Text( "BNPC Base Data Offset: %d", entry->data.BNpcBaseData );
+  }
+}
+
+void LgbViewer::showServerPathEntryView( LGB_SERVERPATH_ENTRY *entry )
+{
+  ImGui::Text( "Server Path Entry" );
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Instance ID: %u", entry->header.instanceId );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.transform.translation.x,
+                 entry->header.transform.translation.y,
+                 entry->header.transform.translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.transform.rotation.x,
+                 entry->header.transform.rotation.y,
+                 entry->header.transform.rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.transform.scale.x,
+                 entry->header.transform.scale.y,
+                 entry->header.transform.scale.z );
+  }
+
+  // Path Data
+  if( ImGui::CollapsingHeader( "Path Data", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Control Points Offset: %d", entry->data.ControlPoints );
+    ImGui::Text( "Control Point Count: %d", entry->data.ControlPoint_Count );
+    ImGui::Text( "Reserved 1: %u", entry->data.Reserved1 );
+    ImGui::Text( "Reserved 2: %u", entry->data.Reserved2 );
+  }
+
+  // Control Points
+  if( ImGui::CollapsingHeader( "Control Points" ) )
+  {
+    if( entry->points.empty() )
+    {
+      ImGui::Text( "No control points found." );
+    }
+    else
+    {
+      ImGui::Text( "Total Points: %zu", entry->points.size() );
+      ImGui::Separator();
+
+      // Create a table for better organization
+      if( ImGui::BeginTable( "ControlPointsTable", 5,
+                            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                            ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY ) )
+      {
+        ImGui::TableSetupColumn( "Point ID", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "X", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Y", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Z", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Selected", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableHeadersRow();
+
+        for( size_t i = 0; i < entry->points.size(); ++i )
+        {
+          const auto& point = entry->points[i];
+          ImGui::TableNextRow();
+
+          ImGui::TableSetColumnIndex( 0 );
+          ImGui::Text( "%u", point.PointID );
+
+          ImGui::TableSetColumnIndex( 1 );
+          ImGui::Text( "%.3f", point.Translation.x );
+
+          ImGui::TableSetColumnIndex( 2 );
+          ImGui::Text( "%.3f", point.Translation.y );
+
+          ImGui::TableSetColumnIndex( 3 );
+          ImGui::Text( "%.3f", point.Translation.z );
+
+          ImGui::TableSetColumnIndex( 4 );
+          ImGui::Text( "%s", point.Selected ? "Yes" : "No" );
+        }
+
+        ImGui::EndTable();
+      }
+    }
+  }
+}
+
 void LgbViewer::showEntryViewWidget( EntryViewWidget& widget )
 {
   if( !widget.isOpen )
@@ -3038,6 +3243,12 @@ void LgbViewer::showEntryViewWidget( EntryViewWidget& widget )
         break;
       case LgbEntryType::PopRange:
         showPopRangeEntryView( static_cast< LGB_POP_RANGE_ENTRY * >( widget.entry.get() ) );
+        break;
+      case LgbEntryType::ServerPath:
+        showServerPathEntryView( static_cast< LGB_SERVERPATH_ENTRY * >( widget.entry.get() ) );
+        break;
+      case LgbEntryType::BattleNpc:
+        showBnpcEntryView( static_cast< LGB_BNPC_ENTRY * >( widget.entry.get() ) );
         break;
       default:
         showUnimplementedEntryView( widget.entry.get() );

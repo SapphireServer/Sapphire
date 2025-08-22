@@ -12,7 +12,7 @@
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
-#include "LgbTypes.h"
+#include "datReaderPs3/DatCategories/bg/LgbTypes.h"
 #include "../../bparse.h"
 
 
@@ -113,6 +113,40 @@ public:
   };
 };
 
+class LGB_SERVERPATH_ENTRY : public LgbEntry
+{
+public:
+  ServerPathData data;
+  std::vector< PathControlPoint > points;
+  std::string name;
+
+  LGB_SERVERPATH_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  {
+    data = *reinterpret_cast< ServerPathData* >( buf + offset );
+    name = std::string( buf + offset + header.nameOffset );
+    data.ControlPoint_Count = xivps3::utils::bparse::byteswap( data.ControlPoint_Count );
+    data.ControlPoints = xivps3::utils::bparse::byteswap( data.ControlPoints );
+    data.Reserved1 = xivps3::utils::bparse::byteswap( data.Reserved1 );
+    data.Reserved2 = xivps3::utils::bparse::byteswap( data.Reserved2 );
+
+    int innerOff = offset + data.ControlPoints;
+    for( int i = 0; i < data.ControlPoint_Count; ++i )
+    {
+      PathControlPoint point;
+      point = *reinterpret_cast< PathControlPoint* >( buf + innerOff );
+
+      point.PointID = xivps3::utils::bparse::byteswap( point.PointID );
+      point.Translation.x = xivps3::utils::bparse::byteswap( point.Translation.x );
+      point.Translation.y = xivps3::utils::bparse::byteswap( point.Translation.y );
+      point.Translation.z = xivps3::utils::bparse::byteswap( point.Translation.z );
+      points.push_back( point );
+      innerOff += sizeof( PathControlPoint );
+
+    }
+
+  };
+};
+
 class LGB_SG_ENTRY : public LgbEntry
 {
 public:
@@ -129,6 +163,7 @@ public:
 
   };
 };
+
 
 class LGB_ENPC_ENTRY : public LgbEntry
 {
@@ -343,6 +378,10 @@ struct LGB_GROUP
         else if( type == LgbEntryType::BattleNpc )
         {
           entries.push_back( std::make_shared< LGB_BNPC_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::ServerPath )
+        {
+          entries.push_back( std::make_shared< LGB_SERVERPATH_ENTRY >( buf, entryOffset ) );
         }
         else
         {

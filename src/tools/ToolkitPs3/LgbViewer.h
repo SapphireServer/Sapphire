@@ -347,5 +347,7 @@ private:
   void showPopRangeEntryView(LGB_POP_RANGE_ENTRY* entry);
   void showUnimplementedEntryView(LgbEntry* entry);
   void openEntryViewWidget(std::shared_ptr<LgbEntry> entry);
+  void showServerPathEntryView( LGB_SERVERPATH_ENTRY *entry );
+  void showBnpcEntryView( LGB_BNPC_ENTRY *entry );
 
 };

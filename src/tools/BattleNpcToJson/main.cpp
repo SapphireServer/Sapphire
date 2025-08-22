@@ -338,6 +338,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry *pObj, cons
 }
 
 std::unordered_map< uint32_t, nlohmann::json > territoryJsonData;
+std::unordered_map< uint32_t, nlohmann::json > pathJsonData;
 
 
 struct BnpcGroupInfo
@@ -350,6 +351,8 @@ struct BnpcGroupInfo
 
 void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGroupInfo& groupInfo,
                       uint32_t& totalEntries );
+
+void exportPaths( uint32_t uint32, const std::string& name, const std::vector< LGB_SERVERPATH_ENTRY * >& vector );
 
 void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::string& path,
                         xivps3::dat::GameData *gameData )
@@ -374,6 +377,7 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
 
     // Group BNPC entries by group info
     std::unordered_map< std::string, BnpcGroupInfo > groupedBnpcEntries;
+    std::vector< LGB_SERVERPATH_ENTRY * > pathEntries;
 
     for( const auto& lgb : lgbList )
     {
@@ -387,6 +391,11 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
           {
             auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY * >( entry.get() );
             bnpcEntries.push_back( pBNpc );
+          }
+          else if( entry->getType() == LgbEntryType::ServerPath )
+          {
+            auto pathEntry = reinterpret_cast< LGB_SERVERPATH_ENTRY * >( entry.get() );
+            pathEntries.push_back( pathEntry );
           }
         }
 
@@ -430,6 +439,9 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
       exportBnpcGroup( zoneId, name, groupInfo, totalGroupEntries );
     }
 
+    exportPaths( zoneId, name, pathEntries );
+
+
     if( totalGroupEntries > 0 )
     {
       std::cout << fmt::format( "[Info] id: {} name: {} file: {} total groups: {} total entities: {}",
@@ -448,6 +460,28 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
         jsonFile << finalJson.dump( 2 );
         jsonFile.close();
         std::cout << "Created grouped JSON file: " << filename << " with " << territoryJsonData[ zoneId ].size() <<
+            " entries" << std::endl;
+      }
+    }
+
+    if(!pathEntries.empty())
+    {
+      std::cout << fmt::format( "[Info] id: {} name: {} file: {} total paths: {}",
+                                zoneId, name, path, pathEntries.size() ) << std::endl;
+
+      // Create folder structure: bnpcs/zoneName/
+      std::string folderPath = "bnpcs/" + name;
+      std::filesystem::create_directories( folderPath );
+
+      // Export final JSON with proper path structure
+      std::string filename = folderPath + "/" + name + "_paths.json";
+      std::ofstream jsonFile( filename );
+      if( jsonFile.is_open() )
+      {
+        nlohmann::json finalJson = pathJsonData[ zoneId ];
+        jsonFile << finalJson.dump( 2 );
+        jsonFile.close();
+        std::cout << "Created JSON file: " << filename << " with " << pathJsonData[ zoneId ].size() <<
             " entries" << std::endl;
       }
     }
@@ -560,6 +594,51 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
   std::string groupKey = fmt::format( "{}", groupInfo.groupName );
   territoryJsonData[ zoneId ][ groupKey ] = bnpcGroupJson;
 }
+
+void exportPaths( uint32_t zoneId, const std::string& name, const std::vector< LGB_SERVERPATH_ENTRY * >& paths )
+{
+  if( paths.empty() )
+    return;
+
+  if( pathJsonData[ zoneId ].is_null() )
+  {
+    pathJsonData[ zoneId ] = nlohmann::json::object();
+  }
+
+  // Create paths object where each key is the instance ID
+  nlohmann::json pathsObject = nlohmann::json::object();
+
+  for( const auto& path : paths )
+  {
+    nlohmann::json pathEntry = nlohmann::json::object();
+
+    // Transform information
+    pathEntry[ "position" ] = nlohmann::json::array( {
+      path->header.transform.translation.x,
+      path->header.transform.translation.y,
+      path->header.transform.translation.z
+    } );
+
+    // Control points array
+    for( const auto& point : path->points )
+    {
+      nlohmann::json controlPoint = nlohmann::json::object();
+      controlPoint[ "pointId" ] = point.PointID;
+      controlPoint[ "position" ] = nlohmann::json::array( {
+        point.Translation.x,
+        point.Translation.y,
+        point.Translation.z
+      } );
+
+      pathEntry[ "controlPoints" ].push_back( controlPoint );
+    }
+
+    // Add to the main paths object using instance ID as key
+    pathsObject[ std::to_string( path->header.instanceId ) ] = pathEntry;
+  }
+  pathJsonData[ zoneId ] = pathsObject;
+}
+
 
 int main( int argc, char *argv[ ] )
 {

@@ -315,7 +315,7 @@ struct PathControlPoint
   uint8_t Padding00[1];
 };
 
-struct ServerPath : public InstanceObject
+struct ServerPathData : public InstanceObject
 {
     int32_t ControlPoints;
     int32_t ControlPoint_Count;

@@ -81,6 +81,8 @@ void ZoneEditor::init()
 {
   initializeCache();
   initializeNavmeshRendering();
+  initializeServerPathShader();
+
 }
 
 void ZoneEditor::initializeCache()
@@ -183,6 +185,8 @@ void ZoneEditor::updateSearchFilter()
     }
   }
 }
+
+
 
 void ZoneEditor::updateBnpcSearchFilter()
 {
@@ -1696,6 +1700,91 @@ void ZoneEditor::loadBnpcs()
   }
 }
 
+void ZoneEditor::loadServerPaths()
+{
+  m_serverPathCache.clear();
+
+  if( !m_selectedZone )
+    return;
+
+  // Load JSON data from bnpcs folder
+  std::string jsonPath = fmt::format( "bnpcs/{}/{}_paths.json", m_selectedZone->name, m_selectedZone->name );
+
+  // Check if JSON file exists
+  if( !std::filesystem::exists( jsonPath ) )
+  {
+    Engine::Logger::debug( "No paths JSON file found for zone: {}", m_selectedZone->name );
+    return;
+  }
+
+  try
+  {
+    // Read JSON file
+    std::ifstream jsonFile( jsonPath );
+    if( !jsonFile.is_open() )
+    {
+      Engine::Logger::error( "Failed to open paths JSON file: {}", jsonPath );
+      return;
+    }
+
+    nlohmann::json pathsData;
+    jsonFile >> pathsData;
+    jsonFile.close();
+
+    // Iterate through each path entry
+    for( auto& [instanceIdStr, pathData] : pathsData.items() )
+    {
+      uint32_t instanceId = std::stoul( instanceIdStr );
+
+      // Create cached path entry
+      auto cachedPath = CachedServerPath();
+
+      // Basic information
+      cachedPath.instanceId = instanceId;
+
+      // Position data
+      if( pathData.contains( "position" ) && pathData["position"].is_array() && pathData["position"].size() == 3 )
+      {
+        cachedPath.position.x = pathData["position"][0].get<float>();
+        cachedPath.position.y = pathData["position"][1].get<float>();
+        cachedPath.position.z = pathData["position"][2].get<float>();
+      }
+
+      // Control points
+      if( pathData.contains( "controlPoints" ) && pathData["controlPoints"].is_array() )
+      {
+        for( const auto& controlPointData : pathData["controlPoints"] )
+        {
+          PathControlPoint point;
+
+          if( controlPointData.contains( "pointId" ) )
+            point.PointID = controlPointData["pointId"].get<uint16_t>();
+
+          if( controlPointData.contains( "position" ) && controlPointData["position"].is_array() && controlPointData["position"].size() == 3 )
+          {
+            point.Translation.x = controlPointData["position"][0].get<float>();
+            point.Translation.y = controlPointData["position"][1].get<float>();
+            point.Translation.z = controlPointData["position"][2].get<float>();
+          }
+
+
+          cachedPath.points.push_back( point );
+        }
+      }
+
+      // Store in cache
+      m_serverPathCache[instanceId] = cachedPath;
+    }
+
+    Engine::Logger::info( "Loaded {} server paths for zone: {}", m_serverPathCache.size(), m_selectedZone->name );
+  }
+  catch( std::runtime_error& e )
+  {
+    Engine::Logger::error( "Error loading paths from JSON {}: {}", jsonPath, e.what() );
+  }
+
+}
+
 void ZoneEditor::onSelectionChanged()
 {
   if( m_selectedZone )
@@ -1710,6 +1799,9 @@ void ZoneEditor::onSelectionChanged()
     }
 
     loadBnpcs();
+    loadServerPaths();
+    if( !m_serverPathCache.empty() )
+      buildServerPathGeometry();
     // Reset BNPC window state when zone changes
     m_selectedBnpcIndex = -1;
     m_filteredBnpcs.clear();
@@ -2104,12 +2196,148 @@ void ZoneEditor::show()
     showBnpcWindow();
   }
 
+  if( m_showServerPathWindow )
+  {
+    showServerPathWindow();
+  }
+
   if( m_showNavmeshWindow )
   {
     showNavmeshWindow();
   }
 
   showGambitEditor();
+}
+
+void ZoneEditor::showServerPathWindow()
+{
+  if( !m_showServerPathWindow )
+    return;
+
+  ImGui::Begin( "Server Paths", &m_showServerPathWindow );
+
+  if( m_serverPathCache.empty() )
+  {
+    ImGui::Text( "No server paths available" );
+    ImGui::End();
+    return;
+  }
+
+  // Display list of server paths
+  ImGui::Text( "Server Paths (%zu)", m_serverPathCache.size() );
+  ImGui::Separator();
+
+  uint32_t previousSelection = m_selectedServerPathId;
+
+  for( auto& [pathId, cachedPath] : m_serverPathCache )
+  {
+    ImGui::PushID( pathId );
+
+    std::string pathLabel = "Path ID: " + std::to_string( pathId );
+    if( ImGui::Selectable( pathLabel.c_str(), m_selectedServerPathId == pathId ) )
+    {
+      m_selectedServerPathId = pathId;
+    }
+
+    if( previousSelection != m_selectedServerPathId )
+    {
+      buildServerPathGeometry();
+    }
+
+
+    ImGui::PopID();
+  }
+
+  ImGui::Separator();
+
+  // Display selected server path details
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath != m_serverPathCache.end() )
+  {
+    auto& path = selectedPath->second;
+
+    ImGui::Text( "Selected Server Path Details:" );
+    ImGui::Separator();
+
+    ImGui::Text( "Instance ID: %u", path.instanceId );
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 path.position.x, path.position.y, path.position.z );
+    ImGui::Text( "Control Points: %zu", path.points.size() );
+
+    ImGui::Separator();
+
+    // Display and edit control points
+    if( ImGui::TreeNode( "Control Points" ) )
+    {
+      for( size_t i = 0; i < path.points.size(); ++i )
+      {
+        auto& point = path.points[i];
+
+        ImGui::PushID( static_cast<int>( i ) );
+
+        std::string pointLabel = "Point " + std::to_string( i );
+        bool isSelected = point.Selected != 0;
+
+        if( ImGui::Checkbox( ("Selected##" + std::to_string( i )).c_str(), &isSelected ) )
+        {
+          point.Selected = isSelected ? 1 : 0;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text( "%s - Pos: %.3f, %.3f, %.3f",
+                     pointLabel.c_str(),
+                     point.Translation.x,
+                     point.Translation.y,
+                     point.Translation.z );
+
+        // Edit control point position
+        if( ImGui::TreeNode( ( "Edit Point " + std::to_string( i ) ).c_str() ) )
+        {
+          float pos[3] = { point.Translation.x, point.Translation.y, point.Translation.z };
+          if( ImGui::InputFloat3( "Position", pos ) )
+          {
+            point.Translation.x = pos[0];
+            point.Translation.y = pos[1];
+            point.Translation.z = pos[2];
+          }
+
+          ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+      }
+      ImGui::TreePop();
+    }
+
+    // Add/Remove control points
+    ImGui::Separator();
+    if( ImGui::Button( "Add Control Point" ) )
+    {
+      PathControlPoint newPoint{};
+      newPoint.Translation = path.position;
+      newPoint.PointID = static_cast<uint16_t>( path.points.size() );
+      newPoint.Selected = 0;
+      path.points.push_back( newPoint );
+    }
+
+    ImGui::SameLine();
+    if( ImGui::Button( "Remove Selected Points" ) && !path.points.empty() )
+    {
+      path.points.erase(
+        std::remove_if( path.points.begin(),
+                        path.points.end(),
+                        []( const PathControlPoint& point ) { return point.Selected != 0; } ),
+        path.points.end() );
+
+      // Update PointID to match indices after removal
+      for( size_t i = 0; i < path.points.size(); ++i )
+      {
+        path.points[i].PointID = static_cast<uint16_t>( i );
+      }
+    }
+  }
+
+  ImGui::End();
 }
 
 
@@ -2478,6 +2706,153 @@ void ZoneEditor::renderBnpcMarkers()
 
   // Unbind shader
   glUseProgram( 0 );
+}
+
+void ZoneEditor::renderServerPaths()
+{
+  if( !m_showServerPathsInNavmesh || !m_serverPathShader || !m_serverPathVAO || m_serverPathVertexCount == 0 )
+  {
+    return;
+  }
+
+  // Check if we have a valid selection
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath == m_serverPathCache.end() || selectedPath->second.points.empty() )
+  {
+    return;
+  }
+
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 model = glm::mat4( 1.0f );
+  glm::mat4 mvp = projection * view * model;
+
+  // Enhanced blending for better visibility
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+  // Temporarily disable depth writing but keep depth testing
+  // This prevents lines from being occluded too aggressively
+  glDepthMask( GL_FALSE );
+  glDisable(GL_DEPTH_TEST);
+
+  // Bias depth slightly to ensure lines appear on top
+  glEnable( GL_POLYGON_OFFSET_FILL );
+  glPolygonOffset( -1.0f, -1.0f );
+
+  // Enable line width for thicker lines (if supported)
+  glLineWidth( 3.0f );
+
+  // Use line shader
+  glUseProgram( m_serverPathShader );
+
+  // Set uniforms
+  GLint mvpLoc = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  if( mvpLoc != -1 )
+  {
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  }
+
+  // Set red color for server path lines
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( colorLoc != -1 )
+  {
+    glUniform4f( colorLoc, 1.0f, 0.0f, 0.0f, 0.8f ); // Red with slight transparency
+  }
+
+  // Render lines
+  glBindVertexArray( m_serverPathVAO );
+  glDrawArrays( GL_LINES, 0, m_serverPathVertexCount );
+  glBindVertexArray( 0 );
+
+  // Restore OpenGL state
+  glLineWidth( 1.0f );
+  glDisable( GL_POLYGON_OFFSET_FILL );
+  glDepthMask( GL_TRUE );
+
+  // Unbind shader
+  glUseProgram( 0 );
+  glEnable(GL_DEPTH_TEST);
+
+}
+
+void ZoneEditor::initializeServerPathShader()
+{
+  // Simple line shader
+  const char* vertexShaderSource = R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+
+    uniform mat4 u_mvp;
+
+    void main()
+    {
+      gl_Position = u_mvp * vec4(aPos, 1.0);
+    }
+  )";
+
+  const char* fragmentShaderSource = R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    uniform vec4 u_color;
+
+    void main()
+    {
+      FragColor = u_color;
+    }
+  )";
+
+  // Compile vertex shader
+  GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
+  glShaderSource( vertexShader, 1, &vertexShaderSource, NULL );
+  glCompileShader( vertexShader );
+
+  // Check for vertex shader compile errors
+  int success;
+  char infoLog[512];
+  glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success );
+  if( !success )
+  {
+    glGetShaderInfoLog( vertexShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog );
+    return;
+  }
+
+  // Compile fragment shader
+  GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
+  glShaderSource( fragmentShader, 1, &fragmentShaderSource, NULL );
+  glCompileShader( fragmentShader );
+
+  // Check for fragment shader compile errors
+  glGetShaderiv( fragmentShader, GL_COMPILE_STATUS, &success );
+  if( !success )
+  {
+    glGetShaderInfoLog( fragmentShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog );
+    glDeleteShader( vertexShader );
+    return;
+  }
+
+  // Link shaders
+  m_serverPathShader = glCreateProgram();
+  glAttachShader( m_serverPathShader, vertexShader );
+  glAttachShader( m_serverPathShader, fragmentShader );
+  glLinkProgram( m_serverPathShader );
+
+  // Check for linking errors
+  glGetProgramiv( m_serverPathShader, GL_LINK_STATUS, &success );
+  if( !success )
+  {
+    glGetProgramInfoLog( m_serverPathShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog );
+  }
+
+  glDeleteShader( vertexShader );
+  glDeleteShader( fragmentShader );
 }
 
 void ZoneEditor::initializeBnpcMarkerRendering()
@@ -3346,7 +3721,7 @@ void ZoneEditor::renderNavmeshToTexture()
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
   renderSenseRanges();
   renderBnpcMarkers();
-
+  renderServerPaths();
   // Unbind framebuffer (back to default)
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
@@ -3445,6 +3820,88 @@ void main()
 
   m_senseRangeShader = createShaderProgram( vertexShader, fragmentShader );
 }
+
+void ZoneEditor::initializeServerPathRendering()
+{
+  glGenVertexArrays( 1, &m_serverPathVAO );
+  glGenBuffers( 1, &m_serverPathVBO );
+
+  glBindVertexArray( m_serverPathVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_serverPathVBO );
+
+  // Set up vertex attributes (position and color)
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::buildServerPathGeometry()
+{
+  if( m_serverPathVAO == 0 )
+  {
+    initializeServerPathRendering();
+  }
+
+  // Check if we have a valid selection
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath == m_serverPathCache.end() || selectedPath->second.points.empty() )
+  {
+    m_serverPathVertexCount = 0;
+    return;
+  }
+
+  const auto& path = selectedPath->second;
+  std::vector< float > vertices;
+
+  // Create line segments connecting all control points
+  for( size_t i = 0; i < path.points.size(); ++i )
+  {
+    // Calculate world position (path position + relative control point position)
+    float worldX = path.position.x + path.points[i].Translation.x;
+    float worldY = path.position.y + path.points[i].Translation.y;
+    float worldZ = path.position.z + path.points[i].Translation.z;
+
+    vertices.push_back( worldX );
+    vertices.push_back( worldY );
+    vertices.push_back( worldZ );
+
+    // If this isn't the last point, add the next point to create a line segment
+    if( i < path.points.size() - 1 )
+    {
+      float nextWorldX = path.position.x + path.points[i + 1].Translation.x;
+      float nextWorldY = path.position.y + path.points[i + 1].Translation.y;
+      float nextWorldZ = path.position.z + path.points[i + 1].Translation.z;
+
+      vertices.push_back( nextWorldX );
+      vertices.push_back( nextWorldY );
+      vertices.push_back( nextWorldZ );
+    }
+  }
+
+  if( vertices.empty() )
+  {
+    m_serverPathVertexCount = 0;
+    return;
+  }
+
+  glBindVertexArray( m_serverPathVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_serverPathVBO );
+
+  // Upload vertex data
+  glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( float ), vertices.data(), GL_STATIC_DRAW );
+
+  // Set up vertex attributes
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  m_serverPathVertexCount = vertices.size() / 3;
+  glBindVertexArray( 0 );
+
+  printf( "Built server path geometry for Path ID %u: %d vertices\n",
+          m_selectedServerPathId, m_serverPathVertexCount );
+}
+
 
 void ZoneEditor::buildSenseRangeGeometry()
 {

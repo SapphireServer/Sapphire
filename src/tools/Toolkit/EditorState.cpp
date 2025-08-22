@@ -920,7 +920,10 @@ void EditorState::render( double deltaTime )
 
 
     ImGui::DockBuilderDockWindow( "BNPC Editor", right1_id );
+    ImGui::DockBuilderDockWindow( "Server Paths", right1_id );
     ImGui::DockBuilderDockWindow( "LGB Groups", right1_id );
+
+
 
 
     dockInitialized = true;
