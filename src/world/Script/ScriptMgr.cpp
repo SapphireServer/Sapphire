@@ -306,7 +306,8 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     if( questDone )
     {
-      auto callback = [ this, warp, warpCondition ]( Entity::Player& player, const Event::SceneResult& result ) {
+      auto callback = [ this, warp, warpCondition ]( Entity::Player& player, const Event::SceneResult& result )
+      {
         auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
         auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
@@ -333,6 +334,9 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
         if( result.getResult( 0 ) == 1 )
         {
+
+          eventMgr.bootstrapSceneEvent( player, result.eventId, 0x4203 );
+
           if( warp->_data.PreCutScene != 0 && warp->_data.PostCutScene == 0 )
           {
             eventMgr.playScene( player, result.eventId, 1000, 0x00003000, { 1 }, callback );
@@ -343,11 +347,33 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
           }
           else if( warp->_data.PreCutScene != 0 && warp->_data.PostCutScene != 0 )
           {
-            eventMgr.playScene( player, result.eventId, 1000, 0x00003000, { 1 }, [ this, warp, warpCondition, callback ]( Entity::Player& player, const Event::SceneResult& result )
+            eventMgr.playScene( player, result.eventId, 1000, 0x00004203, { 1 }, [ this, warp, warpCondition ]( Entity::Player& player, const Event::SceneResult& result )
             {
               auto eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-              eventMgr.playScene( player, result.eventId, 1001, 0x00003000, { 1 }, callback );
+              auto callback = [ this, warp, warpCondition ]( Entity::Player& player, const Event::SceneResult& result ) {
+                auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+                auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
+                auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+                auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+                auto popRangeInfo = instanceObjectCache.getPopRangeInfo( warp->data().PopRange );
+
+                if( popRangeInfo )
+                {
+                  auto pTeri = teriMgr.getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
+                  warpMgr.requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
+                                                pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+
+                  player.removeCurrency( Common::CurrencyType::Gil, warpCondition->_data.Gil );
+                }
+
+                eventMgr.playScene( player, result.eventId, 1002, 0x00003003, { 1 }, nullptr );
+              };
+
+              eventMgr.playScene( player, result.eventId, 1001, 0x00004203, { 1 }, callback );
+
             } );
           }
           else
