@@ -11,8 +11,6 @@
 
 #include "matrix4.h"
 #include "vec3.h"
-#include "sgb.h"
-#include "LgbTypes.h"
 #include "../../bparse.h"
 
 struct FileHeader

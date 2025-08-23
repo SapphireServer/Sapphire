@@ -1,9 +1,6 @@
 #include "InstanceObjectCache.h"
 #include "Exd/ExdData.h"
 
-#include <datReader/DatCategories/bg/pcb.h>
-#include <datReader/DatCategories/bg/lgb.h>
-#include <datReader/DatCategories/bg/sgb.h>
 #include <GameData.h>
 #include <File.h>
 #include <DatCat.h>
@@ -17,6 +14,9 @@
 #include <Logging/Logger.h>
 #include <Service.h>
 #include <Util/UtilMath.h>
+
+#include "DatCategories/DatCommon.h"
+#include "datReader/DatCategories/bg/lgb.h"
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
@@ -104,49 +104,49 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
         {
           switch( pEntry->getType() )
           {
-            case LgbEntryType::MapRange:
+            case eAssetType::MapRange:
             {
-              auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
+              auto pMapRange = std::reinterpret_pointer_cast< MapRangeEntry >( pEntry );
               m_mapRangeCache.insert( id, pMapRange );
 
               break;
             }
-            case LgbEntryType::ExitRange:
+            case eAssetType::ExitRange:
             {
-              auto pExitRange = std::reinterpret_pointer_cast< LGB_EXIT_RANGE_ENTRY >( pEntry );
+              auto pExitRange = std::reinterpret_pointer_cast< ExitRangeEntry >( pEntry );
               m_exitRangeCache.insert( id, pExitRange );
 
               break;
             }
-            case LgbEntryType::PopRange:
+            case eAssetType::PopRange:
             {
-              auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
+              auto pPopRange = std::reinterpret_pointer_cast< PopRangeEntry >( pEntry );
               m_popRangeCache.insert( id, pPopRange );
               break;
             }
-            case LgbEntryType::CollisionBox:
+            case eAssetType::CollisionBox:
             {
               //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
 
               //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
               break;
             }
-            case LgbEntryType::EventObject:
+            case eAssetType::EventObject:
             {
-              auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+              auto pEObj = std::reinterpret_pointer_cast< EventObjectEntry >( pEntry );
               m_eobjCache.insert( 0, pEObj );
-              m_eobjBaseInstanceMap.emplace( std::make_pair( id, pEObj->data.BaseId ), pEObj->header.instanceId );
+              m_eobjBaseInstanceMap.emplace( std::make_pair( id, pEObj->header.BaseId ), pEObj->header.InstanceID );
               break;
             }
-            case LgbEntryType::EventNpc:
+            case eAssetType::EventNPC:
             {
-              auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+              auto pENpc = std::reinterpret_pointer_cast< EventNPCEntry >( pEntry );
               m_enpcCache.insert( id, pENpc );
               break;
             }
-            case LgbEntryType::EventRange:
+            case eAssetType::EventRange:
             {
-              auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
+              auto pEventRange = std::reinterpret_pointer_cast< EventRangeEntry >( pEntry );
               m_eventRangeCache.insert( 0, pEventRange );
               break;
             }
@@ -230,13 +230,13 @@ std::shared_ptr< Sapphire::InstanceObjectCache::PopRangeInfo > Sapphire::Instanc
 
   auto popInfo = std::make_shared< Sapphire::InstanceObjectCache::PopRangeInfo >();
 
-  popInfo->m_pos = Common::FFXIVARR_POSITION3 { popRange->header.transform.translation.x,
-                                               popRange->header.transform.translation.y,
-                                               popRange->header.transform.translation.z };
+  popInfo->m_pos = Common::FFXIVARR_POSITION3 { popRange->header.Transformation.Translation.x,
+                                               popRange->header.Transformation.Translation.y,
+                                               popRange->header.Transformation.Translation.z };
 
-  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.transform.rotation.x,
-                                                popRange->header.transform.rotation.y,
-                                                popRange->header.transform.rotation.z };
+  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.Transformation.Translation.x,
+                                                popRange->header.Transformation.Translation.y,
+                                                popRange->header.Transformation.Translation.z };
 
   popInfo->m_rotation = Common::Util::eulerToDirection( targetRot );
 

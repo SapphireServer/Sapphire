@@ -1,7 +1,6 @@
 #include <Common.h>
 #include <Service.h>
 
-#include <datReader/DatCategories/bg/lgb.h>
 #include <Exd/ExdData.h>
 
 #include <Event/EventHandler.h>
@@ -26,6 +25,7 @@
 
 #include "Session.h"
 #include "WorldServer.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Event;
 using namespace Sapphire::Network::Packets;
@@ -71,7 +71,7 @@ void MapMgr::updateAll( Entity::Player& player )
   
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->data.enpcId );
+    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->header.BaseId );
     if( eNpcIt == std::end( m_eNpcCacheMap ) )
       continue;
 
@@ -95,7 +95,7 @@ void MapMgr::updateAll( Entity::Player& player )
         {
           auto& quest = m_questCacheMap[ npcData ]->data();
 
-          if( quest.Client == eventNpc.second->data.enpcId )
+          if( quest.Client == eventNpc.second->header.BaseId )
           {
             insertQuest( player, npcData, eventNpc.first, mapData );
           }
@@ -175,7 +175,7 @@ void MapMgr::updateAll( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObjIt = m_eObjCacheMap.find( eventObj.second->data.BaseId );
+    auto eObjIt = m_eObjCacheMap.find( eventObj.second->header.BaseId );
     if( eObjIt == std::end( m_eObjCacheMap ) )
       continue;
 
@@ -190,7 +190,7 @@ void MapMgr::updateAll( Entity::Player& player )
     {
       auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
 
-      if( quest.Client == eventObj.second->data.BaseId )
+      if( quest.Client == eventObj.second->header.BaseId )
       {
         insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
       }
@@ -213,7 +213,7 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->data.enpcId );
+    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->header.BaseId );
     if( eNpcIt == std::end( m_eNpcCacheMap ) )
       continue;
 
@@ -236,7 +236,7 @@ void MapMgr::updateQuests( Entity::Player& player )
       {
         auto& quest = m_questCacheMap[ npcData ]->data();
 
-        if( quest.Client == eventNpc.second->data.enpcId )
+        if( quest.Client == eventNpc.second->header.BaseId )
         {
           insertQuest( player, npcData, eventNpc.first, mapData );
         }
@@ -250,7 +250,7 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObjIt = m_eObjCacheMap.find( eventObj.second->data.BaseId );
+    auto eObjIt = m_eObjCacheMap.find( eventObj.second->header.BaseId );
     if( eObjIt == std::end( m_eObjCacheMap ) )
       continue;
 
@@ -265,7 +265,7 @@ void MapMgr::updateQuests( Entity::Player& player )
     {
       auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
 
-      if( quest.Client == eventObj.second->data.BaseId )
+      if( quest.Client == eventObj.second->header.BaseId )
       {
         insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
       }

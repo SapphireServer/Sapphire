@@ -308,11 +308,11 @@ int main( int argc, char* argv[] )
           totalGroups++;
           for( const auto& pEntry : group.entries )
           {
-            auto pGimmick = dynamic_cast< LGB_SG_ENTRY* >( pEntry.get() );
-            auto pBgParts = dynamic_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+            auto pGimmick = dynamic_cast< SharedGroupEntry* >( pEntry.get() );
+            auto pBgParts = dynamic_cast< BGEntry* >( pEntry.get() );
             totalGroupEntries++;
 
-            if( pEntry->getType() == LgbEntryType::EventObject )
+            if( pEntry->getType() == eAssetType::EventObject )
             {
               auto pObj = pEntry.get();
               static std::string eobjStr( "\"EObj\", " );
@@ -321,32 +321,32 @@ int main( int argc, char* argv[] )
               std::string name;
               uint32_t eobjlevelHierachyId = 0;
 
-              auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-              id = pEobj->data.BaseId;
-              unknown = pEobj->header.instanceId;
+              auto pEobj = reinterpret_cast< EventObjectEntry* >( pObj );
+              id = pEobj->header.BaseId;
+              unknown = pEobj->header.InstanceID;
 
-              eobjlevelHierachyId = pEobj->data.BoundInstanceID;
+              eobjlevelHierachyId = pEobj->header.BoundInstanceID;
 
               std::string states = "";
               std::string gimmickName = "";
               for( const auto& pEntry1 : group.entries )
               {
                 auto pGObj = pEntry1.get();
-                if( pGObj->getType() == LgbEntryType::SharedGroup && pGObj->header.instanceId == pEobj->data.BoundInstanceID )
+                if( pGObj->getType() == eAssetType::SharedGroup && pGObj->header.InstanceID == pEobj->header.BoundInstanceID )
                 {
-                  auto pGObjR = reinterpret_cast< LGB_SG_ENTRY* >( pGObj );
+                  auto pGObjR = reinterpret_cast< SharedGroupEntry* >( pGObj );
                   char* dataSection = nullptr;
 
-                  auto file = g_gameData->getFile( pGObjR->gimmickFileName );
+                  auto file = g_gameData->getFile( pGObjR->AssetPath );
                   auto sections = file->get_data_sections();
                   dataSection = &sections.at( 0 )[ 0 ];
                   auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
 
-                  auto pos = pGObjR->gimmickFileName.find_last_of( "/" );
+                  auto pos = pGObjR->AssetPath.find_last_of( "/" );
 
                   if( pos != std::string::npos )
                   {
-                    name = pGObjR->gimmickFileName.substr( pos + 1 );
+                    name = pGObjR->AssetPath.substr( pos + 1 );
                     name = name.substr( 0, name.length() - 4 );
                     gimmickName = name;
                   }
@@ -356,7 +356,7 @@ int main( int argc, char* argv[] )
                     states = "    // States -> ";
                     for( auto entries1 : sgbFile.stateEntries )
                     {
-                      states += entries1.name + " (id: " + std::to_string( entries1.header.id ) + ") ";
+                      //states += entries1.data() + " (id: " + std::to_string( entries1.header.id ) + ") ";
                     }
                     states += "\n";
                   }
@@ -398,14 +398,14 @@ int main( int argc, char* argv[] )
 
               eobjects += "    instance.addEObj( \"" + name + "\", " + std::to_string( id ) +
                             ", " + std::to_string( eobjlevelHierachyId ) +
-                            ", " + std::to_string( pObj->header.instanceId ) + ", " + std::to_string( state ) +
-                            ", " + "{ " + std::to_string( pObj->header.transform.translation.x ) + "f, "
-                            + std::to_string( pObj->header.transform.translation.y ) + "f, "
-                            + std::to_string( pObj->header.transform.translation.z ) + "f }, "
-                            + std::to_string( pObj->header.transform.scale.x ) + "f, "
+                            ", " + std::to_string( pObj->header.InstanceID ) + ", " + std::to_string( state ) +
+                            ", " + "{ " + std::to_string( pObj->header.Transformation.Translation.x ) + "f, "
+                            + std::to_string( pObj->header.Transformation.Translation.y ) + "f, "
+                            + std::to_string( pObj->header.Transformation.Translation.z ) + "f }, "
+                            + std::to_string( pObj->header.Transformation.Scale.x ) + "f, "
 
                             // the rotation inside the sgbs is the inverse of what the game uses
-                            + std::to_string( pObj->header.transform.rotation.y * -1.f ) + "f"
+                            + std::to_string( pObj->header.Transformation.Rotation.y * -1.f ) + "f"
                             + ", " + std::to_string( permissionInv ) + "); \n" + states;
             }
           }

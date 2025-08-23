@@ -326,28 +326,35 @@ private:
   struct EntryViewWidget
   {
     ImGuiID id;
-    std::shared_ptr<LgbEntry> entry;
+    std::shared_ptr< LgbEntry > entry;
     bool isOpen;
     std::string windowTitle;
 
-    EntryViewWidget(std::shared_ptr<LgbEntry> e) : entry(e), isOpen(true)
+    EntryViewWidget( std::shared_ptr< LgbEntry > e ) : entry( e ), isOpen( true )
     {
-      id = ImGui::GetID(("EntryView_" + std::to_string(entry->header.instanceId)).c_str());
-      windowTitle = std::to_string(entry->header.instanceId);
+      id = ImGui::GetID( ( "EntryView_" + std::to_string( entry->header.InstanceID ) ).c_str() );
+      windowTitle = std::to_string( entry->header.InstanceID );
     }
   };
 
-  std::vector<EntryViewWidget> m_entryViewWidgets;
+  std::vector< EntryViewWidget > m_entryViewWidgets;
 
   // Methods for entry viewing
-  void showEntryViewWidget(EntryViewWidget& widget);
-  void showSGEntryView(LGB_SG_ENTRY* entry);
-  void showEObjEntryView(LGB_EOBJ_ENTRY* entry);
-  void showExitRangeEntryView(LGB_EXIT_RANGE_ENTRY* entry);
-  void showPopRangeEntryView(LGB_POP_RANGE_ENTRY* entry);
-  void showUnimplementedEntryView(LgbEntry* entry);
-  void openEntryViewWidget(std::shared_ptr<LgbEntry> entry);
-  void showServerPathEntryView( LGB_SERVERPATH_ENTRY *entry );
-  void showBnpcEntryView( LGB_BNPC_ENTRY *entry );
+  void showEntryViewWidget( EntryViewWidget& widget );
 
+  void showSGEntryView( LGB_SG_ENTRY *entry );
+
+  void showEObjEntryView( LGB_EOBJ_ENTRY *entry );
+
+  void showExitRangeEntryView( LGB_EXIT_RANGE_ENTRY *entry );
+
+  void showPopRangeEntryView( LGB_POP_RANGE_ENTRY *entry );
+
+  void showUnimplementedEntryView( LgbEntry *entry );
+
+  void openEntryViewWidget( std::shared_ptr< LgbEntry > entry );
+
+  void showServerPathEntryView( LGB_SERVERPATH_ENTRY *entry );
+
+  void showBnpcEntryView( LGB_BNPC_ENTRY *entry );
 };

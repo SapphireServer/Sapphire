@@ -6,9 +6,6 @@
 #include <Exd/ExdData.h>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
-#include <datReader/DatCategories/bg/pcb.h>
-#include <datReader/DatCategories/bg/lgb.h>
-#include <datReader/DatCategories/bg/sgb.h>
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
 #include "Script/ScriptMgr.h"
@@ -30,6 +27,8 @@
 
 #include <Encounter/Encounter.h>
 #include <Task/MoveTerritoryTask.h>
+
+#include "DatCategories/InstanceObjectParser.h"
 
 
 using namespace Sapphire::Common;
@@ -585,15 +584,15 @@ void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& 
   if( m_pEntranceEObj != nullptr )
   {
     if( rect )
-      player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
+      player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
     else
       player.setRot( PI - PI / 2 );
     player.setPos( m_pEntranceEObj->getPos() );
   }
   else if( rect )
   {
-    player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
-    player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
+    player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
+    player.setPos( { rect->header.Transformation.Translation.x, rect->header.Transformation.Translation.y, rect->header.Transformation.Translation.z } );
   }
   else
   {

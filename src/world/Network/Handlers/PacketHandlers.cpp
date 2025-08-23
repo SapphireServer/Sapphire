@@ -8,9 +8,6 @@
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Util/Util.h>
 
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
-
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Service.h>
@@ -46,6 +43,7 @@
 #include "Session.h"
 #include "WorldServer.h"
 #include "Forwards.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -281,10 +279,10 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   if( pExitRange )
   {
-    auto pPopRange = instanceObjectCache.getPopRangeInfo( pExitRange->data.destInstanceObjectId );
+    auto pPopRange = instanceObjectCache.getPopRangeInfo( pExitRange->header.destInstanceObjectId );
     if( pPopRange )
     {
-      targetZone = pExitRange->data.destTerritoryType;
+      targetZone = pExitRange->header.destTerritoryType;
       targetPos = pPopRange->m_pos;
       rotation = pPopRange->m_rotation;
       PlayerMgr::sendDebug( player, "ZoneLine #{0} found. Rotation: {1}, Zone: #{2} ", exitBoxId, rotation, targetZone );
@@ -320,9 +318,9 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
   auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
   discoveryPacket->data().mapId = tInfo->data().Map;
-  discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
+  discoveryPacket->data().mapPartId = pRefInfo->header.discoveryIndex;
   server().queueForPlayer( player.getCharacterId(), discoveryPacket );
-  playerMgr().onDiscoverArea( player, tInfo->data().Map, pRefInfo->data.discoveryIndex );
+  playerMgr().onDiscoverArea( player, tInfo->data().Map, pRefInfo->header.discoveryIndex );
 
 }
 

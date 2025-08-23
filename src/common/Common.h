@@ -6,7 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
-#include "datReader/DatCategories/bg/LgbTypes.h"
+#include "DatCategories/InstanceObject.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -1928,7 +1928,7 @@ namespace Sapphire::Common
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
   // todo: load BNpcBase and other exd data into this struct
-  struct BNPCInstanceObject
+  struct BNPCData
   {
     uint16_t territoryType;
     std::string bnpcName;
@@ -1992,7 +1992,7 @@ namespace Sapphire::Common
     SENSE_COUNT
   };
 
-  struct BNpcCacheEntry : BNPCInstanceObject
+  struct BNpcCacheEntry : BNPCData
   {
     BNpcBaseData baseData;
   };

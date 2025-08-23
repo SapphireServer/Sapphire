@@ -3,7 +3,6 @@
 #include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketContainer.h>
-#include <datReader/DatCategories/bg/LgbTypes.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include <Service.h>

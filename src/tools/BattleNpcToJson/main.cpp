@@ -243,13 +243,13 @@ void writeMapRangeEntry( std::ofstream& out, LgbEntry *pObj )
   auto mapId = -1;
   auto discoveryIndex = pMapRange->data.discoveryIndex;
 
-  vec3 translation = pObj->header.transform.translation;
+  vec3 translation = pObj->header.Transformation.Translation;
 
-  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.instanceId ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.x ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.y ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.z ) + " " +
-                      std::to_string( pMapRange->header.transform.rotation.y ) + " " +
+  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.InstanceID ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.x ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.y ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.z ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Rotation.y ) + " " +
                       std::to_string( pMapRange->data.mapId ) + " " +
                       std::to_string( pMapRange->data.discoveryIndex ) + "\n"
   );
@@ -267,7 +267,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry *pObj, cons
   auto mapId = -1;
   //auto discoveryIndex = pBNpc->data.discoveryIndex;
 
-  vec3 translation = pObj->header.transform.translation;
+  vec3 translation = pObj->header.Transformation.Translation;
   for( auto ref : group.refs )
   {
     auto& groupList = layerSetMap[ ref.LayerSetID ];
@@ -289,11 +289,11 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry *pObj, cons
                       group.name + ", " +
                       name + ", " +
                       pBNpc->name + ", " +
-                      std::to_string( pBNpc->header.instanceId ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.x ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.y ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.z ) + ", " +
-                      std::to_string( pBNpc->data.transform.rotation.y ) + ", " +
+                      std::to_string( pBNpc->header.InstanceID ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.x ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.y ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.z ) + ", " +
+                      std::to_string( pBNpc->data.Transformation.Rotation.y ) + ", " +
                       std::to_string( pBNpc->data.BaseId ) + ", " +
                       std::to_string( pBNpc->data.PopWeather ) + ", " +
                       std::to_string( pBNpc->data.PopTimeStart ) + ", " +
@@ -563,13 +563,13 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
     jsonEntry[ "SenseInfo" ] = SenseEntry;
 
     nlohmann::json baseInfo;
-    baseInfo[ "instanceId" ] = pBNpc->data.instanceId;
+    baseInfo[ "instanceId" ] = pBNpc->data.InstanceID;
     baseInfo[ "groupId" ] = groupInfo.groupId;
     baseInfo[ "position" ] = {
-      pBNpc->header.transform.translation.x, pBNpc->header.transform.translation.y,
-      pBNpc->header.transform.translation.z
+      pBNpc->header.Transformation.Translation.x, pBNpc->header.Transformation.Translation.y,
+      pBNpc->header.Transformation.Translation.z
     };
-    baseInfo[ "rotation" ] = pBNpc->data.transform.rotation.y;
+    baseInfo[ "rotation" ] = pBNpc->data.Transformation.Rotation.y;
     baseInfo[ "baseId" ] = pBNpc->data.BaseId;
     baseInfo[ "nameId" ] = pBNpc->data.NameId;
     baseInfo[ "equipmentId" ] = pBNpc->data.EquipmentID;
@@ -584,7 +584,7 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
     jsonEntry[ "baseInfo" ] = baseInfo;
 
     // Use instance ID as the key for this BNPC entry
-    bnpcsObject[ std::to_string( pBNpc->data.instanceId ) ] = jsonEntry;
+    bnpcsObject[ std::to_string( pBNpc->data.InstanceID ) ] = jsonEntry;
   }
 
   // Add the bnpcs object to the group
@@ -614,9 +614,9 @@ void exportPaths( uint32_t zoneId, const std::string& name, const std::vector< L
 
     // Transform information
     pathEntry[ "position" ] = nlohmann::json::array( {
-      path->header.transform.translation.x,
-      path->header.transform.translation.y,
-      path->header.transform.translation.z
+      path->header.Transformation.Translation.x,
+      path->header.Transformation.Translation.y,
+      path->header.Transformation.Translation.z
     } );
 
     // Control points array
@@ -634,7 +634,7 @@ void exportPaths( uint32_t zoneId, const std::string& name, const std::vector< L
     }
 
     // Add to the main paths object using instance ID as key
-    pathsObject[ std::to_string( path->header.instanceId ) ] = pathEntry;
+    pathsObject[ std::to_string( path->header.InstanceID ) ] = pathEntry;
   }
   pathJsonData[ zoneId ] = pathsObject;
 }

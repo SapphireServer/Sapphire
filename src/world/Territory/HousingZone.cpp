@@ -19,13 +19,11 @@
 #include "Inventory/ItemContainer.h"
 #include "WorldServer.h"
 
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
-
 #include "Forwards.h"
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
 #include "InstanceObjectCache.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -313,9 +311,9 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto eObjInfo = instanceObjectCache.getEObj( landInfo.SignboardEObj );
   if( eObjInfo )
   {
-    pos.x = eObjInfo->data.transform.translation.x;
-    pos.y = eObjInfo->data.transform.translation.y;
-    pos.z = eObjInfo->data.transform.translation.z;
+    pos.x = eObjInfo->header.Transformation.Translation.x;
+    pos.y = eObjInfo->header.Transformation.Translation.y;
+    pos.z = eObjInfo->header.Transformation.Translation.z;
   }
   else
   {

@@ -1,9 +1,6 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
-
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Territory.h"
 

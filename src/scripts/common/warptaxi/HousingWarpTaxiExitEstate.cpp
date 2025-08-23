@@ -2,10 +2,9 @@
 #include <Actor/Player.h>
 
 #include <Exd/ExdData.h>
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
 #include <Util/UtilMath.h>
 
+#include "DatCategories/InstanceObjectParser.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Territory.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
@@ -51,8 +50,8 @@ public:
         auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
         auto exitRange = instanceObjectCache.getPopRange( landInfo.ExitPopRange );
 
-        Common::FFXIVARR_POSITION3 pos{ exitRange->data.transform.translation.x, exitRange->data.transform.translation.y, exitRange->data.transform.translation.z };
-        float rot = Common::Util::eulerToDirection( { exitRange->data.transform.rotation.x, exitRange->data.transform.rotation.y, exitRange->data.transform.rotation.z } );
+        Common::FFXIVARR_POSITION3 pos{ exitRange->header.Transformation.Translation.x, exitRange->header.Transformation.Translation.y, exitRange->header.Transformation.Translation.z };
+        float rot = Common::Util::eulerToDirection( { exitRange->header.Transformation.Rotation.x, exitRange->header.Transformation.Rotation.y, exitRange->header.Transformation.Rotation.z } );
 
         warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, landIdent.territoryTypeId << 16 | landIdent.wardNum, pos, rot );
       }

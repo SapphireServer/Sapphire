@@ -241,13 +241,13 @@ void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
   auto mapId = -1;
   auto discoveryIndex = pMapRange->data.discoveryIndex;
 
-  vec3 translation = pObj->header.transform.translation;
+  vec3 translation = pObj->header.Transformation.Translation;
 
-  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.instanceId ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.x ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.y ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.z ) + " " +
-                      std::to_string( pMapRange->header.transform.rotation.y ) + " " +
+  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.InstanceID ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.x ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.y ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.z ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Rotation.y ) + " " +
                       std::to_string( pMapRange->data.mapId ) + " " +
                       std::to_string( pMapRange->data.discoveryIndex ) + "\n"
   );
@@ -265,7 +265,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
   auto mapId = -1;
   //auto discoveryIndex = pBNpc->data.discoveryIndex;
 
-  vec3 translation = pObj->header.transform.translation;
+  vec3 translation = pObj->header.Transformation.Translation;
   for( auto ref : group.refs )
   {
     auto& groupList = layerSetMap[ ref.LayerSetID ];
@@ -287,11 +287,11 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
                       group.name + ", " +
                       name + ", " +
                       pBNpc->name + ", " +
-                      std::to_string( pBNpc->header.instanceId ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.x ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.y ) + ", " +
-                      std::to_string( pBNpc->header.transform.translation.z ) + ", " +
-                      std::to_string( pBNpc->data.transform.rotation.y ) + ", " +
+                      std::to_string( pBNpc->header.InstanceID ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.x ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.y ) + ", " +
+                      std::to_string( pBNpc->header.Transformation.Translation.z ) + ", " +
+                      std::to_string( pBNpc->data.Transformation.Rotation.y ) + ", " +
                       std::to_string( pBNpc->data.BaseId ) + ", " +
                       std::to_string( pBNpc->data.PopWeather ) + ", " +
                         std::to_string( pBNpc->data.PopTimeStart ) + ", " +

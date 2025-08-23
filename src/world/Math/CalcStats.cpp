@@ -120,7 +120,7 @@ float CalcStats::calculateBaseStat( const Chara& chara )
 // Leggerless' HP Formula
 // ROUNDDOWN(JobModHP * (BaseHP / 100)) + ROUNDDOWN(VitHPMod / 100 * (VIT - BaseDET))
 
-uint32_t CalcStats::calculateMaxHp( Player& player )
+uint32_t CalcStats::calculateMaxHp( Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
@@ -184,7 +184,7 @@ uint32_t CalcStats::calculateMaxHp( Chara& chara )
   return result;
 }
 
-uint32_t CalcStats::calculateMaxMp( Player& player )
+uint32_t CalcStats::calculateMaxMp( Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 

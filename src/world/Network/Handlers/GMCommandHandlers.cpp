@@ -73,7 +73,7 @@ enum GmCommand
   QuestInspect = 0x0131,
   GC = 0x0154,
   GCRank = 0x0155,
-  Aetheryte = 0x015E,
+  Aetheryte1 = 0x015E,
   Wireframe = 0x0226,
   Teri = 0x0258,
   Kick = 0x025C,
@@ -441,7 +441,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                    targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
     }
-    case GmCommand::Aetheryte:
+    case GmCommand::Aetheryte1:
     {
       if( param1 == 0 )
       {

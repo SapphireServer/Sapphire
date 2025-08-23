@@ -173,7 +173,7 @@ namespace Sapphire::Entity
     uint32_t getLastRoamTargetReachedTime() const;
     void setLastRoamTargetReachedTime( uint32_t time );
 
-    std::shared_ptr< Common::BNPCInstanceObject > getInstanceObjectInfo() const;
+    std::shared_ptr< Common::BNPCData > getInstanceObjectInfo() const;
 
     void setRoamTargetReached( bool reached );
     bool isRoamTargetReached() const;
@@ -215,7 +215,7 @@ namespace Sapphire::Entity
 
     float m_naviTargetReachedDistance;
 
-    std::shared_ptr< Common::BNPCInstanceObject > m_pInfo;
+    std::shared_ptr< Common::BNPCData > m_pInfo;
 
     uint32_t m_timeOfDeath;
     uint32_t m_lastRoamTargetReachedTime;

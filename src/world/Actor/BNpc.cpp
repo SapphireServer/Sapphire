@@ -1299,7 +1299,7 @@ void BNpc::setLastRoamTargetReachedTime( uint32_t time )
   m_lastRoamTargetReachedTime = time;
 }
 
-std::shared_ptr< Common::BNPCInstanceObject > BNpc::getInstanceObjectInfo() const
+std::shared_ptr< Common::BNPCData > BNpc::getInstanceObjectInfo() const
 {
   return m_pInfo;
 }

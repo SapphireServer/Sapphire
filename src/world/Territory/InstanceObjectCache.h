@@ -6,12 +6,12 @@
 #include <map>
 #include <Common.h>
 
-struct LGB_MAP_RANGE_ENTRY;
-struct LGB_EXIT_RANGE_ENTRY;
-struct LGB_POP_RANGE_ENTRY;
-struct LGB_EOBJ_ENTRY;
-struct LGB_ENPC_ENTRY;
-struct LGB_EVENT_RANGE_ENTRY;
+struct MapRangeEntry;
+struct ExitRangeEntry;
+struct PopRangeEntry;
+struct EventObjectEntry;
+struct EventNPCEntry;
+struct EventRangeEntry;
 
 
 namespace Sapphire
@@ -57,13 +57,13 @@ namespace Sapphire
       if( m_objectCache.find( zoneId ) == m_objectCache.end() )
       {
         ObjectMap cache;
-        cache[ entry->header.instanceId ] = std::move( entry );
+        cache[ entry->header.InstanceID ] = std::move( entry );
         m_objectCache[ zoneId ] = cache;
       }
       else
       {
         auto it = m_objectCache.find( zoneId );
-        it->second[ entry->header.instanceId ] = std::move( entry );
+        it->second[ entry->header.InstanceID ] = std::move( entry );
       }
     }
 
@@ -80,12 +80,12 @@ namespace Sapphire
   class InstanceObjectCache
   {
   public:
-    using MapRangePtr = std::shared_ptr< LGB_MAP_RANGE_ENTRY >;
-    using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
-    using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
-    using EObjPtr = std::shared_ptr< LGB_EOBJ_ENTRY >;
-    using ENpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
-    using EventRangePtr = std::shared_ptr< LGB_EVENT_RANGE_ENTRY >;
+    using MapRangePtr = std::shared_ptr< MapRangeEntry >;
+    using ExitRangePtr = std::shared_ptr< ExitRangeEntry >;
+    using PopRangePtr = std::shared_ptr< PopRangeEntry >;
+    using EObjPtr = std::shared_ptr< EventObjectEntry >;
+    using ENpcPtr = std::shared_ptr< EventNPCEntry >;
+    using EventRangePtr = std::shared_ptr< EventRangeEntry >;
 
     using EObjMapPtr = std::unordered_map< uint32_t, EObjPtr >*;
     using ENpcMapPtr = std::unordered_map< uint32_t, ENpcPtr >*;
@@ -117,12 +117,12 @@ namespace Sapphire
     EventRangePtr getEventRange( uint32_t eventRangeId );
 
   private:
-    ObjectCache< LGB_MAP_RANGE_ENTRY > m_mapRangeCache;
-    ObjectCache< LGB_EXIT_RANGE_ENTRY > m_exitRangeCache;
-    ObjectCache< LGB_POP_RANGE_ENTRY > m_popRangeCache;
-    ObjectCache< LGB_EOBJ_ENTRY > m_eobjCache;
-    ObjectCache< LGB_ENPC_ENTRY > m_enpcCache;
-    ObjectCache< LGB_EVENT_RANGE_ENTRY > m_eventRangeCache;
+    ObjectCache< MapRangeEntry > m_mapRangeCache;
+    ObjectCache< ExitRangeEntry > m_exitRangeCache;
+    ObjectCache< PopRangeEntry > m_popRangeCache;
+    ObjectCache< EventObjectEntry > m_eobjCache;
+    ObjectCache< EventNPCEntry > m_enpcCache;
+    ObjectCache< EventRangeEntry > m_eventRangeCache;
 
     std::map< std::pair< uint16_t, uint32_t >, uint32_t > m_eobjBaseInstanceMap;
     std::shared_ptr< Framework > m_pFramework;

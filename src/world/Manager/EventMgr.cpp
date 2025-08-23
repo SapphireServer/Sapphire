@@ -10,8 +10,6 @@
 #include "Event/EventDefs.h"
 
 #include <Exd/ExdData.h>
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -31,6 +29,8 @@
 #include "WorldServer.h"
 #include "Actor/Player.h"
 #include <Script/ScriptMgr.h>
+
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
@@ -234,9 +234,9 @@ uint32_t EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
   if( levelInfo )
     return levelInfo->data().BaseId;
   else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
-    return pObj->data.BaseId;
+    return pObj->header.BaseId;
   else if( auto pNpc = instanceObjectCache.getENpc( eventActorId ) )
-    return pNpc->data.enpcId;
+    return pNpc->header.BaseId;
 
   return 0;
 }
