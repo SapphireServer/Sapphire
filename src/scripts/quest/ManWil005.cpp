@@ -181,13 +181,17 @@ class ManWil005 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 )
+
+    quest.setSeq( Seq2 );
+    Scene00005( quest, player );
+    /* if( result.getResult( 0 ) == 1 )
     {
       auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
-      eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
-    }
+      // TODO
+      //eventMgr().eventFinish( player, result.eventId, 0 );
+      //pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+    }*/
   }
 
   //////////////////////////////////////////////////////////////////////
