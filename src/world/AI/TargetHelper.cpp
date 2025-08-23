@@ -186,6 +186,21 @@ namespace Sapphire::World::AI
     return m_negate ? !ret : ret;
   }
 
+  bool IsDeadFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  {
+    bool ret = false;
+    // this shouldnt ever happen, ban them
+    if( pSrc == pTarget )
+    {
+      ret = false;
+    }
+    else if( pTarget->getStatus() == Common::ActorStatus::Dead )
+    {
+      ret = true;
+    }
+    return m_negate ? !ret : ret;
+  }
+
   void Snapshot::createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
                                  uint32_t count, bool fillWithRandom,
                                  const std::vector< TargetSelectFilterPtr >& filters,

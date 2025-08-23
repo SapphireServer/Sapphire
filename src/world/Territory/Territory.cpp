@@ -283,6 +283,14 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
 
     m_eventObjects[ pEObj->getId() ] = pEObj;
   }
+  else if( pActor->isArea() )
+  {
+    auto pArea = pActor->getAsArea();
+    if( pArea->getOwnerObjKind() == Common::ObjKind::Player )
+      m_playerAreaObjects[ pArea->getOwnerId() ] = pArea;
+    else
+      m_bNpcAreaObjects[ pArea->getOwnerId() ] = pArea;
+  }
 }
 
 void Territory::removeActor( const Entity::GameObjectPtr& pActor )
@@ -291,6 +299,13 @@ void Territory::removeActor( const Entity::GameObjectPtr& pActor )
   CellPtr pCell = getCellPtr( cellId.x, cellId.y );
   if( pCell && pCell->hasActor( pActor ) )
     pCell->removeActorFromCell( pActor );
+
+  if( pActor->isChara() )
+  {
+    // todo: remove status effects by flag zoning
+    auto pChara = pActor->getAsChara();
+    pChara->removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
+  }
 
   if( pActor->isPlayer() )
   {
@@ -318,6 +333,14 @@ void Territory::removeActor( const Entity::GameObjectPtr& pActor )
   else if( pActor->isEventObj() )
   {
     m_eventObjects.erase( pActor->getId() );
+  }
+  else if( pActor->isArea() )
+  {
+    auto pArea = pActor->getAsArea();
+    if( pArea->getOwnerObjKind() == Common::ObjKind::Player )
+      m_playerAreaObjects.erase( pArea->getOwnerId() );
+    else
+      m_bNpcAreaObjects.erase( pArea->getOwnerId() );
   }
 
   // remove from lists of other actors
@@ -476,6 +499,13 @@ bool Territory::update( uint64_t tickCount )
 
   if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
+
+  // todo: probably a separate list for bnpcs?
+  for( const auto& [ ownerId, pArea ] : m_playerAreaObjects )
+  {
+    if( m_playerMap.find( ownerId ) == m_playerMap.end() )
+      removeActor( pArea );
+  }
 
   m_lastUpdate = tickCount;
 
@@ -948,7 +978,7 @@ bool Territory::loadBNpcs()
 
         // Base info
         const auto& baseInfo = bnpcData[ "baseInfo" ];
-        auto position = baseInfo[ "position" ];
+        const auto& position = baseInfo[ "position" ];
         bnpc->territoryType = getTerritoryTypeId();
         bnpc->bnpcName = groupName; // or extract from JSON if available
         bnpc->instanceId = baseInfo[ "instanceId" ].get< uint32_t >();

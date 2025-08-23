@@ -1644,12 +1644,12 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
           surviveDamage = ( getHp() - 1 );
         }
 
-        takeDamage( surviveDamage );
+        takeDamage( surviveDamage, false );
       }
       else
       {
         // no mercy on hated players
-        takeDamage( damage );
+        takeDamage( damage, false );
       }
       Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
       // todo: this used to work without refreshing the entire UI state

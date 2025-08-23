@@ -286,6 +286,10 @@ Sets hp/mp/tp, sets status, plays animation and fires onDeath event
 */
 void Chara::die()
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
   m_status = ActorStatus::Dead;
   m_hp = 0;
   m_mp = 0;
@@ -293,6 +297,8 @@ void Chara::die()
 
   // fire onDeath event
   onDeath();
+
+  removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnDeath );
 
   // if the actor is a player, the update needs to be send to himself too
   bool selfNeedsUpdate = isPlayer();
@@ -400,8 +406,12 @@ magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
-void Chara::takeDamage( uint32_t damage )
+void Chara::takeDamage( uint32_t damage, bool broadcastUpdate )
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
   if( damage >= m_hp )
   {
     switch( m_invincibilityType )
@@ -422,6 +432,13 @@ void Chara::takeDamage( uint32_t damage )
   }
   else
     m_hp -= damage;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeDamageHp, damage );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 /*!
@@ -431,7 +448,7 @@ in range
 
 \param amount of hp to be healed
 */
-void Chara::heal( uint32_t amount )
+void Chara::heal( uint32_t amount, bool broadcastUpdate )
 {
   if( ( m_hp + amount ) > getMaxHp() )
   {
@@ -439,6 +456,13 @@ void Chara::heal( uint32_t amount )
   }
   else
     m_hp += amount;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeRecoverHp, amount );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 void Chara::restoreMP( uint32_t amount )
@@ -497,7 +521,7 @@ void Chara::autoAttack( CharaPtr pTarget )
 
     server().queueForPlayers( getInRangePlayerIds(), effectPacket );
 
-    pTarget->takeDamage( damage );
+    pTarget->takeDamage( damage, false );
   }
 }
 
@@ -944,19 +968,11 @@ void Chara::onTick()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeDamageHp, thisTickDmg );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickHeal );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeRecoverMp, thisTickHeal );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 }
 
@@ -994,25 +1010,27 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }
 
-void Chara::spawnAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
+void Chara::createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos )
 {
-  despawnAreaObject();
+  removeAreaObject();
   removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
 
   // todo: delay spawning the ground target til action shows hit effect
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId, scale, getId(), pos );
+  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId, scale, shared_from_this(), pos );
+
   pTeri->pushActor( m_pAreaObject );
 }
 
-void Chara::despawnAreaObject()
+void Chara::removeAreaObject()
 {
   if( m_pAreaObject )
   {
     auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
     pTeri->removeActor( m_pAreaObject );
 
     m_pAreaObject = nullptr;

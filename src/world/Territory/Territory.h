@@ -49,6 +49,8 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::PlayerPtr > m_playerMap;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bNpcMap;
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventObjects;
+    std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_playerAreaObjects;
+    std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_bNpcAreaObjects;
 
     std::unordered_map< uint32_t, std::shared_ptr< Common::BNpcCacheEntry > > m_bNpcBaseMap;
 

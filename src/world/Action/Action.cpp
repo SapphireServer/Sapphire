@@ -731,7 +731,10 @@ void Action::Action::handleStatusEffects()
       else if( m_lutEntry.potency == 0 )*/
       if( status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && status.groundAOE.vfxId > 0 )
       {
-        m_pSource->spawnAreaObject( getId(), m_lutEntry.potency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
+        if( status.groundAOE.aoeType == GroundAOEType::Damage )
+          m_pSource->createAreaObject( getId(), m_lutEntry.potency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
+        else
+          m_pSource->createAreaObject( getId(), m_lutEntry.curePotency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );     
       }
       applyStatusEffect( true, m_pSource, m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );

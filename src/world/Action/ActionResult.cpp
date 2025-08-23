@@ -178,12 +178,12 @@ void ActionResult::execute()
     {
       auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
       auto statusEffects( m_target->getStatusEffectMap() );
-      for( auto status : statusEffects )
+      for( auto& status : statusEffects )
       {
         scriptMgr.onPlayerHit( m_target, *status.second );
       }
 
-      m_target->takeDamage( m_result.Value );
+      m_target->takeDamage( m_result.Value, false );
       int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *m_source, m_result.Value, m_aggroModifier );
       m_target->onActionHostile( m_source, aggro );
       break;
@@ -192,7 +192,7 @@ void ActionResult::execute()
     case CalcResultType::TypeRecoverHp:
     case CalcResultType::TypeCriticalRecoverHp:
     {
-      m_target->heal( m_result.Value );
+      m_target->heal( m_result.Value, false );
 
       if( m_aggroModifier != 0 )
       {

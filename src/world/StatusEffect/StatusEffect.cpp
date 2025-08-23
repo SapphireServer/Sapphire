@@ -15,6 +15,8 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/StatusEffectMgr.h"
 
+#include "Inventory/Item.h"
+
 #include <Math/CalcStats.h>
 #include "Util/UtilMath.h"
 
@@ -116,6 +118,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
     // filter by allies
     static auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
     static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+    static auto pDeadFilter = std::make_shared< World::AI::IsDeadFilter >();
 
     if( m_targetActor->getAreaObject() == nullptr )
       return;
@@ -133,10 +136,30 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
 
         auto pChara = pActor->getAsChara();
 
+        // dont hit dead targets
+        // todo: are there puddles which revive actors?
+        if( pDeadFilter->isApplicable( m_sourceActor, pChara ) )
+          continue;
+        
         const auto& pos = pAreaObject->getPos();
         const auto& potency = pAreaObject->getActionPotency();
         if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius )
         {
+          auto wepDmg = 1.f;
+
+          // todo: 
+          if( auto player = m_sourceActor->getAsPlayer() )
+          {
+            auto item = player->getEquippedWeapon();
+            assert( item );
+
+            auto role = player->getRole();
+            if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+              wepDmg = item->getMagicalDmg();
+            else
+              wepDmg = item->getPhysicalDmg();
+          }
+
           switch( m_groundAOE.aoeType )
           {
             case Common::GroundAOEType::Damage:
@@ -146,7 +169,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
                 pPartyFilter->isApplicable( m_sourceActor, pChara ) || m_sourceActor == pChara )
                 continue;
 
-              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, 1.0f );
+              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, wepDmg );
               float damageVal = dmg.first;
               Common::CalcResultType damageType = dmg.second;
 
@@ -159,7 +182,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
               if( !pPartyFilter->isApplicable( m_sourceActor, pChara ) )
                 continue;
 
-              auto heal = Math::CalcStats::calcActionHealing( *m_sourceActor, potency, 1.0f );
+              auto heal = Math::CalcStats::calcActionHealing( *m_sourceActor, potency, wepDmg );
               float healVal = heal.first;
               Common::CalcResultType healType = heal.second;
 
@@ -253,7 +276,7 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
   if( auto pAreaObject = m_targetActor->getAreaObject() )
   {
     if( pAreaObject->getActionId() == m_groundAOE.actionId )
-      m_targetActor->despawnAreaObject();
+      m_targetActor->removeAreaObject();
   }
 
   scriptMgr.onStatusTimeOut( m_targetActor, m_id );

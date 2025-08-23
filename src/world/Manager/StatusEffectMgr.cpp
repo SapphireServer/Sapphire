@@ -18,18 +18,11 @@ void StatusEffectMgr::damage( Entity::CharaPtr pSource, Entity::CharaPtr pTarget
   pTarget->takeDamage( amount );
   int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *pSource, amount, 1.0f );
   pTarget->onActionHostile( pSource, aggro );
-
-  Network::Util::Packet::sendActorControl( pTarget->getInRangePlayerIds( pTarget->isPlayer() ), pTarget->getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
-                                           Common::CalcResultType::TypeDamageHp, amount );
-  Network::Util::Packet::sendHudParam( *pTarget );
 }
 
 void StatusEffectMgr::heal( Entity::CharaPtr pSource, Entity::CharaPtr pTarget, uint32_t amount )
 {
   pTarget->heal( amount );
-  Network::Util::Packet::sendActorControl( pTarget->getInRangePlayerIds( pTarget->isPlayer() ), pTarget->getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
-                                           Common::CalcResultType::TypeRecoverHp, amount );
-  Network::Util::Packet::sendHudParam( *pTarget );
 
   int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *pSource, amount, 0.5f );
   auto hateList = pTarget->getHateList();
