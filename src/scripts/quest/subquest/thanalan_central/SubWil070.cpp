@@ -107,9 +107,11 @@ class SubWil070 : public Sapphire::ScriptAPI::QuestScript
     {
       if( varIdx == 1 )
       {
-      quest.setUI8AL( quest.getUI8AL() + 1 );
-      if (quest.getUI8AL() == 4)
-        quest.setSeq( SeqFinish );
+        quest.setUI8AL( quest.getUI8AL() + 1 );
+        quest.setUI8BH( quest.getUI8BH() + 1 );
+
+        if (quest.getUI8AL() == 4)
+          quest.setSeq( SeqFinish );
       }
       eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 4, Item0Icon } );
     }
@@ -126,11 +128,8 @@ class SubWil070 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setUI8BH( 1 );
       quest.setSeq( Seq1 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////

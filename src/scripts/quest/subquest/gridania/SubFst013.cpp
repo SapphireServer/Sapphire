@@ -146,6 +146,7 @@ private:
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq3 );
+    eventMgr().sendEventNotice( player, getId(), 1, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -170,6 +171,7 @@ private:
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq5 );
+    eventMgr().sendEventNotice( player, getId(), 3, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -223,7 +225,7 @@ private:
   void Scene00096Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( SeqFinish );
-    eventMgr().sendEventNotice( player, getId(), 4, 2, 0, 0 );
+    eventMgr().sendEventNotice( player, getId(), 4, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -248,6 +250,7 @@ private:
   void Scene00098Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq4 );
+    eventMgr().sendEventNotice( player, getId(), 2, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -272,7 +275,7 @@ private:
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq2 );
-    eventMgr().sendEventNotice( player, getId(), 0, 2, 0, 0 );
+    eventMgr().sendEventNotice( player, getId(), 0, 0 );
   }
 
 };

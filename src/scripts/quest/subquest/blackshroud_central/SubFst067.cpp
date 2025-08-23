@@ -55,6 +55,9 @@ private:
   static constexpr auto Item0 = 2000192;
   static constexpr auto Item0Icon = 22627;
 
+  bool enemy0Downed = false;
+  bool enemy1Downed = false;
+
 public:
   SubFst067() : Sapphire::ScriptAPI::QuestScript( 65919 ){};
   ~SubFst067() = default;
@@ -88,24 +91,7 @@ public:
       case Eobject1:
       {
         if( quest.getSeq() == Seq2 )
-        {
-          auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-
-          bool enemy0Downed = false;
-          bool enemy1Downed = false;
-
-          auto enem0 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
-          auto enem1 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
-
-          if( enem0 == nullptr || ( enem0 != nullptr && enem0->getHp() == 0 ) ) enemy0Downed = true;
-          if( enem1 == nullptr || ( enem1 != nullptr && enem1->getHp() == 0 ) ) enemy1Downed = true;
-
-
-          if( enemy0Downed && enemy1Downed )
-            Scene00006( quest, player );
-          else
-            Scene00013( quest, player );
-        }
+          Scene00006( quest, player );
         break;
       }
       case Eobject2:
@@ -147,10 +133,12 @@ public:
     {
       case Enemy0:
       {
+        enemy0Downed = true;
         break;
       }
       case Enemy1:
       {
+        enemy1Downed = true;
         break;
       }
     }
@@ -158,10 +146,10 @@ public:
 
   void onWithinRange( World::Quest& quest, Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) override
   {
-    if( quest.getSeq() == Seq2 && param1 == Eventrange0 )
+    if( quest.getSeq() == Seq2 && param1 == Eventrange0 && !enemy0Downed && !enemy1Downed )
     {
       auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-
+      
       bool enemy0Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() ) != nullptr;
       bool enemy1Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() ) != nullptr;
 
@@ -170,8 +158,8 @@ public:
         auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
         auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
 
-        enemy0->hateListAddDelayed( player.getAsPlayer(), 1 );
-        enemy1->hateListAddDelayed( player.getAsPlayer(), 1 );
+        enemy0->hateListAddDelayed( player.getAsPlayer(), 1000 );
+        enemy1->hateListAddDelayed( player.getAsPlayer(), 1000 );
       }
     }
   }
