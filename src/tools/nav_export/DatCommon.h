@@ -1,6 +1,6 @@
 #pragma once
 
-enum eAssetType : __int32
+enum eAssetType : int32_t
 {
   AssetNone = 0x0,
   BG = 0x1,
