@@ -149,7 +149,7 @@ struct SGB_MODEL_ENTRY :
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
+  SGB_MODEL_ENTRY( char* buf, size_t offset, SgbGroupEntryType type )
   {
     this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );

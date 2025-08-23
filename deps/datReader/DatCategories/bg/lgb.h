@@ -163,7 +163,7 @@ public:
   ::BNPCInstanceObject data;
   BNpcBaseData baseData;
 
-  LGB_BNPC_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_BNPC_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ::BNPCInstanceObject* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
