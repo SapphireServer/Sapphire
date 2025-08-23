@@ -154,7 +154,7 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
                          const vec3* scale = nullptr,
                          const vec3* rotation = nullptr,
                          const vec3* translation = nullptr,
-                         const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
+                         const InstanceObject* pSgbEntry = nullptr )
 {
   auto& pcb_file = *pPcbFile.get();
 
@@ -178,17 +178,17 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
     {
       if( pSgbEntry )
       {
-        v.x *= pSgbEntry->header.scale.x;
-        v.y *= pSgbEntry->header.scale.y;
-        v.z *= pSgbEntry->header.scale.z;
+        v.x *= pSgbEntry->Transformation.Scale.x;
+        v.y *= pSgbEntry->Transformation.Scale.y;
+        v.z *= pSgbEntry->Transformation.Scale.z;
 
-        v = v * matrix4::rotateX( pSgbEntry->header.rotation.x );
-        v = v * matrix4::rotateY( pSgbEntry->header.rotation.y );
-        v = v * matrix4::rotateZ( pSgbEntry->header.rotation.z );
+        v = v * matrix4::rotateX( pSgbEntry->Transformation.Rotation.x );
+        v = v * matrix4::rotateY( pSgbEntry->Transformation.Rotation.y );
+        v = v * matrix4::rotateZ( pSgbEntry->Transformation.Rotation.z );
 
-        v.x += pSgbEntry->header.translation.x;
-        v.y += pSgbEntry->header.translation.y;
-        v.z += pSgbEntry->header.translation.z;
+        v.x += pSgbEntry->Transformation.Translation.x;
+        v.y += pSgbEntry->Transformation.Translation.y;
+        v.z += pSgbEntry->Transformation.Translation.z;
       }
 
       if( scale )
@@ -248,7 +248,7 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
 }
 
 bool pcbTransformModel( const std::string& fileName, const vec3* scale, const vec3* rotation,
-                        const vec3* translation, ExportedGroup& exportgroup, const SGB_MODEL_ENTRY* pModel = nullptr )
+                        const vec3* translation, ExportedGroup& exportgroup, const InstanceObject* pModel = nullptr )
 {
   if( auto pPcbFile = pCache->getPcbFile( fileName ) )
   {
@@ -257,16 +257,40 @@ bool pcbTransformModel( const std::string& fileName, const vec3* scale, const ve
   return true;
 };
 
-void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
+void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
 {
   if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
   {
-    const auto& sgbFile = *pSgbFile;
-    for( const auto& group : sgbFile.entries )
+    auto& sgbFile = *pSgbFile;
+    for( const auto& layer : sgbFile.layers )
     {
-      for( const auto& pSgbEntry : group.entries )
+      auto& layerInstances = sgbFile.layerInstanceObjects[ layer.LayerID ];
+      for( const auto& instance : layerInstances )
       {
-        auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSgbEntry.get() );
+        switch( instance->getType() )
+        {
+          case BG:
+          {
+            auto model = dynamic_cast< BGEntry* >( instance.get() );
+            std::string collisionFile = model->collisionFileName;
+            pcbTransformModel( collisionFile, &pGimmick->header.Transformation.Scale,
+              &pGimmick->header.Transformation.Rotation,
+                   &pGimmick->header.Transformation.Translation,
+                   exportgroup, &instance->header );
+            break;
+          }
+
+
+          case SharedGroup:
+          {
+            auto sharedGroup = dynamic_cast< SharedGroupEntry* >( instance.get() );
+            exportSgbModel( sharedGroup->AssetPath, pGimmick, exportgroup );
+            break;
+          }
+
+
+        }
+   /*       auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSgbEntry.get() );
         std::string fileName = pModel->collisionFileName;
         if( pModel->type == SgbGroupEntryType::Gimmick )
         {
@@ -292,7 +316,7 @@ void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, Exporte
         }
         pcbTransformModel( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
                            &pGimmick->header.translation, exportgroup, pModel );
-
+        */
       }
     }
   }
@@ -428,8 +452,7 @@ int main( int argc, char* argv[] )
         {
           ExportedGroup exportedGroup;
           exportedGroup.name = group.name;
-
-          //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+          std::cout << "\t" << group.name << " Size " << group.header.InstanceObject_Count << "\n";
           for( const auto& pEntry : group.entries )
           {
             std::string fileName( "" );
@@ -438,56 +461,60 @@ int main( int argc, char* argv[] )
             // write files
             switch( pEntry->getType() )
             {
-              case LgbEntryType::NaviMeshRange:
+              case eAssetType::NaviMeshRange:
               {
                 std::cout << "NaviMeshRange\n";
               }
               break;
 
-              case LgbEntryType::MapRange:
+              case eAssetType::MapRange:
               {
                 std::cout << "MapRange\n";
               }
               break;
 
-              case LgbEntryType::DoorRange:
+              case eAssetType::DoorRange:
               {
                 std::cout << "DoorRange\n";
               }
                 break;
 
-              case LgbEntryType::CollisionBox:
+              case eAssetType::CollisionBox:
               {
                 std::cout << "CollisionBox\n";
               }
                 break;
 
-              case LgbEntryType::BgParts:
+              case eAssetType::BG:
               {
-                auto pBgParts = static_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+                auto pBgParts = static_cast< BGEntry* >( pEntry.get() );
                 fileName = pBgParts->collisionFileName;
                 if( !fileName.empty() && pBgParts->header.CollisionType == COLLISION_ATTRIBUTE_TYPE_None )
                   std::cout << "BgParts -------------------- BIG WTF !!!\n";
-                pcbTransformModel( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
-                  &pBgParts->header.translation, exportedGroup );
+                pcbTransformModel( fileName,
+                  &pBgParts->header.Transformation.Scale,
+                  &pBgParts->header.Transformation.Rotation,
+                  &pBgParts->header.Transformation.Translation, exportedGroup );
               }
               break;
 
               // gimmick entry
-              case LgbEntryType::Gimmick:
+              case eAssetType::SharedGroup:
               {
-                auto pGimmick = static_cast< LGB_SG_ENTRY* >( pEntry.get() );
+                auto pGimmick = static_cast< SharedGroupEntry* >( pEntry.get() );
 
-                exportSgbModel( pGimmick->gimmickFileName, pGimmick, exportedGroup );
+                exportSgbModel( pGimmick->AssetPath, pGimmick, exportedGroup );
               }
               break;
 
-              case LgbEntryType::EventObject:
+              case eAssetType::EventObject:
               {
                 auto pEobj = static_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
-                pcbTransformModel( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation, exportedGroup );
+                pcbTransformModel( fileName, &pEntry->header.Transformation.Scale,
+                  &pEntry->header.Transformation.Rotation,
+                  &pEntry->header.Transformation.Translation, exportedGroup );
 
-                auto sgbPath = getEobjSgbPath( pEobj->header.eobjId );
+                auto sgbPath = getEobjSgbPath( pEobj->header.InstanceID );
                 if ( !sgbPath.empty() )
                 {
                   exportSgbModel( sgbPath, pEobj, exportedGroup, true );
@@ -502,6 +529,9 @@ int main( int argc, char* argv[] )
               }
               break;
               default:
+              {
+                std::cout << "Asset Type:" << pEntry->getType() << "\n";
+              }
                 break;
             }
           }

@@ -13,10 +13,14 @@
 #include <sstream>
 #include <iomanip>
 
+#include "InstanceObject.h"
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
+#include "Layer.h"
+#include "DatCommon.h"
 
+#include "InstanceObjectParser.h"
 // garbage to skip model loading
 extern bool noObj;
 
@@ -28,158 +32,8 @@ struct LGB_FILE_HEADER;
 struct LGB_GROUP;
 struct LGB_GROUP_HEADER;
 
-enum class LgbEntryType :
-  uint32_t
-{
-  BgParts = 1,
-  Light = 3,
-  Vfx = 4,
-  PositionMarker = 5,
-  Gimmick = 6,
-  SharedGroup6 = 6,// secondary variable is set to 2
-  Sound = 7,
-  EventNpc = 8,
-  BattleNpc = 9,
-  Aetheryte = 12,
-  EnvSpace = 13,
-  Gathering = 14,
-  SharedGroup15 = 15,// secondary variable is set to 13
-  Treasure = 16,
-  Weapon = 39,
-  PopRange = 40,
-  ExitRange = 41,
-  MapRange = 43,
-  NaviMeshRange = 44,
-  EventObject = 45,
-  EnvLocation = 47,
-  EventRange = 49,
-  QuestMarker = 51,
-  CollisionBox = 57,
-  DoorRange = 58,
-  LineVfx = 59,
-  ClientPath = 65,
-  ServerPath = 66,
-  GimmickRange = 67,
-  TargetMarker = 68,
-  ChairMarker = 69,
-  ClickableRange = 70,
-  PrefetchRange = 71,
-  FateRange = 72,
-  SphereCastRange = 75,
-};
-
-struct InstanceObject
-{
-  LgbEntryType type;
-  uint32_t unknown;
-  uint32_t nameOffset;
-  vec3 translation;
-  vec3 rotation;
-  vec3 scale;
-};
-
-class LgbEntry
-{
-public:
-  char* m_buf;
-  uint32_t m_offset;
-  InstanceObject header;
-
-  LgbEntry()
-  {
-    m_buf = nullptr;
-    m_offset = 0;
-    memset( &header, 0, sizeof( header ) );
-  };
-
-  LgbEntry( char* buf, uint32_t offset )
-  {
-    m_buf = buf;
-    m_offset = offset;
-    header = *reinterpret_cast< InstanceObject* >( buf + offset );
-  };
-
-  const LgbEntryType getType() const
-  {
-    return header.type;
-  };
-
-  virtual ~LgbEntry()
-  {
-  };
-};
-
-enum eModelConfigCollisionType : int32_t
-{
-  COLLISION_ATTRIBUTE_TYPE_None = 0x0,
-  COLLISION_ATTRIBUTE_TYPE_Replace = 0x1,
-  COLLISION_ATTRIBUTE_TYPE_Box = 0x2,
-};
 
 
-struct BgPartsData :
-  public InstanceObject
-{
-  uint32_t modelFileOffset;
-  uint32_t collisionFileOffset;
-  eModelConfigCollisionType CollisionType;
-  uint32_t AttributeMask;
-  uint32_t Attribute;
-  int32_t CollisionConfig;
-  int8_t IsVisible;
-  uint8_t RenderShadowEnabled;
-  uint8_t RenderLightShadowEnabled;
-  uint8_t Padding00[1];
-  float RenderModelClipRange;
-};
-
-class LGB_BGPARTS_ENTRY :
-  public LgbEntry
-{
-public:
-  BgPartsData header;
-  std::string name;
-  std::string modelFileName;
-  std::string collisionFileName;
-
-  LGB_BGPARTS_ENTRY()
-  {
-  };
-
-  LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
-  {
-    header = *reinterpret_cast<BgPartsData*>( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + header.modelFileOffset );
-    collisionFileName = std::string( buf + offset + header.collisionFileOffset );
-  };
-};
-
-struct SGData :
-  public InstanceObject
-{
-  uint32_t gimmickFileOffset;
-  char unknownBytes[100];
-};
-
-class LGB_SG_ENTRY :
-  public LgbEntry
-{
-public:
-  SGData header;
-  std::string name;
-  std::string gimmickFileName;
-
-  LGB_SG_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
-  {
-    header = *reinterpret_cast<SGData*>( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
-    //std::cout << "\t " << gimmickFileName << " unknown: " << header.unknown << "\n";
-  };
-};
 
 struct ENpcData :
   public InstanceObject
@@ -189,99 +43,75 @@ struct ENpcData :
 };
 
 class LGB_ENPC_ENTRY :
-  public LgbEntry
+  public InstanceObjectEntry
 {
 public:
   ENpcData header;
   std::string name;
 
   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+          InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< ENpcData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
     //std::cout << "\t ENpc " << header.enpcId << " " << name << "\n";
   };
 };
 
-struct EObjData :
-  public InstanceObject
-{
-  uint32_t eobjId;
-  uint32_t levelHierachyId;
-  uint8_t unknown1[0xC];
-};
-
-struct LGB_EOBJ_ENTRY :
-  public LgbEntry
+struct LGB_EOBJ_ENTRY : public InstanceObjectEntry
 {
 public:
   EObjData header;
   std::string name;
 
   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+          InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< EObjData* >( buf + offset );
     //std::cout << "\t " << header.eobjId << " " << name << " unknown: " << header.unknown << "\n";
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
   };
 };
 
-struct MapRangeData :
-  public InstanceObject
-{
-  uint32_t type;
-  uint16_t unknown2;
-  uint16_t unknown3;
-  uint8_t unknown4[0x10];
-};
 
-struct LGB_MAP_RANGE_ENTRY :
-  public LgbEntry
+struct LGB_MAP_RANGE_ENTRY :  public InstanceObjectEntry
 {
 public:
   MapRangeData header;
   std::string name;
 
   LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+          InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< MapRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
   };
 };
 
-struct LGB_COLLISION_BOX_HEADER :
-  public InstanceObject
-{
-  uint8_t unk[100];
-};
-
 struct LGB_COLLISION_BOX_ENTRY :
-  public LgbEntry
+  public InstanceObjectEntry
 {
-  LGB_COLLISION_BOX_HEADER header;
+  CollisionBoxData header;
   std::string name;
 
   LGB_COLLISION_BOX_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+          InstanceObjectEntry( buf, offset )
   {
-    header = *reinterpret_cast< LGB_COLLISION_BOX_HEADER* >( buf + offset );
-    header.type = LgbEntryType::CollisionBox;
-    name = std::string( buf + offset + header.nameOffset );
+    header = *reinterpret_cast< CollisionBoxData* >( buf + offset );
+    header.AssetType = eAssetType::CollisionBox;
+    name = std::string( buf + offset + header.Name );
     std::stringstream ss;
-    ss << "\nName: " << name << "Id: " << header.unknown << "\n";
-    ss << "Pos: " << header.translation.x << " " << header.translation.y << " " << header.translation.z << "\n";
-    ss << "Rot?: " << header.rotation.x << " " << header.rotation.y << " " << header.rotation.z << "\n";
-    ss << "Scale?: " << header.scale.x << " " << header.scale.y << " " << header.scale.z << "\n";
+    ss << "\nName: " << name << "Id: " << header.InstanceID << "\n";
+    ss << "Pos: " << header.Transformation.Translation.x << " " << header.Transformation.Translation.y << " " << header.Transformation.Translation.z << "\n";
+    ss << "Rot?: " << header.Transformation.Rotation.x << " " << header.Transformation.Rotation.y << " " << header.Transformation.Rotation.z << "\n";
+    ss << "Scale?: " << header.Transformation.Scale.x << " " << header.Transformation.Scale.y << " " << header.Transformation.Scale.z << "\n";
     ss << "00 01 02 03 04 05 06 07 | 08 09 0A 0B 0C 0D 0E 0F\n";
     ss << "-------------------------------------------------\n";
     ss << std::hex;
     ss << std::setw( 2 );
     ss << std::setfill( '0' );
 
-    for( auto i = 1; i < sizeof( header.unk ); ++i )
+  /*  for( auto i = 1; i < sizeof( header. ); ++i )
       if( i % 16 == 0 )
         ss << std::setw(2) << (int)header.unk[i - 1] << "\n";
       else if( i % 8 == 0 )
@@ -289,100 +119,48 @@ struct LGB_COLLISION_BOX_ENTRY :
       else
         ss << std::setw(2) << (int)header.unk[i - 1] << " ";
     ss << "\n";
-    std::cout << ss.str();
+    std::cout << ss.str();*/
   }
 };
 
-struct LayerGroup
-{
-  uint32_t LayerGroupID;
-  int32_t Name;
-  int32_t Layers;
-  int32_t Layer_Count;
-};
-
-struct Layer
-{
-  uint32_t LayerID;
-  int32_t Name;
-  int32_t InstanceObjects;
-  int32_t InstanceObject_Count;
-  int8_t ToolModeVisible;
-  int8_t ToolModeReadOnly;
-  int8_t IsBushLayer;
-  int8_t PS3Visible;
-  int32_t LayerSetRef;
-  uint16_t FestivalID;
-  uint16_t FestivalPhaseID;
-  int8_t IsTemporary;
-  int8_t IsHousing;
-  uint16_t VersionMask;
-  uint32_t Reserved;
-  int32_t OBSetReferencedList;
-  int32_t OBSetReferencedList_Count;
-  int32_t OBSetEnableReferencedList;
-  int32_t OBSetEnableReferencedList_Count;
-};
 
 
-struct LGB_GROUP_HEADER
-{
-  uint32_t id;
-  int32_t groupNameOffset;
-  int32_t entriesOffset;
-  int32_t entryCount;
-  int8_t ToolModeVisible;
-  int8_t ToolModeReadOnly;
-  int8_t IsBushLayer;
-  int8_t PS3Visible;
-  int32_t LayerSetRef;
-  uint16_t FestivalID;
-  uint16_t FestivalPhaseID;
-  int8_t IsTemporary;
-  int8_t IsHousing;
-  uint16_t VersionMask;
-  uint32_t Reserved;
-  int32_t OBSetReferencedList;
-  int32_t OBSetReferencedList_Count;
-  int32_t OBSetEnableReferencedList;
-  int32_t OBSetEnableReferencedList_Count;
-};
 
 struct LGB_GROUP
 {
   LGB_FILE* parent;
-  LGB_GROUP_HEADER header;
+  Layer header;
   std::string name;
-  std::vector< std::shared_ptr< LgbEntry > > entries;
+  std::vector< std::shared_ptr< InstanceObjectEntry > > entries;
 
   LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
   {
     parent = parentStruct;
-    header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.groupNameOffset );
+    header = *reinterpret_cast< Layer* >( buf + offset );
+    name = std::string( buf + offset + header.Name );
     //entries.resize( header.entryCount );
     //std::cout << name << "\n\t unknown: " << header.unknown << "\n";
-    const auto entriesOffset = offset + header.entriesOffset;
-    for( auto i = 0; i < header.entryCount; ++i )
+    const auto entriesOffset = offset + header.InstanceObjects;
+    for( auto i = 0; i < header.InstanceObject_Count; ++i )
     {
       const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + i * 4 ) );
 
       try
       {
-        const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
+        const auto type = *reinterpret_cast<eAssetType*>( buf + entryOffset );
         // garbage to skip model loading
         switch( type )
         {
-          case LgbEntryType::BgParts:
-            entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+          case eAssetType::BG:
+            entries.push_back( std::make_shared< BGEntry >( buf, entryOffset ) );
             break;
-          case LgbEntryType::Gimmick:
-            entries.push_back( std::make_shared< LGB_SG_ENTRY >( buf, entryOffset ) );
+          case eAssetType::SharedGroup:
+            entries.push_back( std::make_shared< SharedGroupEntry >( buf, entryOffset ) );
             break;
-          case LgbEntryType::EventObject:
+          case eAssetType::EventObject:
             entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
             break;
-          case LgbEntryType::CollisionBox:
+          case eAssetType::CollisionBox:
           //case LgbEntryType::NaviMeshRange:
             //std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << ( int )type << " index: " << i << " entryOffset: " << entryOffset << "\n";
             //entries.push_back( std::make_shared< LGB_COLLISION_BOX_ENTRY >( buf, entryOffset ) );
