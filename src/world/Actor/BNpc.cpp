@@ -921,13 +921,12 @@ void BNpc::checkAggro()
           // Calculate the difference between BNPC rotation and angle to player
           float angleDiff = angleToPlayer - bnpcRotation;
 
-          const float M_PI = 3.14159265358979323846f; // PI
           // Normalize angle difference to [-PI, PI]
-          while( angleDiff > M_PI ) angleDiff -= 2.0f * M_PI;
-          while( angleDiff < -M_PI ) angleDiff += 2.0f * M_PI;
+          while( angleDiff > PI ) angleDiff -= 2.0f * PI;
+          while( angleDiff < -PI ) angleDiff += 2.0f * PI;
 
           // Check if player is within the 75-degree vision cone (37.5 degrees on each side)
-          float halfConeAngle = ( 75.0f * M_PI / 180.0f ) / 2.0f;
+          float halfConeAngle = ( 75.0f * PI / 180.0f ) / 2.0f;
 
           if( abs( angleDiff ) <= halfConeAngle )
           {
