@@ -36,6 +36,13 @@ namespace Sapphire
     uint32_t timeOfDeath;
   };
 
+  struct CachedServerPath
+  {
+    vec3 position;
+    uint32_t instanceId;
+    std::vector< PathControlPoint > points;
+  };
+
   class Territory : public CellHandler< Cell >, public std::enable_shared_from_this< Territory >
   {
   protected:
@@ -51,6 +58,8 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventObjects;
     std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_playerAreaObjects;
     std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_bNpcAreaObjects;
+
+    std::unordered_map< uint32_t, CachedServerPath > m_serverPathCache;
 
     std::unordered_map< uint32_t, std::shared_ptr< Common::BNpcCacheEntry > > m_bNpcBaseMap;
 
@@ -81,6 +90,8 @@ namespace Sapphire
 
   public:
     Territory();
+
+    void loadServerPaths();
 
     Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 

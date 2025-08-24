@@ -67,6 +67,87 @@ Territory::Territory() :
 {
 }
 
+void Territory::loadServerPaths()
+{
+  m_serverPathCache.clear();
+
+  // Load JSON data from bnpcs folder
+  std::string jsonPath = fmt::format( "data/bnpcs/{}/{}_paths.json", m_internalName, m_internalName );
+
+  // Check if JSON file exists
+  if( !std::filesystem::exists( jsonPath ) )
+  {
+    Logger::debug( "No paths JSON file found for zone: {}", m_internalName );
+    return;
+  }
+
+  try
+  {
+    // Read JSON file
+    std::ifstream jsonFile( jsonPath );
+    if( !jsonFile.is_open() )
+    {
+      Logger::error( "Failed to open paths JSON file: {}", jsonPath );
+      return;
+    }
+
+    nlohmann::json pathsData;
+    jsonFile >> pathsData;
+    jsonFile.close();
+
+    // Iterate through each path entry
+    for( auto& [instanceIdStr, pathData] : pathsData.items() )
+    {
+      uint32_t instanceId = std::stoul( instanceIdStr );
+
+      // Create cached path entry
+      auto cachedPath = CachedServerPath();
+
+      // Basic information
+      cachedPath.instanceId = instanceId;
+
+      // Position data
+      if( pathData.contains( "position" ) && pathData["position"].is_array() && pathData["position"].size() == 3 )
+      {
+        cachedPath.position.x = pathData["position"][0].get<float>();
+        cachedPath.position.y = pathData["position"][1].get<float>();
+        cachedPath.position.z = pathData["position"][2].get<float>();
+      }
+
+      // Control points
+      if( pathData.contains( "controlPoints" ) && pathData["controlPoints"].is_array() )
+      {
+        for( const auto& controlPointData : pathData["controlPoints"] )
+        {
+          PathControlPoint point;
+
+          if( controlPointData.contains( "pointId" ) )
+            point.PointID = controlPointData["pointId"].get<uint16_t>();
+
+          if( controlPointData.contains( "position" ) && controlPointData["position"].is_array() && controlPointData["position"].size() == 3 )
+          {
+            point.Translation.x = controlPointData["position"][0].get<float>();
+            point.Translation.y = controlPointData["position"][1].get<float>();
+            point.Translation.z = controlPointData["position"][2].get<float>();
+          }
+
+
+          cachedPath.points.push_back( point );
+        }
+      }
+
+      // Store in cache
+      m_serverPathCache[instanceId] = cachedPath;
+    }
+
+    Logger::info( "Loaded {} server paths for zone: {}", m_serverPathCache.size(), m_internalName );
+  }
+  catch( std::runtime_error& e )
+  {
+    Logger::error( "Error loading paths from JSON {}: {}", jsonPath, e.what() );
+  }
+}
+
 Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
                       const std::string& placeName ) :
   m_currentWeather( Common::Weather::FairSkies ),
@@ -93,6 +174,8 @@ Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const std::string
   loadWeatherRates();
 
   loadBNpcs();
+
+  loadServerPaths();
 
   m_currentWeather = getNextWeather();
 }
