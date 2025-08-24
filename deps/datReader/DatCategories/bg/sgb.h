@@ -324,8 +324,9 @@ struct SGB_FILE
       const auto entriesOffset = layerOffset + layer.InstanceObjects + layerOffsets[ i ];
       for( int ioIdx = 0; ioIdx < layer.InstanceObject_Count; ++ioIdx )
       {
-        const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset  ) );
+        const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + ioIdx * 4 ) );
 
+        std::cout << "entryOffset: " << entryOffset << "\n";
         try
         {
           const auto type = *reinterpret_cast<eAssetType*>( buf + entryOffset );

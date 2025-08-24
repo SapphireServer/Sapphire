@@ -71,7 +71,7 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   const uint32_t tw = ( gw + ts - 1 ) / ts;
   const uint32_t th = ( gh + ts - 1 ) / ts;
 
-  printf( "[Navmesh]  - Tiles %d x %d\n", tw, th );
+ // printf( "[Navmesh]  - Tiles %d x %d\n", tw, th );
 
   int tileBits = rcMin( ( int ) ilog2( nextPow2( tw * th ) ), 14 );
   if( tileBits > 14 )
@@ -80,7 +80,7 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   m_maxTiles = 1 << tileBits;
   m_maxPolysPerTile = 1 << polyBits;
 
-  printf( "[Navmesh]  - %.1fK verts, %.1fK tris\n", m_mesh->getVertCount() / 1000.0f, m_mesh->getTriCount() / 1000.0f );
+//  printf( "[Navmesh]  - %.1fK verts, %.1fK tris\n", m_mesh->getVertCount() / 1000.0f, m_mesh->getTriCount() / 1000.0f );
 
   return true;
 }

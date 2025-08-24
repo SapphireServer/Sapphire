@@ -10,8 +10,8 @@
 #include <string>
 
 #include "vec3.h"
-#include "Layer.h"
-#include "InstanceObjectParser.h"
+#include "DatCategories/Layer.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 // garbage to skip model loading
 extern bool noObj;
@@ -28,14 +28,14 @@ struct SGB_GROUP_HEADER;
 
 
 enum SgbDataType :
-  uint32_t
+    uint32_t
 {
   Unknown0008 = 0x0008,
   Group = 0x0100,
 };
 
 enum SgbGroupEntryType :
-  uint32_t
+    uint32_t
 {
   Model = 0x01,
   Gimmick = 0x06,
@@ -60,9 +60,9 @@ struct SGTimeline_t
   uint32_t TimelineID;
   int8_t AutoPlay;
   int8_t LoopPlayback;
-  uint8_t Padding00[2];
+  uint8_t Padding00[ 2 ];
   eTimelineCollisionState CollisionState;
-  uint32_t Reserved[1];
+  uint32_t Reserved[ 1 ];
 };
 
 
@@ -76,7 +76,7 @@ struct SGB_GROUP1C_HEADER
   SgbDataType type;
   int32_t nameOffset;
   uint32_t unknown08;
-  
+
   int32_t entryCount;
   uint32_t unknown14;
   int32_t modelFileOffset;
@@ -103,7 +103,7 @@ struct SGB_GROUP1C_ENTRY
 struct SGB_GROUP_ENTRY
 {
 public:
-  char* m_buf;
+  char *m_buf;
   uint32_t m_offset;
 
   SGB_GROUP_ENTRY()
@@ -112,7 +112,7 @@ public:
     m_offset = 0;
   };
 
-  SGB_GROUP_ENTRY( char* buf, uint32_t offset )
+  SGB_GROUP_ENTRY( char *buf, uint32_t offset )
   {
     m_buf = buf;
     m_offset = offset;
@@ -134,14 +134,14 @@ struct SGB_ENTRY_HEADER
 };
 
 struct SGB_MODEL_HEADER :
-  public SGB_ENTRY_HEADER
+    public SGB_ENTRY_HEADER
 {
   int32_t modelFileOffset;
   int32_t collisionFileOffset;
 };
 
 struct SGB_MODEL_ENTRY :
-  public SGB_GROUP_ENTRY
+    public SGB_GROUP_ENTRY
 {
   SGB_MODEL_HEADER header;
   SgbGroupEntryType type;
@@ -149,10 +149,10 @@ struct SGB_MODEL_ENTRY :
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
+  SGB_MODEL_ENTRY( char *buf, uint32_t offset, SgbGroupEntryType type )
   {
     this->type = type;
-    header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
+    header = *reinterpret_cast< SGB_MODEL_HEADER * >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     modelFileName = std::string( buf + offset + header.modelFileOffset );
     collisionFileName = std::string( buf + offset + header.collisionFileOffset );
@@ -163,17 +163,18 @@ struct SGB_GROUP
 {
   SGB_GROUP_HEADER header;
   std::string name;
-  SGB_FILE* parent;
+  SGB_FILE *parent;
   std::vector< std::shared_ptr< SGB_GROUP_ENTRY > > entries;
 
-  SGB_GROUP( char* buf, SGB_FILE* file, std::set< std::string >* offset1cObjects, uint32_t fileSize, uint32_t offset, bool isOffset1C = false )
+  SGB_GROUP( char *buf, SGB_FILE *file, std::set< std::string > *offset1cObjects, uint32_t fileSize, uint32_t offset,
+             bool isOffset1C = false )
   {
     parent = file;
 
 
     if( isOffset1C )
     {
-      auto header1c = *reinterpret_cast< SGB_GROUP1C_HEADER* >( buf + offset );
+      auto header1c = *reinterpret_cast< SGB_GROUP1C_HEADER * >( buf + offset );
 
       auto entriesOffset = offset + sizeof( header1c );
 
@@ -181,7 +182,7 @@ struct SGB_GROUP
       for( auto i = 0; i < entryCount; ++i )
       {
         auto entryOffset = entriesOffset + ( i * 24 );
-        auto entry = *reinterpret_cast< SGB_GROUP1C_ENTRY* >( buf + entryOffset );
+        auto entry = *reinterpret_cast< SGB_GROUP1C_ENTRY * >( buf + entryOffset );
 
         std::string entryModelFile( buf + entryOffset + entry.modelFileOffset + 9 );
         if( entryModelFile.find( ".sgb" ) != std::string::npos )
@@ -193,24 +194,24 @@ struct SGB_GROUP
     }
     auto entriesOffset = offset + sizeof( header );
 
-  /*  header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    /*  header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );
+      name = std::string( buf + offset + header.nameOffset );
 
-    for( auto i = 0; i < header.entryCount; ++i )
-    {
-      auto entryOffset = entriesOffset + *reinterpret_cast< uint32_t* >( buf + ( entriesOffset + ( i * 4 ) ) );
-      if( entryOffset > fileSize )
-        throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
-      auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-      if( type == SgbGroupEntryType::Model || type == SgbGroupEntryType::Gimmick )
+      for( auto i = 0; i < header.entryCount; ++i )
       {
-        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType )type ) );
-      }
-      else
-      {
-        // std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << type << " index: " << i << " entryOffset: " << entryOffset << "\n";
-      }
-    }*/
+        auto entryOffset = entriesOffset + *reinterpret_cast< uint32_t* >( buf + ( entriesOffset + ( i * 4 ) ) );
+        if( entryOffset > fileSize )
+          throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
+        auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
+        if( type == SgbGroupEntryType::Model || type == SgbGroupEntryType::Gimmick )
+        {
+          entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType )type ) );
+        }
+        else
+        {
+          // std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << type << " index: " << i << " entryOffset: " << entryOffset << "\n";
+        }
+      }*/
   }
 };
 
@@ -230,7 +231,7 @@ struct Scene_t
   int32_t _SGRandomTimelineSettings;
   int32_t HousingSettings;
   int32_t _SGClockSettings;
-  int32_t Reserved1[4];
+  int32_t Reserved1[ 4 ];
 };
 
 struct SceneSettings_t
@@ -255,10 +256,10 @@ struct SceneSettings_t
   int8_t TerrainOcclusionRainEnabled;
   int8_t TerrainOcclusionDustEnabled;
   int8_t ConstantTimeModeEnabled;
-  uint8_t Padding00[1];
+  uint8_t Padding00[ 1 ];
   float ConstantTime;
   int32_t LevelWeatherTable;
-  int32_t Reserved1[5];
+  int32_t Reserved1[ 5 ];
 };
 
 
@@ -271,10 +272,10 @@ struct SGTimelineFolder_t
 
 struct SGB_HEADER
 {
-  char magic[4];     // SGB1
+  char magic[ 4 ]; // SGB1
   uint32_t fileSize;
   uint32_t unknown1;
-  char ChunkID[4];
+  char ChunkID[ 4 ];
   int ChunkSize;
 };
 
@@ -296,38 +297,38 @@ struct SGB_FILE
     memset( &header, 0, sizeof( header ) );
   }
 
-  SGB_FILE( char* buf )
+  SGB_FILE( char *buf )
   {
     constexpr int baseOffset = 0x14;
-    header = *reinterpret_cast< SGB_HEADER* >( buf );
-    scene = *reinterpret_cast< Scene_t* >( buf + sizeof( SGB_HEADER ) );
-    sgTimelineFolder = *reinterpret_cast< SGTimelineFolder_t* >( buf + sizeof( SGB_HEADER ) + scene.SGTimelineFolder );
+    header = *reinterpret_cast< SGB_HEADER * >( buf );
+    scene = *reinterpret_cast< Scene_t * >( buf + sizeof( SGB_HEADER ) );
+    sgTimelineFolder = *reinterpret_cast< SGTimelineFolder_t * >( buf + sizeof( SGB_HEADER ) + scene.SGTimelineFolder );
     sceneSettings = *reinterpret_cast< SceneSettings_t * >( buf + sizeof( SGB_HEADER ) + scene.Settings );
-    layerGroup = *reinterpret_cast< LayerGroup* >( buf + sizeof( SGB_HEADER ) + scene.LayerGroups );
+    layerGroup = *reinterpret_cast< LayerGroup * >( buf + sizeof( SGB_HEADER ) + scene.LayerGroups );
 
     int layerOffset = sizeof( SGB_HEADER ) + scene.LayerGroups + layerGroup.Layers;
 
     layers.resize( layerGroup.Layer_Count );
     std::vector< int > layerOffsets;
     layerOffsets.resize( layerGroup.Layer_Count );
-    memcpy( layerOffsets.data(), buf + sizeof( SGB_HEADER ) + scene.LayerGroups + sizeof( LayerGroup ), sizeof( int ) * layerGroup.Layer_Count  );
+    memcpy( layerOffsets.data(), buf + sizeof( SGB_HEADER ) + scene.LayerGroups + sizeof( LayerGroup ),
+            sizeof( int ) * layerGroup.Layer_Count );
 
     for( auto i = 0; i < layerGroup.Layer_Count; ++i )
     {
       auto& layer = layers[ i ];
-      layer = *reinterpret_cast< Layer* >( buf + layerOffset + layerOffsets[ i ]  );
-      std::string name = std::string( buf + sizeof( SGB_HEADER ) + scene.LayerGroups + sizeof(LayerGroup) + layers[i].Name );
-
-
+      layer = *reinterpret_cast< Layer * >( buf + layerOffset + layerOffsets[ i ] );
+      std::string name = std::string(
+        buf + sizeof( SGB_HEADER ) + scene.LayerGroups + sizeof( LayerGroup ) + layers[ i ].Name );
 
       const auto entriesOffset = layerOffset + layer.InstanceObjects + layerOffsets[ i ];
       for( int ioIdx = 0; ioIdx < layer.InstanceObject_Count; ++ioIdx )
       {
-        const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset  ) );
+        const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t * >( buf + entriesOffset + ioIdx * 4 );
 
         try
         {
-          const auto type = *reinterpret_cast<eAssetType*>( buf + entryOffset );
+          const auto type = *reinterpret_cast< eAssetType * >( buf + entryOffset );
           switch( type )
           {
             case BG:
@@ -346,10 +347,8 @@ struct SGB_FILE
 
             default:
               break;
-
           }
-        }
-        catch( std::exception& e )
+        } catch( std::exception& e )
         {
           std::cout << ( std::string( e.what() ) + "\n" );
         }
@@ -357,22 +356,9 @@ struct SGB_FILE
     }
 
     if( sgTimelineFolder.SGTimeline_Count != 0 )
-      timeline = *reinterpret_cast< SGTimeline_t* >( buf + sizeof( SGB_HEADER ) + scene.SGTimelineFolder + sgTimelineFolder.SGTimelines );
+      timeline = *reinterpret_cast< SGTimeline_t * >(
+        buf + sizeof( SGB_HEADER ) + scene.SGTimelineFolder + sgTimelineFolder.SGTimelines );
 
-    if( strncmp( &header.magic[ 0 ], "SGB1", 4 ) != 0 || strncmp( &header.ChunkID[ 0 ], "SCN1", 4 ) != 0 )
-      throw std::runtime_error( "Unable to load SGB File!" );
-
-    try
-    {
-    //  auto group = SGB_GROUP( buf, this, &stateEntries, header.fileSize, baseOffset + header.sgTimelineFolder.SGTimelines );
-    //  entries.push_back( group );
-    //  timeline = *reinterpret_cast< SGTimeline_t * >( buf + sizeof( SGB_HEADER ) + header.sgTimelineFolder.SGTimelines  );
-
-    }
-    catch( std::exception& e )
-    {
-      std::cout << ( std::string( e.what() ) + "\n" );
-    }
   };
 };
 

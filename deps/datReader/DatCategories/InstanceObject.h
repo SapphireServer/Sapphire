@@ -28,6 +28,31 @@ enum eModelConfigCollisionType : int32_t
   COLLISION_ATTRIBUTE_TYPE_Box = 0x2,
 };
 
+enum TriggerBoxShape : int32_t
+{
+  TriggerBoxShapeBox = 0x1,
+  TriggerBoxShapeSphere = 0x2,
+  TriggerBoxShapeCylinder = 0x3,
+  TriggerBoxShapeBoard = 0x4,
+  TriggerBoxShapeMesh = 0x5,
+  TriggerBoxShapeBoardBothSides = 0x6,
+};
+
+
+struct ModelCollisionConfig
+{
+  uint32_t CollisionAttributeMask;
+  uint32_t CollisionAttribute;
+  TriggerBoxShape CollisionBoxShape;
+  Transformation CollisionBoxTransformation;
+  float AABBMinX;
+  float AABBMinY;
+  float AABBMinZ;
+  float AABBMaxX;
+  float AABBMaxY;
+  float AABBMaxZ;
+};
+
 struct BgData : InstanceObject
 {
   int32_t AssetPath;
@@ -146,15 +171,6 @@ struct ENPCData : InstanceObject
   uint32_t BaseId;
 };
 
-enum TriggerBoxShape : int32_t
-{
-  TriggerBoxShapeBox = 0x1,
-  TriggerBoxShapeSphere = 0x2,
-  TriggerBoxShapeCylinder = 0x3,
-  TriggerBoxShapeBoard = 0x4,
-  TriggerBoxShapeMesh = 0x5,
-  TriggerBoxShapeBoardBothSides = 0x6,
-};
 
 struct TriggerBoxInstanceObject
 {

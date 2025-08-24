@@ -13,14 +13,14 @@
 #include <sstream>
 #include <iomanip>
 
-#include "InstanceObject.h"
+#include "DatCategories/InstanceObject.h"
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
-#include "Layer.h"
-#include "DatCommon.h"
+#include "DatCategories/Layer.h"
+#include "DatCategories/DatCommon.h"
 
-#include "InstanceObjectParser.h"
+#include "DatCategories/InstanceObjectParser.h"
 // garbage to skip model loading
 extern bool noObj;
 

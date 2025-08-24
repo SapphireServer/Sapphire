@@ -133,6 +133,7 @@ class BGEntry : public InstanceObjectEntry
 {
 public:
   BgData header;
+  ModelCollisionConfig collisionConfig;
   std::string name;
   std::string modelFileName;
   std::string collisionFileName;
@@ -147,6 +148,7 @@ public:
     name = std::string( buf + offset + header.Name );
     modelFileName = std::string( buf + offset + header.AssetPath );
     collisionFileName = std::string( buf + offset + header.CollisionAssetPath );
+    collisionConfig = *reinterpret_cast< ModelCollisionConfig* >( buf + offset + header.CollisionConfig );
   };
 };
 
