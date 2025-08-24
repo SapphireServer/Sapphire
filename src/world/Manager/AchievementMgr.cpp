@@ -94,12 +94,29 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto achvDataList = player.getAchievementData().progressData;
-  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId )->data();
-  auto achvType = static_cast< Common::Achievement::Type >( achvExd.ConditionType );
+  auto achv = player.getAchievementData();
+  auto achvDataList = achv.progressData;
+  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId );
+  auto achvData = achvExd->_data;
+  auto achvType = static_cast< Common::Achievement::Type>(achvData.ConditionType);
 
   // get paired type:subtype key for stored data
-  auto dataKey = getKeyFromType( achvType, achvExd.ConditionArg[ 0 ] );
+  auto dataKey = getKeyFromType( achvType, achvData.ConditionArg[ 0 ] );
+
+  if( !achvDataList.size() || ( achvDataList.size() == 1 && achvDataList.begin()->second == 0) )
+  {
+    switch(achvType)
+    {
+      case Common::Achievement::Type::Classjob:
+      {
+        retrieveProgressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+        auto test = 0;
+        break;
+      }
+    }
+
+    achvDataList = player.getAchievementData().progressData;
+  }
 
   // get achievement progress data, if it exists (otherwise pass 0)
   uint32_t currProg = 0;
@@ -107,7 +124,7 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
     currProg = achvDataList[ dataKey.u32 ];
 
   // get maximum progress for given achievement, as required by client
-  uint32_t maxProg = static_cast< uint32_t >( achvExd.ConditionArg[ 1 ] );
+  uint32_t maxProg = static_cast< uint32_t >( achvData.ConditionArg[ 1 ] );
 
   // cap maximum progress display to maximum progress
   return { std::min( currProg, maxProg ), maxProg };

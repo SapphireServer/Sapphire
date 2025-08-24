@@ -50,6 +50,14 @@ namespace Sapphire::World::Manager
       progressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
     }
 
+    // Similar to progressAchievementByType but update player's m_achievementData with the actual achievement value.
+    // Used to return the value of packet ACHIEVEMENT_REQUEST_RATE in case of player.getAchievementData().progressData empty
+    template< auto AchievementType >
+    void retrieveProgressAchievementByType( Entity::Player& player, int32_t argument, uint32_t progressCount = 1 )
+    {
+      retrieveProgressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
+    }
+
     /// <summary>
     /// check if player has an achievement by its given id
     /// </summary>
@@ -104,6 +112,8 @@ namespace Sapphire::World::Manager
 
     template< typename AchievementTypeT, AchievementTypeT achievementType >
     inline void progressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
+    template< typename AchievementTypeT, AchievementTypeT achievementType >
+    inline void retrieveProgressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
   };
 
   
@@ -169,6 +179,20 @@ namespace Sapphire::World::Manager
       if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvData.progressData[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
     }
+  }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::Classjob >( Entity::Player& player, int32_t classJob, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::Classjob, classJob );
+
+    auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
+
+    achvData.progressData[ dataKey.u32 ] = level;
+
+    player.setAchievementData( achvData );
   }
 
   template<>
