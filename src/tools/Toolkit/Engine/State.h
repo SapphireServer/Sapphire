@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-  class ApplicationContext;
+  struct ApplicationContext;
 }
 
 namespace Engine

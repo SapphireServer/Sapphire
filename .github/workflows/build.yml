@@ -1,8 +1,6 @@
 name: Build
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 # Automatically cancel previous runs of this workflow on the same branch
 concurrency:
@@ -11,50 +9,52 @@ concurrency:
 
 jobs:
   ubuntu:
+    # Skip building pull requests from the same repository
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
     strategy:
       fail-fast: false
       matrix:
-        buildType: [RelWithDebInfo, Debug]
+        cmakeArgs:
+          - -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+          - -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v5
       with:
         submodules: recursive
-    - name: update
-      run: sudo apt-get update
     - name: install deps
-      run: sudo apt install -y ninja-build libmariadb-dev zlib1g-dev mariadb-server xorg-dev
-    - name: cmake
       run: |
-        mkdir build 
-        cd build
-        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
-    - name: build sapphire
-      run: cd build && ninja
+        sudo apt update
+        sudo apt install -y libmariadb-dev zlib1g-dev mariadb-server xorg-dev
+    - name: build
+      run: |
+        cmake -B build -G Ninja ${{ matrix.cmakeArgs }}
+        cmake --build build
 
   windows:
+    # Skip building pull requests from the same repository
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
     strategy:
       fail-fast: false
       matrix:
-        buildType: [RelWithDebInfo, Debug]
+        cmakeArgs:
+          - -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
+          - -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
         
     runs-on: windows-2025
       
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v5
       with:
         submodules: recursive
     - name: Enable Developer Command Prompt
-      uses: ilammy/msvc-dev-cmd@v1.10.0
+      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
     - name: install deps
       run: |
-        choco install --no-progress mariadb ninja
-    - name: cmake init
+        choco install --no-progress mariadb
+    - name: build
       run: |
-        mkdir build
-        cd build
-        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl
-    - name: build sapphire
-      run: cd build && ninja
+        cmake -B build -G Ninja ${{ matrix.cmakeArgs }}
+        cmake --build build

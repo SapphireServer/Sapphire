@@ -12,7 +12,7 @@
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 
 #include <Logging/Logger.h>
-#include <Util/Util.cpp>
+#include <Util/Util.h>
 
 #include <Actor/Player.h>
 #include <Inventory/Item.h>
@@ -343,7 +343,7 @@ bool MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Excel::
 
   if( quest.TimeBegin || quest.TimeEnd )
   {
-    uint64_t curEorzeaTime = Util::getEorzeanTimeStamp();
+    uint64_t curEorzeaTime = Sapphire::Common::Util::getEorzeanTimeStamp();
     uint32_t convTime = 100 * ( curEorzeaTime / 3600 % 24 ) + curEorzeaTime / 60 % 60;
 
     if( quest.TimeBegin <= quest.TimeEnd )

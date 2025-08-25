@@ -1,5 +1,5 @@
 #include <Common.h>
-#include <Vector3.cpp>
+#include <Vector3.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
