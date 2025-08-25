@@ -73,25 +73,7 @@ public:
 
 
 
-enum LayerSetReferencedType
-{
-  All = 0x0,
-  Include = 0x1,
-  Exclude = 0x2,
-  Undetermined = 0x3,
-};
 
-struct LayerSetReferenced
-{
-  uint32_t LayerSetID;
-};
-
-struct LayerSetReferencedList
-{
-  LayerSetReferencedType ReferencedType;
-  int32_t LayerSets;
-  int32_t LayerSetCount;
-};
 
 
 struct LGB_GROUP
@@ -109,7 +91,7 @@ struct LGB_GROUP
     header = *reinterpret_cast< Layer* >( buf + offset );
     name = std::string( buf + offset + header.Name );
 
-    std::cout << name << " groups: " << header.InstanceObject_Count << " " << header.InstanceObjects << std::endl;
+    //std::cout << name << " groups: " << header.InstanceObject_Count << " " << header.InstanceObjects << std::endl;
 
     layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
 
@@ -177,6 +159,11 @@ struct LGB_GROUP
             entries.emplace_back( std::make_shared< BattleNPCEntry >( buf, entryOffset ) );
             break;
           }
+          case eAssetType::CollisionBox:
+          {
+            entries.emplace_back( std::make_shared< CollisionBoxEntry >( buf, entryOffset ) );
+            break;
+          }
           default:
           {
             entries.emplace_back( std::make_shared< InstanceObjectEntry >( buf, entryOffset ) );
@@ -214,7 +201,6 @@ struct LGB_FILE
   LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
   {
     m_name = std::string( buf + 20 + header.nameOff );
-   // m_name = name;
   }
 
   LGB_FILE( char* buf )
@@ -223,11 +209,6 @@ struct LGB_FILE
     m_name = std::string( buf + 20 +  header.nameOff );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );
-    if( header.groupCount == 0 )
-    {
-      std::cout << "No groups found for " << m_name << std::endl;
-      return;
-    }
 
     constexpr auto baseOffset = sizeof( header );
     for( size_t i = 0; i < header.groupCount; ++i )

@@ -18,9 +18,9 @@
 #include "exportmgr.h"
 
 #include "cache.h"
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include "DatCategories/bg/pcb.h"
+#include "DatCategories/bg/lgb.h"
+#include "DatCategories/bg/sgb.h"
 
 #include <GameData.h>
 #include <File.h>
@@ -488,25 +488,25 @@ int main( int argc, char *argv[ ] )
             {
               case eAssetType::NaviMeshRange:
               {
-                std::cout << "NaviMeshRange\n";
+              //  std::cout << "NaviMeshRange\n";
               }
               break;
 
               case eAssetType::MapRange:
               {
-                std::cout << "MapRange\n";
+              //  std::cout << "MapRange\n";
               }
               break;
 
               case eAssetType::DoorRange:
               {
-                std::cout << "DoorRange\n";
+              //  std::cout << "DoorRange\n";
               }
               break;
 
               case eAssetType::CollisionBox:
               {
-                std::cout << "CollisionBox\n";
+              //  std::cout << "CollisionBox\n";
               }
               break;
 
@@ -534,27 +534,21 @@ int main( int argc, char *argv[ ] )
 
               case eAssetType::EventObject:
               {
-                auto pEobj = static_cast< LGB_EOBJ_ENTRY * >( pEntry.get() );
+                auto pEobj = static_cast< EventObjectEntry * >( pEntry.get() );
                 pcbTransformModel( fileName, &pEntry->header.Transformation.Scale,
                                    &pEntry->header.Transformation.Rotation,
                                    &pEntry->header.Transformation.Translation, exportedGroup );
 
-                auto sgbPath = getEobjSgbPath( pEobj->header.InstanceID );
+                auto sgbPath = getEobjSgbPath( pEobj->header.BaseId );
                 if( !sgbPath.empty() )
                 {
                   exportSgbModel( sgbPath, pEobj, exportedGroup, true );
-
-                  if( auto pGimmick = pCache->getSgbFile( sgbPath ) )
-                  {
-                    for( const auto& offset1cFile : pGimmick->stateEntries )
-                      exportSgbModel( offset1cFile, pEobj, exportedGroup, true );
-                  }
                 }
               }
               break;
               default:
               {
-                std::cout << "Asset Type:" << pEntry->getType() << "\n";
+              //  std::cout << "Asset Type:" << pEntry->getType() << "\n";
               }
               break;
             }

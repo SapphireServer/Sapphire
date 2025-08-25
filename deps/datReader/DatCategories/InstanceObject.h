@@ -138,6 +138,23 @@ enum eColorState : int32_t
   ColorStateReset = 0x3,
 };
 
+struct SGMemberID
+{
+  uint8_t MemberIDs[4];
+};
+
+struct SGMemberInstanceID
+{
+  uint32_t InstanceID;
+  SGMemberID MemberID;
+};
+
+struct SGOverriddenMember_t
+{
+  int32_t AssetType;
+  SGMemberID MemberID;
+};
+
 struct SGData : InstanceObject
 {
   int32_t AssetPath;
@@ -215,7 +232,11 @@ struct MapRangeData : InstanceObject
 
 struct CollisionBoxData : InstanceObject
 {
-  TriggerBoxInstanceObject triggerBox;
+  TriggerBoxShape triggerBoxShape;
+  int16_t priority;
+  int8_t enabled;
+  uint8_t padding;
+  uint32_t reserved;
   uint32_t m_attribute;
   uint32_t m_attributeMask;
   uint32_t m_resourceId;

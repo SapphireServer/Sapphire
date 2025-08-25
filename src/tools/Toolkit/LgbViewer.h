@@ -322,6 +322,13 @@ private:
 
   void clearMapTexture();
 
+  private:
+  // Cache for SGB files to prevent them from being destroyed
+  std::unordered_map< std::string, std::unique_ptr< SGB_FILE > > m_cachedSgbFiles;
+
+  // Method to get or cache an SGB file
+  SGB_FILE* getCachedSgbFile( const std::string& assetPath );
+
   // Add these members for individual entry viewing
   struct EntryViewWidget
   {
@@ -349,6 +356,9 @@ private:
   void showExitRangeEntryView( ExitRangeEntry *entry );
 
   void showPopRangeEntryView( PopRangeEntry *entry );
+
+  void showCollisionBoxEntryView( CollisionBoxEntry* entry );
+
 
   void showUnimplementedEntryView( InstanceObjectEntry *entry );
 

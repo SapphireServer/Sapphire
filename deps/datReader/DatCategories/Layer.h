@@ -32,3 +32,23 @@ struct Layer
   int32_t OBSetEnableReferencedList;
   int32_t OBSetEnableReferencedList_Count;
 };
+
+enum LayerSetReferencedType
+{
+  All = 0x0,
+  Include = 0x1,
+  Exclude = 0x2,
+  Undetermined = 0x3,
+};
+
+struct LayerSetReferenced
+{
+  uint32_t LayerSetID;
+};
+
+struct LayerSetReferencedList
+{
+  LayerSetReferencedType ReferencedType;
+  int32_t LayerSets;
+  int32_t LayerSetCount;
+};

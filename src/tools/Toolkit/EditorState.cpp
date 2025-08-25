@@ -911,7 +911,7 @@ void EditorState::render( double deltaTime )
     unsigned int down_id;
     ImGui::DockBuilderSplitNode( left_id, ImGuiDir_Down, 0.4, &top_id, &down_id );
     ImGui::DockBuilderDockWindow( "Zone Editor", down_id );
-    ImGui::DockBuilderDockWindow( "Lgb Viewer", top_id );
+    ImGui::DockBuilderDockWindow( "Lgb Viewer", down_id );
     ImGui::DockBuilderDockWindow( "Map Viewer", top_id );
 
 

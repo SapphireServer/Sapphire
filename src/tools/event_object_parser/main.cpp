@@ -351,15 +351,7 @@ int main( int argc, char* argv[] )
                     gimmickName = name;
                   }
 
-                  if( sgbFile.stateEntries.size() > 0 )
-                  {
-                    states = "    // States -> ";
-                    for( auto entries1 : sgbFile.stateEntries )
-                    {
-                      //states += entries1.data() + " (id: " + std::to_string( entries1.header.id ) + ") ";
-                    }
-                    states += "\n";
-                  }
+
                   break;
                 }
               }

@@ -222,7 +222,7 @@ bool LgbViewer::loadLgbData( std::string lgbPath, std::vector< LGB_GROUP >& grou
   auto bg_file = gameData.getFile( lgbPath );
   data_section = bg_file->access_data_sections().at( 0 );
 
-
+  groups.clear();
   LGB_FILE bgLgb( &data_section[ 0 ], "bg" );
   name = bgLgb.m_name;
   for( auto& group : bgLgb.groups )
@@ -243,6 +243,7 @@ void LgbViewer::onSelectionChanged()
     if( data.Map > 0 )
     {
       loadMapTexture( data.Map );
+      m_zoomLevel = -1.0f;
     }
 
 
@@ -450,7 +451,20 @@ void LgbViewer::showGroupsWindow()
 
                 // Name column
                 ImGui::TableSetColumnIndex( 1 );
-                ImGui::Text( "%s", entry->name.c_str() );
+                if( entry->getType() == eAssetType::SharedGroup )
+                {
+                  auto sharedGroup = dynamic_cast< SharedGroupEntry* >( entry.get() );
+                  std::string sharedGroupName = sharedGroup->AssetPath;
+                  ImGui::Text( "%s", sharedGroupName.c_str() );
+                }
+                else if( entry->getType() == eAssetType::BG )
+                {
+                  auto sharedGroup = dynamic_cast< BGEntry* >( entry.get() );
+                  std::string modelName = sharedGroup->modelFileName;
+                  ImGui::Text( "%s", modelName.c_str() );
+                }
+                else
+                  ImGui::Text( "%s", entry->name.c_str() );
 
                 // Type column
                 ImGui::TableSetColumnIndex( 2 );
@@ -466,7 +480,7 @@ void LgbViewer::showGroupsWindow()
                 // Focus button column
                 ImGui::TableSetColumnIndex( 4 );
                 std::string focusButtonId = "Focus##" + std::to_string( entry->header.InstanceID );
-                if( ImGui::Button( focusButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                if( ImGui::SmallButton( focusButtonId.c_str() ) )
                 {
                   focusOn3DPosition( entry->header.Transformation.Translation );
                 }
@@ -474,7 +488,7 @@ void LgbViewer::showGroupsWindow()
                 // View button column
                 ImGui::TableSetColumnIndex( 5 );
                 std::string viewButtonId = "View##" + std::to_string( entry->header.InstanceID );
-                if( ImGui::Button( viewButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                if( ImGui::SmallButton( viewButtonId.c_str() ) )
                 {
                   openEntryViewWidget( entry );
                 }
@@ -2743,6 +2757,41 @@ void LgbViewer::clearMapTexture()
   }
 }
 
+SGB_FILE* LgbViewer::getCachedSgbFile( const std::string& assetPath )
+{
+  // Check if already cached
+  auto it = m_cachedSgbFiles.find( assetPath );
+  if( it != m_cachedSgbFiles.end() )
+  {
+    return it->second.get();
+  }
+
+  // Load and cache the SGB file
+  auto& gameData = Engine::Service< xiv::dat::GameData >::ref();
+  auto file = gameData.getFile( assetPath );
+  if( file )
+  {
+    auto sections = file->get_data_sections();
+    if( !sections.empty() && !sections.at( 0 ).empty() )
+    {
+      auto dataSection = &sections.at( 0 )[ 0 ];
+      try
+      {
+        auto sgbFile = std::make_unique< SGB_FILE >( &dataSection[ 0 ] );
+        SGB_FILE* result = sgbFile.get();
+        m_cachedSgbFiles[ assetPath ] = std::move( sgbFile );
+        return result;
+      }
+      catch( const std::exception& e )
+      {
+        // Handle error
+        return nullptr;
+      }
+    }
+  }
+  return nullptr;
+}
+
 void LgbViewer::refresh()
 {
   m_needsRefresh = true;
@@ -3040,16 +3089,19 @@ void LgbViewer::showEntryViewWidget( EntryViewWidget& widget )
     switch( widget.entry->getType() )
     {
       case eAssetType::SharedGroup:
-        showSGEntryView( static_cast< SharedGroupEntry * >( widget.entry.get() ) );
+        showSGEntryView( dynamic_cast< SharedGroupEntry * >( widget.entry.get() ) );
         break;
       case eAssetType::EventObject:
-        showEObjEntryView( static_cast< EventObjectEntry * >( widget.entry.get() ) );
+        showEObjEntryView( dynamic_cast< EventObjectEntry * >( widget.entry.get() ) );
         break;
       case eAssetType::ExitRange:
-        showExitRangeEntryView( static_cast< ExitRangeEntry* >( widget.entry.get() ) );
+        showExitRangeEntryView( dynamic_cast< ExitRangeEntry* >( widget.entry.get() ) );
         break;
       case eAssetType::PopRange:
-        showPopRangeEntryView( static_cast< PopRangeEntry* >( widget.entry.get() ) );
+        showPopRangeEntryView( dynamic_cast< PopRangeEntry* >( widget.entry.get() ) );
+        break;
+      case eAssetType::CollisionBox:
+        showCollisionBoxEntryView( dynamic_cast< CollisionBoxEntry* >( widget.entry.get() ) );
         break;
       default:
         showUnimplementedEntryView( widget.entry.get() );
@@ -3058,6 +3110,7 @@ void LgbViewer::showEntryViewWidget( EntryViewWidget& widget )
   }
   ImGui::End();
 }
+
 
 void LgbViewer::showSGEntryView( SharedGroupEntry *entry )
 {
@@ -3093,39 +3146,241 @@ void LgbViewer::showSGEntryView( SharedGroupEntry *entry )
   if( ImGui::CollapsingHeader( "Shared Group Data", ImGuiTreeNodeFlags_DefaultOpen ) )
   {
     ImGui::Text( "Gimmick File: %s", entry->AssetPath.c_str() );
-    ImGui::Text( "Gimmick File Offset: %u", entry->header.AssetPath );
 
     ImGui::Spacing();
     ImGui::Text( "Extended SGData Fields:" );
     ImGui::Separator();
 
-    // Note: These fields may not be available in the current SGData structure
-    // You'll need to update the SGData struct to include these fields
+    // Use the cached SGB file instead of loading it fresh each time
+    SGB_FILE* sgbFile1 = getCachedSgbFile( entry->AssetPath );
 
-    // Asset and Door State
-    ImGui::Text( "Asset Path: %d", entry->header.AssetPath );
+    if( sgbFile1 )
+    {
+      auto& sgbFile = *sgbFile1;
+
+      try
+      {
+
+        // SGB File Header Information
+        if( ImGui::CollapsingHeader( "SGB File Header", ImGuiTreeNodeFlags_DefaultOpen ) )
+        {
+          ImGui::Text( "Magic: %.4s", sgbFile.header.magic );
+          ImGui::Text( "File Size: %u", sgbFile.header.fileSize );
+          ImGui::Text( "Chunk ID: %.4s", sgbFile.header.ChunkID );
+          ImGui::Text( "Chunk Size: %d", sgbFile.header.ChunkSize );
+        }
+
+        // Scene Information
+        if( ImGui::CollapsingHeader( "Scene", ImGuiTreeNodeFlags_DefaultOpen ) )
+        {
+          ImGui::Text( "Layer Group Count: %d", sgbFile.layerGroup.Layer_Count );
+          ImGui::Text( "Timeline Count: %d", sgbFile.sgTimelineFolder.SGTimeline_Count );
+        }
+
+        // Scene Settings
+        if( ImGui::CollapsingHeader( "Scene Settings", ImGuiTreeNodeFlags_DefaultOpen ) )
+        {
+          ImGui::Text( "Is Partial Output: %s", sgbFile.sceneSettings.IsPartialOutput ? "Yes" : "No" );
+          ImGui::Text( "Contains Layer Set Ref: %s", sgbFile.sceneSettings.ContainsLayerSetRef ? "Yes" : "No" );
+          ImGui::Text( "Is Dungeon: %s", sgbFile.sceneSettings.IsDungeon ? "Yes" : "No" );
+          ImGui::Text( "Exists Grass Data: %s", sgbFile.sceneSettings.ExistsGrassData ? "Yes" : "No" );
+          ImGui::Text( "Camera Far Clip Distance: %.3f", sgbFile.sceneSettings.CameraFarClipDistance );
+          ImGui::Text( "Main Light Orbit Curve: %.3f", sgbFile.sceneSettings.MainLightOrbitCurve );
+          ImGui::Text( "Main Light Orbit Clamp: %.3f", sgbFile.sceneSettings.MainLightOrbitClamp );
+          ImGui::Text( "Shadow Far Distance: %.3f", sgbFile.sceneSettings.ShadowFarDistance );
+          ImGui::Text( "Shadow Distance Fade: %.3f", sgbFile.sceneSettings.ShadowDistanceFade );
+          ImGui::Text( "BG Sky Visibility: %.3f", sgbFile.sceneSettings.BGSkyVisibility );
+          ImGui::Text( "Terrain Occlusion Rain Enabled: %s", sgbFile.sceneSettings.TerrainOcclusionRainEnabled ? "Yes" : "No" );
+          ImGui::Text( "Terrain Occlusion Dust Enabled: %s", sgbFile.sceneSettings.TerrainOcclusionDustEnabled ? "Yes" : "No" );
+          ImGui::Text( "Constant Time Mode Enabled: %s", sgbFile.sceneSettings.ConstantTimeModeEnabled ? "Yes" : "No" );
+          if( sgbFile.sceneSettings.ConstantTimeModeEnabled )
+          {
+            ImGui::Text( "Constant Time: %.3f", sgbFile.sceneSettings.ConstantTime );
+          }
+        }
+
+        // Timelines
+        if( ImGui::CollapsingHeader( "Timelines" ) && !sgbFile.timelines.empty() )
+        {
+          for( size_t i = 0; i < sgbFile.timelines.size(); ++i )
+          {
+            const auto& timeline = sgbFile.timelines[i];
+            const auto& timelineName = i < sgbFile.timelineNames.size() ? sgbFile.timelineNames[i] : "Unknown";
+
+            if( ImGui::TreeNode( ( "Timeline " + std::to_string( i ) + ": " + timelineName ).c_str() ) )
+            {
+              ImGui::Text( "Member ID: %u", timeline.MemberID );
+              ImGui::Text( "Timeline ID: %u", timeline.TimelineID );
+              ImGui::Text( "Auto Play: %s", timeline.AutoPlay ? "Yes" : "No" );
+              ImGui::Text( "Loop Playback: %s", timeline.LoopPlayback ? "Yes" : "No" );
+              ImGui::Text( "Binder Count: %d", timeline.Binder_Count );
+              ImGui::Text( "Binary Count: %d", timeline.Binary_Count );
+
+              // Collision State
+              const char* collisionStateStr = "Unknown";
+              switch( timeline.CollisionState )
+              {
+                case eTimelineCollisionState::NoChange: collisionStateStr = "No Change"; break;
+                case eTimelineCollisionState::On: collisionStateStr = "On"; break;
+                case eTimelineCollisionState::Off: collisionStateStr = "Off"; break;
+              }
+              ImGui::Text( "Collision State: %s", collisionStateStr );
+
+              ImGui::TreePop();
+            }
+          }
+        }
+
+        // Layers
+        if( ImGui::CollapsingHeader( "Layers" ) && !sgbFile.layers.empty() )
+        {
+          for( size_t i = 0; i < sgbFile.layers.size(); ++i )
+          {
+            const auto& layer = sgbFile.layers[i];
+
+            if( ImGui::TreeNode( ( "Layer " + std::to_string( i ) + " (ID: " + std::to_string( layer.LayerID ) + ")" ).c_str() ) )
+            {
+              ImGui::Text( "Layer ID: %u", layer.LayerID );
+              ImGui::Text( "Instance Object Count: %d", layer.InstanceObject_Count );
+              ImGui::Text( "Festival ID: %u", layer.FestivalID );
+              ImGui::Text( "Festival Phase ID: %u", layer.FestivalPhaseID );
+              ImGui::Text( "Version Mask: 0x%04X", layer.VersionMask );
+
+              // Show instance objects in this layer
+              auto it = sgbFile.layerInstanceObjects.find( layer.LayerID );
+              if( it != sgbFile.layerInstanceObjects.end() && !it->second.empty() )
+              {
+                ImGui::Text( "Instance Objects (%zu):", it->second.size() );
+
+                // Create table for instance objects
+                if( ImGui::BeginTable( ( "InstanceObjectsTable_" + std::to_string( layer.LayerID ) ).c_str(), 7,
+                                     ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY,
+                                     ImVec2( 0, 300 ) ) )
+                {
+                  // Table headers
+                  ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+                  ImGui::TableSetupColumn( "Type", ImGuiTableColumnFlags_WidthFixed, 100.0f );
+                  ImGui::TableSetupColumn( "Position", ImGuiTableColumnFlags_WidthFixed, 150.0f );
+                  ImGui::TableSetupColumn( "Rotation", ImGuiTableColumnFlags_WidthFixed, 150.0f );
+                  ImGui::TableSetupColumn( "Scale", ImGuiTableColumnFlags_WidthFixed, 150.0f );
+                  ImGui::TableSetupColumn( "Asset Path", ImGuiTableColumnFlags_WidthStretch );
+                  ImGui::TableSetupColumn( "View", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+                  ImGui::TableSetupScrollFreeze( 0, 1 ); // Freeze header row
+                  ImGui::TableHeadersRow();
+
+                  // Table rows
+                  for( size_t objIdx = 0; objIdx < it->second.size(); ++objIdx )
+                  {
+                    const auto& obj = it->second[objIdx];
+
+                    ImGui::TableNextRow();
+
+                    // Instance ID
+                    ImGui::TableSetColumnIndex( 0 );
+                    ImGui::Text( "%u", obj->header.InstanceID );
+
+                    // Object type
+                    ImGui::TableSetColumnIndex( 1 );
+                    std::string type = getEntryTypeString( static_cast< eAssetType >( obj->header.AssetType ) );
+
+                    ImGui::Text( "%s", type.c_str() );
+
+                    // Position
+                    ImGui::TableSetColumnIndex( 2 );
+                    ImGui::Text( "%.2f, %.2f, %.2f",
+                                 obj->header.Transformation.Translation.x,
+                                 obj->header.Transformation.Translation.y,
+                                 obj->header.Transformation.Translation.z );
+
+                    // Rotation
+                    ImGui::TableSetColumnIndex( 3 );
+                    ImGui::Text( "%.2f, %.2f, %.2f",
+                                 obj->header.Transformation.Rotation.x,
+                                 obj->header.Transformation.Rotation.y,
+                                 obj->header.Transformation.Rotation.z );
+
+                    // Scale
+                    ImGui::TableSetColumnIndex( 4 );
+                    ImGui::Text( "%.2f, %.2f, %.2f",
+                                 obj->header.Transformation.Scale.x,
+                                 obj->header.Transformation.Scale.y,
+                                 obj->header.Transformation.Scale.z );
+
+                    // Asset Path (only for BG and SharedGroup types)
+                    ImGui::TableSetColumnIndex( 5 );
+                    auto entryCopy = *obj;
+                    if( obj->header.AssetType == eAssetType::BG )
+                    {
+                      // Cast to BGEntry and get asset path
+                      auto bgEntry = std::dynamic_pointer_cast< BGEntry >( obj );
+                      if( bgEntry )
+                      {
+                        ImGui::Text( "%s", bgEntry->collisionFileName.c_str() );
+                      }
+                      else
+                      {
+                        ImGui::Text( "N/A" );
+                      }
+                    }
+                    else if( obj->header.AssetType == eAssetType::SharedGroup )
+                    {
+                      // Cast to SharedGroupEntry and get asset path
+                      auto sgEntry = std::dynamic_pointer_cast< SharedGroupEntry >( obj );
+                      if( sgEntry )
+                      {
+                        ImGui::Text( "%s", sgEntry->AssetPath.c_str() );
+                      }
+                      else
+                      {
+                        ImGui::Text( "N/A" );
+                      }
+                    }
+                    else
+                    {
+                      ImGui::Text( "-" );
+                    }
+                    // View button
+                    ImGui::TableSetColumnIndex( 6 );
+                    std::string viewButtonId = "View##SGB_" + std::to_string( layer.LayerID ) + "_" + std::to_string( obj->header.InstanceID );
+                    if( ImGui::SmallButton( viewButtonId.c_str() ) )
+                    {
+                      openEntryViewWidget( obj );
+                    }
+
+                  }
+
+                  ImGui::EndTable();
+                }
+              }
+
+              ImGui::TreePop();
+            }
+          }
+        }
+
+      }
+      catch( const std::exception& e )
+      {
+        ImGui::TextColored( ImVec4( 1.0f, 0.3f, 0.3f, 1.0f ), "Error parsing SGB file: %s", e.what() );
+      }
+    }
+    // Original SGData fields (keeping for compatibility)
+    ImGui::Spacing();
+    ImGui::Text( "Original SGData Fields:" );
+    ImGui::Separator();
+
+    ImGui::Text( "Asset Path Offset: %d", entry->header.AssetPath );
     ImGui::Text( "Initial Door State: %d", ( int ) entry->header.InitialDoorState );
-
-    // Member Override Information
     ImGui::Text( "Overridden Members: %d", entry->header.OverriddenMembers );
     ImGui::Text( "Overridden Member Count: %d", entry->header.OverriddenMember_Count );
-
-    // State Information
     ImGui::Text( "Initial Rotation State: %d", ( int ) entry->header.InitialRotationState );
     ImGui::Text( "Initial Transform State: %d", ( int ) entry->header.InitialTransformState );
     ImGui::Text( "Initial Color State: %d", ( int ) entry->header.InitialColorState );
-
-    // Timeline and Animation
     ImGui::Text( "Random Timeline Auto Play: %s", entry->header.RandomTimelineAutoPlay ? "Yes" : "No" );
     ImGui::Text( "Random Timeline Loop Playback: %s", entry->header.RandomTimelineLoopPlayback ? "Yes" : "No" );
-
-    // Collision and Path Settings
-    ImGui::Text( "Collision Controllable Without EObj: %s",
-                 entry->header.IsCollisionControllableWithoutEObj ? "Yes" : "No" );
+    ImGui::Text( "Collision Controllable Without EObj: %s", entry->header.IsCollisionControllableWithoutEObj ? "Yes" : "No" );
     ImGui::Text( "Bound Client Path Instance ID: %u", entry->header.BoundClientPathInstanceID );
     ImGui::Text( "Move Path Settings: %d", entry->header.MovePathSettings );
-
-    // Navigation Mesh
     ImGui::Text( "Not Create Navimesh Door: %s", entry->header.NotCreateNavimeshDoor ? "Yes" : "No" );
   }
 }
@@ -3272,6 +3527,102 @@ void LgbViewer::showPopRangeEntryView( PopRangeEntry* entry )
     ImGui::Text( "Count: %d", entry->header.relativePositions.PosCount );
     ImGui::Unindent();
   }
+}
+
+void LgbViewer::showCollisionBoxEntryView( CollisionBoxEntry* entry )
+{
+  ImGui::Text( "Collision Box Entry" );
+  ImGui::Separator();
+
+  // Basic information
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    std::cout << "Instance ID: " << entry->header.InstanceID << std::endl;
+
+    ImGui::Text( "Instance ID: %u", entry->header.InstanceID );
+    ImGui::Text( "Name: %s", entry->name.c_str() );
+    ImGui::Text( "Type: %s", getEntryTypeString( entry->getType() ).c_str() );
+  }
+
+  // Transform information
+  if( ImGui::CollapsingHeader( "Transform", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 entry->header.Transformation.Translation.x,
+                 entry->header.Transformation.Translation.y,
+                 entry->header.Transformation.Translation.z );
+    ImGui::Text( "Rotation: %.3f, %.3f, %.3f",
+                 entry->header.Transformation.Rotation.x,
+                 entry->header.Transformation.Rotation.y,
+                 entry->header.Transformation.Rotation.z );
+    ImGui::Text( "Scale: %.3f, %.3f, %.3f",
+                 entry->header.Transformation.Scale.x,
+                 entry->header.Transformation.Scale.y,
+                 entry->header.Transformation.Scale.z );
+  }
+
+  // Collision Box specific data
+  if( ImGui::CollapsingHeader( "Collision Box Data", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    // Trigger Box Shape
+    const char* shapeStr = "Unknown";
+    switch( entry->header.triggerBoxShape )
+    {
+      case TriggerBoxShapeBox: shapeStr = "Box"; break;
+      case TriggerBoxShapeSphere: shapeStr = "Sphere"; break;
+      case TriggerBoxShapeCylinder: shapeStr = "Cylinder"; break;
+      case TriggerBoxShapeBoard: shapeStr = "Board"; break;
+      case TriggerBoxShapeMesh: shapeStr = "Mesh"; break;
+      case TriggerBoxShapeBoardBothSides: shapeStr = "Board Both Sides"; break;
+      default: shapeStr = "Unknown"; break;
+    }
+    ImGui::Text( "Trigger Box Shape: %s (%d)", shapeStr, static_cast< int32_t >( entry->header.triggerBoxShape ) );
+
+    ImGui::Text( "Priority: %d", entry->header.priority );
+    ImGui::Text( "Enabled: %s", entry->header.enabled ? "Yes" : "No" );
+
+    ImGui::Separator();
+
+    // Collision attributes
+    ImGui::Text( "Attribute: 0x%08X", entry->header.m_attribute );
+    ImGui::Text( "Attribute Mask: 0x%08X", entry->header.m_attributeMask );
+    ImGui::Text( "Resource ID: %u", entry->header.m_resourceId );
+    ImGui::Text( "Push Player Out: %s", entry->header.m_pushPlayerOut ? "Yes" : "No" );
+
+    ImGui::Spacing();
+
+    // Display attribute bits in a more readable format
+    if( ImGui::CollapsingHeader( "Attribute Bits" ) )
+    {
+      ImGui::Text( "Attribute (0x%08X):", entry->header.m_attribute );
+      for( int i = 0; i < 32; ++i )
+      {
+        if( entry->header.m_attribute & ( 1u << i ) )
+        {
+          ImGui::Text( "  Bit %d: Set", i );
+        }
+      }
+
+      ImGui::Spacing();
+
+      ImGui::Text( "Attribute Mask (0x%08X):", entry->header.m_attributeMask );
+      for( int i = 0; i < 32; ++i )
+      {
+        if( entry->header.m_attributeMask & ( 1u << i ) )
+        {
+          ImGui::Text( "  Bit %d: Set", i );
+        }
+      }
+    }
+
+    // Additional debug information
+    if( ImGui::CollapsingHeader( "Debug Information" ) )
+    {
+      ImGui::Text( "Padding: 0x%02X", entry->header.padding );
+      ImGui::Text( "Reserved: 0x%08X", entry->header.reserved );
+    }
+  }
+
 }
 
 void LgbViewer::showUnimplementedEntryView( InstanceObjectEntry *entry )

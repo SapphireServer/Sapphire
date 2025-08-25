@@ -18,7 +18,6 @@ struct SGB_FILE;
 struct SGB_HEADER;
 struct SGB_MODEL_ENTRY;
 struct SGB_MODEL_HEADER;
-struct SGB_GROUP;
 struct SGB_GROUP_HEADER;
 
 

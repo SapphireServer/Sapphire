@@ -468,7 +468,7 @@ void LgbViewer::showGroupsWindow()
                 // Focus button column
                 ImGui::TableSetColumnIndex( 4 );
                 std::string focusButtonId = "Focus##" + std::to_string( entry->header.InstanceID );
-                if( ImGui::Button( focusButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                if( ImGui::SmallButton( focusButtonId.c_str() ) )
                 {
                   focusOn3DPosition( entry->header.Transformation.Translation );
                 }
@@ -476,7 +476,7 @@ void LgbViewer::showGroupsWindow()
                 // View button column
                 ImGui::TableSetColumnIndex( 5 );
                 std::string viewButtonId = "View##" + std::to_string( entry->header.InstanceID );
-                if( ImGui::Button( viewButtonId.c_str(), ImVec2( -1, 0 ) ) )
+                if( ImGui::SmallButton( viewButtonId.c_str() ) )
                 {
                   openEntryViewWidget( entry );
                 }

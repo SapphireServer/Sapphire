@@ -40,7 +40,6 @@ class ExitRangeEntry : public InstanceObjectEntry
 {
 public:
   ExitRangeData header;
-  std::string name;
 
   ExitRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -53,7 +52,6 @@ class PopRangeEntry : public InstanceObjectEntry
 {
 public:
   PopRangeData header;
-  std::string name;
 
   PopRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -66,7 +64,6 @@ class EventRangeEntry : public InstanceObjectEntry
 {
 public:
   EventRangeData header;
-  std::string name;
 
   EventRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -79,7 +76,6 @@ class SharedGroupEntry : public InstanceObjectEntry
 {
 public:
   SGData header;
-  std::string name;
   std::string AssetPath;
 
   SharedGroupEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
@@ -94,7 +90,6 @@ class EventNPCEntry : public InstanceObjectEntry
 {
 public:
   ENPCData header;
-  std::string name;
 
   EventNPCEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -107,7 +102,6 @@ class BattleNPCEntry : public InstanceObjectEntry
 {
 public:
   BNPCInstanceObject header;
-  std::string name;
 
   BattleNPCEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -120,7 +114,6 @@ class EventObjectEntry : public InstanceObjectEntry
 {
 public:
   EObjData header;
-  std::string name;
 
   EventObjectEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
   {
@@ -134,7 +127,6 @@ class BGEntry : public InstanceObjectEntry
 public:
   BgData header;
   ModelCollisionConfig collisionConfig;
-  std::string name;
   std::string modelFileName;
   std::string collisionFileName;
 
@@ -152,11 +144,26 @@ public:
   };
 };
 
+class CollisionBoxEntry : public InstanceObjectEntry
+{
+public:
+  CollisionBoxData header;
+
+  CollisionBoxEntry()
+  {
+  };
+
+  CollisionBoxEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  {
+    header = *reinterpret_cast< CollisionBoxData* >( buf + offset );
+    name = std::string( buf + offset + header.Name );
+  };
+};
+
 class MapRangeEntry : public InstanceObjectEntry
 {
 public:
   MapRangeData header;
-  std::string name;
 
   MapRangeEntry()
   {
