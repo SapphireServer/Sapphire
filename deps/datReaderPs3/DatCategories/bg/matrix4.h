@@ -8,12 +8,7 @@
 struct matrix4
 {
   // 4x4
-  float grid[16];
-
-  matrix4()
-  {
-    memset( &grid[ 0 ], 0, sizeof( grid ) );
-  }
+  float grid[ 16 ] = {};
 
   float operator()( int row, int col ) const
   {

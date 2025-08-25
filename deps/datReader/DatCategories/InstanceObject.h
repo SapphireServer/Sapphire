@@ -14,7 +14,7 @@ struct InstanceObjectBase
   int32_t AssetType;
   uint32_t InstanceID;
   int32_t Name;
-  Transformation Transformation;
+  struct Transformation Transformation;
 };
 
 struct InstanceObject : InstanceObjectBase

@@ -42,7 +42,7 @@ enum SgbGroupEntryType :
   Gimmick = 0x06,
 };
 
-enum eTimelineCollisionState : __int32
+enum eTimelineCollisionState : int32_t
 {
   NoChange = 0x0,
   On = 0x1,
