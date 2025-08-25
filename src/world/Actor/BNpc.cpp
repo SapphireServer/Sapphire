@@ -58,6 +58,7 @@
 #include <AI/Fsm/StateCombat.h>
 #include <AI/Fsm/StateRetreat.h>
 #include <AI/Fsm/StateDead.h>
+#include <AI/TargetHelper.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World;
@@ -119,7 +120,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
   m_modelChara = bNpcBaseData->data().Model;
   m_enemyType = bNpcBaseData->data().Battalion;
 
-  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
+  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
     setFlag( NoRoam | Immobile );
 
   m_class = ClassJob::Gladiator;
@@ -840,6 +841,9 @@ void BNpc::checkAggro()
 
 
   bool hasAggro = false;
+  auto pCharaSelf = getAsChara();
+  static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+
   for( uint32_t i = 0; i < 2; ++i )
   {
     float senseRange = m_senseData.SenseRange[ i ];
@@ -851,16 +855,27 @@ void BNpc::checkAggro()
         auto actors = getInRangeActors();
         for( const auto& actor : actors )
         {
-          // TODO: handle friendly bnpcs such as guards
-          if( !actor->isPlayer() )
+          if( !actor->isChara() )
             continue;
 
-          auto pPlayer = actor->getAsPlayer();
-          if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+          auto pCharaTarget = actor->getAsChara();
+
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
             continue;
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+
+          if( auto pPlayer = actor->getAsPlayer() )
+            if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+              continue;
 
           // diminish sense range if required.
-          senseRange = calculateAdjustedRange( senseRange, pPlayer->getLevel(), getLevel() );
+          senseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
@@ -880,26 +895,26 @@ void BNpc::checkAggro()
           if( !actor->isChara() )
             continue;
 
-          if( getBNpcType() == Common::BNpcType::Friendly )
-          {
-            if( actor->isBattleNpc() && actor->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
-              continue;
-          }
+          auto pCharaTarget = actor->getAsChara();
 
-          if( getBNpcType() == Common::BNpcType::Enemy )
-          {
-            if( actor->isBattleNpc() && actor->getAsBNpc()->getBNpcType() == Common::BNpcType::Enemy )
-              continue;
-          }
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
+            continue;
 
-          if( !actor->getAsChara()->isAlive() )
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+          if( !pCharaTarget->isAlive() )
             continue;
 
           // Check if player is within sense range first (distance check)
           float distance = Common::Util::distance( getPos(), actor->getPos() );
 
           // Diminish sense range if required
-          float adjustedSenseRange = calculateAdjustedRange( senseRange, actor->getAsChara()->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
 
           if( distance > adjustedSenseRange )
             continue; // Too far away
@@ -947,11 +962,21 @@ void BNpc::checkAggro()
         auto actors = getInRangeActors();
         for( const auto& actor : actors )
         {
-          if( !actor->isPlayer() )
+          if( !actor->isChara() )
             continue;
 
-          auto pPlayer = actor->getAsPlayer();
-          if( !pPlayer->isAlive() )
+          auto pCharaTarget = actor->getAsChara();
+
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
+            continue;
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+          if( !pCharaTarget->isAlive() )
             continue;
 
           float distance = Common::Util::distance( getPos(), actor->getPos() );
