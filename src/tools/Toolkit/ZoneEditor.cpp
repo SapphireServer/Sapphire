@@ -3770,13 +3770,14 @@ void ZoneEditor::renderSenseRanges()
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
   glLineWidth( 3.0f );
-
+  glDisable(GL_DEPTH_TEST);
   // Render as line strips/loops
   glDrawArrays( GL_LINE_LOOP, 0, m_senseRangeVertexCount );
 
   glDisable( GL_BLEND );
   glBindVertexArray( 0 );
   glUseProgram( 0 );
+  glEnable(GL_DEPTH_TEST);
 }
 
 void ZoneEditor::initializeSenseRangeRendering()
