@@ -9,6 +9,7 @@
 #include <Common.h>
 
 #include "Actor/Player.h"
+#include "Manager/PlayerMgr.h"
 
 namespace Sapphire::World::Manager
 {
@@ -272,5 +273,62 @@ namespace Sapphire::World::Manager
         }
       }
     }
+  }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::Quest >( Entity::Player& player, int32_t classJob, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::Classjob, classJob );
+
+    auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
+
+    achvData.progressData[ dataKey.u32 ] = level;
+
+    player.setAchievementData( achvData );
+  }
+
+  template<>
+  inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::MapDiscovery >( Entity::Player& player, int32_t mapId, uint32_t allDiscovered )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::MapDiscovery, mapId );
+
+    if( !achvData.progressData.count( dataKey.u32 ) )
+      achvData.progressData[ dataKey.u32 ] = 0;
+
+    achvData.progressData[ dataKey.u32 ] = allDiscovered;
+
+    const auto achvIdList = getAchievementIdByType( Common::Achievement::Type::MapDiscovery );
+
+    for( auto achvId : achvIdList )
+    {
+
+      if( hasAchievementUnlocked( player, achvId ) )
+        continue;
+
+      auto pAchv = getAchievementDetail( achvId );
+      if( !pAchv || pAchv->_data.ConditionArg[0] != mapId )
+        continue;
+
+      if( allDiscovered )
+        unlockAchievement( player, achvId );
+    }
+  }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::MapDiscovery >( Entity::Player& player, int32_t mapId, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::MapDiscovery, mapId );
+
+    bool discovered = playerMgr().isAllAreaDiscovered( player, mapId );
+
+    achvData.progressData[ dataKey.u32 ] = discovered;
+
+    player.setAchievementData( achvData );
   }
 }

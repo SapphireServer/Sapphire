@@ -1168,7 +1168,7 @@ namespace Sapphire::Common
       Unknown_5,// Hunt related? id 1259
       Quest, // Quests that need all required args met
       Unknown_7,
-      Unknown_8,// Map discovery related
+      MapDiscovery,// Map discovery related
       QuestAny,// Quests that need any required args met
       ChocoboRank,
       PvPRank,

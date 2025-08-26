@@ -102,15 +102,19 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
 
   // get paired type:subtype key for stored data
   auto dataKey = getKeyFromType( achvType, achvData.ConditionArg[ 0 ] );
-
-  if( !achvDataList.size() || ( achvDataList.size() == 1 && achvDataList.begin()->second == 0) )
+  
+  if( !achvDataList.count( dataKey.u32 ) )
   {
     switch(achvType)
     {
       case Common::Achievement::Type::Classjob:
       {
         retrieveProgressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
-        auto test = 0;
+        break;
+      }
+      case Common::Achievement::Type::MapDiscovery:
+      {
+        retrieveProgressAchievementByType< Common::Achievement::Type::MapDiscovery >( player, achvData.ConditionArg[0] );
         break;
       }
     }
@@ -120,6 +124,8 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
 
   // get achievement progress data, if it exists (otherwise pass 0)
   uint32_t currProg = 0;
+  auto test = achvDataList[ dataKey.u32 ];
+  auto check = achvDataList.count( dataKey.u32 );
   if( achvDataList.count( dataKey.u32 ) )
     currProg = achvDataList[ dataKey.u32 ];
 
@@ -127,7 +133,7 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
   uint32_t maxProg = static_cast< uint32_t >( achvData.ConditionArg[ 1 ] );
 
   // cap maximum progress display to maximum progress
-  return { std::min( currProg, maxProg ), maxProg };
+  return { std::min( currProg, maxProg > 0 ? maxProg : 1 ), maxProg > 0 ? maxProg : 1 };
 }
 
 void AchievementMgr::handleLinkedAchievementsForId( Entity::Player& player, uint32_t achievementId )
