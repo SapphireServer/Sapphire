@@ -1080,7 +1080,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
       return;
     }
 
-    obj->setAnimationFlag( state1, state2 );
+    obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {
@@ -1283,7 +1283,7 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
       return;
     }
 
-    obj->setAnimationFlag( state1, state2 );
+    obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {

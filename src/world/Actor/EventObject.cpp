@@ -27,7 +27,7 @@ using namespace Sapphire::Network::ActorControl;
 EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
                           FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
-  m_gimmickId( gimmickId ),
+  m_sharedGroupId( gimmickId ),
   m_instanceId( instanceId ),
   m_state( initialState ),
   m_objectId( objectId ),
@@ -43,9 +43,9 @@ EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickI
   m_rot = rotation;
 }
 
-uint32_t EventObject::getGimmickId() const
+uint32_t EventObject::getSharedGroupId() const
 {
-  return m_gimmickId;
+  return m_sharedGroupId;
 }
 
 uint32_t EventObject::getObjectId() const
@@ -73,9 +73,9 @@ void EventObject::setOnTalkHandler( EventObject::OnTalkEventHandler handler )
   m_onTalkEventHandler = std::move( handler );
 }
 
-void EventObject::setGimmickId( uint32_t gimmickId )
+void EventObject::setSharedGroupId( uint32_t sharedGroupId )
 {
-  m_gimmickId = gimmickId;
+  m_sharedGroupId = sharedGroupId;
 }
 
 uint8_t EventObject::getState() const
@@ -88,9 +88,9 @@ void EventObject::setState( uint8_t state )
   m_state = state;
 }
 
-void EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
+void EventObject::playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag )
 {
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), EObjAnimation, flag, animationFlag );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), PlaySharedGroupTimeline, flag, animationFlag );
 }
 
 void EventObject::setHousingLink( uint32_t housingLink )
@@ -129,7 +129,7 @@ void EventObject::spawn( PlayerPtr pTarget )
   eobjStatePacket->data().Flag = getState();
   eobjStatePacket->data().BaseId = getObjectId();
   eobjStatePacket->data().LayoutId = getInstanceId();
-  eobjStatePacket->data().BindLayoutId = getGimmickId();
+  eobjStatePacket->data().BindLayoutId = getSharedGroupId();
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().Pos = getPos();
   eobjStatePacket->data().Scale = getScale();

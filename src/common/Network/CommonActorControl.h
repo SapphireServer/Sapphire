@@ -224,9 +224,9 @@ namespace Sapphire::Network::ActorControl
      * param1 = state
      * param2 = actorid
      */
-    EObjSetState = 0x199,
+    SetSharedGroupTimelineState = 0x199,
     Unk6 = 0x19C,
-    EObjAnimation = 0x19D,
+    PlaySharedGroupTimeline = 0x19D,
 
     SetTitle = 0x1F4,
 
