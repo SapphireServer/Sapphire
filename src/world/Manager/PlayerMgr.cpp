@@ -482,19 +482,6 @@ void PlayerMgr::onDiscoverArea( Entity::Player& player, int16_t mapId, int16_t s
 
   if( allDiscovered )
   {
-    /* auto achiList = exdData.getRows< Excel::Achievement >();
-    auto achvId = 0;
-    auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-    //auto achi = achiList[ 0 ];
-    for( auto achi : achiList )
-    {
-      auto achvData = achi->data_;
-      if (achvData.ConditionType == Common::Achievement::Type::MapDiscovery && achvData.ConditionArg[0] == mapId)
-      {
-        achvId = achvData;
-        break;
-      }
-    }*/
     onGainExp( player, exp * 10 ) ;
   }
 }
