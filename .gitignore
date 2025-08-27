@@ -149,4 +149,3 @@ config/*.ini
 
 imgui.ini
 .DS_Store
-/src/scripts/quest/classquest/ACN/ClsAcn050.cpp

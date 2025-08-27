@@ -1,256 +1,235 @@
-// FFXIVTheMovie.ParserV3.8
-// param used:
-//WARP_GREHFARR = 181|9|40|14|0|false
+// This is an automatically generated C++ script template
+// Content needs to be added by hand to make it function
+// In order for this script to be loaded, move it to the correct folder in <root>/scripts/
+
 #include <Actor/Player.h>
-#include <Actor/BNpc.h>
+#include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
-#include "Manager/TerritoryMgr.h"
-#include "Manager/EventMgr.h"
-#include "Territory/Territory.h"
-#include <Manager/WarpMgr.h>
+
+// Quest Script: ManSea001_00107
+// Quest Name: Coming to Limsa Lominsa
+// Quest ID: 65643
+// Start NPC: 1001028 (Ryssfloh)
+// End NPC: 1002697 (Baderon)
 
 using namespace Sapphire;
 
 class ManSea001 : public Sapphire::ScriptAPI::QuestScript
 {
-public:
-  ManSea001() : Sapphire::ScriptAPI::QuestScript( 65643 ){}; 
-  ~ManSea001() = default; 
+  private:
+    // Basic quest information 
+    // Quest vars / flags used
+    // BitFlag8
+    // UI8AL
 
-  //SEQ_0, 1 entries
-  //SEQ_1, 3 entries
-  //SEQ_255, 2 entries
-
-  //ACTOR0 = 1001028
-  //ACTOR1 = 1002732
-  //ACTOR2 = 1002697
-  //CUTEVENT = 202
-  //EOBJECT0 = 2001679
-  //EOBJECT1 = 2001680
-  //EVENTACTIONSEARCH = 1
-  //LOCACTOR0 = 1002732
-  //LOCPOSACTOR0 = 4107186
-  //OPENINGEVENTHANDLER = 1245185
-  //POPRANGE0 = 4127803
-  //TERRITORYTYPE0 = 181
-
-  static constexpr auto EVENT_ON_TALK = 0;
-  static constexpr auto EVENT_ON_EMOTE = 1;
-  static constexpr auto EVENT_ON_BNPC_KILL = 2;
-  static constexpr auto EVENT_ON_WITHIN_RANGE = 3;
-  static constexpr auto EVENT_ON_ENTER_TERRITORY = 4;
-  static constexpr auto EVENT_ON_EVENT_ITEM = 5;
-  static constexpr auto EVENT_ON_EOBJ_HIT = 6;
-  static constexpr auto EVENT_ON_SAY = 7;
-
-private:
-  void onProgress( World::Quest& quest, Entity::Player& player, uint32_t type, uint64_t param1, uint32_t param2, uint32_t param3 )
-  {
-    switch( quest.getSeq() )
+    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1002732
+    /// Countable Num: 0 Seq: 255 Event: 1 Listener: 2001679
+    // Steps in this quest ( 0 is before accepting, 
+    // 1 is first, 255 means ready for turning it in
+    enum Sequence : uint8_t
     {
-      case 0:
+      Seq0 = 0,
+      Seq1 = 1,
+      SeqFinish = 255,
+    };
+
+    // Entities found in the script data of the quest
+    static constexpr auto Actor0 = 1001028; // Ryssfloh ( Pos: -39.841301 20.000000 -4.951920  Teri: 181 )
+    static constexpr auto Actor1 = 1002732; // Grehfarr ( Pos: 11.192500 20.999300 13.347300  Teri: 181 )
+    static constexpr auto Actor2 = 1002697; // Baderon ( Pos: 20.297800 40.199902 -6.102380  Teri: 181 )
+    static constexpr auto CutEvent = 202;
+    static constexpr auto Eobject0 = 2001679; //{ 2001679, 181, { -57.398499, 18.000000, 0.063036 }, 1.000000 }; // 
+    static constexpr auto Eobject1 = 2001680; //{ 2001680, 181, { -35.055000, 20.000000, -0.014301 }, 1.000000 }; // 
+    static constexpr auto EventActionSearch = 1;
+    static constexpr auto LocActor0 = 1002732; // Grehfarr ( Pos: 11.192500 20.999300 13.347300  Teri: 181 )
+    static constexpr auto LocPosActor0 = 4107186; // 
+    static constexpr auto OpeningEventHandler = 1245185;
+    static constexpr auto Poprange0 = 4127803;
+    static constexpr auto Territorytype0 = 181;
+
+    void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
+    {
+      if( quest.getUI8AL() == 1 )
       {
-        if( type != EVENT_ON_BNPC_KILL ) Scene00000( quest, player ); // Scene00000: Normal(QuestOffer, TargetCanMove), id=unknown
-        // +Callback Scene00001: Normal(Talk, FadeIn, TargetCanMove), id=RYSSFLOH
-        // +Callback Scene00002: Normal(QuestAccept, SystemTalk), id=unknown
-        break;
-      }
-      case 1:
-      {
-        if( param1 == 1002732 ) // ACTOR1 = GREHFARR
-        {
-          if( quest.getUI8AL() != 1 )
-          {
-            Scene00005( quest, player ); // Scene00005: Normal(Talk, YesNo, TargetCanMove, CanCancel), id=GREHFARR
-          }
-          break;
-        }
-        if( param1 == 2001679 ) // EOBJECT0 = unknown
-        {
-          Scene00007( quest, player ); // Scene00007: Normal(None), id=unknown
-          break;
-        }
-        if( param1 == 2001680 ) // EOBJECT1 = unknown
-        {
-          Scene00009( quest, player ); // Scene00009: Normal(None), id=unknown
-          break;
-        }
-        break;
-      }
-      case 255:
-      {
-        if( param1 == 1002697 ) // ACTOR2 = unknown
-        {
-          Scene00011( quest, player ); // Scene00011: Normal(CutScene), id=unknown
-          // +Callback Scene00012: Normal(QuestReward, QuestComplete, SystemTalk), id=unknown
-          break;
-        }
-        if( param1 == 1002732 ) // ACTOR1 = GREHFARR
-        {
-          Scene00013( quest, player ); // Scene00013: Normal(Talk, YesNo, TargetCanMove, CanCancel), id=GREHFARR
-          break;
-        }
-        break;
-      }
-      default:
-      {
-        playerMgr().sendUrgent( player, "Sequence {} not defined.", quest.getSeq() );
-        break;
+        quest.setUI8AL( 0 );
+        quest.setBitFlag8( 1, false );
+        quest.setSeq( SeqFinish );
       }
     }
-  }
 
-public:
+  public:
+    ManSea001() : Sapphire::ScriptAPI::QuestScript( 65643 ){}; 
+    ~ManSea001() = default; 
+
+  //////////////////////////////////////////////////////////////////////
+  // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    onProgress( quest, player, EVENT_ON_TALK, actorId, 0, 0 );
-  }
-
-  void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Sapphire::Entity::Player& player ) override
-  {
-    playerMgr().sendDebug( player, "emote: {}", emoteId );
-    onProgress( quest, player, EVENT_ON_EMOTE, actorId, 0, emoteId );
-  }
-
-  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
-  {
-    onProgress( quest, player, EVENT_ON_BNPC_KILL, static_cast< uint64_t >( bnpc.getBNpcNameId() ), bnpc.getLayoutId(), 0 );
-  }
-
-  void onWithinRange( World::Quest& quest, Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z ) override
-  {
-    onProgress( quest, player, EVENT_ON_WITHIN_RANGE, static_cast< uint64_t >( param1 ), 0, 0 );
-  }
-
-  void onEnterTerritory( World::Quest& quest, Sapphire::Entity::Player& player, uint16_t param1, uint16_t param2 ) override
-  {
-    onProgress( quest, player, EVENT_ON_ENTER_TERRITORY, static_cast< uint64_t >( param1 ), static_cast< uint32_t >( param2 ), 0 );
-  }
-  void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId ) override
-  {
-    onProgress( quest, player, EVENT_ON_EVENT_ITEM, actorId, 0, 0 );
-  }
-  void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId ) override
-  {
-    onProgress( quest, player, EVENT_ON_EOBJ_HIT, actorId, actionId, 0 );
-  }
-  void onSay( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t sayId ) override
-  {
-    onProgress( quest, player, EVENT_ON_SAY, actorId, sayId, 0 );
-  }
-
-private:
-  void checkProgressSeq0( World::Quest& quest, Entity::Player& player )
-  {
-    quest.setSeq( 1 );
-  }
-  void checkProgressSeq1( World::Quest& quest, Entity::Player& player )
-  {
-    if( quest.getUI8AL() == 1 )
+    switch( actorId )
     {
-      quest.setUI8AL( 0 );
-      quest.setBitFlag8( 1, false );
-      quest.setSeq( 255 );
+      case Actor0:
+      {
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        break;
+      }
+      case Actor1:
+      {
+        if( quest.getSeq() == Seq1 )
+        {
+          if( quest.getUI8AL() != 1 )
+            Scene00005( quest, player );
+        }
+        else if( quest.getSeq() == SeqFinish )
+          Scene00013( quest, player );
+        break;
+      }
+      case Actor2:
+      {
+        if( quest.getSeq() == SeqFinish )
+          Scene00011( quest, player );
+        break;
+      }
     }
   }
 
-  void Scene00000( World::Quest& quest, Entity::Player& player ) //SEQ_0: , <No Var>, <No Flag>
+
+  private:
+  //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00000: Normal(QuestOffer, TargetCanMove), id=unknown" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      if( result.numOfResults > 0 && result.getResult( 0 ) == 1 )
-      {
-        Scene00001( quest, player );
-      }
-    };
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, callback );
-  }
-  void Scene00001( World::Quest& quest, Entity::Player& player ) //SEQ_0: , <No Var>, <No Flag>
-  {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00001: Normal(Talk, FadeIn, TargetCanMove), id=RYSSFLOH" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      Scene00002( quest, player );
-    };
-    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, callback );
-  }
-  void Scene00002( World::Quest& quest, Entity::Player& player ) //SEQ_0: , <No Var>, <No Flag>
-  {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00002: Normal(QuestAccept, SystemTalk), id=unknown" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      player.setOpeningSequence( 2 );
-      checkProgressSeq0( quest, player );
-    };
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, callback );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManSea001::Scene00000Return ) );
   }
 
-  void Scene00005( World::Quest& quest, Entity::Player& player ) //SEQ_1: ACTOR1, UI8AL = 1, Flag8(1)=True
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00005: Normal(Talk, YesNo, TargetCanMove, CanCancel), id=GREHFARR" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
+    if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      if( result.errorCode == 0 || ( result.numOfResults > 0 && result.getResult( 0 ) == 1 ) )
-      {
-        quest.setUI8AL( 1 );
-        quest.setBitFlag8( 1, true );
-        checkProgressSeq1( quest, player );
-        eventMgr().eventFinish( player, result.eventId, 1 );
-        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
-      }
-    };
-    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, callback );
+      Scene00001( quest, player );
+    }
   }
 
-  void Scene00007( World::Quest& quest, Entity::Player& player ) //SEQ_1: EOBJECT0, <No Var>, <No Flag>
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00007: Normal(None), id=unknown" );
-    checkProgressSeq1( quest, player );
+    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManSea001::Scene00001Return ) );
   }
 
-  void Scene00009( World::Quest& quest, Entity::Player& player ) //SEQ_1: EOBJECT1, <No Var>, <No Flag>
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00009: Normal(None), id=unknown" );
-    checkProgressSeq1( quest, player );
+    Scene00002( quest, player );
   }
 
-  void Scene00011( World::Quest& quest, Entity::Player& player ) //SEQ_255: ACTOR2, <No Var>, <No Flag>
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00011: Normal(CutScene), id=unknown" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      Scene00012( quest, player );
-    };
-    eventMgr().playQuestScene( player, getId(), 11, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, callback );
-  }
-  void Scene00012( World::Quest& quest, Entity::Player& player ) //SEQ_255: ACTOR2, <No Var>, <No Flag>
-  {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00012: Normal(QuestReward, QuestComplete, SystemTalk), id=unknown" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      if( result.numOfResults > 0 && result.getResult( 0 ) == 1 )
-      {
-        player.finishQuest( getId(), result.getResult( 1 ) );
-      }
-    };
-    eventMgr().playQuestScene( player, getId(), 12, HIDE_HOTBAR, callback );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManSea001::Scene00002Return ) );
   }
 
-  void Scene00013( World::Quest& quest, Entity::Player& player ) //SEQ_255: ACTOR1, <No Var>, <No Flag>
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00013: Normal(Talk, YesNo, TargetCanMove, CanCancel), id=GREHFARR" );
-    auto callback = [ & ]( World::Quest& quest, Entity::Player& player , const Event::SceneResult& result )
-    {
-      if( result.errorCode == 0 || ( result.numOfResults > 0 && result.getResult( 0 ) == 1 ) )
-      {
-        eventMgr().eventFinish( player, result.eventId, 1 );
-        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
-      }
-    };
-    eventMgr().playQuestScene( player, getId(), 13, HIDE_HOTBAR, callback );
+    player.setOpeningSequence( 2 );
+    checkQuestCompletion( quest, player );
+    quest.setSeq( Seq1 );
   }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &ManSea001::Scene00005Return ) );
+  }
+
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+    if ( result.getResult( 0 ) == 1 ) // say yes to lift attendant
+    {
+      quest.setUI8AL( 1 );
+      quest.setBitFlag8( 1, true );
+      checkQuestCompletion( quest, player );
+      eventMgr().eventFinish( player, result.eventId, 1 );
+      warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00007( World::Quest& quest, Entity::Player& player )
+  {
+    //playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00007: Normal(None), id=unknown" );
+    eventMgr().playQuestScene( player, getId(), 7, NONE, bindSceneReturn( &ManSea001::Scene00007Return ) );
+  }
+
+  void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    checkQuestCompletion( quest, player );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00009( World::Quest& quest, Entity::Player& player )
+  {
+    //playerMgr().sendDebug( player, "ManSea001:65643 calling Scene00009: Normal(None), id=unknown" );
+    eventMgr().playQuestScene( player, getId(), 9, NONE, bindSceneReturn( &ManSea001::Scene00009Return ) );
+  }
+
+  void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    checkQuestCompletion( quest, player );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00011( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 11, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManSea001::Scene00011Return ) );
+  }
+
+  void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    Scene00012( quest, player );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00012( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 12, HIDE_HOTBAR, bindSceneReturn( &ManSea001::Scene00012Return ) );
+  }
+
+  void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult( 1 ) );
+    }
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00013( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 13, HIDE_HOTBAR, bindSceneReturn( &ManSea001::Scene00013Return ) );
+  }
+
+  void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if ( result.getResult( 0 ) == 1 )
+    {
+      eventMgr().eventFinish( player, result.eventId, 1 );
+      warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
+    }
+  }
+
 };
 
 EXPOSE_SCRIPT( ManSea001 );

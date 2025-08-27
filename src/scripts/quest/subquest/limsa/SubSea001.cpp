@@ -217,7 +217,7 @@ private:
       if( result.getResult( 0 ) == 1 )
       {
         quest.setSeq( Seq2 );
-        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 10, 21, 13 }, -2.f );
+        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 11.3f, 20.9f, 13.3f }, -2.3f );
       }
     }
     else
@@ -387,6 +387,7 @@ private:
   {
     //What do I replace this with?
     //player.playScene(player, getId(), 15, 0, 0, 0);
+    //eventMgr().playScene( player, getId(), 15, NONE ); //Maybe this?
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -398,7 +399,10 @@ private:
 
   void Scene00016Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00017( quest, player );
+    if( result.getResult( 0 ) == 1 ) // Turn in quest item
+    {
+      Scene00017( quest, player );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
