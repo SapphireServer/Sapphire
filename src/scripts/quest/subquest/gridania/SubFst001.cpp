@@ -92,8 +92,6 @@ private:
       quest.setUI8BH( 1 );
       quest.setSeq( SeqFinish );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -105,7 +103,6 @@ private:
 
   void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
-
 
   }
 
@@ -119,7 +116,6 @@ private:
   void Scene00099Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -131,12 +127,10 @@ private:
 
   void Scene00100Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
 };

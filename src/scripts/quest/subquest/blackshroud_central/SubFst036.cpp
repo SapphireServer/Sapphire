@@ -73,11 +73,13 @@ public:
     {
       case Enemy0:
       {
+        if( quest.getSeq() != Seq1 )
+          return;
+
         quest.setUI8AL( quest.getUI8AL() + 1 );
         eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 8 );
         if( quest.getUI8AL() >= 8 )
         {
-          quest.setUI8AL( 0 );
           quest.setSeq( SeqFinish );
         }
         break;

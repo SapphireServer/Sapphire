@@ -139,7 +139,6 @@ private:
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId() );
