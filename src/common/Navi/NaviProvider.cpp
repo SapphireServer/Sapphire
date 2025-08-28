@@ -697,7 +697,7 @@ void Sapphire::Common::Navi::NaviProvider::setMoveTarget( int32_t naviAgentId,
   }
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Common::Navi::NaviProvider::getMovePos( int32_t naviAgentId )
+Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Common::Navi::NaviProvider::getAgentPos( int32_t naviAgentId )
 {
   const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   if( !ag )

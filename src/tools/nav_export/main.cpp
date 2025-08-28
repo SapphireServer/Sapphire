@@ -569,7 +569,19 @@ int main( int argc, char *argv[ ] )
               {
                 if( instanceObject->getType() == CollisionBox )
                 {
-                  std::cout << "\t\t " << "- " << instanceObject->header.InstanceID  << " CollisionBox present" << "\n";
+                  auto collisionBox = static_cast< CollisionBoxEntry * >( instanceObject.get() );
+                  const char* shapeStr = "Unknown";
+                  switch( collisionBox->header.triggerBoxShape )
+                  {
+                    case TriggerBoxShapeBox: shapeStr = "Box"; break;
+                    case TriggerBoxShapeSphere: shapeStr = "Sphere"; break;
+                    case TriggerBoxShapeCylinder: shapeStr = "Cylinder"; break;
+                    case TriggerBoxShapeBoard: shapeStr = "Board"; break;
+                    case TriggerBoxShapeMesh: shapeStr = "Mesh"; break;
+                    case TriggerBoxShapeBoardBothSides: shapeStr = "Board Both Sides"; break;
+                    default: shapeStr = "Unknown"; break;
+                  }
+                  std::cout << "\t\t " << "- " << instanceObject->header.InstanceID  << " CollisionBox Shape:" << shapeStr << "\n";
                 }
               }
 
@@ -582,6 +594,14 @@ int main( int argc, char *argv[ ] )
 
 
               std::cout << "\t\t-- " << timeline.MemberID << " - " << pSgbFile->timelineNames[ memberIdx ] << "\n";
+              const char* collisionStateStr = "Unknown";
+              switch( timeline.CollisionState )
+              {
+                case eTimelineCollisionState::NoChange: collisionStateStr = "No Change"; break;
+                case eTimelineCollisionState::On: collisionStateStr = "On"; break;
+                case eTimelineCollisionState::Off: collisionStateStr = "Off"; break;
+              }
+              std::cout << "\t\t\t-- CollisionState:" << collisionStateStr << "\n";
               ++memberIdx;
             }
 

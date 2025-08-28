@@ -1997,6 +1997,14 @@ namespace Sapphire::Common
     BNpcBaseData baseData;
   };
 
+
+  struct CachedServerPath
+  {
+    vec3 position;
+    uint32_t instanceId;
+    std::vector< PathControlPoint > points;
+  };
+
   /*
    * CellId is used to identify a cell in the cell container of a zone
    */

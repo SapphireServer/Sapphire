@@ -80,7 +80,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
   m_pPlayer = player.getAsPlayer();
 
   // mark player as "bound by duty"
-  player.setCondition( PlayerCondition::BoundByDuty );
+  //player.setCondition( PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 
@@ -301,7 +301,7 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  player.removeCondition( PlayerCondition::BoundByDuty );
+  //player.removeCondition( PlayerCondition::BoundByDuty );
 }
 
 void Sapphire::QuestBattle::success()

@@ -36,13 +36,6 @@ namespace Sapphire
     uint32_t timeOfDeath;
   };
 
-  struct CachedServerPath
-  {
-    vec3 position;
-    uint32_t instanceId;
-    std::vector< PathControlPoint > points;
-  };
-
   class Territory : public CellHandler< Cell >, public std::enable_shared_from_this< Territory >
   {
   protected:
@@ -59,7 +52,7 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_playerAreaObjects;
     std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_bNpcAreaObjects;
 
-    std::unordered_map< uint32_t, CachedServerPath > m_serverPathCache;
+    std::unordered_map< uint32_t, std::shared_ptr< Common::CachedServerPath > > m_serverPathCache;
 
     std::unordered_map< uint32_t, std::shared_ptr< Common::BNpcCacheEntry > > m_bNpcBaseMap;
 
@@ -111,6 +104,8 @@ namespace Sapphire
     std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > getTerritoryTypeInfo() const;
 
     uint64_t getLastActivityTime() const;
+
+    std::shared_ptr< Common::CachedServerPath > getServerPath( uint32_t instanceId );
 
     virtual bool init();
 

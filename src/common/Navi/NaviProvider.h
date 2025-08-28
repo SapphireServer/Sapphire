@@ -59,7 +59,7 @@ namespace Sapphire::Common::Navi
     void setMoveTarget( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& endPos );
     void resetMoveTarget( int32_t naviAgentId );
 
-    Common::FFXIVARR_POSITION3 getMovePos( int32_t naviAgentId );
+    Common::FFXIVARR_POSITION3 getAgentPos( int32_t naviAgentId );
 
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;

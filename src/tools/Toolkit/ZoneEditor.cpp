@@ -1654,6 +1654,7 @@ void ZoneEditor::loadBnpcs()
         cachedBnpc->Route = behaviour[ "routeId" ].get< uint8_t >();
         cachedBnpc->TerritoryRange = behaviour[ "territoryRange" ].get< uint16_t >();
         cachedBnpc->DropItem = behaviour[ "dropItem" ].get< uint32_t >();
+        cachedBnpc->ServerPathId = behaviour[ "serverPathId" ].get< uint32_t >();
 
         // Sense info
         cachedBnpc->SenseRangeRate = senseInfo[ "senseRangeRate" ].get< float >();

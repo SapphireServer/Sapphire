@@ -109,6 +109,12 @@ namespace Sapphire::Entity
 
     Entity::AreaObjectPtr m_pAreaObject;
 
+    /*! Ptr to currently active server Path */
+    std::shared_ptr< Common::CachedServerPath > m_pActiveServerPath;
+    /*! currently active server path point ID */
+    uint8_t m_serverPathPointIndex{0};
+    bool m_isReversePath{false};
+
   public:
     Chara( Common::ObjKind type );
 
@@ -117,6 +123,13 @@ namespace Sapphire::Entity
     virtual void calculateStats() {};
 
     int64_t getLastUpdateTime() const;
+
+    std::shared_ptr< Common::CachedServerPath > getActiveServerPath() const;
+    void setActiveServerPath( std::shared_ptr< Common::CachedServerPath > pPath );
+    void setActiveServerPathPointIndex( uint8_t index );
+    uint8_t getActiveServerPathPointIndex() const;
+    bool isReversePath() const;
+    void setReversePath( bool reverse );
 
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
