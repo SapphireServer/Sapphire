@@ -7,6 +7,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -71,6 +72,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -135,6 +137,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -199,6 +202,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -263,6 +267,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -327,6 +332,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -391,6 +397,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -455,6 +462,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -519,6 +527,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -583,6 +592,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -647,6 +657,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -711,6 +722,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -775,6 +787,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -839,6 +852,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -903,6 +917,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -967,6 +982,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1031,6 +1047,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1095,6 +1112,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1159,6 +1177,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1223,6 +1242,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1287,6 +1307,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1351,6 +1372,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1415,6 +1437,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1479,6 +1502,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1543,6 +1567,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1607,6 +1632,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1671,6 +1697,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1735,6 +1762,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1799,6 +1827,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1863,6 +1892,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1927,6 +1957,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -1991,6 +2022,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2055,6 +2087,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2119,6 +2152,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2183,6 +2217,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2247,6 +2282,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2318,6 +2354,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2382,6 +2419,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2453,6 +2491,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2524,6 +2563,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2595,6 +2635,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2659,6 +2700,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2723,6 +2765,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2787,6 +2830,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2851,6 +2895,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2915,6 +2960,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -2979,6 +3025,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3043,6 +3090,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3107,6 +3155,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3178,6 +3227,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3249,6 +3299,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3313,6 +3364,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3377,6 +3429,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3441,6 +3494,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3512,6 +3566,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3583,6 +3638,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3654,6 +3710,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3725,6 +3782,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3789,6 +3847,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3853,6 +3912,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3917,6 +3977,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -3981,6 +4042,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4045,6 +4107,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4109,6 +4172,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4173,6 +4237,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4237,6 +4302,7 @@
           "moveAI": 0,
           "normalAI": 30189,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4301,6 +4367,7 @@
           "moveAI": 0,
           "normalAI": 30293,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4365,6 +4432,7 @@
           "moveAI": 0,
           "normalAI": 30293,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4429,6 +4497,7 @@
           "moveAI": 0,
           "normalAI": 30293,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4493,6 +4562,7 @@
           "moveAI": 0,
           "normalAI": 30202,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4557,6 +4627,7 @@
           "moveAI": 0,
           "normalAI": 30202,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4628,6 +4699,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4699,6 +4771,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4770,6 +4843,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4834,6 +4908,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -4905,6 +4980,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 7
         },
@@ -4969,6 +5045,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5033,6 +5110,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5097,6 +5175,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5161,6 +5240,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5232,6 +5312,7 @@
           "moveAI": 0,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5296,6 +5377,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5367,6 +5449,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5431,6 +5514,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5495,6 +5579,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5559,6 +5644,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5623,6 +5709,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5687,6 +5774,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5751,6 +5839,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5815,6 +5904,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5879,6 +5969,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -5943,6 +6034,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6007,6 +6099,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6071,6 +6164,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6135,6 +6229,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6199,6 +6294,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6263,6 +6359,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6327,6 +6424,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6391,6 +6489,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6455,6 +6554,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6519,6 +6619,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6583,6 +6684,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6647,6 +6749,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6711,6 +6814,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6775,6 +6879,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6839,6 +6944,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6903,6 +7009,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -6967,6 +7074,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7031,6 +7139,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7095,6 +7204,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7159,6 +7269,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7223,6 +7334,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7287,6 +7399,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7351,6 +7464,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7415,6 +7529,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7479,6 +7594,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7543,6 +7659,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7607,6 +7724,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7671,6 +7789,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7735,6 +7854,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7799,6 +7919,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7863,6 +7984,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7927,6 +8049,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -7991,6 +8114,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8055,6 +8179,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8119,6 +8244,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8183,6 +8309,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8247,6 +8374,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8311,6 +8439,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8375,6 +8504,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8439,6 +8569,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8503,6 +8634,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8567,6 +8699,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8631,6 +8764,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8695,6 +8829,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8759,6 +8894,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8823,6 +8959,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8887,6 +9024,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -8951,6 +9089,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9015,6 +9154,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9079,6 +9219,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9143,6 +9284,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9207,6 +9349,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9271,6 +9414,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9335,6 +9479,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9399,6 +9544,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9463,6 +9609,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9527,6 +9674,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9591,6 +9739,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9655,6 +9804,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9719,6 +9869,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9783,6 +9934,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9847,6 +9999,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9911,6 +10064,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -9975,6 +10129,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10039,6 +10194,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10103,6 +10259,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10167,6 +10324,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10231,6 +10389,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10295,6 +10454,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10359,6 +10519,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10423,6 +10584,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10487,6 +10649,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10551,6 +10714,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10615,6 +10779,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10679,6 +10844,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10743,6 +10909,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10807,6 +10974,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10871,6 +11039,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10935,6 +11104,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -10999,6 +11169,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11063,6 +11234,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11127,6 +11299,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11191,6 +11364,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11255,6 +11429,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11319,6 +11494,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11383,6 +11559,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11447,6 +11624,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11511,6 +11689,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11575,6 +11754,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11639,6 +11819,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11703,6 +11884,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11767,6 +11949,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11831,6 +12014,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11895,6 +12079,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -11959,6 +12144,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12023,6 +12209,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12087,6 +12274,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12151,6 +12339,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12215,6 +12404,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12279,6 +12469,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12343,6 +12534,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12407,6 +12599,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12471,6 +12664,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12535,6 +12729,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12599,6 +12794,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12663,6 +12859,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12727,6 +12924,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12791,6 +12989,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12855,6 +13054,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12919,6 +13119,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -12983,6 +13184,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13047,6 +13249,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13111,6 +13314,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13175,6 +13379,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13239,6 +13444,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13303,6 +13509,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13367,6 +13574,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13431,6 +13639,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13495,6 +13704,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13559,6 +13769,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13623,6 +13834,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13694,6 +13906,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13758,6 +13971,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13822,6 +14036,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13886,6 +14101,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -13950,6 +14166,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14014,6 +14231,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14078,6 +14296,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14142,6 +14361,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14206,6 +14426,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14270,6 +14491,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14334,6 +14556,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14398,6 +14621,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14462,6 +14686,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14526,6 +14751,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14590,6 +14816,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14654,6 +14881,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14718,6 +14946,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14782,6 +15011,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14846,6 +15076,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14910,6 +15141,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -14974,6 +15206,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15038,6 +15271,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15102,6 +15336,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15166,6 +15401,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15230,6 +15466,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15294,6 +15531,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15358,6 +15596,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15422,6 +15661,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15486,6 +15726,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15550,6 +15791,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15614,6 +15856,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15678,6 +15921,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15742,6 +15986,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15806,6 +16051,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15870,6 +16116,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15934,6 +16181,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -15998,6 +16246,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16062,6 +16311,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16126,6 +16376,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16190,6 +16441,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16254,6 +16506,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16318,6 +16571,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16382,6 +16636,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16446,6 +16701,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16510,6 +16766,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16574,6 +16831,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16638,6 +16896,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16702,6 +16961,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16766,6 +17026,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16830,6 +17091,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16894,6 +17156,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -16958,6 +17221,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17022,6 +17286,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17086,6 +17351,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17150,6 +17416,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17214,6 +17481,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17278,6 +17546,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17342,6 +17611,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17406,6 +17676,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17470,6 +17741,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17534,6 +17806,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17598,6 +17871,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17662,6 +17936,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17726,6 +18001,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17790,6 +18066,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17854,6 +18131,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17918,6 +18196,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -17982,6 +18261,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18046,6 +18326,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18110,6 +18391,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18174,6 +18456,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18238,6 +18521,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18302,6 +18586,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18366,6 +18651,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18430,6 +18716,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18494,6 +18781,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18558,6 +18846,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18622,6 +18911,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18686,6 +18976,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18750,6 +19041,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18814,6 +19106,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18878,6 +19171,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -18942,6 +19236,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19006,6 +19301,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19070,6 +19366,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19134,6 +19431,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19198,6 +19496,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19262,6 +19561,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19326,6 +19626,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19390,6 +19691,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19454,6 +19756,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19518,6 +19821,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19582,6 +19886,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19646,6 +19951,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19710,6 +20016,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19774,6 +20081,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19838,6 +20146,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19902,6 +20211,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -19966,6 +20276,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20030,6 +20341,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20094,6 +20406,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20158,6 +20471,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20222,6 +20536,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20286,6 +20601,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20350,6 +20666,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20414,6 +20731,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20478,6 +20796,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20542,6 +20861,7 @@
           "moveAI": 0,
           "normalAI": 30126,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20606,6 +20926,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20670,6 +20991,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20734,6 +21056,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20798,6 +21121,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20862,6 +21186,7 @@
           "moveAI": 0,
           "normalAI": 30057,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20926,6 +21251,7 @@
           "moveAI": 0,
           "normalAI": 30125,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -20990,6 +21316,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21054,6 +21381,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21118,6 +21446,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21182,6 +21511,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21246,6 +21576,7 @@
           "moveAI": 0,
           "normalAI": 30120,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21317,6 +21648,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21381,6 +21713,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21445,6 +21778,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21509,6 +21843,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21573,6 +21908,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21637,6 +21973,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21701,6 +22038,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21765,6 +22103,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21829,6 +22168,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21893,6 +22233,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -21957,6 +22298,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22021,6 +22363,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22085,6 +22428,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22149,6 +22493,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22213,6 +22558,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22277,6 +22623,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22341,6 +22688,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22405,6 +22753,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22469,6 +22818,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22533,6 +22883,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22597,6 +22948,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22661,6 +23013,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22725,6 +23078,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22789,6 +23143,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22853,6 +23208,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22917,6 +23273,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -22981,6 +23338,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23045,6 +23403,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23109,6 +23468,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23173,6 +23533,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23237,6 +23598,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23301,6 +23663,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23365,6 +23728,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23429,6 +23793,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23493,6 +23858,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23557,6 +23923,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23621,6 +23988,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23685,6 +24053,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23749,6 +24118,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23813,6 +24183,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23877,6 +24248,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -23941,6 +24313,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24005,6 +24378,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24069,6 +24443,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24133,6 +24508,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24197,6 +24573,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24261,6 +24638,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24325,6 +24703,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24389,6 +24768,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24453,6 +24833,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24517,6 +24898,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24581,6 +24963,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24645,6 +25028,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24709,6 +25093,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24773,6 +25158,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24837,6 +25223,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24901,6 +25288,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -24965,6 +25353,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25029,6 +25418,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25093,6 +25483,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25157,6 +25548,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25221,6 +25613,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25285,6 +25678,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25349,6 +25743,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25413,6 +25808,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25477,6 +25873,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25541,6 +25938,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25605,6 +26003,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25669,6 +26068,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25733,6 +26133,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25797,6 +26198,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25861,6 +26263,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25925,6 +26328,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -25989,6 +26393,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26053,6 +26458,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26117,6 +26523,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26181,6 +26588,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26245,6 +26653,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26309,6 +26718,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26373,6 +26783,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26437,6 +26848,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26501,6 +26913,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26565,6 +26978,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26629,6 +27043,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26693,6 +27108,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26757,6 +27173,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26821,6 +27238,7 @@
           "moveAI": 0,
           "normalAI": 30060,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26885,6 +27303,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -26949,6 +27368,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27013,6 +27433,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27077,6 +27498,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27141,6 +27563,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27205,6 +27628,7 @@
           "moveAI": 0,
           "normalAI": 30125,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27269,6 +27693,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27333,6 +27758,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27397,6 +27823,7 @@
           "moveAI": 0,
           "normalAI": 30057,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27461,6 +27888,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27525,6 +27953,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27589,6 +28018,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27653,6 +28083,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27717,6 +28148,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27781,6 +28213,7 @@
           "moveAI": 0,
           "normalAI": 30060,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27845,6 +28278,7 @@
           "moveAI": 0,
           "normalAI": 30060,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27909,6 +28343,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -27973,6 +28408,7 @@
           "moveAI": 0,
           "normalAI": 30060,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28037,6 +28473,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28101,6 +28538,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28165,6 +28603,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28229,6 +28668,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28293,6 +28733,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28364,6 +28805,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28428,6 +28870,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28492,6 +28935,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28556,6 +29000,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28620,6 +29065,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28684,6 +29130,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28748,6 +29195,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28812,6 +29260,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28876,6 +29325,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -28940,6 +29390,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29004,6 +29455,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29068,6 +29520,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29132,6 +29585,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29196,6 +29650,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29260,6 +29715,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29324,6 +29780,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29388,6 +29845,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29452,6 +29910,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29516,6 +29975,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29580,6 +30040,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29644,6 +30105,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29708,6 +30170,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29772,6 +30235,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29836,6 +30300,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29900,6 +30365,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -29964,6 +30430,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30028,6 +30495,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30092,6 +30560,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30156,6 +30625,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30220,6 +30690,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30284,6 +30755,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30348,6 +30820,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30412,6 +30885,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30476,6 +30950,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30540,6 +31015,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30604,6 +31080,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30668,6 +31145,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30732,6 +31210,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30796,6 +31275,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30860,6 +31340,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30924,6 +31405,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -30988,6 +31470,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31052,6 +31535,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31116,6 +31600,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31180,6 +31665,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31244,6 +31730,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31308,6 +31795,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31372,6 +31860,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31436,6 +31925,7 @@
           "moveAI": 0,
           "normalAI": 30125,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31500,6 +31990,7 @@
           "moveAI": 0,
           "normalAI": 30057,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31564,6 +32055,7 @@
           "moveAI": 0,
           "normalAI": 30119,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31628,6 +32120,7 @@
           "moveAI": 0,
           "normalAI": 30124,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31692,6 +32185,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31756,6 +32250,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31820,6 +32315,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31884,6 +32380,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -31948,6 +32445,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32012,6 +32510,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32076,6 +32575,7 @@
           "moveAI": 1,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32140,6 +32640,7 @@
           "moveAI": 1,
           "normalAI": 30063,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32204,6 +32705,7 @@
           "moveAI": 0,
           "normalAI": 30059,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32268,6 +32770,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32332,6 +32835,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32396,6 +32900,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32460,6 +32965,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32524,6 +33030,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32588,6 +33095,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32652,6 +33160,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32716,6 +33225,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32780,6 +33290,7 @@
           "moveAI": 1,
           "normalAI": 30246,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32844,6 +33355,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32908,6 +33420,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -32972,6 +33485,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33036,6 +33550,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33100,6 +33615,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33164,6 +33680,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33228,6 +33745,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33292,6 +33810,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33363,6 +33882,7 @@
           "moveAI": 0,
           "normalAI": 30051,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33427,6 +33947,7 @@
           "moveAI": 0,
           "normalAI": 30055,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33491,6 +34012,7 @@
           "moveAI": 0,
           "normalAI": 30053,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33555,6 +34077,7 @@
           "moveAI": 0,
           "normalAI": 30054,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33619,6 +34142,7 @@
           "moveAI": 0,
           "normalAI": 30051,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33683,6 +34207,7 @@
           "moveAI": 0,
           "normalAI": 30055,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33747,6 +34272,7 @@
           "moveAI": 0,
           "normalAI": 30052,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33811,6 +34337,7 @@
           "moveAI": 0,
           "normalAI": 30054,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33875,6 +34402,7 @@
           "moveAI": 0,
           "normalAI": 30053,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -33946,6 +34474,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34010,6 +34539,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34074,6 +34604,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34138,6 +34669,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34202,6 +34734,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34266,6 +34799,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34330,6 +34864,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34394,6 +34929,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34458,6 +34994,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34522,6 +35059,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34586,6 +35124,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34650,6 +35189,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34714,6 +35254,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34778,6 +35319,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34842,6 +35384,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34906,6 +35449,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -34970,6 +35514,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35034,6 +35579,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35098,6 +35644,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35162,6 +35709,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35226,6 +35774,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35297,6 +35846,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35361,6 +35911,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35425,6 +35976,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35489,6 +36041,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35553,6 +36106,7 @@
           "moveAI": 3,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35624,6 +36178,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35688,6 +36243,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35752,6 +36308,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35816,6 +36373,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35880,6 +36438,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -35951,6 +36510,7 @@
           "moveAI": 8,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36015,6 +36575,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36079,6 +36640,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36143,6 +36705,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36207,6 +36770,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36271,6 +36835,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36335,6 +36900,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36399,6 +36965,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36463,6 +37030,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36527,6 +37095,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36591,6 +37160,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36655,6 +37225,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36719,6 +37290,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36783,6 +37355,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36847,6 +37420,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36911,6 +37485,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -36982,6 +37557,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 10
         },
@@ -37046,6 +37622,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 10
         },
@@ -37117,6 +37694,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37181,6 +37759,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37245,6 +37824,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37309,6 +37889,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37380,6 +37961,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37444,6 +38026,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37508,6 +38091,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37572,6 +38156,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37643,6 +38228,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37707,6 +38293,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37771,6 +38358,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37842,6 +38430,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37913,6 +38502,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -37984,6 +38574,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38048,6 +38639,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38112,6 +38704,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38176,6 +38769,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38240,6 +38834,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38311,6 +38906,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 10
         },
@@ -38382,6 +38978,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38446,6 +39043,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38517,6 +39115,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38588,6 +39187,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38659,6 +39259,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38723,6 +39324,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38787,6 +39389,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38858,6 +39461,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -38929,6 +39533,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39000,6 +39605,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39064,6 +39670,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39135,6 +39742,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39199,6 +39807,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39270,6 +39879,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39334,6 +39944,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39398,6 +40009,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39469,6 +40081,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39533,6 +40146,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39597,6 +40211,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },
@@ -39668,6 +40283,7 @@
           "moveAI": 1,
           "normalAI": 0,
           "routeId": 0,
+          "serverPathId": 0,
           "territoryRange": 0,
           "wanderingRange": 6
         },

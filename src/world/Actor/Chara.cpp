@@ -796,6 +796,16 @@ int64_t Chara::getLastUpdateTime() const
   return m_lastUpdate;
 }
 
+float Chara::getWalkSpeed() const
+{
+  return m_walkSpeed;
+}
+
+float Chara::getRunSpeed() const
+{
+  return m_runSpeed;
+}
+
 std::shared_ptr< Common::CachedServerPath > Chara::getActiveServerPath() const
 {
   return m_pActiveServerPath;
@@ -1033,7 +1043,8 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
       }
     }
     setPos( navPos );
-    pNav->updateAgentPosition( getAgentId(), getPos(), getRadius() );
+    // speed needs to be reset properly here
+    pNav->updateAgentPosition( getAgentId(), getPos(), getRadius(), 1 );
   }
   else
   {

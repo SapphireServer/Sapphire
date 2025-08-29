@@ -24,7 +24,8 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   if( pNaviProvider && bnpc.pathingActive() )
   {
     auto state = bnpc.getState();
-    pNaviProvider->updateAgentParameters( bnpc.getAgentId(), bnpc.getRadius(), state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat );
+    bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
+    pNaviProvider->updateAgentParameters( bnpc.getAgentId(), bnpc.getRadius(), isRunning, isRunning ? bnpc.getRunSpeed() : bnpc.getWalkSpeed() );
   }
 
   auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );

@@ -48,7 +48,7 @@ namespace Sapphire::Common::Navi
 
     bool hasNaviMesh() const;
 
-    int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius );
+    int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius, float speed = 1.0f );
 
     void removeAgent( int32_t naviAgentId );
 
@@ -64,12 +64,12 @@ namespace Sapphire::Common::Navi
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;
 
-    int32_t updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius, float speed );
 
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
-    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning );
+    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
 
     std::string getNaviPath() const { return m_naviPath; }

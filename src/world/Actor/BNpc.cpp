@@ -153,6 +153,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
 
 
   m_radius = bNpcBaseData->data().Scale;
+  m_baseScale = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
@@ -179,7 +180,12 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
     auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
     {
-      m_radius *= modelSkeleton->data().Radius;
+      m_radius = modelSkeleton->data().Radius * m_baseScale;
+      m_walkSpeed = modelSkeleton->data().WalkSpeed;
+      m_runSpeed = modelSkeleton->data().RunSpeed;
+
+      //m_autoAttackAnimation = modelSkeleton->data().AutoAttackType;
+
     }
   }
 
@@ -395,7 +401,9 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    auto state = getState();
+    bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), isRunning ? getRunSpeed() : getWalkSpeed() );
     setAgentId( newAgentId );
     return true;
   }
@@ -432,7 +440,9 @@ bool BNpc::moveTo( const Chara& targetChara )
     face( targetChara.getPos() );
     setPos( pos1 );
     pNaviProvider->resetMoveTarget( getAgentId() );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    auto state = getState();
+    bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), isRunning ? getRunSpeed() : getWalkSpeed() );
     setAgentId( newAgentId );
     return true;
   }
