@@ -164,7 +164,7 @@ class ClsGla020 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | HIDE_UI, bindSceneReturn( &ClsGla020::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | DISABLE_SKIP | HIDE_UI, bindSceneReturn( &ClsGla020::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )

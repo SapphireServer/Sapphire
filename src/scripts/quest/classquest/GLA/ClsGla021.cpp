@@ -134,7 +134,7 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &ClsGla021::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ClsGla021::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -151,7 +151,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &ClsGla021::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ClsGla021::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )

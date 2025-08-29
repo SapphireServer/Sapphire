@@ -715,7 +715,7 @@ class ClsGla050 : public Sapphire::ScriptAPI::QuestScript
     quest.setBitFlag8( 1, true );
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    enemy->hateListAdd( player.getAsPlayer(), 100 );
+    enemy->hateListAdd( player.getAsPlayer(), 1 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -743,7 +743,7 @@ class ClsGla050 : public Sapphire::ScriptAPI::QuestScript
     quest.setBitFlag8( 2, true );
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromLayoutId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    enemy->hateListAdd( player.getAsPlayer(), 100 );
+    enemy->hateListAdd( player.getAsPlayer(), 1 );
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -95,7 +95,7 @@ class ManWil002 : public Sapphire::ScriptAPI::QuestScript
         eventMgr().eventActionStart( player, getId(), 0x13, [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
               player.registerAetheryte( Aetheryte0 );
               player.setRewardFlag( Common::UnlockEntry::Return );
-              Scene00002( quest, player ); }, nullptr, getId() );
+              Scene00001( quest, player ); }, nullptr, getId() );
         break;
       }
       case Actor20:
@@ -141,7 +141,7 @@ class ManWil002 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )

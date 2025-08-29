@@ -147,7 +147,7 @@ class ManSea003 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManSea003::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &ManSea003::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
