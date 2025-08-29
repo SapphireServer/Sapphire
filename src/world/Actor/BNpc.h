@@ -209,6 +209,7 @@ namespace Sapphire::Entity
 
     uint32_t m_flags;
 
+
     BNpcBaseData m_senseData;
 
     Common::BNpcType m_bnpcType;

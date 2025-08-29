@@ -105,6 +105,11 @@ namespace Sapphire::Entity
     /*! Detour Crowd actor scale */
     float m_radius;
 
+    float m_baseScale;
+
+    float m_walkSpeed{1.0};
+    float m_runSpeed{1.0};
+
     uint32_t m_dirtyFlag{};
 
     Entity::AreaObjectPtr m_pAreaObject;
@@ -123,6 +128,9 @@ namespace Sapphire::Entity
     virtual void calculateStats() {};
 
     int64_t getLastUpdateTime() const;
+
+    float getWalkSpeed() const;
+    float getRunSpeed() const;
 
     std::shared_ptr< Common::CachedServerPath > getActiveServerPath() const;
     void setActiveServerPath( std::shared_ptr< Common::CachedServerPath > pPath );

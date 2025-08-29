@@ -307,7 +307,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   // only activate this for debug purposes to spawn bnpcs in dungeons
-  //updateSpawnPoints();
+  updateSpawnPoints();
   updateState( tickCount );
   scriptMgr.onInstanceUpdate( *this, tickCount );
 

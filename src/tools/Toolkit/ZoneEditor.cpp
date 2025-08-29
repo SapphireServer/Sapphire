@@ -262,6 +262,14 @@ void ZoneEditor::showBnpcWindowHeader()
   else if( m_selectedBnpcIndex >= 0 )
   {
     ImGui::Text( "BNPC Selected: %s", m_filteredBnpcs[ m_selectedBnpcIndex ]->bnpcName.c_str() );
+
+    uint32_t previousSelection = m_selectedServerPathId;
+    m_selectedServerPathId = m_filteredBnpcs[ m_selectedBnpcIndex ]->ServerPathId;
+    if( previousSelection != m_selectedServerPathId )
+    {
+      buildServerPathGeometry();
+    }
+
   }
   else
   {
@@ -1670,8 +1678,7 @@ void ZoneEditor::loadBnpcs()
         // Set default values for fields that might not be in JSON
         cachedBnpc->EventGroup = 0;
         cachedBnpc->BNpcBaseData = 0;
-        cachedBnpc->BNPCRankId = 0;
-        cachedBnpc->ServerPathId = 0;
+
 
         // Generate name string for display (you might want to look up actual names)
         cachedBnpc->nameString = fmt::format( "{} ({})", groupName, cachedBnpc->instanceId );

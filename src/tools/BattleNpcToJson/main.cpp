@@ -551,6 +551,7 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
     behaviourEntry[ "normalAI" ] = pBNpc->data.NormalAI;
     behaviourEntry[ "wanderingRange" ] = pBNpc->data.WanderingRange;
     behaviourEntry[ "routeId" ] = pBNpc->data.Route;
+    behaviourEntry[ "serverPathId" ] = pBNpc->data.ServerPathId;
     behaviourEntry[ "territoryRange" ] = pBNpc->data.TerritoryRange;
     behaviourEntry[ "dropItem" ] = pBNpc->data.DropItem;
     jsonEntry[ "Behaviour" ] = behaviourEntry;
