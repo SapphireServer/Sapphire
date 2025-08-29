@@ -13,9 +13,9 @@ namespace Sapphire::Entity
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
 
-    uint32_t getGimmickId() const;
+    uint32_t getSharedGroupId() const;
 
-    void setGimmickId( uint32_t gimmickId );
+    void setSharedGroupId( uint32_t sharedGroupId );
 
     uint8_t getState() const;
 
@@ -41,7 +41,7 @@ namespace Sapphire::Entity
 
     void despawn( PlayerPtr pTarget ) override;
 
-    void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+    void playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag );
 
     void setHousingLink( uint32_t housingLink );
 
@@ -57,7 +57,7 @@ namespace Sapphire::Entity
   protected:
     uint32_t m_instanceId;
     uint32_t m_housingLink;
-    uint32_t m_gimmickId;
+    uint32_t m_sharedGroupId;
     uint32_t m_objectId;
     uint32_t m_ownerId;
     uint8_t m_state;

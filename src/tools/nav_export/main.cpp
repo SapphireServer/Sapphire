@@ -318,37 +318,12 @@ void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, E
             break;
           }
         }
-        /*       auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSgbEntry.get() );
-             std::string fileName = pModel->collisionFileName;
-             if( pModel->type == SgbGroupEntryType::Gimmick )
-             {
-               if( auto pSubSgbFile = pCache->getSgbFile( pModel->modelFileName ) )
-               {
-                 for( const auto& subGroup : pSubSgbFile->entries )
-                 {
-                   for( const auto& pSubEntry : subGroup.entries )
-                   {
-                     auto pSubModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSubEntry.get() );
-                     std::string subModelFile = pSubModel->modelFileName;
-                     //"bg/ex1/02_dra_d2/alx/common/bgparts/d2a0_a7_btog2.mdl"
-                     //"bg/ex1/02_dra_d2/alx/common/collision/d2a0_a1_twl01.pcb"
-                     replaceAll( subModelFile, "/bgparts/", "/collision/" );
-                     replaceAll( subModelFile, ".mdl", ".pcb ");
 
-                     if( pSubModel && pSubModel->type == SgbGroupEntryType::Model )
-                       pcbTransformModel( subModelFile, &pGimmick->header.scale, &pGimmick->header.rotation,
-                                          &pGimmick->header.translation, exportgroup, pSubModel );
-                   }
-                 }
-               }
-             }
-             pcbTransformModel( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
-                                &pGimmick->header.translation, exportgroup, pModel );
-             */
       }
     }
   }
 };
+
 
 int main( int argc, char *argv[ ] )
 {
@@ -408,6 +383,9 @@ int main( int argc, char *argv[ ] )
       const auto& zonePath = zoneNameToPath( zoneName );
       if( exportedTeriMap.find( zonePath ) != exportedTeriMap.end() )
         continue;
+
+      std::unordered_map< uint32_t, SharedGroupEntry* > m_sharedGroupMap;
+      std::unordered_map< uint32_t, EventObjectEntry* > m_eventObjectMap;
 
       std::string zoneNameShort = zonePath.substr( zonePath.find_last_of( '/' ) + 1 );
 
@@ -494,7 +472,9 @@ int main( int argc, char *argv[ ] )
 
               case eAssetType::MapRange:
               {
-              //  std::cout << "MapRange\n";
+                auto mapRange = static_cast< MapRangeEntry * >( pEntry.get() );
+                vec3 rangePos = mapRange->header.Transformation.Translation;
+                exportedZone.mapRanges.push_back( rangePos );
               }
               break;
 
@@ -528,6 +508,8 @@ int main( int argc, char *argv[ ] )
               {
                 auto pSg = static_cast< SharedGroupEntry * >( pEntry.get() );
 
+                m_sharedGroupMap[ pEntry->header.InstanceID ] = pSg;
+
                 exportSgbModel( pSg->AssetPath, pSg, exportedGroup );
               }
               break;
@@ -535,6 +517,9 @@ int main( int argc, char *argv[ ] )
               case eAssetType::EventObject:
               {
                 auto pEobj = static_cast< EventObjectEntry * >( pEntry.get() );
+
+                m_eventObjectMap[ pEntry->header.InstanceID ] = pEobj;
+
                 pcbTransformModel( fileName, &pEntry->header.Transformation.Scale,
                                    &pEntry->header.Transformation.Rotation,
                                    &pEntry->header.Transformation.Translation, exportedGroup );
@@ -560,6 +545,72 @@ int main( int argc, char *argv[ ] )
       // :(
       if( zoneCount % nJobs == 0 )
         pCache->purge();
+
+
+      // gather dynamic collisions controlled by eobj
+      for( auto [ id, object] : m_eventObjectMap )
+      {
+        if( object->header.BoundInstanceID != 0 )
+        {
+          auto pBoundGroup = m_sharedGroupMap[ object->header.BoundInstanceID ];
+          if( !pBoundGroup )
+            continue;
+
+          std::cout << "Found BoundInstanceID " << object->header.BoundInstanceID << " to " << object->header.BaseId <<"\n";
+          std::cout << "\t " << pBoundGroup->AssetPath << "\n";
+
+          if( auto pSgbFile = pCache->getSgbFile( pBoundGroup->AssetPath ) )
+          {
+            int memberIdx = 0;
+
+            for( auto& [layerId, layers]: pSgbFile->layerInstanceObjects )
+            {
+              for( auto& instanceObject : layers )
+              {
+                if( instanceObject->getType() == CollisionBox )
+                {
+                  auto collisionBox = static_cast< CollisionBoxEntry * >( instanceObject.get() );
+                  const char* shapeStr = "Unknown";
+                  switch( collisionBox->header.triggerBoxShape )
+                  {
+                    case TriggerBoxShapeBox: shapeStr = "Box"; break;
+                    case TriggerBoxShapeSphere: shapeStr = "Sphere"; break;
+                    case TriggerBoxShapeCylinder: shapeStr = "Cylinder"; break;
+                    case TriggerBoxShapeBoard: shapeStr = "Board"; break;
+                    case TriggerBoxShapeMesh: shapeStr = "Mesh"; break;
+                    case TriggerBoxShapeBoardBothSides: shapeStr = "Board Both Sides"; break;
+                    default: shapeStr = "Unknown"; break;
+                  }
+                  std::cout << "\t\t " << "- " << instanceObject->header.InstanceID  << " CollisionBox Shape:" << shapeStr << "\n";
+                }
+              }
+
+            }
+
+            if( !pSgbFile->timelines.empty() )
+              std::cout << "\t\tTimelines: " << "\n";
+            for( auto&timeline : pSgbFile->timelines )
+            {
+
+
+              std::cout << "\t\t-- " << timeline.MemberID << " - " << pSgbFile->timelineNames[ memberIdx ] << "\n";
+              const char* collisionStateStr = "Unknown";
+              switch( timeline.CollisionState )
+              {
+                case eTimelineCollisionState::NoChange: collisionStateStr = "No Change"; break;
+                case eTimelineCollisionState::On: collisionStateStr = "On"; break;
+                case eTimelineCollisionState::Off: collisionStateStr = "Off"; break;
+              }
+              std::cout << "\t\t\t-- CollisionState:" << collisionStateStr << "\n";
+              ++memberIdx;
+            }
+
+          }
+
+        }
+
+      }
+
 
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
       exportedZone.groups.clear();

@@ -58,6 +58,8 @@
 #include <AI/Fsm/StateCombat.h>
 #include <AI/Fsm/StateRetreat.h>
 #include <AI/Fsm/StateDead.h>
+#include <AI/Fsm/StateFollowPath.h>
+#include <AI/Fsm/StateResumePath.h>
 #include <AI/TargetHelper.h>
 
 using namespace Sapphire;
@@ -385,7 +387,7 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
+  auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
   auto distance = Common::Util::distance( pos1, pos );
 
   if( distance < getNaviTargetReachedDistance() )
@@ -421,7 +423,7 @@ bool BNpc::moveTo( const Chara& targetChara )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
+  auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
   auto distance = Common::Util::distance( pos1, targetChara.getPos() );
 
   if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
@@ -1283,27 +1285,49 @@ void BNpc::initFsm()
   auto stateIdle = make_StateIdle();
   auto stateCombat = make_StateCombat();
   auto stateDead = make_StateDead();
-  if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( m_pInfo->ServerPathId != 0 && pZone && pZone->getServerPath( m_pInfo->ServerPathId ) )
   {
-    auto stateRoam = make_StateRoam();
-    stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
-    stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-    stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    stateRoam->addTransition( stateDead, make_IsDeadCondition() );
-    m_fsm->addState( stateRoam );
+    auto statePath = make_StateFollowPath();
+    auto stateResumePath = make_StateResumePath();
+    statePath->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+    statePath->addTransition( stateDead, make_IsDeadCondition() );
+
+    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
+    stateCombat->addTransition( stateResumePath, make_HateListEmptyCondition() );
+    stateResumePath->addTransition( statePath, make_RoamTargetReachedCondition() );
+
+    m_fsm->addState( statePath );
+
+    m_fsm->setCurrentState( statePath );
   }
-  stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-  stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
-  stateIdle->addTransition( stateDead, make_IsDeadCondition() );
-  stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-  m_fsm->addState( stateIdle );
-  if( !hasFlag( NoDeaggro ) )
+  else
   {
-    auto stateRetreat = make_StateRetreat();
-    stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
-    stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+    if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
+    {
+      auto stateRoam = make_StateRoam();
+      stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
+      stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+      stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+      stateRoam->addTransition( stateDead, make_IsDeadCondition() );
+      m_fsm->addState( stateRoam );
+    }
+    stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+    stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
+    stateIdle->addTransition( stateDead, make_IsDeadCondition() );
+    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
+    m_fsm->addState( stateIdle );
+    if( !hasFlag( NoDeaggro ) )
+    {
+      auto stateRetreat = make_StateRetreat();
+      stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
+      stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+    }
+    m_fsm->setCurrentState( stateIdle );
   }
-  m_fsm->setCurrentState( stateIdle );
 }
 
 void BNpc::processGambits( uint64_t tickCount )

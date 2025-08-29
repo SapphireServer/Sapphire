@@ -66,7 +66,7 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   if( bnpc.getAgentId() != -1 )
   {
-    auto pos = pNaviProvider->getMovePos( bnpc.getAgentId() );
+    auto pos = pNaviProvider->getAgentPos( bnpc.getAgentId() );
     if( pos.x != bnpc.getPos().x || pos.y != bnpc.getPos().y || pos.z != bnpc.getPos().z )
       bnpc.setPos( pos );
   }

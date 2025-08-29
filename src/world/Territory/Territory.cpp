@@ -96,53 +96,53 @@ void Territory::loadServerPaths()
     jsonFile.close();
 
     // Iterate through each path entry
-    for( auto& [instanceIdStr, pathData] : pathsData.items() )
+    for( auto& [ instanceIdStr, pathData ] : pathsData.items() )
     {
       uint32_t instanceId = std::stoul( instanceIdStr );
 
       // Create cached path entry
-      auto cachedPath = CachedServerPath();
+      auto cachedPath = std::make_shared< Common::CachedServerPath >();
 
       // Basic information
-      cachedPath.instanceId = instanceId;
+      cachedPath->instanceId = instanceId;
 
       // Position data
-      if( pathData.contains( "position" ) && pathData["position"].is_array() && pathData["position"].size() == 3 )
+      if( pathData.contains( "position" ) && pathData[ "position" ].is_array() && pathData[ "position" ].size() == 3 )
       {
-        cachedPath.position.x = pathData["position"][0].get<float>();
-        cachedPath.position.y = pathData["position"][1].get<float>();
-        cachedPath.position.z = pathData["position"][2].get<float>();
+        cachedPath->position.x = pathData[ "position" ][ 0 ].get< float >();
+        cachedPath->position.y = pathData[ "position" ][ 1 ].get< float >();
+        cachedPath->position.z = pathData[ "position" ][ 2 ].get< float >();
       }
 
       // Control points
-      if( pathData.contains( "controlPoints" ) && pathData["controlPoints"].is_array() )
+      if( pathData.contains( "controlPoints" ) && pathData[ "controlPoints" ].is_array() )
       {
-        for( const auto& controlPointData : pathData["controlPoints"] )
+        for( const auto& controlPointData : pathData[ "controlPoints" ] )
         {
           PathControlPoint point;
 
           if( controlPointData.contains( "pointId" ) )
-            point.PointID = controlPointData["pointId"].get<uint16_t>();
+            point.PointID = controlPointData[ "pointId" ].get< uint16_t >();
 
-          if( controlPointData.contains( "position" ) && controlPointData["position"].is_array() && controlPointData["position"].size() == 3 )
+          if( controlPointData.contains( "position" ) && controlPointData[ "position" ].is_array() && controlPointData[
+                "position" ].size() == 3 )
           {
-            point.Translation.x = controlPointData["position"][0].get<float>();
-            point.Translation.y = controlPointData["position"][1].get<float>();
-            point.Translation.z = controlPointData["position"][2].get<float>();
+            point.Translation.x = controlPointData[ "position" ][ 0 ].get< float >();
+            point.Translation.y = controlPointData[ "position" ][ 1 ].get< float >();
+            point.Translation.z = controlPointData[ "position" ][ 2 ].get< float >();
           }
 
 
-          cachedPath.points.push_back( point );
+          cachedPath->points.push_back( point );
         }
       }
 
       // Store in cache
-      m_serverPathCache[instanceId] = cachedPath;
+      m_serverPathCache[ instanceId ] = cachedPath;
     }
 
     Logger::info( "Loaded {} server paths for zone: {}", m_serverPathCache.size(), m_internalName );
-  }
-  catch( std::runtime_error& e )
+  } catch( std::runtime_error& e )
   {
     Logger::error( "Error loading paths from JSON {}: {}", jsonPath, e.what() );
   }
@@ -565,6 +565,15 @@ void Territory::updateBNpcs( uint64_t tickCount )
 uint64_t Territory::getLastActivityTime() const
 {
   return m_lastActivityTime;
+}
+
+std::shared_ptr< Common::CachedServerPath > Territory::getServerPath( uint32_t instanceId )
+{
+  auto serverPath = m_serverPathCache.find( instanceId );
+  if( serverPath != m_serverPathCache.end() )
+    return serverPath->second;
+
+  return nullptr;
 }
 
 bool Territory::update( uint64_t tickCount )
@@ -1112,6 +1121,7 @@ bool Territory::loadBNpcs()
         bnpc->Route = behaviour[ "routeId" ].get< uint32_t >();
         bnpc->TerritoryRange = behaviour[ "territoryRange" ].get< uint32_t >();
         bnpc->DropItem = behaviour[ "dropItem" ].get< uint32_t >();
+        bnpc->ServerPathId = behaviour[ "serverPathId" ].get< uint32_t >();
 
         // Sense info
         const auto& senseInfo = bnpcData[ "SenseInfo" ];
@@ -1124,13 +1134,12 @@ bool Territory::loadBNpcs()
 
         // Additional fields that might not be in JSON but are expected by the system
         bnpc->EventGroup = 0; // Set default or extract from JSON if available
-        bnpc->ServerPathId = 0; // Set default or extract from JSON if available
 
         // Store in the base map
         m_bNpcBaseMap[ bnpc->instanceId ] = bnpc;
 
         // Add to spawn info if it should spawn
-        if( bnpc->Nonpop != 1 )
+       // if( bnpc->Nonpop != 1 )
         {
           SpawnInfo info;
           info.bnpcPtr = nullptr;

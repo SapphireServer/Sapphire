@@ -15,7 +15,7 @@ void TaskMgr::update( uint64_t tickCount )
     // is the task ready for execution?
     if( ( tickCount - pTask->getQueueTimeMs() ) >= pTask->getDelayTimeMs() )
     {
-      Logger::info( "[TaskMgr] " + pTask->toString() );
+      //Logger::debug( "[TaskMgr] " + pTask->toString() );
       pTask->execute();
     }
     else

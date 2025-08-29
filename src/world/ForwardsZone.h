@@ -71,6 +71,8 @@ namespace World::AI::Fsm
   TYPE_FORWARD( StateCombat );
   TYPE_FORWARD( StateRetreat );
   TYPE_FORWARD( StateDead );
+  TYPE_FORWARD( StateFollowPath );
+  TYPE_FORWARD( StateResumePath );
 
   TYPE_FORWARD( RoamNextTimeReachedCondition );
   TYPE_FORWARD( RoamTargetReachedCondition );

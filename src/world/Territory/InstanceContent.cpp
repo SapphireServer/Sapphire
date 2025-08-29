@@ -103,7 +103,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   }
 
   // mark player as "bound by duty"
-  player.setCondition( PlayerCondition::BoundByDuty );
+  //player.setCondition( PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 }
@@ -306,6 +306,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
+  // only activate this for debug purposes to spawn bnpcs in dungeons
+  //updateSpawnPoints();
   updateState( tickCount );
   scriptMgr.onInstanceUpdate( *this, tickCount );
 
@@ -749,7 +751,7 @@ void Sapphire::InstanceContent::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  player.removeCondition( PlayerCondition::BoundByDuty );
+  //player.removeCondition( PlayerCondition::BoundByDuty );
 }
 
 uint32_t Sapphire::InstanceContent::getExpireValue()
