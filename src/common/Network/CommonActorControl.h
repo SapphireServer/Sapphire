@@ -114,7 +114,7 @@ namespace Sapphire::Network::ActorControl
     ItemFailMsg = 0x86,
     ActionLearnMsg1 = 0x87,
 
-    FreeEventPos = 0x8A,
+    SetRollbackFlag = 0x8A,
     MoveType = 0x8E, // 1 == pvp, 0 == normal
 
     DailyQuestSeed = 0x90, // param1 = the daily quest seed

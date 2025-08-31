@@ -149,8 +149,8 @@ void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
 
 void ActionResultBuilder::sendActionResults( const std::vector< Entity::CharaPtr >& targetList )
 {
-  Logger::debug( "EffectBuilder result: " );
-  Logger::debug( "Targets afflicted: {}", targetList.size() );
+  //Logger::debug( "EffectBuilder result: " );
+  //Logger::debug( "Targets afflicted: {}", targetList.size() );
 
   do // we want to send at least one packet even nothing is hit so other players can see
   {

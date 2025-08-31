@@ -636,7 +636,7 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage
   }
   else
   {
-    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, factor );
+  //  Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
 
   return std::pair( factor, hitType );
