@@ -354,6 +354,7 @@ void exportBnpcGroup( uint32_t zoneId, const std::string& zoneName, const BnpcGr
 
 void exportPaths( uint32_t uint32, const std::string& name, const std::vector< LGB_SERVERPATH_ENTRY * >& vector );
 
+LayerSetToTerritoryIdMap layerSetToTerritoryIdMap;
 void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::string& path,
                         xivps3::dat::GameData *gameData )
 {
@@ -383,12 +384,14 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
     {
       for( const auto& group : lgb.groups )
       {
+
         // Check if group has any BNPC entries
         std::vector< LGB_BNPC_ENTRY * > bnpcEntries;
         for( auto& entry : group.entries )
         {
           if( entry->getType() == LgbEntryType::BattleNpc )
           {
+
             auto pBNpc = reinterpret_cast< LGB_BNPC_ENTRY * >( entry.get() );
             bnpcEntries.push_back( pBNpc );
           }
@@ -418,6 +421,8 @@ void exportBnpcEntries( uint32_t zoneId, const std::string& name, const std::str
             groupInfo.groupName = group.name;
             groupInfo.groupId = group.header.id;
             groupInfo.layerSetId = ref.LayerSetID;
+            if( layerSetToTerritoryIdMap[ ref.LayerSetID ] != zoneId )
+              continue;
             groupedBnpcEntries[ groupKey ] = groupInfo;
           }
 
@@ -640,7 +645,6 @@ void exportPaths( uint32_t zoneId, const std::string& name, const std::vector< L
   pathJsonData[ zoneId ] = pathsObject;
 }
 
-
 int main( int argc, char *argv[ ] )
 {
   auto startTime = std::chrono::system_clock::now();
@@ -665,7 +669,7 @@ int main( int argc, char *argv[ ] )
   std::ofstream discoverySql( "maprange_export.csv", std::ios::trunc );
 
   LayerSetToGroupIdsMap layerMap;
-  LayerSetToTerritoryIdMap layerSetToTerritoryIdMap;
+
 
   zoneNameToPath( "f1f1" );
   zoneDumpList.emplace( "f1d1" );
@@ -701,12 +705,6 @@ int main( int argc, char *argv[ ] )
 
     std::cout << id << " found Path: " << strippedPath << std::endl;
 
-    exportBnpcEntries( id, name, strippedPath + "bg.lgb", gameData );
-    exportBnpcEntries( id, name, strippedPath + "planmap.lgb", gameData );
-    exportBnpcEntries( id, name, strippedPath + "planevent.lgb", gameData );
-    exportBnpcEntries( id, name, strippedPath + "planner.lgb", gameData );
-    exportBnpcEntries( id, name, strippedPath + "planlive.lgb", gameData );
-
     try
     {
       std::cout << id << " found Path1: " << std::string( "bg/" + zonePath + ".lvb" ) << std::endl;
@@ -731,6 +729,14 @@ int main( int argc, char *argv[ ] )
     {
       continue;
     }
+
+    exportBnpcEntries( id, name, strippedPath + "bg.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planmap.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planevent.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planner.lgb", gameData );
+    exportBnpcEntries( id, name, strippedPath + "planlive.lgb", gameData );
+
+
   }
 
 
