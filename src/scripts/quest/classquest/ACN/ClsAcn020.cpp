@@ -199,6 +199,7 @@ class ClsAcn020 : public Sapphire::ScriptAPI::QuestScript
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
+      player.setRewardFlag( Sapphire::Common::UnlockEntry::HuntingLog );
     }
 
   }
