@@ -4,6 +4,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <cstdint>
 
 namespace Sapphire::Common::Navi
 {
