@@ -228,6 +228,16 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
     Common::Service< WarpMgr >::ref().requestPlayerTeleport( player, static_cast< uint16_t >( aetheryteId ), 1 );
   }
+  else if( ( subCommand == "condition" ) && ( !params.empty() ) )
+  {
+    int32_t conditionId, value;
+    sscanf( params.c_str(), "%i %i", &conditionId, &value );
+
+    if( value == 1 )
+      player.setCondition( static_cast< Common::PlayerCondition >( conditionId ) );
+    else
+      player.removeCondition( static_cast< Common::PlayerCondition >( conditionId ) );
+  }
   else if( ( subCommand == "discovery" ) && ( !params.empty() ) )
   {
     int32_t map_id;
