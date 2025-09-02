@@ -50,10 +50,13 @@ namespace Sapphire::Network::Packets
     SetPSNId = 0x0073,
     SetBillingTime = 0x0075,
 
+    AllienceInviteResult = 0x0078,
+    AllienceInviteReplyResult = 0x0079,
+    AllienceInviteUpdate = 0x007A,
+
     InviteResult = 0x00C9,
     InviteReplyResult = 0x00CA,
     InviteUpdate = 0x00CB,
-
     GetCommonlistResult = 0x00CC,
     GetCommonlistDetailResult = 0x00CD,
     SetProfileResult = 0x00CE,
@@ -80,7 +83,9 @@ namespace Sapphire::Network::Packets
     GetBlacklistResult = 0x00E3,
 
     FriendlistRemoveResult = 0xE6,
+
     PcSearchResult = 0xEB,
+
     LinkshellResult = 0xF0,
     GetLinkshellListResult = 0x00F1,
 
@@ -98,9 +103,9 @@ namespace Sapphire::Network::Packets
     GetRetainerSalesHistoryResult = 0x10A,
     MarketRetainerUpdate = 0x10B,
     CatalogSearchResult = 0x10C,
+
     FreeCompanyResult = 0x10E,
     GetFcStatusResult = 0x10F,
-
     GetFcInviteListResult = 0x110,
     GetFcProfileResult = 0x111,
     GetFcHeaderResult = 0x112,
@@ -112,7 +117,11 @@ namespace Sapphire::Network::Packets
     GetFcParamsResult = 0x118,
     GetFcActionResult = 0x119,
     GetFcMemoResult = 0x11A,
+
+    LeaveNoviceNetwork = 0x11D,
+
     InfoGMCommandResult = 0x122,
+
     SyncTagHeader = 0x12C,
     SyncTag32 = 0x12D,
     SyncTag64 = 0x12E,
@@ -148,7 +157,9 @@ namespace Sapphire::Network::Packets
     ActorMove = 0x0192,
     Transfer = 0x193,
     Warp = 0x0194,
+
     RequestCast = 0x196,
+
     UpdateParty = 0x199,
     InitZone = 0x019A,
     HateList = 0x019B,
@@ -164,6 +175,7 @@ namespace Sapphire::Network::Packets
     Equip = 0x01A5,
     Inspect = 0x01A6,
     Name = 0x01A7,
+
     AttachMateriaRequest = 0x1A9,
     RetainerList = 0x1AA,
     RetainerData = 0x1AB,
@@ -253,14 +265,16 @@ namespace Sapphire::Network::Packets
     ResumeEventScene2Str = 0x1FF,
     Mount = 0x0200,
     ResumeEventScene4Str = 0x201,
+
     Director = 0x226,
-    DownDebugPacket = 0x227,
+
     EventLogMessageHeader = 0x258,
     EventLogMessage2 = 0x259,
     EventLogMessage4 = 0x25A,
     EventLogMessage8 = 0x25B,
     EventLogMessage16 = 0x25C,
     EventLogMessage32 = 0x25D,
+
     BattleTalkHeader = 0x262,
     BattleTalk2 = 0x263,
     BattleTalk4 = 0x264,
@@ -290,6 +304,7 @@ namespace Sapphire::Network::Packets
     GMOrder8 = 0x292,
     GMOrder16 = 0x293,
     GMOrder32 = 0x294,
+
     InspectQuests = 0x29E,
     InspectGuildleves = 0x29F,
     InspectReward = 0x2A0,
@@ -325,10 +340,10 @@ namespace Sapphire::Network::Packets
     BallistaStart = 0x2E9,
     RetainerCustomizePreset = 0x2EA,
     FateReward = 0x2EB,
-
     HouseList = 0x2EC,
     House = 0x2ED,
     YardObjectList = 0x2EE,
+
     YardObject = 0x2F0,
     Interior = 0x2F1,
     HousingAuction = 0x2F2,
@@ -375,7 +390,9 @@ namespace Sapphire::Network::Packets
     GroundMarker = 0x335,
     Frontline01Result = 0x336,
     Frontline01BaseInfo = 0x337,
+
     FinishContentMatchToClient = 0x339,
+
     UnMountLink = 0x33E,
 
   };
