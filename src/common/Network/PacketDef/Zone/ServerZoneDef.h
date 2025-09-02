@@ -1659,10 +1659,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   * Structural representation of the packet sent by the server
   * to update duty info in general
   */
-  struct FFXIVIpcResponsePenalties : FFXIVIpcBasePacket< ResponsePenalties >
+  /*struct FFXIVIpcResponsePenalties : FFXIVIpcBasePacket< ResponsePenalties >
   {
     uint8_t penalties[2];
-  };
+  };*/
 
   /**
   * Structural representation of the packet sent by the server

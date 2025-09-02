@@ -26,7 +26,7 @@ using namespace Sapphire::World::Manager;
 
 void Sapphire::Network::GameConnection::cfRequestPenalties( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto dutyInfoPacket = makeZonePacket< Server::FFXIVIpcResponsePenalties >( player.getId() );
+/*  auto dutyInfoPacket = makeZonePacket< Server::FFXIVIpcResponsePenalties >( player.getId() );
   auto penaltyMinutes = player.getCFPenaltyMinutes();
   if( penaltyMinutes > 255 )
   {
@@ -34,7 +34,7 @@ void Sapphire::Network::GameConnection::cfRequestPenalties( const Packets::FFXIV
     penaltyMinutes = 255;
   }
   dutyInfoPacket->data().penalties[ 0 ] = static_cast< uint8_t >( penaltyMinutes ); //TODO: What is the second array for?
-  queueOutPacket( dutyInfoPacket );
+  queueOutPacket( dutyInfoPacket );*/
 }
 
 void Sapphire::Network::GameConnection::requestBonus( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
