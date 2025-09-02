@@ -57,10 +57,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     char message[1024];
   };
 
- /* struct FFXIVIpcEnableLogout : FFXIVIpcBasePacket< EnableLogout >
+  struct FFXIVIpcEnableLogout : FFXIVIpcBasePacket< EnableLogout >
   {
     uint8_t content;
-  };*/
+  };
 
 
   /**
@@ -568,7 +568,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     float RecastMax[80];
   };
 
-/*  struct FFXIVIpcHudParam : FFXIVIpcBasePacket< HudParam >
+  struct FFXIVIpcHudParam : FFXIVIpcBasePacket< HudParam >
   {
     uint8_t ClassJob;
     uint8_t Lv;
@@ -582,7 +582,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t __padding1;
     uint8_t __padding2;
     Common::StatusWork effect[30];
-  };*/
+  };
 
   struct FFXIVIpcActionResult : FFXIVIpcBasePacket< ActionResult >
   {
@@ -1026,10 +1026,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t PhysicalBonus[6];
   };
 
-/*  struct FFXIVIpcStatus : FFXIVIpcBasePacket< Status >
+  struct FFXIVIpcStatus : FFXIVIpcBasePacket< Status >
   {
     Common::StatusWork effect[30];
-  };*/
+  };
 
   /**
   * Structural representation of the packet sent by the server
