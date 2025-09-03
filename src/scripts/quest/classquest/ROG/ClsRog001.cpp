@@ -58,11 +58,10 @@ class ClsRog001 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //if( result.getResult( 0 ) == 1 )
-      //{
-    if( player.isQuestCompleted( QstSubsea016 ) ) // Todo: Remove when quest is fixed
+    if( result.getResult( 0 ) == 1 )
+      {
         player.finishQuest( getId(), result.getResult( 1 ) );
-      //}
+      }
   }
 
 };
