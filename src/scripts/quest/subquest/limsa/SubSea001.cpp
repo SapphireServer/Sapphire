@@ -217,7 +217,7 @@ private:
       if( result.getResult( 0 ) == 1 )
       {
         quest.setSeq( Seq2 );
-        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 10, 21, 13 }, -2.f );
+        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 11.3f, 20.9f, 13.3f }, -2.3f );
       }
     }
     else
@@ -230,7 +230,7 @@ private:
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -242,7 +242,7 @@ private:
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -255,7 +255,7 @@ private:
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -267,7 +267,7 @@ private:
 
   void Scene00006( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00006Return ) );
+    eventMgr().playQuestScene( player, getId(), 6, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00006Return ) );
   }
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -280,7 +280,7 @@ private:
 
   void Scene00007( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 7, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00007Return ) );
+    eventMgr().playQuestScene( player, getId(), 7, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00007Return ) );
   }
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -292,7 +292,7 @@ private:
 
   void Scene00008( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 8, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00008Return ) );
+    eventMgr().playQuestScene( player, getId(), 8, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00008Return ) );
   }
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -305,7 +305,7 @@ private:
 
   void Scene00009( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 9, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00009Return ) );
+    eventMgr().playQuestScene( player, getId(), 9, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00009Return ) );
   }
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -317,7 +317,7 @@ private:
 
   void Scene00010( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 10, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00010Return ) );
+    eventMgr().playQuestScene( player, getId(), 10, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00010Return ) );
   }
 
   void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -330,7 +330,7 @@ private:
 
   void Scene00011( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 11, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00011Return ) );
+    eventMgr().playQuestScene( player, getId(), 11, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00011Return ) );
   }
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -342,7 +342,7 @@ private:
 
   void Scene00012( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 12, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00012Return ) );
+    eventMgr().playQuestScene( player, getId(), 12, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00012Return ) );
   }
 
   void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -355,7 +355,7 @@ private:
 
   void Scene00013( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 13, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00013Return ) );
+    eventMgr().playQuestScene( player, getId(), 13, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00013Return ) );
   }
 
   void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -367,7 +367,7 @@ private:
 
   void Scene00014( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 14, HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00014Return ) );
+    eventMgr().playQuestScene( player, getId(), 14, NO_DEFAULT_CAMERA | HIDE_HOTBAR, bindSceneReturn( &SubSea001::Scene00014Return ) );
   }
 
   void Scene00014Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -387,6 +387,7 @@ private:
   {
     //What do I replace this with?
     //player.playScene(player, getId(), 15, 0, 0, 0);
+    //eventMgr().playScene( player, getId(), 15, NONE ); //Maybe this?
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -398,7 +399,10 @@ private:
 
   void Scene00016Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00017( quest, player );
+    if( result.getResult( 0 ) == 1 ) // Turn in quest item
+    {
+      Scene00017( quest, player );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
