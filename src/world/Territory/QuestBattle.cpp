@@ -288,8 +288,7 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
                           it->second->getObjectId(), eventId );
 }
 
-void
-Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
+void Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceEnterTerritory( *this, player, eventId, param1, param2 );
@@ -308,6 +307,7 @@ void Sapphire::QuestBattle::success()
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   //m_state = DutyFinished;
+
   eventMgr.eventStart( *m_pPlayer, m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
   eventMgr.playScene( *m_pPlayer, getDirectorId(), 60001, 0x40000,
     [ & ]( Entity::Player& player, const Event::SceneResult& result )
@@ -315,6 +315,32 @@ void Sapphire::QuestBattle::success()
       eventMgr.eventFinish( player, getDirectorId(), 1 );
       eventMgr.eventStart( player, player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
       eventMgr.playScene( player, getDirectorId(), 6, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
+                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                        {
+                          eventMgr.eventFinish( player, getDirectorId(), 1 );
+
+                          auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+                          scriptMgr.onDutyComplete( *this, *m_pPlayer );
+
+                          playerMgr().onExitInstance( player );
+                        } );
+
+    } );
+}
+
+void Sapphire::QuestBattle::success( uint32_t returnScene )
+{
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  //m_state = DutyFinished;
+
+  eventMgr.eventStart( *m_pPlayer, m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+
+  eventMgr.playScene( *m_pPlayer, getDirectorId(), 60001, 0x40000,
+    [ &, returnScene ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      eventMgr.eventFinish( player, getDirectorId(), 1 );
+      eventMgr.eventStart( player, player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+      eventMgr.playScene( player, getDirectorId(), returnScene, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
                         {
                           eventMgr.eventFinish( player, getDirectorId(), 1 );

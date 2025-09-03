@@ -207,28 +207,25 @@ class ClsPgl050 : public Sapphire::ScriptAPI::QuestScript
       case Enemy0:
       {
         quest.setUI8AL( 1 );
-        checkCompletition( quest, player );
         break;
       }
       case Enemy1:
       {
         quest.setUI8BH( 1 );
-        checkCompletition( quest, player );
         break;
       }
       case Enemy2:
       {
         quest.setUI8BL( 1 );
-        checkCompletition( quest, player );
         break;
       }
       case Enemy3:
       {
         quest.setUI8CH( 1 );
-        checkCompletition( quest, player );
         break;
       }
     }
+    checkCompletition( quest, player );
   }
 
   void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId ) override
