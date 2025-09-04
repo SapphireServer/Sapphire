@@ -40,7 +40,7 @@ namespace Sapphire::World::Manager
 
     void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
 
-    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint8_t id );
+    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint32_t id );
 
     void onExitInstance( Sapphire::Entity::Player& player );
 

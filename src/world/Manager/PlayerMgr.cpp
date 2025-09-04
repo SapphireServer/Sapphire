@@ -480,7 +480,7 @@ void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battl
                                          param1, param2, param3, param4, param5, param6, param7, param8 );
 }
 
-void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
+void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint32_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
   const auto maxRank = 4;
