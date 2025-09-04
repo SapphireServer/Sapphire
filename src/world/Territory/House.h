@@ -11,7 +11,6 @@ namespace Sapphire
   class House
   {
   public:
-    // TODO: this is constructed wit ha 64-bit houseId in getNextHouseId
     House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, std::string  estateName,
            std::string  estateComment );
     virtual ~House();

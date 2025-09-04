@@ -63,8 +63,6 @@ namespace Sapphire
     InvMaxItemsPair getInventoryItemMax() const;
 
   private:
-    uint32_t getNextHouseId();
-
     Common::LandIdent m_landIdent;
 
     uint32_t m_landSetId;
