@@ -103,10 +103,7 @@ bool Sapphire::HousingZone::init()
   Common::Furniture obj {};
   memset( &obj, 0x0, sizeof( Common::Furniture ) );
 
-  for( auto& arr : m_yardObjects )
-  {
-    memcpy( &arr, &m_yardObjects, sizeof( Common::Furniture ) );
-  }
+  m_yardObjects.fill( obj );
 
   auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
   auto landCache = housingMgr.getLandCacheMap();
@@ -160,7 +157,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
   auto isInSubdivision = isPlayerSubInstance( player );
 
   uint32_t yardPacketNum;
-  uint32_t yardPacketTotal = 8;
+  uint32_t yardPacketTotal = 2;
 
   sendLandSet( player );
 
