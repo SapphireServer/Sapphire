@@ -25,7 +25,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     void initialize( Entity::Chara& actor, uint8_t headRotation, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation )
     {
 
-      m_data.dir = Common::Util::floatToUInt8Rot( actor.getRot() );
+      m_data.dir = actor.getRotUInt8();
       m_data.dirBeforeSlip = headRotation;
       m_data.flag = animationType;
       m_data.flag2 = state;

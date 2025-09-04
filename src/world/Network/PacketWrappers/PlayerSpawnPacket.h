@@ -73,8 +73,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Pos[ 0 ] = player.getPos().x;
       m_data.Pos[ 1 ] = player.getPos().y;
       m_data.Pos[ 2 ] = player.getPos().z;
-      m_data.Dir = Common::Util::floatToUInt16Rot( player.getRot() );
-
+      m_data.Dir = player.getRotUInt16();
 
       m_data.Title = player.getTitle();
       m_data.Voice = player.getVoiceId();

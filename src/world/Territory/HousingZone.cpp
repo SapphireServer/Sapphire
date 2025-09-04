@@ -127,6 +127,7 @@ bool Sapphire::HousingZone::init()
     // setup house
     if( entry.m_houseId )
     {
+      // TODO: m_houseId is uint64_t but house takes uint32_t?
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
       housingMgr.updateHouseModels( house );
       land->setHouse( house );

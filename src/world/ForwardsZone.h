@@ -96,8 +96,8 @@ TYPE_FORWARD( LootTableResult );
 
 namespace Inventory
 {
-using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
-using InventoryTypeList = std::vector< Common::InventoryType >;
+  using InventoryContainerPair = std::pair< Common::InventoryType, uint16_t >;
+  using InventoryTypeList = std::vector< Common::InventoryType >;
 TYPE_FORWARD( HousingItem );
 }
 

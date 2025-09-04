@@ -1,4 +1,4 @@
-﻿#include "GfxApi.h"
+#include "GfxApi.h"
 
 #include <limits>
 #include <map>
@@ -712,6 +712,9 @@ GLenum Engine::Rendering::toGL( BlendFunc blendFunc )
       return GL_ONE_MINUS_DST_COLOR;
     case BlendFunc::SrcAlphaSaturate:
       return GL_SRC_ALPHA_SATURATE;
+    default:
+      assert( false );
+      return GL_NONE;
   }
 }
 
@@ -2305,7 +2308,7 @@ void Mesh::generateVAO( int startVertexOffset )
                                toGL( element.getType() ),
                                GL_FALSE,
                                stride,
-                               ( void* ) ( startVertexOffset + offset ) );
+                               ( void* ) ( uintptr_t ) ( startVertexOffset + offset ) );
       }
       else
       {
@@ -2313,7 +2316,7 @@ void Mesh::generateVAO( int startVertexOffset )
                                 element.sizeElems(),
                                 toGL( element.getType() ),
                                 stride,
-                                ( void* ) ( startVertexOffset + offset ) );
+                                ( void* ) ( uintptr_t ) ( startVertexOffset + offset ) );
       }
 
       checkOpenGLError();
@@ -2488,7 +2491,7 @@ void Mesh::draw( int numIndices, int startIndexOffset )
 
     //std::cout << "numIndices" << numIndices << ", startIndexOffset: " << startIndexOffset
     //    << ", ib->IndexType(): " << toGLSTR(ib->IndexType()) << std::endl;
-    glDrawElements( GL_TRIANGLES, numIndices, toGL( ib->getIndexType() ), ( void* ) startIndexOffset );
+    glDrawElements( GL_TRIANGLES, numIndices, toGL( ib->getIndexType() ), ( void* ) ( uintptr_t ) startIndexOffset );
     checkOpenGLError();
 
   }

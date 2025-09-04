@@ -128,7 +128,7 @@ struct SGB_HEADER
 
 struct SGB_FILE
 {
-  SGB_HEADER header;
+  SGB_HEADER header = {};
   Scene_t scene;
   SceneSettings_t sceneSettings;
   LayerGroup layerGroup;
@@ -138,11 +138,6 @@ struct SGB_FILE
   std::vector< Layer > layers;
 
   std::unordered_map< uint32_t, std::vector< std::shared_ptr< InstanceObjectEntry > > > layerInstanceObjects;
-
-  SGB_FILE()
-  {
-    memset( &header, 0, sizeof( header ) );
-  }
 
   SGB_FILE( char *buf )
   {

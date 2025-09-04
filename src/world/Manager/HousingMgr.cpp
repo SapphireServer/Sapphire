@@ -680,6 +680,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
 
   // create house
   auto ident = pLand->getLandIdent();
+  // TODO: getNextHouseId returns uint64_t but house id is uint32_t?
   auto house = make_House( getNextHouseId(), pLand->getLandSetId(), ident, "Estate #" + std::to_string( ident.landId + 1 ), "" );
 
   pLand->setHouse( house );
