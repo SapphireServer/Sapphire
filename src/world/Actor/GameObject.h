@@ -64,6 +64,10 @@ namespace Sapphire::Entity
 
     float getRot() const;
 
+    uint8_t getRotUInt8() const;
+
+    uint8_t getRotUInt16() const;
+
     virtual void setRot( float rot );
 
     bool isChara() const;

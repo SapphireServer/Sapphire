@@ -45,7 +45,7 @@ public:
                                    [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                    {
                                      player.registerAetheryte( eventId & 0xFFFF );
-                                     eventMgr().playScene( player, eventId, 3, 0 );
+                                     eventMgr().playScene( player, eventId, 3, NO_DEFAULT_CAMERA );
                                    },
                                    []( Entity::Player& ply, uint32_t evntId, uint64_t additional )
                                    {

@@ -476,6 +476,11 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
+  // NOTE: we truncate the float to uint32_t here (not round it), the game works the same way (supposedly)
+  auto truncate = []( const std::pair< float, Common::CalcResultType >& dmg ) {
+    return std::make_pair( static_cast< uint32_t >( dmg.first ), dmg.second );
+  };
+
   // todo: what do for npcs?
   auto wepDmg = 1.f;
 
@@ -492,10 +497,10 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
 
     // is auto attack
     if( getId() == 7 || getId() == 8 )
-      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() );
+      return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() ) );
   }
 
-  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg ) );
 }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
@@ -1091,7 +1096,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( chara->isAlive() && ( m_lutEntry.curePotency > 0 || m_canTargetFriendly ) && m_pSource->isFriendly( *chara ) )
     return actorApplicable;
 
-  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) > 0 && m_pSource->isHostile( *chara ) )
+  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) && m_pSource->isHostile( *chara ) )
     return actorApplicable;
 
   return false;

@@ -3444,7 +3444,7 @@ void ZoneEditor::renderNavmesh()
   ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
 
   // Display the texture
-  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+  ImGui::Image( ImTextureRef( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
 
   // Handle 3D BNPC interaction (replaces the old 2D overlay)
   handle3DBnpcInteraction( imageScreenPos, imageSize );

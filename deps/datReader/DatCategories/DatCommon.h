@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 enum eAssetType : int32_t
 {
   AssetNone = 0x0,

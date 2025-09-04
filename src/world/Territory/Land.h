@@ -12,7 +12,7 @@ namespace Sapphire
   {
   public:
 
-    Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+    Land( uint16_t zoneId, uint8_t wardNum, uint16_t landId, uint32_t landSetId,
           std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > info );
     virtual ~Land();
     void init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
@@ -63,8 +63,6 @@ namespace Sapphire
     InvMaxItemsPair getInventoryItemMax() const;
 
   private:
-    uint32_t getNextHouseId();
-
     Common::LandIdent m_landIdent;
 
     uint32_t m_landSetId;

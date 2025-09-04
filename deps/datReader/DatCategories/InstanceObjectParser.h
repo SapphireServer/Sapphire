@@ -1,4 +1,7 @@
 #pragma once
+
+#include <string>
+
 #include "DatCommon.h"
 #include "InstanceObject.h"
 
@@ -15,10 +18,10 @@ public:
   {
     m_buf = nullptr;
     m_offset = 0;
-    memset( &header, 0, sizeof( header ) );
+    header = {};
   };
 
-  InstanceObjectEntry( char* buf, uint32_t offset )
+  InstanceObjectEntry( char* buf, size_t offset )
   {
     m_buf = buf;
     m_offset = offset;
@@ -41,7 +44,7 @@ class ExitRangeEntry : public InstanceObjectEntry
 public:
   ExitRangeData header;
 
-  ExitRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  ExitRangeEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< ExitRangeData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -53,7 +56,7 @@ class PopRangeEntry : public InstanceObjectEntry
 public:
   PopRangeData header;
 
-  PopRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  PopRangeEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< PopRangeData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -65,7 +68,7 @@ class EventRangeEntry : public InstanceObjectEntry
 public:
   EventRangeData header;
 
-  EventRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  EventRangeEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< EventRangeData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -78,7 +81,7 @@ public:
   SGData header;
   std::string AssetPath;
 
-  SharedGroupEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  SharedGroupEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< SGData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -91,7 +94,7 @@ class EventNPCEntry : public InstanceObjectEntry
 public:
   ENPCData header;
 
-  EventNPCEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  EventNPCEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< ENPCData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -103,7 +106,7 @@ class BattleNPCEntry : public InstanceObjectEntry
 public:
   BNPCInstanceObject header;
 
-  BattleNPCEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  BattleNPCEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< BNPCInstanceObject* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -115,7 +118,7 @@ class EventObjectEntry : public InstanceObjectEntry
 public:
   EObjData header;
 
-  EventObjectEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  EventObjectEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< EObjData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -134,7 +137,7 @@ public:
   {
   };
 
-  BGEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  BGEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< BgData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -153,7 +156,7 @@ public:
   {
   };
 
-  CollisionBoxEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  CollisionBoxEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< CollisionBoxData* >( buf + offset );
     name = std::string( buf + offset + header.Name );
@@ -169,7 +172,7 @@ public:
   {
   };
 
-  MapRangeEntry( char* buf, uint32_t offset ) : InstanceObjectEntry( buf, offset )
+  MapRangeEntry( char* buf, size_t offset ) : InstanceObjectEntry( buf, offset )
   {
     header = *reinterpret_cast< MapRangeData* >( buf + offset );
     name = std::string( buf + offset + header.Name );

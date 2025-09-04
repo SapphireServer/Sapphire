@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <cstdint>
 #include "MysqlCommon.h"
 
 

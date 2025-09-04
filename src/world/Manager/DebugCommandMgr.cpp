@@ -558,7 +558,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     sscanf( params.c_str(), "%hu", &param1 );
 
     auto effectPacket = std::make_shared< EffectPacket >( player.getId(), static_cast< uint32_t >( player.getTargetId() ), param1 );
-    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+    effectPacket->setRotation( player.getRotUInt16() );
 
     Common::CalcResultParam entry{};
     entry.Value = static_cast< int16_t >( param1 );
@@ -577,7 +577,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     uint8_t speed{ 20 };
     float x{ 0 }, y{ 0 }, z{ 0 };
 
-    sscanf( params.c_str(), "%u %u %u %d %d %d", &animationType, &animationState, &speed, &x, &y, &z );
+    sscanf( params.c_str(), "%" SCNu8 " %" SCNu8 " %" SCNu8 " %f %f %f", &animationType, &animationState, &speed, &x, &y, &z );
     auto targetId = static_cast< uint32_t >( player.getTargetId() );
     auto actorMovePacket = makeZonePacket< FFXIVIpcActorMove >( targetId, player.getId() );
 
@@ -594,8 +594,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     if( pTarget )
     {
-      actorMovePacket->data().dir = Common::Util::floatToUInt8Rot( pTarget->getRot() );
-      actorMovePacket->data().dirBeforeSlip = Common::Util::floatToUInt8Rot( pTarget->getRot() );
+      actorMovePacket->data().dir = pTarget->getRotUInt8();
+      actorMovePacket->data().dirBeforeSlip = pTarget->getRotUInt8();
       actorMovePacket->data().flag = animationType;
       actorMovePacket->data().flag2 = animationState;
       actorMovePacket->data().speed = speed;
@@ -790,7 +790,7 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().Dir = Common::Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().Dir = player.getRotUInt16();
     server().queueForPlayer( player.getCharacterId(), setActorPosPacket );
   }
 }

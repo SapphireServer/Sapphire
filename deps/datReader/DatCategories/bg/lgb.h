@@ -32,7 +32,7 @@ public:
   {
     m_buf = nullptr;
     m_offset = 0;
-    memset( &header, 0, sizeof( header ) );
+    header = {};
   };
 
   LgbEntry( char* buf, size_t offset )

@@ -511,7 +511,7 @@ void Chara::autoAttack( CharaPtr pTarget )
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
 
     auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Common::Util::floatToUInt16Rot( getRot() ) );
+    effectPacket->setRotation( getRotUInt16() );
 
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage );
@@ -1053,7 +1053,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
   pTeri->updateActorPosition( *this );
   // todo: send the correct knockback packet to player
   server().queueForPlayers( getInRangePlayerIds(),
-                            std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
+                            std::make_shared< MoveActorPacket >( *this, getRotUInt8(), 2, 0, 0, 0x5A / 4 ) );
 }
 
 void Chara::createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale,
