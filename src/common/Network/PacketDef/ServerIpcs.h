@@ -340,6 +340,7 @@ namespace Sapphire::Network::Packets
     BallistaStart = 0x2E9,
     RetainerCustomizePreset = 0x2EA,
     FateReward = 0x2EB,
+
     HouseList = 0x2EC,
     House = 0x2ED,
     YardObjectList = 0x2EE,
