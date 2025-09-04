@@ -82,7 +82,7 @@ namespace Sapphire::Db
 
     void prepareStatement( uint32_t index, const std::string& sql, ConnectionFlags flags );
 
-    virtual void doPrepareStatements() = 0;
+    virtual void doPrepareStatements() {};
 
   protected:
     std::vector< std::shared_ptr< Mysql::PreparedStatement > > m_stmts;
