@@ -143,7 +143,7 @@ public:
     if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
     {
       instance.setDirectorVar( SUCCESS_CALLED, 1 );
-      instance.success();
+      instance.success( 9 );
       return;
     }
   }
@@ -171,7 +171,6 @@ public:
 
   void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
   {
-    // MISSING LAST SCENE
     auto idx = player.getQuestIndex( instance.getQuestId() );
     if( idx == -1 )
       return;
