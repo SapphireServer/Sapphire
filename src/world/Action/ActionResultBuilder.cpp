@@ -181,7 +181,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
     if( !targetList.empty() )
       mainTarget = targetList[ 0 ]->getId();
     auto actionResult = makeEffectPacket( m_sourceChara->getId(), mainTarget, m_actionId );
-    actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
+    actionResult->setRotation( m_sourceChara->getRotUInt16() );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
     actionResult->setTargetPosition( m_sourceChara->getPos() );
@@ -215,7 +215,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   {
     uint32_t mainTargetId = targetList.empty() ? m_sourceChara->getId() : targetList[ 0 ]->getId();
     auto actionResult = makeEffectPacket1( m_sourceChara->getId(), mainTargetId, m_actionId );
-    actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
+    actionResult->setRotation( m_sourceChara->getRotUInt16() );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
 

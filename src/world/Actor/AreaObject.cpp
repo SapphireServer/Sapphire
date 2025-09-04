@@ -55,7 +55,7 @@ void AreaObject::spawn( PlayerPtr pTarget )
   areaSpawnPacket->data().OwnerId = getOwnerId();
   areaSpawnPacket->data().Pos = getPos();
   areaSpawnPacket->data().EntityId = getId();
-  areaSpawnPacket->data().Dir = Util::floatToUInt16Rot( getRot() );
+  areaSpawnPacket->data().Dir = getRotUInt16();
   // these numbers are from a retail packet cap, unsure what each does
   areaSpawnPacket->data().SharedGroupTimelineState = 28384;
   areaSpawnPacket->data().Args = 227;

@@ -134,7 +134,7 @@ void EventObject::spawn( PlayerPtr pTarget )
   eobjStatePacket->data().Pos = getPos();
   eobjStatePacket->data().Scale = getScale();
   eobjStatePacket->data().EntityId = getId();
-  eobjStatePacket->data().Dir = Util::floatToUInt16Rot( getRot() );
+  eobjStatePacket->data().Dir = getRotUInt16();
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().PermissionInvisibility = getPermissionInvisibility();
   eobjStatePacket->data().Args = 0xE0;

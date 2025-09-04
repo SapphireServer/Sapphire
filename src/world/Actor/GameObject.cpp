@@ -91,6 +91,16 @@ float GameObject::getRot() const
   return m_rot;
 }
 
+uint8_t Sapphire::Entity::GameObject::getRotUInt8() const
+{
+  return Common::Util::floatToUInt8Rot( getRot() );
+}
+
+uint8_t Sapphire::Entity::GameObject::getRotUInt16() const
+{
+  return Common::Util::floatToUInt16Rot( getRot() );
+}
+
 void GameObject::setRot( float rot )
 {
   m_rot = rot;
