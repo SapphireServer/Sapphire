@@ -236,6 +236,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void ZoneScript::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
+  {
+  }
+
+
   ///////////////////////////////////////////////////////////////////
 
   InstanceContentScript::InstanceContentScript( uint32_t instanceContentId ) :

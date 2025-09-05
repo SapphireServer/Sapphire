@@ -357,10 +357,34 @@ namespace Sapphire::ScriptAPI
   */
   class ZoneScript : public ScriptObject
   {
+  protected:
+    template< typename Ret, class Obj >
+    inline std::function< void( Sapphire::Entity::Player& ) > bindScene( Ret ( Obj::*f )( Sapphire::Entity::Player& ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
+    }
+    template< typename Ret, class Obj >
+    inline std::function< void( Entity::Player& player, const Event::SceneResult& result ) >
+    bindSceneReturn( Ret ( Obj::*f )( Entity::Player& player, const Event::SceneResult& result ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1, std::placeholders::_2 );
+    }
   public:
     explicit ZoneScript( uint32_t zoneId );
 
     virtual void onZoneInit();
+
+    virtual void onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
   /*!
