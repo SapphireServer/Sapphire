@@ -1189,14 +1189,15 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
 
   if( subCommand == "create" || subCommand == "cr" )
   {
-    uint32_t contentFinderConditionId;
-    sscanf( params.c_str(), "%d", &contentFinderConditionId );
+    uint32_t questId;
+    uint16_t questBattleId;
+    sscanf( params.c_str(), "%d %d", &questId, &questBattleId );
 
-    auto instance = terriMgr.createQuestBattle( contentFinderConditionId );
+    auto instance = terriMgr.createQuestBattle( questId, questBattleId );
     if( instance )
       PlayerMgr::sendDebug( player, "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", contentFinderConditionId );
+      PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", questBattleId );
   }
   else if( subCommand == "complete" )
   {

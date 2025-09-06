@@ -522,7 +522,7 @@ private:
       auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      teriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+      teriMgr.createAndJoinQuestBattle( player, m_id, Questbattle0 );
     }
   }
 

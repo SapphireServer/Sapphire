@@ -235,7 +235,7 @@ private:
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );*/
+      pTeriMgr.createAndJoinQuestBattle( player, m_id, Questbattle0 );*/
     }
   }
 
