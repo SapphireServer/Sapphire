@@ -182,7 +182,7 @@ public:
     if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
     {
       instance.setDirectorVar( SUCCESS_CALLED, 1 );
-      instance.success();
+      instance.success( 6 );
       return;
     }
 

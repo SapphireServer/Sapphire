@@ -156,12 +156,13 @@ public:
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if( bnpc.getBNpcNameId() != Enemy0 )
+    auto currentKC120 = quest.getUI8AL();
+
+    if( ( bnpc.getBNpcNameId() != Enemy0 && !quest.getSeq() == Seq1 ) || currentKC120 == 6 )
       return;
     else
     {
-      auto currentKC120 = quest.getUI8AL();
-      if( currentKC120 <= 6 )
+      if( currentKC120 < 6 )
       {
         eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC120 + 1, 6 );
         quest.setUI8AL( currentKC120 + 1 );
@@ -189,6 +190,7 @@ private:
     quest.setBitFlag8( eggId , true);
     checkQuestCompletion( quest, player );
   }
+
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////

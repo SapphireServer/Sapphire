@@ -140,12 +140,27 @@ public:
 
 
 private:
-  void checkQuestProgression( World::Quest& quest, Entity::Player& player )
+  void checkQuestProgression( World::Quest& quest, Entity::Player& player, uint8_t index, bool isStepsCheck )
   {
-    if( quest.getUI8AL() == 6 && quest.getUI8BH() == 2 )
+    if( quest.getBitFlag8( index ) )
+      return;
+
+    quest.setBitFlag8( index, true );
+
+    if (isStepsCheck)
     {
-      quest.setSeq( SeqFinish );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8BH(), 2 );
     }
+    else
+    {
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 6 );
+    }
+
+    if( quest.getUI8AL() >= 6 && quest.getUI8BH() >= 2 )
+      quest.setSeq( SeqFinish );
+
   }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
@@ -173,7 +188,7 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 1 );
+    checkQuestProgression( quest, player, 1, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -196,7 +211,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 2 );
+    checkQuestProgression( quest, player, 2, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -219,7 +234,7 @@ private:
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 3 );
+    checkQuestProgression( quest, player, 3, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -242,7 +257,7 @@ private:
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 4 );
+    checkQuestProgression( quest, player, 4, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -265,7 +280,7 @@ private:
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 5 );
+    checkQuestProgression( quest, player, 5, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -288,7 +303,7 @@ private:
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doHustingsStripCheck( quest, player, 6 );
+    checkQuestProgression( quest, player, 6, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -311,7 +326,7 @@ private:
 
   void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doStepsOfThalCheck( quest, player, 7 );
+    checkQuestProgression( quest, player, 7, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -334,7 +349,7 @@ private:
 
   void Scene00015Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    doStepsOfThalCheck( quest, player, 8 );
+    checkQuestProgression( quest, player, 8, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -452,31 +467,6 @@ private:
   {
   }
 
-  void doStepsOfThalCheck( World::Quest& quest, Entity::Player& player, uint8_t index )
-  {
-    if( !quest.getBitFlag8( index ) )
-    {
-      quest.setBitFlag8( index, true );
-      auto thalCount = quest.getUI8BH();
-      thalCount += 1;
-      quest.setUI8BH( thalCount );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, thalCount, 2 );
-      checkQuestProgression( quest, player );
-    }
-  }
-
-  void doHustingsStripCheck( World::Quest& quest, Entity::Player& player, uint8_t index )
-  {
-    if( !quest.getBitFlag8( index ) )
-    {
-      quest.setBitFlag8( index, true );
-      auto hustCount = quest.getUI8AL();
-      hustCount += 1;
-      quest.setUI8AL( hustCount );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
-      checkQuestProgression( quest, player );
-    }
-  }
 };
 
 EXPOSE_SCRIPT( SubWil020 );

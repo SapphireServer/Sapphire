@@ -70,6 +70,11 @@ private:
         }
         break;
       }
+      case Eobject0:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00001( quest, player );
+      }
     }
   }
 
@@ -102,7 +107,7 @@ private:
       case Enemy2:
       {
         quest.setUI8AL( quest.getUI8AL() + 1 );
-        if( quest.getUI8AL() >= 4 )
+        if( quest.getUI8AL() >= 3 )
         {
           quest.setUI8BH( 0 );
           quest.setUI8AL( 0 );
@@ -128,10 +133,9 @@ private:
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      Scene00001( quest, player );
+      quest.setUI8BH( 1 );
+      quest.setSeq( Seq1 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -143,8 +147,6 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setUI8BH( 1 );
-    quest.setSeq( Seq1 );
   }
 
   //////////////////////////////////////////////////////////////////////
