@@ -5,6 +5,7 @@
 #include "WorldServer.h"
 #include "Session.h"
 
+#include <optional>
 #include <unordered_map>
 #include <Service.h>
 
@@ -291,16 +292,16 @@ TerritoryPtr TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
   return pZone;
 }
 
-TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
+TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questId, uint16_t questBattleId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto pQuestBattleInfo = exdData.getRow< Excel::QuestBattle >( questBattleId );
-  if( !pQuestBattleInfo )
+  auto pQuestInfo = exdData.getRow< Excel::Quest >( questId );
+  if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
     return nullptr;
 
-  auto pQuestInfo = exdData.getRow< Excel::Quest >( pQuestBattleInfo->data().Quest );
-  if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
+  auto pQuestBattleInfo = exdData.getRow< Excel::QuestBattle >( questBattleId );
+  if( !pQuestBattleInfo )
     return nullptr;
 
   auto teriList = exdData.getRows< Excel::TerritoryType >();
@@ -644,9 +645,9 @@ void TerritoryMgr::disableCurrentFestival()
   setCurrentFestival( 0 );
 }
 
-void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t questBattleId )
+void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint32_t questId, uint16_t questBattleId )
 {
-  auto qb = createQuestBattle( questBattleId );
+  auto qb = createQuestBattle( questId, questBattleId );
   if( !qb )
     return;
 
