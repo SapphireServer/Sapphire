@@ -153,6 +153,19 @@ bool TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
   return pTeri->data().IntendedUse == TerritoryIntendedUse::HousingArea;
 }
 
+uint8_t TerritoryMgr::getHousingIndex( uint32_t territoryTypeId ) const
+{
+  int housingIndex = 0xFF;
+  if( territoryTypeId == 339 )
+    housingIndex = 0;
+  else if( territoryTypeId == 340 )
+    housingIndex = 1;
+  else if( territoryTypeId == 341 )
+    housingIndex = 2;
+
+  return housingIndex;
+}
+
 uint32_t TerritoryMgr::getInstanceContentId( uint32_t territoryTypeId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -225,7 +238,7 @@ bool TerritoryMgr::createHousingTerritories()
     auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
     uint32_t wardNum;
-    uint32_t wardMaxNum = 8;
+    uint32_t wardMaxNum = 12;
 
     if( territoryInfo->getString( territoryInfo->data().Name ).empty() )
       continue;

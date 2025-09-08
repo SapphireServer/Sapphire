@@ -483,7 +483,7 @@ void HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint1
   // todo: properly get worldId
   wardInfoPacket->data().LandSetId.worldId = 67;
 
-  for( int i = 0; i < 30; i++ )
+  for( int i = 0; i < 60; i++ )
   {
     auto land = hZone->getLand( i );
     assert( land );
@@ -494,8 +494,12 @@ void HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint1
     // so I guess we do the same
     entry.price = land->getCurrentPrice();
 
+
     if( land->getStatus() == Common::HouseStatus::ForSale )
+    {
+    //  entry.status |= Common::HouseStatus::ForSale;
       continue;
+    }
 
     if( auto house = land->getHouse() )
     {
@@ -514,11 +518,12 @@ void HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint1
 
       case Common::LandType::Private:
         entry.status |= Common::WardlandFlags::IsEstateOwned;
-        /* //Disabled. No more name in Info
+         //Disabled. No more name in Info
         auto owner = land->getOwnerId();
-        auto playerName = server.getPlayerNameFromDb( static_cast< uint32_t >( owner ) );
-        memcpy( &entry.fcTag, playerName.c_str(), playerName.size() );
-        */
+
+        auto playerName = playerMgr().getPlayerNameFromDb( owner );
+        memcpy( &entry.name, playerName.c_str(), playerName.size() );
+
         break;
     }
 

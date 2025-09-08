@@ -335,16 +335,17 @@ bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint
         player.updateQuest( quest );
     }
   }
+  else if( auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId ) )
+  {
+    script->onWithinRange( player, eventId, param1, x, y, z );
+  }
   else if( auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( player.getTerritoryTypeId() ) )
   {
     script->onWithinRange( player, eventId, param1, x, y, z );
   }
   else
   {
-    auto script1 = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
-    if( !script1 )
-      return false;
-    script1->onWithinRange( player, eventId, param1, x, y, z );
+    return false;
   }
 
   return true;

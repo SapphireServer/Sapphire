@@ -71,16 +71,16 @@ private:
   uint32_t m_selectedCaptureIdx{ 0 };
   uint32_t m_selectedPacketIdx{ 0 };
 
-  Sapphire::Db::ConnectionInfo m_dbConnectionInfo {"root", "", "ffxivmon", "localhost", 3306, 2, 2};
+  Sapphire::Db::ConnectionInfo m_dbConnectionInfo{ "root", "", "ffxivmon", "localhost", 3306, 2, 2 };
   std::shared_ptr< Sapphire::Db::DbConnection > m_dbConnection;
   bool m_dbConnectionOpen{ false };
   bool m_showDbConfigDialog{ false };
 
   // Database config buffers for ImGui
-  char m_dbUserBuffer[256];
-  char m_dbPasswordBuffer[256];
-  char m_dbDatabaseBuffer[256];
-  char m_dbHostBuffer[256];
+  char m_dbUserBuffer[ 256 ];
+  char m_dbPasswordBuffer[ 256 ];
+  char m_dbDatabaseBuffer[ 256 ];
+  char m_dbHostBuffer[ 256 ];
   int m_dbPortBuffer;
 
   // Config file path

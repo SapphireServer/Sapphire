@@ -108,6 +108,9 @@ namespace Sapphire::World::Manager
     /*! returns true if the territoryType is a housing zone */
     bool isHousingTerritory( uint32_t territoryTypeId ) const;
 
+    /*! returns the index of the housing area */
+    uint8_t getHousingIndex( uint32_t territoryTypeId ) const;
+
     uint32_t getInstanceContentId( uint32_t territoryTypeId ) const;
 
     /*! creates a new instance for a given territoryTypeId */

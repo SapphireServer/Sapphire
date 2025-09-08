@@ -149,8 +149,18 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
 
   const auto& data = aetherData->data();
 
+  uint32_t popRange = data.PopRange[ 0 ];
+  if( teriMgr.isHousingTerritory( data.TerritoryType ) )
+  {
+    auto land = player.getCharaLandData( Common::LandFlagsSlot::Private );
+    int housingIndex = teriMgr.getHousingIndex( data.TerritoryType );
+    auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
+    auto landInfo = info->_data.Lands[ land.landId.landId ];
+    popRange = landInfo.ExitPopRange;
+  }
+
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto pop = instanceObjectCache.getPopRangeInfo( data.PopRange[ 0 ] );
+  auto pop = instanceObjectCache.getPopRangeInfo( popRange );
 
   Common::FFXIVARR_POSITION3 pos{ 0.f, 0.f, 0.f };
 
