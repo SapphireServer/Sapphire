@@ -77,7 +77,7 @@ class SubFst029 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq(SeqFinish);
+      quest.setSeq( SeqFinish );
     }
   }
 
@@ -90,10 +90,10 @@ class SubFst029 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if (result.getResult(0) == 1 && player.collectHandInItems({ Ritem0 }))
-      Scene00100(quest, player);
+    if ( result.getResult(0) == 1 && player.collectHandInItems( { Ritem0 } ))
+      Scene00100( quest, player );
     else
-      Scene00099(quest, player);
+      Scene00099( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -105,8 +105,7 @@ class SubFst029 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //Needs a replacement
-    //player.playScene( getId(), 99, 0, 0, 0 );
+
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -118,12 +117,10 @@ class SubFst029 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
 };

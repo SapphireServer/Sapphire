@@ -67,18 +67,14 @@ class SubSea013 : public Sapphire::ScriptAPI::QuestScript
     if( bnpc.getBNpcNameId() != Enemy0 )
       return;
 
-    auto currentKC = quest.getUI8AL();
+    if( quest.getSeq() == Seq1 )
+    {
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
 
-    if( currentKC + 1 >= 5 )
-    {
-      eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 5 );
-      quest.setSeq( SeqFinish );
-    }
-    else
-    {
-      quest.setUI8AL( currentKC + 1 );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 5 );
-    }
+      if( quest.getUI8AL() >= 5 )
+        quest.setSeq( SeqFinish );
+    }    
   }
 
   private:
@@ -97,8 +93,6 @@ class SubSea013 : public Sapphire::ScriptAPI::QuestScript
     {
       quest.setSeq( Seq1 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -110,14 +104,11 @@ class SubSea013 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-    if( result.getResult( 0 ) == 1 ) // complete quest
+    if( result.getResult( 0 ) == 1 )// complete quest
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
-
 };
 
 EXPOSE_SCRIPT( SubSea013 );

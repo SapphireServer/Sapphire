@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -40,6 +43,12 @@ private:
   static constexpr auto NCUT_15010 = 164;
   static constexpr auto INIT_ENPC_POP_01 = 4107478;
   static constexpr auto INIT_ENPC_POP_02 = 4107479;
+
+  static constexpr uint32_t flags = NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                                HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                                DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                                // todo: wtf is 0x00100000
+                                                DISABLE_CANCEL_EMOTE;
 
 public:
   TheSpiritIsWilling() : Sapphire::ScriptAPI::QuestBattleScript( 30 )
@@ -192,17 +201,206 @@ public:
 
   }
 
+  void setupPhaseTwo( QuestBattle& instance )
+  {
+    auto pPlayer = instance.getPlayerPtr();
+    auto chu = instance.getActiveBNpcByLayoutId( INIT_P_POP_01 );
+
+    instance.setDirectorVar( SET_1_SPAWNED, 0 );
+    instance.setDirectorVar( SET_2_SPAWNED, 1 );
+
+    auto b1 = instance.createBNpcFromLayoutId( INIT_POP_02A_01, 1440, Common::BNpcType::Enemy );
+    auto b2 = instance.createBNpcFromLayoutId( INIT_POP_02A_02, 1440, Common::BNpcType::Enemy );
+    auto b3 = instance.createBNpcFromLayoutId( INIT_POP_02C_02, 1440, Common::BNpcType::Enemy );
+    auto b4 = instance.createBNpcFromLayoutId( INIT_POP_02C_01, 1440, Common::BNpcType::Enemy );
+    auto b5 = instance.createBNpcFromLayoutId( INIT_POP_02B_02, 1440, Common::BNpcType::Enemy );
+    auto b6 = instance.createBNpcFromLayoutId( INIT_POP_02B_01, 1440, Common::BNpcType::Enemy );
+
+    b1->setFlag( Entity::NoDeaggro );
+    b2->setFlag( Entity::NoDeaggro );
+    b3->setFlag( Entity::NoDeaggro );
+    b4->setFlag( Entity::NoDeaggro );
+    b5->setFlag( Entity::NoDeaggro );
+    b6->setFlag( Entity::NoDeaggro );
+
+    chu->hateListAdd( b1, 10000 );
+    chu->hateListAdd( b2, 10000 );
+    chu->hateListAdd( b3, 10000 );
+    chu->hateListAdd( b4, 10000 );
+    /* chu->hateListAdd( b5, 10000 );
+    chu->hateListAdd( b6, 10000 );*/
+
+    b1->hateListAdd( chu, 10000 );
+    b2->hateListAdd( chu, 10000 );
+    b3->hateListAdd( chu, 10000 );
+    b4->hateListAdd( chu, 10000 );
+    b5->hateListAdd( pPlayer, 10000 );
+    b6->hateListAdd( pPlayer, 10000 );
+  }
+
+  void setupPhaseThree( QuestBattle& instance )
+  {
+    auto pPlayer = instance.getPlayerPtr();
+    auto chu = instance.getActiveBNpcByLayoutId( INIT_P_POP_01 );
+
+    instance.setDirectorVar( SET_2_SPAWNED, 0 );
+    instance.setDirectorVar( SET_3_SPAWNED, 1 );
+
+    auto c1 = instance.createBNpcFromLayoutId( INIT_POP_03C_01, 1440, Common::BNpcType::Enemy );
+    auto c2 = instance.createBNpcFromLayoutId( INIT_POP_03C_02, 1440, Common::BNpcType::Enemy );
+    auto c3 = instance.createBNpcFromLayoutId( INIT_POP_03C_03, 1440, Common::BNpcType::Enemy );
+    auto c4 = instance.createBNpcFromLayoutId( INIT_POP_03C_04, 1440, Common::BNpcType::Enemy );
+    auto c5 = instance.createBNpcFromLayoutId( INIT_POP_03D_01, 1440, Common::BNpcType::Enemy );
+
+    c1->setFlag( Entity::NoDeaggro );
+    c2->setFlag( Entity::NoDeaggro );
+    c3->setFlag( Entity::NoDeaggro );
+    c4->setFlag( Entity::NoDeaggro );
+    c5->setFlag( Entity::NoDeaggro );
+
+    chu->hateListAdd( c1, 10000 );
+    chu->hateListAdd( c2, 10000 );
+    chu->hateListAdd( c3, 10000 );
+    chu->hateListAdd( c4, 10000 );
+    chu->hateListAdd( c5, 10000 );
+
+    c1->hateListAdd( chu, 10000 );
+    c2->hateListAdd( chu, 10000 );
+    c3->hateListAdd( chu, 10000 );
+    c4->hateListAdd( chu, 10000 );
+    c5->hateListAdd( chu, 10000 );
+  }
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -0.375134f );
+    player.setPos( { -243.577f, 6.54697f, -24.7088f } );
+  }
+
+  enum vars
+  {
+    SET_1_SPAWNED,
+    SET_2_SPAWNED,
+    SET_3_SPAWNED,
+    SUCCESS_CALLED,
+  };
+
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto pPlayer = instance.getPlayerPtr();
+    auto chu = instance.getActiveBNpcByLayoutId( INIT_P_POP_01 );
 
+    auto phaseOne = instance.getDirectorVar( SET_1_SPAWNED );
+    auto phaseTwo = instance.getDirectorVar( SET_2_SPAWNED );
+    auto phaseThree = instance.getDirectorVar( SET_3_SPAWNED );
+    auto completed = instance.getDirectorVar( SUCCESS_CALLED );
+
+    if( ( pPlayer && !pPlayer->isAlive() ) || ( chu && !chu->isAlive() ) )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( phaseOne )
+    {
+      auto a1 = instance.getActiveBNpcByLayoutId( INIT_POP_01A_01 );
+      auto a2 = instance.getActiveBNpcByLayoutId( INIT_POP_01A_02 );
+      auto a3 = instance.getActiveBNpcByLayoutId( INIT_POP_01A_03 );
+      auto a4 = instance.getActiveBNpcByLayoutId( INIT_POP_01A_04 );
+      auto a5 = instance.getActiveBNpcByLayoutId( INIT_POP_01A_05 );
+
+      if ( !a1 && !a2 && !a3 && !a4 && !a5 )
+        setupPhaseTwo( instance );
+
+    }
+    else if ( phaseTwo )
+    {
+      auto b1 = instance.getActiveBNpcByLayoutId( INIT_POP_02A_01 );
+      auto b2 = instance.getActiveBNpcByLayoutId( INIT_POP_02A_02 );
+      auto b3 = instance.getActiveBNpcByLayoutId( INIT_POP_02C_02 );
+      auto b4 = instance.getActiveBNpcByLayoutId( INIT_POP_02C_01 );
+
+      if( !b1 && !b2 && !b3 && !b4 /* && ( !b5 && b5->getHpPercent() == 0 ) && ( !b6 && b6->getHpPercent() == 0 )*/ )
+        setupPhaseThree( instance );
+    }
+    else if ( phaseThree )
+    {
+      auto c1 = instance.getActiveBNpcByLayoutId( INIT_POP_03C_01 );
+      auto c2 = instance.getActiveBNpcByLayoutId( INIT_POP_03C_02 );
+      auto c3 = instance.getActiveBNpcByLayoutId( INIT_POP_03C_03 );
+      auto c4 = instance.getActiveBNpcByLayoutId( INIT_POP_03C_04 );
+      auto c5 = instance.getActiveBNpcByLayoutId( INIT_POP_03D_01 );
+
+      auto b5 = instance.getActiveBNpcByLayoutId( INIT_POP_02B_02 );
+      auto b6 = instance.getActiveBNpcByLayoutId( INIT_POP_02B_01 );
+
+      if( !c1 && !c2 && !c3 && !c4 && !c5 && !b5 && !b6 )
+      {
+        instance.setDirectorVar( SET_3_SPAWNED, 0 );
+      }
+    }
+    else if( !phaseOne && !phaseTwo && !phaseThree && !completed )
+    {
+      instance.setDirectorVar( SUCCESS_CALLED, 1 );
+      instance.success( 7 );
+      return;
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
-
+    eventMgr().playScene( player, instance.getDirectorId(), 1, flags, [ & ]( Entity::Player& player, const Event::SceneResult& result )
+      {
+        player.setOnEnterEventDone( true );
+      } );
   }
 
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+      auto idx = player.getQuestIndex( instance.getQuestId() );
+      if( idx == -1 )
+        return;
+      auto& quest = player.getQuestByIndex( idx );
+      quest.setSeq( 6 );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto chu = instance.createBNpcFromLayoutId( INIT_P_POP_01, 27780, Common::BNpcType::Friendly );
+
+    auto a1 = instance.createBNpcFromLayoutId( INIT_POP_01A_01, 1440, Common::BNpcType::Enemy );
+    auto a2 = instance.createBNpcFromLayoutId( INIT_POP_01A_02, 1440, Common::BNpcType::Enemy );
+    auto a3 = instance.createBNpcFromLayoutId( INIT_POP_01A_03, 1440, Common::BNpcType::Enemy );
+    auto a4 = instance.createBNpcFromLayoutId( INIT_POP_01A_04, 1440, Common::BNpcType::Enemy );
+    auto a5 = instance.createBNpcFromLayoutId( INIT_POP_01A_05, 1440, Common::BNpcType::Enemy );
+
+    /* Doesnt work with enpcs
+    TODO: create ENpc from layoutId*/
+    auto e1 = instance.createBNpcFromLayoutId( INIT_ENPC_POP_01, 1440, Common::BNpcType::Friendly ); // Hamon
+    auto e2 = instance.createBNpcFromLayoutId( INIT_ENPC_POP_02, 1440, Common::BNpcType::Friendly ); // Rurukuta
+
+    chu->setFlag( Entity::NoDeaggro );
+    a1->setFlag( Entity::NoDeaggro );
+    a2->setFlag( Entity::NoDeaggro );
+    a3->setFlag( Entity::NoDeaggro );
+    a4->setFlag( Entity::NoDeaggro );
+    a5->setFlag( Entity::NoDeaggro );
+
+    chu->hateListAdd( a1, 10000 );
+    chu->hateListAdd( a2, 10000 );
+    chu->hateListAdd( a3, 10000 );
+    chu->hateListAdd( a4, 10000 );
+    chu->hateListAdd( a5, 10000 );
+
+    a1->hateListAdd( chu, 10000 );
+    a2->hateListAdd( chu, 10000 );
+    a3->hateListAdd( chu, 10000 );
+    a4->hateListAdd( chu, 10000 );
+    a5->hateListAdd( chu, 10000 );
+
+    instance.setDirectorVar( SET_1_SPAWNED, 1 );
+  }
 };
 
 EXPOSE_SCRIPT( TheSpiritIsWilling );
