@@ -36,26 +36,26 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount 
 
     if( currPoint < pathSize && !bnpc.isReversePath() )
     {
-      Logger::debug( "Go to next point" );
+      // go to next point
       bnpc.setActiveServerPathPointIndex( currPoint + 1 );
 
       // Check if we've reached the last point, if so reverse the path
       if( currPoint + 1 >= pathSize )
       {
-        Logger::debug( "Reached end of path, reversing" );
+        // eached end, reverse
         bnpc.setReversePath( true );
         bnpc.setActiveServerPathPointIndex( pathSize - 1 );
       }
     }
     else if( currPoint > 0 && bnpc.isReversePath() )
     {
-      Logger::debug( "Go to previous point" );
+      // to previous point
       bnpc.setActiveServerPathPointIndex( currPoint - 1 );
 
       // Check if we've reached the first point, if so reverse the path
       if( currPoint - 1 <= 0 )
       {
-        Logger::debug( "Reached start of path, reversing" );
+        // reached start, reverse
         bnpc.setReversePath( false );
         bnpc.setActiveServerPathPointIndex( 0 );
       }
@@ -68,7 +68,7 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount 
     if( !path )
       return;
 
-    Logger::debug( "Apply target" );
+    // set target
     bnpc.setRoamTargetPos( {
       path->position.x + path->points[ bnpc.getActiveServerPathPointIndex() ].Translation.x,
       path->position.y + path->points[ bnpc.getActiveServerPathPointIndex() ].Translation.y,

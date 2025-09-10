@@ -59,14 +59,8 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
   if( dx == 0.0f && dy == 0.0f )
     return 0.0f;
 
-  if( dy != 0.0f )
-  {
-    return atan2( dy, dx );
-  }
-  else
-  {
-    return 0.0f;
-  }
+  return atan2( dy, dx );
+
 }
 
 uint16_t Util::floatToUInt16( float val )

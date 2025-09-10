@@ -326,13 +326,19 @@ bool Chara::face( const FFXIVARR_POSITION3& p )
 {
   float oldRot = getRot();
   float rot = Common::Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
-  float newRot = PI - rot + ( PI / 2 );
+
+  // Convert to facing direction
+  float newRot = rot + ( PI / 2 );
+
+  // Normalize to [-π, π] range
+  newRot = -fmod( newRot + PI, 2 * PI ) - PI;
 
   setRot( newRot );
 
   return ( fabs( oldRot - newRot ) <= std::numeric_limits< float >::epsilon() *
            fmax( fabs( oldRot ), fabs( newRot ) ) );
 }
+
 
 /*!
 Set and propagate the actor stance to in range players

@@ -64,6 +64,14 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
     bnpc.moveTo( *pHatedActor );
   }
+  else
+  {
+    if( !bnpc.hasFlag( Entity::TurningDisabled ) )
+    {
+      bnpc.face( pHatedActor->getPos() );
+      bnpc.sendPositionUpdate();
+    }
+  }
 
   if( bnpc.getAgentId() != -1 )
   {
@@ -72,12 +80,10 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
       bnpc.setPos( pos );
   }
 
+
+
   if( !hasQueuedAction && distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
-    // todo: dont turn if facing
-    if( !bnpc.hasFlag( Entity::TurningDisabled ) )
-      bnpc.face( pHatedActor->getPos() );
-
     bnpc.processGambits( tickCount );
 
     // in combat range. ATTACK!

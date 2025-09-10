@@ -463,12 +463,13 @@ void BNpc::sendPositionUpdate()
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z )
+  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z || m_lastRot != m_rot )
   {
     auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;
+  m_lastRot = m_rot;
 }
 
 const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const

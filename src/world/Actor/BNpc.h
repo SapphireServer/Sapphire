@@ -225,6 +225,7 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3 m_spawnPos;
     Common::FFXIVARR_POSITION3 m_roamPos;
     Common::FFXIVARR_POSITION3 m_lastPos;
+    float m_lastRot;
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
