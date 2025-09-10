@@ -612,13 +612,20 @@ int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::FFXIVARR_P
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
-  params.maxAcceleration = 15.f;
+  params.maxAcceleration = 10.f;
   params.maxSpeed = speed;
-  params.radius = radius * 0.75f;
-  params.collisionQueryRange = params.radius * 12.0f;
-  params.pathOptimizationRange = params.radius * 20.0f;
+  params.radius = radius;
+  params.collisionQueryRange = speed * 0.5f;
+  params.pathOptimizationRange = speed * 3.0f;
   params.updateFlags = 0;
-  params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS;
+  params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS |
+                    DT_CROWD_OPTIMIZE_VIS |
+                    DT_CROWD_OPTIMIZE_TOPO |
+                    DT_CROWD_OBSTACLE_AVOIDANCE;
+  params.separationWeight = 2.0f;
+  params.obstacleAvoidanceType = 3;
+
+
   float position[] = { pos.x, pos.y, pos.z };
   return m_pCrowd->addAgent( position, &params );
 }
@@ -630,12 +637,18 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
-  params.maxAcceleration = 20.f;
+  params.maxAcceleration = 10.f;
   params.maxSpeed = speed;
-  params.radius = ( radius ) * 0.75f;
-  params.collisionQueryRange = params.radius * 12.0f;
-  params.pathOptimizationRange = params.radius * 20.0f;
+  params.radius = radius;
+  params.collisionQueryRange = speed * 0.5f;
+  params.pathOptimizationRange = speed * 3.0f;
   params.updateFlags = 0;
+  params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS |
+                    DT_CROWD_OPTIMIZE_VIS |
+                    DT_CROWD_OPTIMIZE_TOPO |
+                    DT_CROWD_OBSTACLE_AVOIDANCE;
+  params.separationWeight = 2.0f;
+  params.obstacleAvoidanceType = 3;
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
 }
 
@@ -701,6 +714,21 @@ Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Common::Navi::NaviProvider::getAg
   if( !ag )
     return { 0.f, 0.f, 0.f };
   return { ag->npos[ 0 ], ag->npos[ 1 ], ag->npos[ 2 ] };
+}
+
+float Sapphire::Common::Navi::NaviProvider::getAgentSpeed( int32_t naviAgentId )
+{
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
+  if( !ag )
+    return 0.f;
+
+  // Get current velocity vector
+  const float* vel = ag->vel;
+
+  // Calculate speed (magnitude of velocity vector)
+  float currentSpeed = sqrtf(vel[0] * vel[0] + vel[2] * vel[2]); // 2D speed (XZ plane)
+
+  return currentSpeed;
 }
 
 bool Sapphire::Common::Navi::NaviProvider::isAgentActive( int32_t naviAgentId ) const

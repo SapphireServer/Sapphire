@@ -456,6 +456,16 @@ bool BNpc::moveTo( const Chara& targetChara )
   return false;
 }
 
+float mapSpeedToRange(float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f) {
+  // Clamp the speed to valid range
+  speed = std::max(minSpeed, std::min(maxSpeed, speed));
+
+  // Map from [minSpeed, maxSpeed] to [-π, π]
+  float normalized = (speed - minSpeed) / (maxSpeed - minSpeed); // [0, 1]
+  return (normalized * 2.0f - 1.0f) * 3.1415927f; // [-π, π]
+}
+
+
 void BNpc::sendPositionUpdate()
 {
   uint8_t animationType = 2;
@@ -465,7 +475,19 @@ void BNpc::sendPositionUpdate()
 
   if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z || m_lastRot != m_rot )
   {
-    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
+    int speedI = 0x5a/4;
+    float s = (((static_cast< float >( speedI ) * 2.4639943) * 0.01f ) - 3.1415927f);
+
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+    auto pNaviProvider = pZone->getNaviProvider();
+    // not 100% certain of this range, but with limited samples i tested, it looked somewhat correct
+    float s1 = mapSpeedToRange( pNaviProvider->getAgentSpeed( getAgentId() ), 0, 25.5f );
+    //Logger::debug( "speed: {} {} {}", s, s1, static_cast<uint8_t>((s1 + 3.1415927f) / (2.4639943f * 0.01f)));
+;
+
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, static_cast<uint8_t>((s1 + 3.1415927f) / (2.4639943f * 0.01f)) );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;
