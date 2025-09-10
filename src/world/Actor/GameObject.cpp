@@ -96,7 +96,7 @@ uint8_t Sapphire::Entity::GameObject::getRotUInt8() const
   return Common::Util::floatToUInt8Rot( getRot() );
 }
 
-uint8_t Sapphire::Entity::GameObject::getRotUInt16() const
+uint16_t Sapphire::Entity::GameObject::getRotUInt16() const
 {
   return Common::Util::floatToUInt16Rot( getRot() );
 }

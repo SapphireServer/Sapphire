@@ -14,14 +14,14 @@ public:
   }
 
   void performWarp( Entity::Player& player, uint32_t popRangeId, uint32_t territoryId,
-                    Sapphire::Common::WarpType warpType, float halfPi )
+                    Sapphire::Common::WarpType warpType )
   {
     auto pop = instanceObjectCache().getPopRangeInfo( popRangeId );
     if( !pop )
       return;
 
     warpMgr().requestMoveTerritory( player, warpType, territoryId,
-                                    pop->m_pos, pop->m_rotation + halfPi );
+                                    pop->m_pos, pop->m_rotation );
   }
 
   void Scene00000Return( Entity::Player& player, const Event::SceneResult& result )
@@ -32,13 +32,11 @@ public:
     if( !exitRangeInfo )
       return;
 
-    const float halfPi = 3.14159265358979323846f * 0.5f;
-
     if( result.getResult( 0 ) == 0 )
     {
       // Return to zoneline
       performWarp( player, exitRangeInfo->header.returnInstanceObjectId,
-                   player.getTerritoryId(), Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE, halfPi );
+                   player.getTerritoryId(), Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE );
     }
     else
     {
@@ -68,7 +66,7 @@ public:
         if( !pTeri )
           return;
 
-        performWarp( player, popRangeId, pTeri->getGuId(), Sapphire::Common::WARP_TYPE_EXIT_RANGE, halfPi );
+        performWarp( player, popRangeId, pTeri->getGuId(), Sapphire::Common::WARP_TYPE_EXIT_RANGE );
       }
       else
       {
@@ -78,7 +76,7 @@ public:
           return;
 
         performWarp( player, exitRangeInfo->header.destInstanceObjectId,
-                     pTeri->getGuId(), Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE, halfPi );
+                     pTeri->getGuId(), Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE );
       }
     }
   }

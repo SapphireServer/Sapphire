@@ -231,12 +231,12 @@ std::shared_ptr< Sapphire::InstanceObjectCache::PopRangeInfo > Sapphire::Instanc
   auto popInfo = std::make_shared< Sapphire::InstanceObjectCache::PopRangeInfo >();
 
   popInfo->m_pos = Common::FFXIVARR_POSITION3 { popRange->header.Transformation.Translation.x,
-                                               popRange->header.Transformation.Translation.y,
-                                               popRange->header.Transformation.Translation.z };
-
-  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.Transformation.Translation.x,
                                                 popRange->header.Transformation.Translation.y,
                                                 popRange->header.Transformation.Translation.z };
+
+  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.Transformation.Rotation.x,
+                                                popRange->header.Transformation.Rotation.y,
+                                                popRange->header.Transformation.Rotation.z };
 
   popInfo->m_rotation = Common::Util::eulerToDirection( targetRot );
 

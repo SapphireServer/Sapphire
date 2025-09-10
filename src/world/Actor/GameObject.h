@@ -66,7 +66,7 @@ namespace Sapphire::Entity
 
     uint8_t getRotUInt8() const;
 
-    uint8_t getRotUInt16() const;
+    uint16_t getRotUInt16() const;
 
     virtual void setRot( float rot );
 
