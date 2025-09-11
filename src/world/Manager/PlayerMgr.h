@@ -38,6 +38,8 @@ namespace Sapphire::World::Manager
 
     void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
 
+    bool isAllAreaDiscovered( Sapphire::Entity::Player& player, int16_t mapId );
+
     void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
 
     void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint32_t id );
