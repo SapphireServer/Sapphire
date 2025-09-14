@@ -60,7 +60,6 @@ OldMon::OldMon()
 
   loadConfig(); // Load config first
   initDbConfigBuffers();
-
 }
 
 OldMon::~OldMon()
@@ -124,8 +123,7 @@ void OldMon::loadConfig()
         try
         {
           m_dbConnectionInfo.port = std::stoi( value );
-        }
-        catch( const std::exception& )
+        } catch( const std::exception& )
         {
           m_dbConnectionInfo.port = 3306; // Default port
         }
@@ -177,15 +175,15 @@ void OldMon::show()
   // Show connection status
   if( m_dbConnectionOpen )
   {
-    ImGui::TextColored( ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Connected to %s@%s:%d/%s",
-                       m_dbConnectionInfo.user.c_str(),
-                       m_dbConnectionInfo.host.c_str(),
-                       m_dbConnectionInfo.port,
-                       m_dbConnectionInfo.database.c_str() );
+    ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Connected to %s@%s:%d/%s",
+                        m_dbConnectionInfo.user.c_str(),
+                        m_dbConnectionInfo.host.c_str(),
+                        m_dbConnectionInfo.port,
+                        m_dbConnectionInfo.database.c_str() );
   }
   else
   {
-    ImGui::TextColored( ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Database not connected" );
+    ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Database not connected" );
   }
 
   ImGui::End();
@@ -201,22 +199,21 @@ void OldMon::show()
   {
     showDbConfigDialog();
   }
-
 }
 
 void OldMon::initDbConfigBuffers()
 {
-  strncpy( m_dbUserBuffer, m_dbConnectionInfo.user.c_str(), sizeof(m_dbUserBuffer) - 1 );
-  m_dbUserBuffer[sizeof(m_dbUserBuffer) - 1] = '\0';
+  strncpy( m_dbUserBuffer, m_dbConnectionInfo.user.c_str(), sizeof( m_dbUserBuffer ) - 1 );
+  m_dbUserBuffer[ sizeof( m_dbUserBuffer ) - 1 ] = '\0';
 
-  strncpy( m_dbPasswordBuffer, m_dbConnectionInfo.password.c_str(), sizeof(m_dbPasswordBuffer) - 1 );
-  m_dbPasswordBuffer[sizeof(m_dbPasswordBuffer) - 1] = '\0';
+  strncpy( m_dbPasswordBuffer, m_dbConnectionInfo.password.c_str(), sizeof( m_dbPasswordBuffer ) - 1 );
+  m_dbPasswordBuffer[ sizeof( m_dbPasswordBuffer ) - 1 ] = '\0';
 
-  strncpy( m_dbDatabaseBuffer, m_dbConnectionInfo.database.c_str(), sizeof(m_dbDatabaseBuffer) - 1 );
-  m_dbDatabaseBuffer[sizeof(m_dbDatabaseBuffer) - 1] = '\0';
+  strncpy( m_dbDatabaseBuffer, m_dbConnectionInfo.database.c_str(), sizeof( m_dbDatabaseBuffer ) - 1 );
+  m_dbDatabaseBuffer[ sizeof( m_dbDatabaseBuffer ) - 1 ] = '\0';
 
-  strncpy( m_dbHostBuffer, m_dbConnectionInfo.host.c_str(), sizeof(m_dbHostBuffer) - 1 );
-  m_dbHostBuffer[sizeof(m_dbHostBuffer) - 1] = '\0';
+  strncpy( m_dbHostBuffer, m_dbConnectionInfo.host.c_str(), sizeof( m_dbHostBuffer ) - 1 );
+  m_dbHostBuffer[ sizeof( m_dbHostBuffer ) - 1 ] = '\0';
 
   m_dbPortBuffer = m_dbConnectionInfo.port;
 }
@@ -239,8 +236,7 @@ bool OldMon::connectToDatabase()
       m_dbConnection.reset();
       return false;
     }
-  }
-  catch( const std::exception& e )
+  } catch( const std::exception& e )
   {
     printf( "Database connection failed: %s\n", e.what() );
     m_dbConnectionOpen = false;
@@ -275,7 +271,7 @@ void OldMon::showDbConfigDialog()
     ImGui::Text( "Host:" );
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth( -1.0f );
-    ImGui::InputText( "##Host", m_dbHostBuffer, sizeof(m_dbHostBuffer) );
+    ImGui::InputText( "##Host", m_dbHostBuffer, sizeof( m_dbHostBuffer ) );
 
     // Port
     ImGui::TableNextRow();
@@ -296,7 +292,7 @@ void OldMon::showDbConfigDialog()
     ImGui::Text( "Username:" );
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth( -1.0f );
-    ImGui::InputText( "##Username", m_dbUserBuffer, sizeof(m_dbUserBuffer) );
+    ImGui::InputText( "##Username", m_dbUserBuffer, sizeof( m_dbUserBuffer ) );
 
     // Password
     ImGui::TableNextRow();
@@ -305,7 +301,7 @@ void OldMon::showDbConfigDialog()
     ImGui::Text( "Password:" );
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth( -1.0f );
-    ImGui::InputText( "##Password", m_dbPasswordBuffer, sizeof(m_dbPasswordBuffer), ImGuiInputTextFlags_Password );
+    ImGui::InputText( "##Password", m_dbPasswordBuffer, sizeof( m_dbPasswordBuffer ), ImGuiInputTextFlags_Password );
 
     // Database
     ImGui::TableNextRow();
@@ -314,7 +310,7 @@ void OldMon::showDbConfigDialog()
     ImGui::Text( "Database:" );
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth( -1.0f );
-    ImGui::InputText( "##Database", m_dbDatabaseBuffer, sizeof(m_dbDatabaseBuffer) );
+    ImGui::InputText( "##Database", m_dbDatabaseBuffer, sizeof( m_dbDatabaseBuffer ) );
 
     ImGui::EndTable();
   }
@@ -324,11 +320,11 @@ void OldMon::showDbConfigDialog()
   // Current connection status
   if( m_dbConnectionOpen )
   {
-    ImGui::TextColored( ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Currently connected" );
+    ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Currently connected" );
   }
   else
   {
-    ImGui::TextColored( ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Not connected" );
+    ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Not connected" );
   }
 
   ImGui::Spacing();
@@ -358,8 +354,7 @@ void OldMon::showDbConfigDialog()
       {
         ImGui::OpenPopup( "Connection Failed" );
       }
-    }
-    catch( const std::exception& e )
+    } catch( const std::exception& e )
     {
       printf( "Test connection failed: %s\n", e.what() );
       ImGui::OpenPopup( "Connection Failed" );
@@ -414,7 +409,7 @@ void OldMon::showDbConfigDialog()
   // Success popup
   if( ImGui::BeginPopupModal( "Connection Success", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
   {
-    ImGui::TextColored( ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Connection test successful!" );
+    ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Connection test successful!" );
     ImGui::Text( "Settings are valid but not yet saved." );
     ImGui::Text( "Click 'Apply & Save' to make them permanent." );
     ImGui::Spacing();
@@ -428,12 +423,12 @@ void OldMon::showDbConfigDialog()
   // Settings saved popup
   if( ImGui::BeginPopupModal( "Settings Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
   {
-    ImGui::TextColored( ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "✓ Settings saved and applied!" );
+    ImGui::TextColored( ImVec4( 0.2f, 0.8f, 0.2f, 1.0f ), "✓ Settings saved and applied!" );
     ImGui::Text( "Connected to: %s@%s:%d/%s",
-                m_dbConnectionInfo.user.c_str(),
-                m_dbConnectionInfo.host.c_str(),
-                m_dbConnectionInfo.port,
-                m_dbConnectionInfo.database.c_str() );
+                 m_dbConnectionInfo.user.c_str(),
+                 m_dbConnectionInfo.host.c_str(),
+                 m_dbConnectionInfo.port,
+                 m_dbConnectionInfo.database.c_str() );
     ImGui::Spacing();
     if( ImGui::Button( "OK" ) )
     {
@@ -445,7 +440,7 @@ void OldMon::showDbConfigDialog()
   // Failure popup
   if( ImGui::BeginPopupModal( "Connection Failed", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
   {
-    ImGui::TextColored( ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "✗ Connection failed!" );
+    ImGui::TextColored( ImVec4( 0.8f, 0.2f, 0.2f, 1.0f ), "✗ Connection failed!" );
     ImGui::TextWrapped( "Please check your connection settings and ensure the database server is running." );
     ImGui::Spacing();
     if( ImGui::Button( "OK" ) )
@@ -485,8 +480,7 @@ void OldMon::loadVersions()
       Version v{ id, name };
       m_versions.push_back( v );
     }
-  }
-  catch( const std::exception& e )
+  } catch( const std::exception& e )
   {
     printf( "Error loading versions: %s\n", e.what() );
   }
@@ -807,6 +801,7 @@ void OldMon::showPacketViewer()
 
   ImGui::End();
 }
+
 void OldMon::showHexViewer( const Packet *packet )
 {
   if( !packet )
@@ -840,15 +835,15 @@ void OldMon::showHexViewer( const Packet *packet )
   const float hexByteWidth = charWidth * 2.5f; // Increased button width for better visibility
 
   // Define colors for the first 0x20 bytes (8 groups of 4 bytes each)
-  ImVec4 headerColors[8] = {
-    ImVec4(1.0f, 0.8f, 0.8f, 1.0f), // Light red
-    ImVec4(0.8f, 1.0f, 0.8f, 1.0f), // Light green
-    ImVec4(0.8f, 0.8f, 1.0f, 1.0f), // Light blue
-    ImVec4(1.0f, 1.0f, 0.8f, 1.0f), // Light yellow
-    ImVec4(1.0f, 0.8f, 1.0f, 1.0f), // Light magenta
-    ImVec4(0.8f, 1.0f, 1.0f, 1.0f), // Light cyan
-    ImVec4(1.0f, 0.9f, 0.8f, 1.0f), // Light orange
-    ImVec4(0.9f, 0.9f, 0.9f, 1.0f)  // Light gray
+  ImVec4 headerColors[ 8 ] = {
+    ImVec4( 1.0f, 0.8f, 0.8f, 1.0f ), // Light red
+    ImVec4( 0.8f, 1.0f, 0.8f, 1.0f ), // Light green
+    ImVec4( 0.8f, 0.8f, 1.0f, 1.0f ), // Light blue
+    ImVec4( 1.0f, 1.0f, 0.8f, 1.0f ), // Light yellow
+    ImVec4( 1.0f, 0.8f, 1.0f, 1.0f ), // Light magenta
+    ImVec4( 0.8f, 1.0f, 1.0f, 1.0f ), // Light cyan
+    ImVec4( 1.0f, 0.9f, 0.8f, 1.0f ), // Light orange
+    ImVec4( 0.9f, 0.9f, 0.9f, 1.0f ) // Light gray
   };
 
   for( size_t offset = 0; offset < dataSize; offset += bytesPerLine )
@@ -872,35 +867,35 @@ void OldMon::showHexViewer( const Packet *packet )
         size_t absoluteOffset = offset + i;
 
         // Determine color based on position within first 0x20 bytes
-        ImVec4 textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // Default white
+        ImVec4 textColor = ImVec4( 1.0f, 1.0f, 1.0f, 1.0f ); // Default white
         if( absoluteOffset < 0x20 )
         {
-          int groupIndex = (int)(absoluteOffset / 4); // Groups of 4 bytes
-          textColor = headerColors[groupIndex];
+          int groupIndex = ( int ) ( absoluteOffset / 4 ); // Groups of 4 bytes
+          textColor = headerColors[ groupIndex ];
         }
 
         // Highlight selected byte
-        bool isSelected = (absoluteOffset == m_selectedByteOffset);
+        bool isSelected = ( absoluteOffset == m_selectedByteOffset );
         if( isSelected )
         {
-          ImGui::PushStyleColor( ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f) ); // Black text
-          ImGui::PushStyleColor( ImGuiCol_Button, ImVec4(1.0f, 1.0f, 0.0f, 1.0f) ); // Yellow background
+          ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // Black text
+          ImGui::PushStyleColor( ImGuiCol_Button, ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ) ); // Yellow background
         }
         else
         {
           ImGui::PushStyleColor( ImGuiCol_Text, textColor );
-          ImGui::PushStyleColor( ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f) ); // Transparent
+          ImGui::PushStyleColor( ImGuiCol_Button, ImVec4( 0.0f, 0.0f, 0.0f, 0.0f ) ); // Transparent
         }
 
         // Make hex byte clickable
-        ImGui::PushID( static_cast<int>(absoluteOffset) );
+        ImGui::PushID( static_cast< int >( absoluteOffset ) );
         if( ImGui::Button( fmt::format( "{:02X}", byte ).c_str(), ImVec2( hexByteWidth, 0 ) ) )
         {
           m_selectedByteOffset = absoluteOffset;
         }
         ImGui::PopID();
 
-        ImGui::PopStyleColor(2);
+        ImGui::PopStyleColor( 2 );
 
         // Position for next hex byte - reduced spacing
         if( i < bytesPerLine - 1 )
@@ -931,41 +926,41 @@ void OldMon::showHexViewer( const Packet *packet )
     ImGui::SetCursorPosX( ImGui::GetCursorPosX() + 15 ); // Reduced spacing
 
     // Color the ASCII representation as well for the first 0x20 bytes
-    ImGui::Text("| ");
+    ImGui::Text( "| " );
     ImGui::SameLine();
 
-    for( size_t i = 0; i < asciiLine.length() && (offset + i) < dataSize; ++i )
+    for( size_t i = 0; i < asciiLine.length() && ( offset + i ) < dataSize; ++i )
     {
       size_t absoluteOffset = offset + i;
 
       // Determine color based on position within first 0x20 bytes
-      ImVec4 textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // Default white
+      ImVec4 textColor = ImVec4( 1.0f, 1.0f, 1.0f, 1.0f ); // Default white
       if( absoluteOffset < 0x20 )
       {
-        int groupIndex = (int)(absoluteOffset / 4); // Groups of 4 bytes
-        textColor = headerColors[groupIndex];
+        int groupIndex = ( int ) ( absoluteOffset / 4 ); // Groups of 4 bytes
+        textColor = headerColors[ groupIndex ];
       }
 
-      bool isSelected = (absoluteOffset == m_selectedByteOffset);
+      bool isSelected = ( absoluteOffset == m_selectedByteOffset );
       if( isSelected )
       {
-        ImGui::PushStyleColor( ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f) ); // Black text
-        ImGui::PushStyleColor( ImGuiCol_Button, ImVec4(1.0f, 1.0f, 0.0f, 1.0f) ); // Yellow background
+        ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // Black text
+        ImGui::PushStyleColor( ImGuiCol_Button, ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ) ); // Yellow background
       }
       else
       {
         ImGui::PushStyleColor( ImGuiCol_Text, textColor );
-        ImGui::PushStyleColor( ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f) ); // Transparent
+        ImGui::PushStyleColor( ImGuiCol_Button, ImVec4( 0.0f, 0.0f, 0.0f, 0.0f ) ); // Transparent
       }
 
-      ImGui::PushID( static_cast<int>(absoluteOffset + 10000) ); // Different ID range for ASCII
-      if( ImGui::Button( fmt::format( "{}", asciiLine[i] ).c_str(), ImVec2( charWidth * 1.2f, 0 ) ) )
+      ImGui::PushID( static_cast< int >( absoluteOffset + 10000 ) ); // Different ID range for ASCII
+      if( ImGui::Button( fmt::format( "{}", asciiLine[ i ] ).c_str(), ImVec2( charWidth * 1.2f, 0 ) ) )
       {
         m_selectedByteOffset = absoluteOffset;
       }
       ImGui::PopID();
 
-      ImGui::PopStyleColor(2);
+      ImGui::PopStyleColor( 2 );
 
       if( i < asciiLine.length() - 1 )
       {
@@ -976,6 +971,7 @@ void OldMon::showHexViewer( const Packet *packet )
 
   ImGui::EndChild();
 }
+
 void OldMon::showDataInspector( const Packet *packet )
 {
   ImGui::Text( "Data Inspector" );
@@ -1031,7 +1027,6 @@ void OldMon::showDataInspector( const Packet *packet )
 
       ImGui::Text( "uint16: %u (0x%04X)", u16_le, u16_le );
       ImGui::Text( "int16:  %d", i16_le );
-
     }
     else
     {
@@ -1157,7 +1152,6 @@ void OldMon::showDataInspector( const Packet *packet )
 }
 
 #include <fstream>
-// ... existing includes ...
 
 void OldMon::showPacketGrid()
 {
@@ -1171,28 +1165,58 @@ void OldMon::showPacketGrid()
   if( !selectedCapture )
     return;
 
-  // Simple type filter at the top
+  // Filters at the top
   static char filterTypeInput[ 16 ] = ""; // Hexadecimal filter input
-  static uint32_t filterType = 0; // Parsed filter type value
-  ImGui::Text( "Filter" );
+  static char filterSrcIdInput[ 16 ] = ""; // Hexadecimal filter input for SrcId
+
+  ImGui::Text( "Filters" );
+
+  // Type filter
+  ImGui::Text( "Type:" );
   ImGui::SameLine();
-  if( ImGui::InputTextWithHint( "##TypeFilter", "Enter Type (Hex)", filterTypeInput, sizeof( filterTypeInput ),
-                                ImGuiInputTextFlags_CharsHexadecimal ) )
+  ImGui::InputTextWithHint( "##TypeFilter", "Enter Type (Hex)", filterTypeInput, sizeof( filterTypeInput ),
+                            ImGuiInputTextFlags_CharsHexadecimal );
+
+  ImGui::SameLine();
+
+  // SrcId filter
+  ImGui::Text( "SrcId:" );
+  ImGui::SameLine();
+  ImGui::InputTextWithHint( "##SrcIdFilter", "Enter SrcId (Hex)", filterSrcIdInput, sizeof( filterSrcIdInput ),
+                            ImGuiInputTextFlags_CharsHexadecimal );
+
+  // Clear filter button
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Filters" ) )
   {
-    // Parse filter type when input changes
-    sscanf( filterTypeInput, "%x", &filterType );
+    filterTypeInput[ 0 ] = '\0';
+    filterSrcIdInput[ 0 ] = '\0';
   }
 
-  // Helpful text or reset filter button
+  // Debug info
   ImGui::SameLine();
-  if( ImGui::Button( "Clear Filter" ) )
-  {
-    filterType = 0;
-    filterTypeInput[ 0 ] = '\0';
-  }
+  ImGui::Text( "Active filters - Type: '%s', SrcId: '%s'", filterTypeInput, filterSrcIdInput );
 
   // Horizontal separator
   ImGui::Separator();
+
+  // Helper function to check if hex string starts with filter
+  auto hexStringStartsWith = []( uint32_t value, const char *filter ) -> bool
+  {
+    if( strlen( filter ) == 0 )
+      return true; // Empty filter matches everything
+
+    char valueStr[ 16 ];
+    sprintf( valueStr, "%X", value );
+
+    // Convert both to uppercase for case-insensitive comparison
+    std::string valueUpper = valueStr;
+    std::string filterUpper = filter;
+    std::transform( valueUpper.begin(), valueUpper.end(), valueUpper.begin(), ::toupper );
+    std::transform( filterUpper.begin(), filterUpper.end(), filterUpper.begin(), ::toupper );
+
+    return valueUpper.find( filterUpper ) == 0; // Check if it starts with filter
+  };
 
   // Create a map of packet set IDs to packet sets for quick lookup
   std::unordered_map< uint32_t, const PacketSet * > packetSetMap;
@@ -1201,7 +1225,7 @@ void OldMon::showPacketGrid()
     packetSetMap[ packetSet.id ] = &packetSet;
   }
 
-  if( ImGui::BeginTable( "PacketsTable", 6,
+  if( ImGui::BeginTable( "PacketsTable", 7,
                          ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
                          ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable |
                          ImGuiTableFlags_Sortable ) )
@@ -1209,6 +1233,7 @@ void OldMon::showPacketGrid()
     // Set up columns
     ImGui::TableSetupColumn( "Dir", ImGuiTableColumnFlags_WidthFixed, 40.0f );
     ImGui::TableSetupColumn( "Type", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+    ImGui::TableSetupColumn( "SrcId", ImGuiTableColumnFlags_WidthFixed, 80.0f );
     ImGui::TableSetupColumn( "Size", ImGuiTableColumnFlags_WidthFixed, 60.0f );
     ImGui::TableSetupColumn( "Timestamp", ImGuiTableColumnFlags_WidthFixed, 100.0f );
     ImGui::TableSetupColumn( "Self", ImGuiTableColumnFlags_WidthFixed, 40.0f );
@@ -1219,14 +1244,37 @@ void OldMon::showPacketGrid()
     uint32_t prevPacketSetId = 0;
     size_t consecutiveCount = 0;
 
+    // Count visible packets for debug
+    int visiblePackets = 0;
+    int totalPackets = m_flatPacketList.size();
+
     // Display filtered packets
     for( size_t i = 0; i < m_flatPacketList.size(); ++i )
     {
       const Packet *packet = m_flatPacketList[ i ];
 
       // Apply type filter if one is set
-      if( filterType != 0 && packet->packetType != filterType )
+      if( strlen( filterTypeInput ) > 0 && !hexStringStartsWith( packet->packetType, filterTypeInput ) )
         continue;
+
+      // Extract SrcId with better error handling
+      uint32_t srcId = 0;
+      if( packet->data.size() >= 8 )
+      {
+        // Try different offsets as the structure might vary
+        srcId = *reinterpret_cast< const uint32_t * >( &packet->data[ 4 ] );
+      }
+      else if( packet->data.size() >= 4 )
+      {
+        // Fallback to offset 0 if packet is smaller
+        srcId = *reinterpret_cast< const uint32_t * >( &packet->data[ 0 ] );
+      }
+
+      // Apply SrcId filter if one is set
+      if( strlen( filterSrcIdInput ) > 0 && !hexStringStartsWith( srcId, filterSrcIdInput ) )
+        continue;
+
+      visiblePackets++;
 
       const bool isSelected = ( m_selectedPacketIdx == i );
 
@@ -1329,31 +1377,43 @@ void OldMon::showPacketGrid()
         }
       }
 
-      // ... existing code for other columns ...
       // Type column
       ImGui::TableSetColumnIndex( 1 );
       ImGui::Text( "%X", packet->packetType );
 
-      // Size column
+      // SrcId column
       ImGui::TableSetColumnIndex( 2 );
+      if( srcId != 0 )
+        ImGui::Text( "%X | %i", srcId, srcId );
+      else
+        ImGui::Text( "N/A" );
+
+      // Size column
+      ImGui::TableSetColumnIndex( 3 );
       ImGui::Text( "%u", packet->packetSize );
 
       // Timestamp column
-      ImGui::TableSetColumnIndex( 3 );
-      ImGui::Text( "%u", packet->packetTimeStamp );
+      uint32_t packetTimeStamp = packet->packetTimeStamp;
+      if( packet->data.size() >= 0x1C )
+        packetTimeStamp = *reinterpret_cast< const uint32_t * >( &packet->data[ 0x18 ] );
+      ImGui::TableSetColumnIndex( 4 );
+      ImGui::Text( "%u", packetTimeStamp );
 
       // Self column
-      ImGui::TableSetColumnIndex( 4 );
+      ImGui::TableSetColumnIndex( 5 );
       ImGui::Text( "%s", packet->isForSelf ? "Y" : "N" );
 
       // Comment column
-      ImGui::TableSetColumnIndex( 5 );
+      ImGui::TableSetColumnIndex( 6 );
       ImGui::Text( "%s", packet->comment.c_str() );
 
       ImGui::PopID(); // Ensure unique ID per row to avoid ID conflicts
     }
 
     ImGui::EndTable();
+
+    // Debug info below table
+    ImGui::Text( "Showing %d / %d packets", visiblePackets, totalPackets );
   }
 }
 
