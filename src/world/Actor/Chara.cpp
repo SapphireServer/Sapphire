@@ -44,7 +44,7 @@ Chara::Chara( ObjKind type ) :
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_directorId( 0 ),
-  m_radius( 1.f )
+  m_radius( 2.f )
 {
   m_lastTickTime = 0;
   m_lastUpdate = 0;
@@ -688,11 +688,11 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
 
     effectIt->second->setSlot( effectIt->second->getSlot() - 1 );
 
-    Logger::warn( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
+    Logger::debug( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
     ++effectIt;
   }
 
-  Logger::warn( "Slot id being freed: {}", effectSlotId );
+  Logger::debug( "Slot id being freed: {}", effectSlotId );
 
   if( updateStatus )
   {

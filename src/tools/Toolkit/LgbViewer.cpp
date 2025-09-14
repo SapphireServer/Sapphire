@@ -463,6 +463,19 @@ void LgbViewer::showGroupsWindow()
                   std::string modelName = sharedGroup->modelFileName;
                   ImGui::Text( "%s", modelName.c_str() );
                 }
+                else if( entry->getType() == eAssetType::EventObject )
+                {
+                  std::string eventObjectName = entry->name;
+                  auto sharedGroup = dynamic_cast< EventObjectEntry* >( entry.get() );
+                  auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+                  auto eRow = exdD.getRow< Excel::EObj >( sharedGroup->header.BaseId );
+                  if( eRow )
+                  {
+                    eventObjectName = eRow->getString( eRow->data().Text.SGL );
+                  }
+                  ImGui::Text( "%s", eventObjectName.c_str() );
+
+                }
                 else
                   ImGui::Text( "%s", entry->name.c_str() );
 

@@ -90,7 +90,7 @@ Player::Player() :
   m_onlineStatus = 0;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
-  m_radius = 1.f;
+  m_radius = 2.f;
 
   memset( m_name, 0, sizeof( m_name ) );
   memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
@@ -790,14 +790,6 @@ void Player::removeCondition( Common::PlayerCondition flag )
 
   m_condition[ index ] ^= value;
   Network::Util::Packet::sendCondition( *this );
-}
-
-void Player::update( uint64_t tickCount )
-{
-  // todo: better way to handle this override chara update
-  Service< World::Manager::PlayerMgr >::ref().onUpdate( *this, tickCount );
-
-  Chara::update( tickCount );
 }
 
 void Player::freePlayerSpawnId( uint32_t actorId )

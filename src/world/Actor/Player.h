@@ -81,9 +81,6 @@ namespace Sapphire::Entity
     /*! Event to be called upon player death */
     void onDeath() override;
 
-    /*! Event called on every session iteration */
-    void update( uint64_t tickCount ) override;
-
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! load data for currently active quests */

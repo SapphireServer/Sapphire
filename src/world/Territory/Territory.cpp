@@ -228,8 +228,6 @@ bool Territory::init()
     Logger::warn( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
   }
 
-  onUpdate( 0 );
-
   return true;
 }
 
@@ -350,7 +348,7 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
     {
       auto state = pBNpc->getState();
       bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
-      agentId = m_pNaviProvider->addAgent( pBNpc->getPos(), pBNpc->getRadius(), isRunning ? pBNpc->getRunSpeed() : pBNpc->getWalkSpeed() );
+      agentId = m_pNaviProvider->addAgent( pBNpc->getPos(), pBNpc->getRadius(), pBNpc->getCurrentSpeed() );
       pBNpc->setAgentId( agentId );
       pBNpc->setPathingActive( true );
     }
@@ -527,8 +525,8 @@ bool Territory::checkWeather()
 
 void Territory::updateBNpcs( uint64_t tickCount )
 {
-  if( ( tickCount - m_lastMobUpdate ) <= 250 )
-    return;
+  //if( ( tickCount - m_lastMobUpdate ) <= 250 )
+  //  return;
 
   m_lastMobUpdate = tickCount;
   uint64_t currTime = Common::Util::getTimeSeconds();
@@ -1141,7 +1139,7 @@ bool Territory::loadBNpcs()
         m_bNpcBaseMap[ bnpc->instanceId ] = bnpc;
 
         // Add to spawn info if it should spawn
-       // if( bnpc->Nonpop != 1 )
+        if( bnpc->Nonpop != 1 )
         {
           SpawnInfo info;
           info.bnpcPtr = nullptr;

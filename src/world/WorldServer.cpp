@@ -425,8 +425,8 @@ void WorldServer::mainLoop()
 
     if( tickCount - m_lastServerTick < 300 )
     {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-      continue;
+    //  std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+    //  continue;
     }
     m_lastServerTick = tickCount;
 

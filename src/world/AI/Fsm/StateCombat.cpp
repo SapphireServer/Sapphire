@@ -14,6 +14,11 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
+  if( !pZone )
+  {
+    Logger::debug( "Territory not found for BNPC" );
+    return;
+  }
   auto pNaviProvider = pZone->getNaviProvider();
   bool hasQueuedAction = bnpc.checkAction();
 
@@ -69,7 +74,7 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     if( !bnpc.hasFlag( Entity::TurningDisabled ) )
     {
       bnpc.face( pHatedActor->getPos() );
-      bnpc.sendPositionUpdate();
+      bnpc.sendPositionUpdate( tickCount );
     }
   }
 

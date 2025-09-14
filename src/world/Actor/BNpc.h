@@ -105,10 +105,12 @@ namespace Sapphire::Entity
 
     bool moveTo( const Entity::Chara& targetChara );
 
-    void sendPositionUpdate();
+    void sendPositionUpdate( uint64_t tickCount );
 
     BNpcState getState() const;
     void setState( BNpcState state );
+
+    float getCurrentSpeed() const;
 
     const std::set< std::shared_ptr< HateListEntry > >& getHateList() const;
     void hateListClear();
@@ -226,6 +228,7 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3 m_roamPos;
     Common::FFXIVARR_POSITION3 m_lastPos;
     float m_lastRot;
+    uint64_t m_lastPosUpdate{0};
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;

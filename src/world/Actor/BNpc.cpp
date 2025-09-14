@@ -185,7 +185,6 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
       m_runSpeed = modelSkeleton->data().RunSpeed;
 
       //m_autoAttackAnimation = modelSkeleton->data().AutoAttackType;
-
     }
   }
 
@@ -380,6 +379,13 @@ void BNpc::setState( BNpcState state )
   m_state = state;
 }
 
+float BNpc::getCurrentSpeed() const
+{
+  auto state = getState();
+  bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
+  return isRunning ? getRunSpeed() : getWalkSpeed();
+}
+
 bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
@@ -401,9 +407,7 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    auto state = getState();
-    bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), isRunning ? getRunSpeed() : getWalkSpeed() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed() );
     setAgentId( newAgentId );
     return true;
   }
@@ -440,9 +444,7 @@ bool BNpc::moveTo( const Chara& targetChara )
     face( targetChara.getPos() );
     setPos( pos1 );
     pNaviProvider->resetMoveTarget( getAgentId() );
-    auto state = getState();
-    bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), isRunning ? getRunSpeed() : getWalkSpeed() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed() );
     setAgentId( newAgentId );
     return true;
   }
@@ -456,18 +458,24 @@ bool BNpc::moveTo( const Chara& targetChara )
   return false;
 }
 
-float mapSpeedToRange(float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f) {
+float mapSpeedToRange( float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f )
+{
   // Clamp the speed to valid range
-  speed = std::max(minSpeed, std::min(maxSpeed, speed));
+  speed = std::max( minSpeed, std::min( maxSpeed, speed ) );
 
   // Map from [minSpeed, maxSpeed] to [-π, π]
-  float normalized = (speed - minSpeed) / (maxSpeed - minSpeed); // [0, 1]
-  return (normalized * 2.0f - 1.0f) * 3.1415927f; // [-π, π]
+  float normalized = ( speed - minSpeed ) / ( maxSpeed - minSpeed ); // [0, 1]
+  return ( normalized * 2.0f - 1.0f ) * 3.1415927f; // [-π, π]
 }
 
 
-void BNpc::sendPositionUpdate()
+void BNpc::sendPositionUpdate( uint64_t tickCount )
 {
+  if( ( tickCount - m_lastPosUpdate ) <= 333 )
+    return;
+
+  m_lastPosUpdate = tickCount;
+
   uint8_t animationType = 2;
 
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
@@ -475,19 +483,20 @@ void BNpc::sendPositionUpdate()
 
   if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z || m_lastRot != m_rot )
   {
-    int speedI = 0x5a/4;
-    float s = (((static_cast< float >( speedI ) * 2.4639943) * 0.01f ) - 3.1415927f);
-
     auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-    auto pNaviProvider = pZone->getNaviProvider();
-    // not 100% certain of this range, but with limited samples i tested, it looked somewhat correct
-    float s1 = mapSpeedToRange( pNaviProvider->getAgentSpeed( getAgentId() ), 0, 25.5f );
-    //Logger::debug( "speed: {} {} {}", s, s1, static_cast<uint8_t>((s1 + 3.1415927f) / (2.4639943f * 0.01f)));
-;
+    if( !pZone )
+    {
+      Logger::error( "BNpc::sendPositionUpdate: No zone for id: {}", getTerritoryId() );
+      return;
+    }
 
-    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, static_cast<uint8_t>((s1 + 3.1415927f) / (2.4639943f * 0.01f)) );
+    // not 100% certain of this range, but with limited samples i tested, it looked somewhat correct
+    float s1 = mapSpeedToRange( getCurrentSpeed(), 0, 25.5f );
+
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0,
+                                                           static_cast< uint8_t >( ( s1 + 3.1415927f ) / ( 2.4639943f * 0.01f ) ) );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;
@@ -777,7 +786,7 @@ void BNpc::update( uint64_t tickCount )
   checkAggro();
   // removed check for now, replaced by position check to last position
   //if( m_dirtyFlag & DirtyFlag::Position )
-  sendPositionUpdate();
+  sendPositionUpdate( tickCount );
 
   m_fsm->update( *this, tickCount );
 }
@@ -1032,61 +1041,61 @@ void BNpc::checkAggro()
     if( hasAggro )
       break;
   }
-/*
-  //legacy code
-  if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
-  {
-    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
-    float range = 14.f;
-
-    if( pClosestChara->getLevel() > m_level )
+  /*
+    //legacy code
+    if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
     {
-      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+      // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+      float range = 14.f;
 
-      if( levelDiff >= 10 )
-        range = 0.f;
-      else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+      if( pClosestChara->getLevel() > m_level )
+      {
+        auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+
+        if( levelDiff >= 10 )
+          range = 0.f;
+        else
+          range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+      }
+
+      auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
+
+      if( distance < range )
+      {
+        aggro( pClosestChara );
+      }
     }
-
-    auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
-
-    if( distance < range )
+    else if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() == 0 && pClosestChara->isBattleNpc() ) )
     {
-      aggro( pClosestChara );
-    }
-  }
-  else if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() == 0 && pClosestChara->isBattleNpc() ) )
-  {
-    if( getBNpcType() == Common::BNpcType::Friendly )
-    {
-      if( pClosestChara->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+      if( getBNpcType() == Common::BNpcType::Friendly )
+      {
+        if( pClosestChara->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+          return;
+      }
+
+      if( getEnemyType() == 0 && pClosestChara->getAsBNpc()->getEnemyType() == 0 )
         return;
-    }
 
-    if( getEnemyType() == 0 && pClosestChara->getAsBNpc()->getEnemyType() == 0 )
-      return;
+      // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+      float range = 14.f;
 
-    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
-    float range = 14.f;
+      if( pClosestChara->getLevel() > m_level )
+      {
+        auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
 
-    if( pClosestChara->getLevel() > m_level )
-    {
-      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+        if( levelDiff >= 10 )
+          range = 0.f;
+        else
+          range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+      }
 
-      if( levelDiff >= 10 )
-        range = 0.f;
-      else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
-    }
+      auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
 
-    auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
-
-    if( distance < range )
-    {
-      aggro( pClosestChara );
-    }
-  }*/
+      if( distance < range )
+      {
+        aggro( pClosestChara );
+      }
+    }*/
 }
 
 void BNpc::setOwner( const CharaPtr& m_pChara )
