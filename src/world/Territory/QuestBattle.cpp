@@ -231,13 +231,13 @@ void Sapphire::QuestBattle::onAddEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
+  auto objData = exdData.getRow< Excel::EObj >( object->getBaseId() );
   if( objData )
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
   else
     Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
-                   std::to_string( object->getObjectId() ) );
+                   std::to_string( object->getBaseId() ) );
 }
 
 void Sapphire::QuestBattle::onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2,
@@ -285,7 +285,7 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
     onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
   else
     PlayerMgr::sendDebug( player, "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}",
-                          it->second->getObjectId(), eventId );
+                          it->second->getBaseId(), eventId );
 }
 
 void

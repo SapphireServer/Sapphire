@@ -69,8 +69,11 @@ namespace Sapphire
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
 
+
     if( !pBNpc )
+    {
       return false;
+    }
 
     // todo: these should really use callbacks when the state transitions or we could miss this tick
     switch( m_combatState )
@@ -86,7 +89,9 @@ namespace Sapphire
       case CombatStateType::JustDied:
         return pBNpc->getState() == Entity::BNpcState::JustDied;
       case CombatStateType::Dead:
-        return pBNpc->getState() == Entity::BNpcState::Dead;
+        return pBNpc->getState() == Entity::BNpcState::Dead ||
+               pBNpc->getState() == Entity::BNpcState::JustDied ||
+               pBNpc->getStatus() == Common::ActorStatus::Dead;
       default:
         break;
     }

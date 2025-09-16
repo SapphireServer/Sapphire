@@ -919,12 +919,12 @@ uint32_t Territory::getNextActorId()
   return ++m_nextActorId;
 }
 
-Entity::EventObjectPtr Territory::addEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
+Entity::EventObjectPtr Territory::addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId,
                                            uint32_t instanceId,
                                            uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
                                            float rotation, uint8_t permissionInv )
 {
-  auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, instanceId, state, pos, rotation, name,
+  auto eObj = Entity::make_EventObject( getNextEObjId(), baseId, boundInstanceId, instanceId, state, pos, rotation, name,
                                         permissionInv );
   eObj->setScale( scale );
 

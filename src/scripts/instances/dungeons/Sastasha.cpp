@@ -167,7 +167,7 @@ public:
                                                             { 
                                                               eobj.setPermissionInvisibility( 1 );
 
-                                                              if( eobj.getObjectId() == instance.getCustomVar( Coral ) )
+                                                              if( eobj.getBaseId() == instance.getCustomVar( Coral ) )
                                                               {
                                                                 instance.addEObj( "Inconspicuousswitch", 2000216, 3653858, 3280956, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f, 0 );
                                                                 instance.setVar( 0, Seq1 );

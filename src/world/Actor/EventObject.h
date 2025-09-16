@@ -8,14 +8,14 @@ namespace Sapphire::Entity
   class EventObject : public GameObject
   {
   public:
-    EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
+    EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
                  Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
 
-    uint32_t getSharedGroupId() const;
+    uint32_t getBoundInstanceId() const;
 
-    void setSharedGroupId( uint32_t sharedGroupId );
+    void setBoundInstanceId( uint32_t boundInstanceId );
 
     uint8_t getState() const;
 
@@ -29,7 +29,7 @@ namespace Sapphire::Entity
 
     OnTalkEventHandler getOnTalkHandler() const;
 
-    uint32_t getObjectId() const;
+    uint32_t getBaseId() const;
 
     const std::string& getName() const;
 
@@ -57,8 +57,8 @@ namespace Sapphire::Entity
   protected:
     uint32_t m_instanceId;
     uint32_t m_housingLink;
-    uint32_t m_sharedGroupId;
-    uint32_t m_objectId;
+    uint32_t m_boundInstanceId;
+    uint32_t m_baseId;
     uint32_t m_ownerId;
     uint8_t m_state;
     uint8_t m_permissionInvisibility;

@@ -24,13 +24,13 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
+EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
                           FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
-  m_sharedGroupId( gimmickId ),
+  m_boundInstanceId( boundInstanceId ),
   m_instanceId( instanceId ),
   m_state( initialState ),
-  m_objectId( objectId ),
+  m_baseId( baseId ),
   m_name( givenName ),
   m_housingLink( 0 ),
   m_permissionInvisibility( permissionInv ),
@@ -43,14 +43,14 @@ EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickI
   m_rot = rotation;
 }
 
-uint32_t EventObject::getSharedGroupId() const
+uint32_t EventObject::getBoundInstanceId() const
 {
-  return m_sharedGroupId;
+  return m_boundInstanceId;
 }
 
-uint32_t EventObject::getObjectId() const
+uint32_t EventObject::getBaseId() const
 {
-  return m_objectId;
+  return m_baseId;
 }
 
 float EventObject::getScale() const
@@ -73,9 +73,9 @@ void EventObject::setOnTalkHandler( EventObject::OnTalkEventHandler handler )
   m_onTalkEventHandler = std::move( handler );
 }
 
-void EventObject::setSharedGroupId( uint32_t sharedGroupId )
+void EventObject::setBoundInstanceId( uint32_t boundInstanceId )
 {
-  m_sharedGroupId = sharedGroupId;
+  m_boundInstanceId = boundInstanceId;
 }
 
 uint8_t EventObject::getState() const
@@ -127,9 +127,9 @@ void EventObject::spawn( PlayerPtr pTarget )
   eobjStatePacket->data().Index = spawnIndex;
   eobjStatePacket->data().Kind = getObjKind();
   eobjStatePacket->data().Flag = getState();
-  eobjStatePacket->data().BaseId = getObjectId();
+  eobjStatePacket->data().BaseId = getBaseId();
   eobjStatePacket->data().LayoutId = getInstanceId();
-  eobjStatePacket->data().BindLayoutId = getSharedGroupId();
+  eobjStatePacket->data().BindLayoutId = getBoundInstanceId();
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().Pos = getPos();
   eobjStatePacket->data().Scale = getScale();

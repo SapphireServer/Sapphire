@@ -311,9 +311,6 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
   updateState( tickCount );
   scriptMgr.onInstanceUpdate( *this, tickCount );
 
-  if( m_pEncounter )
-    m_pEncounter->update( tickCount );
-
   m_lastUpdate = tickCount;
 }
 
@@ -450,11 +447,11 @@ void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
-  if( object->getObjectId() == 2000182 ) // start
+  if( object->getBaseId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
+  auto objData = exdData.getRow< Excel::EObj >( object->getBaseId() );
   if( objData )
   {
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
@@ -462,7 +459,7 @@ void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
   else
     Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
-                   std::to_string( object->getObjectId() ) );
+                   std::to_string( object->getBaseId() ) );
 }
 
 void Sapphire::InstanceContent::sendSharedGroup( uint32_t sharedGroupId, uint32_t timeIndex )
@@ -632,7 +629,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjById( uint32_
   Entity::EventObjectPtr pEObj = nullptr;
 
   for( auto& eobj : m_eventIdToObjectMap )
-    if( eobj.second->getObjectId() == eobjId )
+    if( eobj.second->getBaseId() == eobjId )
       return pEObj;
 
   return nullptr;

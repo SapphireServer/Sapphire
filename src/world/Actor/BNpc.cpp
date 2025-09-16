@@ -183,8 +183,6 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
       m_radius = modelSkeleton->data().Radius * m_baseScale;
       m_walkSpeed = modelSkeleton->data().WalkSpeed;
       m_runSpeed = modelSkeleton->data().RunSpeed;
-
-      //m_autoAttackAnimation = modelSkeleton->data().AutoAttackType;
     }
   }
 
@@ -269,6 +267,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
 
 
   m_radius = bNpcBaseData->data().Scale;
+  m_baseScale = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
@@ -294,7 +293,11 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
   {
     auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
-      m_radius *= modelSkeleton->data().Radius;
+    {
+      m_radius = modelSkeleton->data().Radius * m_baseScale;
+      m_walkSpeed = modelSkeleton->data().WalkSpeed;
+      m_runSpeed = modelSkeleton->data().RunSpeed;
+    }
   }
 
   // todo: is this actually good?
@@ -705,7 +708,7 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   if( !hateListHasActor( pChara ) )
   {
     hateListAdd( pChara, 1000 );
-    if( getTargetId() == pChara->getId() )
+    //if( getTargetId() == pChara->getId() )
     {
       updateAggroTarget();
       hateListUpdatePlayers();

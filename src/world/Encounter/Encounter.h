@@ -20,6 +20,14 @@ namespace Sapphire
     SUCCESS
   };
 
+  struct EncounterActor
+  {
+    uint32_t layoutId;
+    uint32_t hp;
+    Common::BNpcType type;
+    uint32_t flags;
+  };
+
   class Encounter : public std::enable_shared_from_this< Encounter >
   {
   public:
@@ -55,15 +63,21 @@ namespace Sapphire
 
     Event::DirectorPtr getDirector();
 
+    void setInitialActorSetup( const std::vector< EncounterActor >& actorSetupList );
+
   protected:
     uint64_t m_startTime{ 0 };
     std::string m_timelineName;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
-    TerritoryPtr m_pTeri;
+
     EncounterStatus m_status{ EncounterStatus::IDLE };
-    std::shared_ptr< TimelinePack > m_pTimeline;
+
     Event::DirectorPtr m_pDirector;
+    TerritoryPtr m_pTeri;
+
+    std::vector< EncounterActor > m_actorSetupList;
+    std::shared_ptr< TimelinePack > m_pTimeline;
   };
 
 

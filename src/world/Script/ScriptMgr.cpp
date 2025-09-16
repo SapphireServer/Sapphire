@@ -210,7 +210,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( auto eobj = zone ? zone->getEObj( static_cast< uint32_t >( actorId ) ) : nullptr )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getObjectId() );
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getBaseId() );
     if( script )
     {
       script->onTalk( eventId, player, *eobj );

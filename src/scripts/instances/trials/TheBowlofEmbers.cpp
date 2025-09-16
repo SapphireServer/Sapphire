@@ -15,19 +15,19 @@ public:
 
   void setupEncounter( InstanceContent& instance, EncounterPtr pEncounter )
   {
+    std::vector< EncounterActor > actors { { NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy, 0 } };
+    pEncounter->setInitialActorSetup( actors );
     pEncounter->init();
-    auto boss = instance.createBNpcFromLayoutId( NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy );
-    boss->init();
-    pEncounter->addBNpc( boss );
   }
 
   void onInit( InstanceContent& instance ) override
   {
+    auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
+    auto director = std::static_pointer_cast< Event::Director >( instanceContent );
     instance.addEObj( "Entrance", 2000182, 4177874, 4177871, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0);
-    auto pEncounter = std::make_shared< Encounter >( instance.shared_from_this()->getAsInstanceContent(),
-      std::static_pointer_cast< Event::Director >( instance.shared_from_this()->getAsInstanceContent() ), "IfritNormal" );
+    auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "IfritNormal" );
     setupEncounter( instance, pEncounter );
-    //instance.setEncounterTimeline(  );
+
     instance.setEncounter( pEncounter );
   }
 
@@ -52,6 +52,9 @@ public:
         pEncounter->setStartTime( tickCount );
         pEncounter->start();
       }
+
+      if( pEncounter )
+        pEncounter->update( tickCount );
 
       // Fight end condition
       if( pEncounter->getStatus() == EncounterStatus::ACTIVE && ifrit && ( !ifrit->isAlive() ) )

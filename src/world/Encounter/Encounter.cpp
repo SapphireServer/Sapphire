@@ -18,6 +18,13 @@ namespace Sapphire
     m_pTimeline->setEncounter( shared_from_this() );
     m_status = EncounterStatus::IDLE;
     m_startTime = 0;
+
+    for( const auto& actor : m_actorSetupList )
+    {
+      auto entry = m_pTeri->createBNpcFromLayoutId( actor.layoutId, actor.hp, actor.type );
+      entry->init();
+      addBNpc( entry );
+    }
   }
 
   void Encounter::start()
@@ -88,5 +95,10 @@ namespace Sapphire
   Event::DirectorPtr Encounter::getDirector()
   {
     return m_pDirector;
+  }
+
+  void Encounter::setInitialActorSetup( const std::vector<EncounterActor>& actorSetupList )
+  {
+    m_actorSetupList = actorSetupList;
   }
 }
