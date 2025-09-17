@@ -157,6 +157,7 @@ void EditorState::load()
     m_zoneEditor.init();
     m_lgbViewer.init();
     m_oldMon.init();
+    m_exdViewer.init();
   }
 
   if( !initMySQLConnection() )
@@ -859,6 +860,10 @@ void EditorState::renderMainMenu()
       {
         m_editorMode = EditorMode::OLDMON;
       }
+      if( ImGui::MenuItem( "Exd" ) )
+      {
+        m_editorMode = EditorMode::EXD;
+      }
 
       ImGui::EndMenu();
     }
@@ -904,6 +909,10 @@ void EditorState::render( double deltaTime )
   {
     m_oldMon.show();
   }
+  else if( m_editorMode == EditorMode::EXD )
+  {
+    m_exdViewer.show();
+  }
 
   if( !dockInitialized )
   {
@@ -923,11 +932,13 @@ void EditorState::render( double deltaTime )
     ImGui::DockBuilderDockWindow( "Lgb Viewer", down_id );
     ImGui::DockBuilderDockWindow( "Map Viewer", top_id );
     ImGui::DockBuilderDockWindow( "Capture Select", down_id );
+    ImGui::DockBuilderDockWindow( "EXD File Selector", down_id );
 
 
     ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.4, &left1_id, &right1_id );
     ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
     ImGui::DockBuilderDockWindow( "Packet Viewer", left1_id );
+    ImGui::DockBuilderDockWindow( "Exd Details", left1_id );
 
 
     ImGui::DockBuilderDockWindow( "BNPC Editor", right1_id );

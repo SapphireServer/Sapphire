@@ -24,6 +24,7 @@
 #include <ZoneEditor.h>
 #include <LgbViewer.h>
 #include <OldMon.h>
+#include <ExdView.h>
 
 namespace Client
 {
@@ -85,6 +86,7 @@ namespace Client
       ZONES,
       OLDMON,
       LGB,
+      EXD,
     } m_editorMode{ ZONES };
 
     std::string m_datLocation{ "F:\\client3.3\\game\\sqpack" };
@@ -97,6 +99,7 @@ namespace Client
     ZoneEditor m_zoneEditor;
     LgbViewer m_lgbViewer;
     OldMon m_oldMon;
+    ExdView m_exdViewer;
 
     std::string m_mysqlHost{ "localhost" };
     std::string m_mysqlUser{ "root" };
