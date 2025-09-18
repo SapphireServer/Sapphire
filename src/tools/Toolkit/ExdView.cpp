@@ -296,9 +296,9 @@ void ExdView::showExdDetails()
   ImGui::Text( "Rows: %zu, Columns: %d", m_cachedData.rows.size(), m_cachedData.columnCount - 1 );
   ImGui::Separator();
   // Display configuration
-  static int maxRowsToDisplay = 10000;
+  static int maxRowsToDisplay = 5000;
   ImGui::SetNextItemWidth( 200 );
-  if( ImGui::SliderInt( "Max Rows", &maxRowsToDisplay, 10, 1000 ) )
+  if( ImGui::SliderInt( "Max Rows", &maxRowsToDisplay, 10, 20000 ) )
   {
     // User changed the display limit
   }
@@ -308,18 +308,79 @@ void ExdView::showExdDetails()
   if( ImGui::BeginTable( tableId, m_cachedData.columnCount,
                          ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
                          ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY |
-                         ImGuiTableFlags_Resizable ) )
+                         ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit ) )
   {
     // Setup columns
-    ImGui::TableSetupColumn( "Row ID", ImGuiTableColumnFlags_WidthFixed, 50.0f );
+    ImGui::TableSetupColumn( "Row ID", ImGuiTableColumnFlags_WidthFixed, 80.0f );
 
     for( int col = 0; col < m_cachedData.columnCount - 1; ++col )
     {
       std::string colName = "Col " + std::to_string( col );
-      ImGui::TableSetupColumn( colName.c_str(), ImGuiTableColumnFlags_WidthStretch, 35.0f );
+
+      // Calculate a reasonable minimum width based on content
+      float minWidth = 60.0f; // Base minimum width
+
+      // Sample some rows to estimate content width
+      float maxContentWidth = 0.0f;
+      int sampleCount = 0;
+      const int maxSamples = 50; // Limit sampling for performance
+
+      for( const auto& [rowId, fields] : m_cachedData.rows )
+      {
+        if( sampleCount >= maxSamples ) break;
+
+        if( col < static_cast<int>(fields.size()) )
+        {
+          const auto& field = fields[col];
+
+          // Convert variant to string for width calculation
+          std::string cellValue;
+          std::visit( [&cellValue]( const auto& value )
+          {
+            using T = std::decay_t< decltype(value) >;
+            if constexpr( std::is_same_v< T, std::string > )
+            {
+              cellValue = value.empty() ? " " : value;
+            }
+            else if constexpr( std::is_same_v< T, bool > )
+            {
+              cellValue = value ? "true" : "false";
+            }
+            else if constexpr( std::is_floating_point_v< T > )
+            {
+              char buffer[ 32 ];
+              snprintf( buffer, sizeof( buffer ), "%.6g", static_cast< double >( value ) );
+              cellValue = buffer;
+            }
+            else if constexpr( std::is_integral_v< T > )
+            {
+              cellValue = std::to_string( value );
+            }
+            else
+            {
+              cellValue = "Unknown";
+            }
+          }, field );
+
+          // Estimate text width (rough approximation: 7 pixels per character)
+          float textWidth = cellValue.length() * 7.0f + 16.0f; // +16 for padding
+          maxContentWidth = std::max( maxContentWidth, textWidth );
+        }
+        sampleCount++;
+      }
+
+      // Also consider header width
+      float headerWidth = colName.length() * 7.0f + 16.0f;
+      maxContentWidth = std::max( maxContentWidth, headerWidth );
+
+      // Set a reasonable width with limits
+      float columnWidth = std::max( minWidth, std::min( maxContentWidth, 300.0f ) );
+
+      ImGui::TableSetupColumn( colName.c_str(), ImGuiTableColumnFlags_WidthFixed, columnWidth );
     }
 
     ImGui::TableHeadersRow();
+
 
 
     ImGui::SameLine();
@@ -360,7 +421,7 @@ void ExdView::showExdDetails()
             using T = std::decay_t< decltype(value) >;
             if constexpr( std::is_same_v< T, std::string > )
             {
-              cellValue = value.empty() ? "(empty)" : value;
+              cellValue = value.empty() ? " " : value;
             }
             else if constexpr( std::is_same_v< T, bool > )
             {
@@ -432,11 +493,15 @@ void ExdView::loadExdData()
 
     auto& cat = exdD.getExdData()->get_category( m_selectedExdFile );
 
+    // Choose language: prefer en if available, otherwise none
     xiv::exd::Language lang = xiv::exd::Language::none;
     if( cat.get_header().get_languages().size() > 1 )
-    {
       lang = xiv::exd::Language::en;
-    }
+
+    // Expected columns from EXH (true member count)
+    const size_t expectedCols =
+      static_cast<size_t>(cat.get_header().get_members().size());
+
     auto& exd = cat.get_data_ln( lang );
     auto& rows = exd.get_rows();
 
@@ -446,24 +511,71 @@ void ExdView::loadExdData()
       return;
     }
 
-    // Cache the data
+    // Copy rows and normalize columns
     m_cachedData.rows = rows;
 
-    // Calculate column count from first row
-    const auto& firstRow = rows.begin()->second;
-    m_cachedData.columnCount = static_cast< int >( firstRow.size() ) + 1; // +1 for row ID
+    if (expectedCols > 0)
+    {
+      for (auto& kv : m_cachedData.rows)
+      {
+        auto& vec = kv.second;
+        if (vec.size() > expectedCols)
+        {
+          // If data was appended per chunk, size will be a multiple of expectedCols.
+          // Keep only the first expectedCols (drop duplicates).
+          if (vec.size() % expectedCols == 0)
+          {
+            vec.resize(expectedCols);
+          }
+          else
+          {
+            // Fallback: clamp to expectedCols (or to current size if smaller).
+            vec.resize(std::min(vec.size(), expectedCols));
+          }
+        }
+        else if (vec.size() < expectedCols)
+        {
+          // Optional: pad to expectedCols if you prefer consistent widths.
+          // Not strictly needed for display; we leave as-is to avoid introducing fake data.
+        }
+      }
+
+      m_cachedData.columnCount = static_cast<int>(expectedCols) + 1; // +1 for Row ID
+    }
+    else
+    {
+      // If we cannot read members from header, fall back to min size among rows.
+      size_t minCols = std::numeric_limits<size_t>::max();
+      for (const auto& kv : m_cachedData.rows)
+        minCols = std::min(minCols, kv.second.size());
+
+      if (minCols == std::numeric_limits<size_t>::max())
+        minCols = 0;
+
+      for (auto& kv : m_cachedData.rows)
+      {
+        auto& vec = kv.second;
+        if (vec.size() > minCols)
+          vec.resize(minCols);
+      }
+
+      m_cachedData.columnCount = static_cast<int>(minCols) + 1;
+    }
 
     m_cachedData.isValid = true;
 
     std::cout << "Successfully loaded " << rows.size() << " rows with "
-        << ( m_cachedData.columnCount - 1 ) << " columns" << std::endl;
-  } catch( const std::exception& e )
+              << ( m_cachedData.columnCount - 1 ) << " columns (from EXH)" << std::endl;
+  }
+  catch( const std::exception& e )
   {
     std::cout << "Error loading EXD data: " << e.what() << std::endl;
     m_cachedData.isValid = false;
-  } catch( ... )
+  }
+  catch( ... )
   {
     std::cout << "Unknown error loading EXD data" << std::endl;
     m_cachedData.isValid = false;
   }
 }
+
