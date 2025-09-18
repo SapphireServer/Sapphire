@@ -1153,6 +1153,12 @@ std::deque< std::pair< uint32_t, uint8_t > >* Player::getSoldItems()
   return &m_soldItems;
 }
 
+void Player::rebaseSoldItems( size_t idx )
+{
+  auto it = m_soldItems.begin() + idx;
+  m_soldItems.erase( it );
+}
+
 void Player::clearSoldItems()
 {
   m_soldItems.clear();

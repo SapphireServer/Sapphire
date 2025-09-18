@@ -10,6 +10,7 @@
 #include "Manager/StatusEffectMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/ShopMgr.h"
 #include "Exd/ExdData.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/InstanceObjectCache.h"
@@ -240,6 +241,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::TerritoryMgr& teriMgr()
     {
       return Common::Service< World::Manager::TerritoryMgr >::ref();
+    }
+
+    World::Manager::ShopMgr& shopMgr()
+    {
+      return Common::Service< World::Manager::ShopMgr >::ref();
     }
   };
 

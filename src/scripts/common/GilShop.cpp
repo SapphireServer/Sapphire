@@ -30,23 +30,27 @@ private:
     {
       // buy
       if( result.getResult( 1 ) == 1 )
-      {
-        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
-        shopMgr.purchaseGilShopItem( player, result.getResult( 4 ), result.getResult( 6 ), result.getResult( 5 ) );
-      }
+        shopMgr().purchaseGilShopItem( player, result.getResult( 4 ), result.getResult( 6 ), result.getResult( 5 ) );
 
       // sell
       // can't sell if the vendor is yourself (eg, housing permit shop)
       else if( result.getResult( 1 ) == 2 && result.actorId != player.getId() )
-      {
-        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
-        shopMgr.sellGilShopItem( player, result.getResult( 2 ), result.getResult( 3 ), result.getResult( 6 ), result.getResult( 5 ) );
-      }
+        shopMgr().sellGilShopItem( player, result.getResult( 2 ), result.getResult( 3 ), result.getResult( 6 ), result.getResult( 5 ) );
 
       eventMgr().playGilShop( player, result.eventId, SCENE_FLAGS, result.getResult( 0 ), [ & ]( Entity::Player& player, const Event::SceneResult& result )
       {
         shopInteractionCallback( player, result );
       });
+      return;
+    }
+    else if( result.numOfResults == 5 )
+    {
+      shopMgr().purchaseBuybackItem( player, result.getResult( 2 ), result.getResult( 3 ), result.getResult( 4 ) );
+
+      eventMgr().playGilShop( player, result.eventId, SCENE_FLAGS, result.getResult( 0 ), [ & ]( Entity::Player& player, const Event::SceneResult& result )
+      {
+        shopInteractionCallback( player, result );
+      } );
       return;
     }
 
