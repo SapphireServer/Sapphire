@@ -378,13 +378,12 @@ void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 
 void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
-  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) );
 
   if( !currItem )
   {
-    // TODO: map currency type to itemid
-    currItem = createItem( static_cast< uint8_t >( type ) + 1 );
-    m_storageMap[ Crystal ]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
+    currItem = createItem( static_cast< uint8_t >( type ) );
+    m_storageMap[ Crystal ]->setItem( static_cast< uint8_t >( type ), currItem );
   }
 
   uint32_t currentAmount = currItem->getStackSize();
@@ -399,9 +398,9 @@ void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 
   auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
   invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = Common::InventoryType::Currency;
+  invUpdate->data().srcStorageId = InventoryType::Crystal;
   invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 1;
+  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type );
   invUpdate->data().srcEntity = getId();
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
@@ -412,7 +411,7 @@ void Player::addCrystal( Common::CrystalType type, uint32_t amount )
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
   server().queueForPlayer( getCharacterId(), invTransFinPacket );
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ), amount ) );
 }
 
 void Player::removeCrystal( Common::CrystalType type, uint32_t amount )
@@ -629,6 +628,11 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
 
   std::pair< uint16_t, uint16_t > freeBagSlot;
   bool foundFreeSlot = false;
+  if (itemInfo->data().UICategory == 59)
+  {
+    this->addCrystal( static_cast< CrystalType >( catalogId ), quantity );
+    return nullptr;
+  }
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
 
