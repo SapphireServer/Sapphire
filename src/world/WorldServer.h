@@ -20,7 +20,7 @@ namespace Sapphire::World
 
     using WorldConfigPtr = std::shared_ptr< Sapphire::Common::Config::WorldConfig >;
 
-    void run( int32_t argc, char* argv[] );
+    void init( int32_t argc, char* argv[] );
 
     bool createSession( uint32_t sessionId );
 
@@ -35,7 +35,9 @@ namespace Sapphire::World
     uint16_t getWorldId() const;
     void setWorldId( uint16_t worldId );
 
-    void mainLoop();
+    void update( uint64_t tickCount );
+
+    void shutdown();
 
     bool isRunning() const;
 
@@ -64,6 +66,8 @@ namespace Sapphire::World
 
     std::string m_configName;
     std::mutex m_sessionMutex;
+
+    std::vector< std::thread > m_threadList;
 
     Sapphire::Common::Config::WorldConfig m_config;
 

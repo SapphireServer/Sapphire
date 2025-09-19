@@ -128,34 +128,9 @@ bool WorldServer::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-std::string readFileToString( const std::string& filename )
-{
-  // Open the file for reading
-  std::ifstream file( filename );
-
-  // Check if the file was opened successfully
-  if( !file )
-  {
-    throw std::runtime_error( "Failed to open file" );
-  }
-
-  // Read the contents of the file into a string
-  std::string fileContents( ( std::istreambuf_iterator< char >( file ) ),
-                              std::istreambuf_iterator< char >() );
-
-  // Close the file
-  file.close();
-
-  // Remove all newlines from the file contents
-  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\n' ), fileContents.end() );
-  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\r' ), fileContents.end() );
 
 
-  // Return the file contents as a string
-  return fileContents;
-}
-
-void WorldServer::run( int32_t argc, char* argv[] )
+void WorldServer::init( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
 
@@ -181,7 +156,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   try
   {
     auto verPath = dataPath + "/../ffxivgame.ver";
-    auto verString = readFileToString( verPath );
+    auto verString = Common::Util::readFileToString( verPath );
     if( verString != m_config.global.general.dataVersion )
     {
       Logger::fatal( "Sqpack version {} does not match expected version {}!", verString, m_config.global.general.dataVersion );
@@ -345,8 +320,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
     return;
   }
 
-  std::vector< std::thread > thread_list;
-  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
+
+  m_threadList.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
 
   auto pDebugCom = std::make_shared< DebugCommandMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
@@ -375,14 +350,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
   Logger::debug( "Initialization took {0}ms", Common::Util::getTimeMs() - start );
 
-  Logger::info( "World server running on {0}:{1}", m_ip, m_port );
-
-  mainLoop();
-
-  for( auto& thread_entry : thread_list )
-  {
-    thread_entry.join();
-  }
+  Logger::info( "World server ready on {0}:{1}", m_ip, m_port );
 
 }
 
@@ -406,37 +374,34 @@ void WorldServer::printBanner() const
   Logger::info( "===========================================================" );
 }
 
-void WorldServer::mainLoop()
+void WorldServer::update( uint64_t tickCount )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
   auto& contentFinder = Common::Service< ContentFinder >::ref();
-
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
 
-  while( isRunning() )
+  auto currTime = Common::Util::getTimeSeconds();
+  taskMgr.update( tickCount );
+  updateSessions( currTime );
+
+  m_lastServerTick = tickCount;
+
+  terriMgr.updateTerritoryInstances( tickCount );
+  scriptMgr.update();
+  contentFinder.update();
+
+  DbKeepAlive( currTime );
+}
+
+void WorldServer::shutdown()
+{
+  for( auto& thread_entry : m_threadList )
   {
-    auto tickCount = Common::Util::getTimeMs();
-
-    auto currTime = Common::Util::getTimeSeconds();
-    taskMgr.update( tickCount );
-    updateSessions( currTime );
-
-    if( tickCount - m_lastServerTick < 300 )
-    {
-    //  std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-    //  continue;
-    }
-    m_lastServerTick = tickCount;
-
-    terriMgr.updateTerritoryInstances( tickCount );
-    scriptMgr.update();
-    contentFinder.update();
-
-
-    DbKeepAlive( currTime );
+    thread_entry.join();
   }
+
+  m_threadList.clear();
 }
 
 void WorldServer::DbKeepAlive( uint32_t currTime )

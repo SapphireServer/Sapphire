@@ -11,6 +11,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+std::shared_ptr< Sapphire::buffer_sink_mt > Sapphire::Logger::m_bufferSink;
+
 
 void Sapphire::Logger::init( const std::string& logPath )
 {
@@ -27,7 +29,9 @@ void Sapphire::Logger::init( const std::string& logPath )
   auto stdout_sink = std::make_shared< spdlog::sinks::stdout_color_sink_mt >();
   auto daily_sink = std::make_shared< spdlog::sinks::daily_file_sink_mt >( logPath + ".log", 0, 0 );
 
-  std::vector< spdlog::sink_ptr > sinks { stdout_sink, daily_sink };
+  m_bufferSink = std::make_shared< buffer_sink_mt >();
+
+  std::vector< spdlog::sink_ptr > sinks{ stdout_sink, daily_sink, m_bufferSink };
 
   auto logger = std::make_shared< spdlog::async_logger >( "logger", sinks.begin(), sinks.end(),
                                                           spdlog::thread_pool(), spdlog::async_overflow_policy::block );
@@ -45,6 +49,11 @@ void Sapphire::Logger::init( const std::string& logPath )
 void Sapphire::Logger::setLogLevel( uint8_t logLevel )
 {
   spdlog::set_level( static_cast< spdlog::level::level_enum >( logLevel ) );
+}
+
+std::shared_ptr< Sapphire::buffer_sink_mt > Sapphire::Logger::getBufferSink()
+{
+  return m_bufferSink;
 }
 
 void Sapphire::Logger::error( const std::string& text )
@@ -76,4 +85,3 @@ void Sapphire::Logger::trace( const std::string& text )
 {
   spdlog::get( "logger" )->trace( text );
 }
-

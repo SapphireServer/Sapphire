@@ -5,6 +5,8 @@
 #include <Util/CrashHandler.h>
 #include <Service.h>
 
+#include "Util/Util.h"
+
 using namespace Sapphire;
 using namespace Sapphire::World;
 
@@ -17,6 +19,15 @@ int main( int32_t argc, char* argv[] )
 
   Common::Service< WorldServer >::set( pServer );
 
-  pServer->run( argc, argv );
+  pServer->init( argc, argv );
+
+  while( pServer->isRunning() )
+  {
+    auto tickCount = Common::Util::getTimeMs();
+    pServer->update( tickCount );
+  }
+
+  pServer->shutdown();
+
   return 0;
 }

@@ -4,22 +4,23 @@
 
 namespace Sapphire
 {
-  Encounter::Encounter( TerritoryPtr pInstance, std::shared_ptr< Event::Director > pDirector, const std::string& timelineName ) :
+  Encounter::Encounter( TerritoryPtr pInstance, std::shared_ptr< Event::Director > pDirector,
+                        const std::string& timelineName ) :
     m_pTeri( pInstance ),
     m_pDirector( pDirector ),
-    m_timelineName( timelineName ),
     m_status( EncounterStatus::UNINITIALIZED )
   {
+    m_setup.timelineName = timelineName;
   }
 
   void Encounter::init()
   {
-    m_pTimeline = TimelinePack::createTimelinePack( m_timelineName );
+    m_pTimeline = TimelinePack::createTimelinePack( m_setup.timelineName );
     m_pTimeline->setEncounter( shared_from_this() );
     m_status = EncounterStatus::IDLE;
     m_startTime = 0;
 
-    for( const auto& actor : m_actorSetupList )
+    for( const auto& actor : m_setup.actorSetupList )
     {
       auto entry = m_pTeri->createBNpcFromLayoutId( actor.layoutId, actor.hp, actor.type );
       entry->init();
@@ -97,8 +98,13 @@ namespace Sapphire
     return m_pDirector;
   }
 
-  void Encounter::setInitialActorSetup( const std::vector<EncounterActor>& actorSetupList )
+  void Encounter::setInitialActorSetup( const std::vector< EncounterActor >& actorSetupList )
   {
-    m_actorSetupList = actorSetupList;
+    m_setup.actorSetupList = actorSetupList;
+  }
+
+  EncounterSetup& Encounter::getSetup()
+  {
+    return m_setup;
   }
 }
