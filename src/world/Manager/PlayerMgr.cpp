@@ -391,6 +391,42 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
   Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, player.getCurrentExp() );
 }
 
+bool PlayerMgr::isAllAreaDiscovered(Entity::Player& player, int16_t mapId)
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  int32_t offset;
+
+  auto info = exdData.getRow< Excel::Map >( mapId );
+  const auto& mapData = info->data();
+
+  if( mapData.IsUint16Discovery )
+    offset = 2 * mapData.DiscoveryIndex;
+  else
+    offset = 320 + 4 * mapData.DiscoveryIndex;
+
+  auto& discovery = player.getDiscoveryBitmask();
+
+  uint32_t mask = mapData.DiscoveryFlag;
+  uint32_t discoveredAreas;
+  if( info->data().IsUint16Discovery )
+  {
+    discoveredAreas = ( discovery[ offset + 1 ] << 8 ) | discovery[ offset ];
+  }
+  else
+  {
+    discoveredAreas = ( discovery[ offset + 3 ] << 24 ) |
+                      ( discovery[ offset + 2 ] << 16 ) |
+                      ( discovery[ offset + 1 ] << 8 ) |
+                      discovery[ offset ];
+  }
+
+  if( ( ( discoveredAreas & mask ) == mask ) )
+    return true;
+  else
+    return false;
+}
+
 void PlayerMgr::onDiscoverArea( Entity::Player& player, int16_t mapId, int16_t subId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -441,9 +477,12 @@ void PlayerMgr::onDiscoverArea( Entity::Player& player, int16_t mapId, int16_t s
 
   bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
 
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::MapDiscovery >( player, mapId, allDiscovered );
+
   if( allDiscovered )
   {
-    onGainExp( player, exp * 10 );
+    onGainExp( player, exp * 10 ) ;
   }
 }
 
