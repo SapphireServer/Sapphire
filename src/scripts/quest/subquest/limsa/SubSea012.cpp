@@ -77,18 +77,16 @@ public:
     if( bnpc.getBNpcNameId() != Enemy0 )
       return;
 
-    auto currentKC = quest.getUI8AL() + 1;
-    quest.setUI8BH( currentKC );
-    quest.setUI8AL( currentKC );
+    if( quest.getSeq() == Seq2 )
+    {
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
 
-    if( currentKC >= 4 )
-    {
-      eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC + 1, 4 );
-      quest.setSeq( SeqFinish );
-    }
-    else
-    {
-      eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC, 4 );
+      //eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 4 );
+      eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AL(), 4, player.getQuestItemIcon( Item0 ) } );
+
+      if( quest.getUI8AL() >= 4 )
+        quest.setSeq( SeqFinish );
     }
   }
 
@@ -159,7 +157,6 @@ private:
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );

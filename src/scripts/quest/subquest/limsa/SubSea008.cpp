@@ -86,20 +86,13 @@ class SubSea008 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
 
 private:
-  void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    if( varIdx == 1 )
+    if( quest.getUI8AL() && quest.getUI8BH() )
     {
-      if( quest.getUI8AL() && quest.getUI8BH() )
-      {
-        quest.setSeq( SeqFinish );
-      }
+      quest.setSeq( SeqFinish );
     }
   }
   //////////////////////////////////////////////////////////////////////
@@ -172,7 +165,7 @@ private:
     eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setUI8AL( 1 );
     quest.setBitFlag8( 1, true );
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
 
   }
 
@@ -203,7 +196,7 @@ private:
     eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setUI8BH( 1 );
     quest.setBitFlag8( 2, true );
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////

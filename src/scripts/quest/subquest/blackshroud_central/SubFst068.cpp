@@ -108,6 +108,7 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    eventMgr().sendEventNotice( player, getId(), 0, 0 );
     quest.setSeq( SeqFinish );
   }
 
