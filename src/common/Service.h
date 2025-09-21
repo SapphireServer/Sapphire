@@ -37,7 +37,7 @@ namespace Sapphire::Common
      */
     static bool empty() noexcept
     {
-      return !static_cast< bool >( service );
+      return !static_cast< bool >( service() );
     }
 
     /**
@@ -52,7 +52,7 @@ namespace Sapphire::Common
      */
     static std::weak_ptr< SvcType > get() noexcept
     {
-      return service;
+      return service();
     }
 
     /**
@@ -71,7 +71,7 @@ namespace Sapphire::Common
      */
     static SvcType& ref() noexcept
     {
-      return *service;
+      return *service();
     }
 
     /**
@@ -83,7 +83,7 @@ namespace Sapphire::Common
     template< typename Impl = SvcType, typename... Args >
     static void set( Args&& ... args )
     {
-      service = std::make_shared< Impl >( std::forward< Args >( args )... );
+      service() = std::make_shared< Impl >( std::forward< Args >( args )... );
     }
 
     /**
@@ -93,7 +93,7 @@ namespace Sapphire::Common
     static void set( std::shared_ptr< SvcType > ptr )
     {
       assert( static_cast< bool >( ptr ) );
-      service = std::move( ptr );
+      service() = std::move( ptr );
     }
 
     /**
@@ -103,10 +103,13 @@ namespace Sapphire::Common
      */
     static void reset()
     {
-      service.reset();
+      service().reset();
     }
 
   private:
-    inline static std::shared_ptr< SvcType > service = nullptr;
+    static std::shared_ptr< SvcType >& service() {
+      static std::shared_ptr< SvcType > svc;
+      return svc;
+    }
   };
 }
