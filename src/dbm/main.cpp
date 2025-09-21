@@ -116,6 +116,8 @@ int main( int32_t argc, char* argv[] )
 
   std::string migrationName;
 
+  uint16_t port;
+
   bool force = false;
 
   // load config first so it can still be overridden if required
@@ -127,6 +129,7 @@ int main( int32_t argc, char* argv[] )
     database = globalConfig.database.database;
     user = globalConfig.database.user;
     pass = globalConfig.database.password;
+    port = globalConfig.database.port;
   }
 
   std::vector< std::string > args( argv + 1, argv + argc );
@@ -155,6 +158,8 @@ int main( int32_t argc, char* argv[] )
       iFile = val;
     else if( arg == "force" )
       force = true;
+    else if( arg == "port" )
+      port = atoi( val.c_str() );
     else if( arg == "name" )
       migrationName = val;
   }
@@ -168,7 +173,7 @@ int main( int32_t argc, char* argv[] )
     return 0;
   }
 
-  auto dbm = DbManager( host, database, user, pass, 3306 );
+  auto dbm = DbManager( host, database, user, pass, port );
 
   if( !sFile.empty() && !iFile.empty() )
   {
