@@ -55,6 +55,30 @@ uint32_t ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
 
 }
 
+bool ShopMgr::purchaseBuybackItem( Entity::Player& player, uint32_t soldItemSlot, uint32_t quantity, uint32_t basePrice )
+{
+  auto soldItems = player.getSoldItems();
+
+  if( !soldItems || soldItems->size() < soldItemSlot )
+    return false;
+
+  auto refund = basePrice * quantity;
+
+  if( player.getCurrency( Common::CurrencyType::Gil ) < refund )
+    return false;
+
+  auto itemId = soldItems->at( soldItemSlot ).first;
+
+  if( !player.addItem( itemId, quantity ) )
+    return false;
+
+  player.removeCurrency( Common::CurrencyType::Gil, refund );
+
+  player.rebaseSoldItems( static_cast< size_t >( soldItemSlot ) );
+
+  return true;
+}
+
 bool ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -84,13 +108,13 @@ bool ShopMgr::sellGilShopItem( Entity::Player& player, uint16_t container, uint8
   if( !item )
     return false;
 
-  auto payback = ( item->data().Price ) * quantity;
+  auto payback = ( item->data().PriceMin ) * quantity;
 
   auto inventoryItem = player.getItemAt( container, fromSlot );
 
   // todo: adding stack remove
-  if( quantity > 1 )
-    return false;
+  //if( quantity > 1 )
+  //  return false;
 
   player.discardItem( ( Common::InventoryType )container, fromSlot );
   player.addSoldItem( itemId, quantity );

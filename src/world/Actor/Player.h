@@ -191,6 +191,7 @@ namespace Sapphire::Entity
     bool collectHandInItems( std::vector< uint32_t > itemIds );
 
     void addSoldItem( uint32_t itemId, uint8_t stackSize );
+    void rebaseSoldItems( size_t idx );
 
     std::deque< std::pair< uint32_t, uint8_t > > *getSoldItems();
 
