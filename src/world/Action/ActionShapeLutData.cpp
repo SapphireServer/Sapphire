@@ -9,7 +9,6 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-ActionShapeLut::ConeLut ActionShapeLut::m_coneLut;
 
 bool ActionShapeLutData::cacheShapes()
 {
@@ -26,7 +25,7 @@ bool ActionShapeLutData::cacheShapes()
     auto id = std::stoi( i.key() );
     auto cone = i.value().get< ConeEntry >();
 
-    if( ActionShapeLut::m_coneLut.count( id ) > 0 )
+    if( ActionShapeLut::lut().count( static_cast< uint16_t >( id ) ) > 0 )
       throw std::runtime_error( fmt::format( "Cone for action with ID {} cannot be defined more than once", i.key() ) );
 
     if( cone.startAngle < -180 )
@@ -41,7 +40,7 @@ bool ActionShapeLutData::cacheShapes()
     cone.startAngle = Sapphire::Common::Util::degreesToRadians( cone.startAngle );
     cone.endAngle = Sapphire::Common::Util::degreesToRadians( cone.endAngle );
 
-    ActionShapeLut::m_coneLut.try_emplace( id, cone );
+    ActionShapeLut::lut().try_emplace( static_cast< uint16_t >( id ), cone );
   }
 
   f.close();
@@ -49,7 +48,7 @@ bool ActionShapeLutData::cacheShapes()
 
   // Repeat for new shapes here
 
-  if( ActionShapeLut::m_coneLut.empty() )
+  if( ActionShapeLut::lut().empty() )
     return false;
 
   return true;
@@ -57,8 +56,8 @@ bool ActionShapeLutData::cacheShapes()
 
 bool ActionShapeLutData::reloadShapes()
 {
-  if( !ActionShapeLut::m_coneLut.empty() )
-    ActionShapeLut::m_coneLut.clear();
+  if( !ActionShapeLut::lut().empty() )
+    ActionShapeLut::lut().clear();
 
   return cacheShapes();
 }

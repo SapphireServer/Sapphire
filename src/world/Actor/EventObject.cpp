@@ -24,8 +24,10 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
-                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv ) :
+EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
+                          uint8_t initialState,
+                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName,
+                          uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
   m_boundInstanceId( boundInstanceId ),
   m_instanceId( instanceId ),
@@ -90,7 +92,8 @@ void EventObject::setState( uint8_t state )
 
 void EventObject::playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag )
 {
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), PlaySharedGroupTimeline, flag, animationFlag );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), PlaySharedGroupTimeline, flag,
+                                           animationFlag );
 }
 
 void EventObject::setHousingLink( uint32_t housingLink )
@@ -120,9 +123,6 @@ void EventObject::spawn( PlayerPtr pTarget )
     return;
 
   auto& server = Common::Service< World::WorldServer >::ref();
-
-  Logger::debug( "Spawning EObj: id#{0} name={1}", getId(), getName() );
-
   auto eobjStatePacket = makeZonePacket< FFXIVIpcCreateObject >( getId(), pTarget->getId() );
   eobjStatePacket->data().Index = spawnIndex;
   eobjStatePacket->data().Kind = getObjKind();
@@ -147,8 +147,6 @@ void EventObject::spawn( PlayerPtr pTarget )
 
 void EventObject::despawn( PlayerPtr pTarget )
 {
-  Logger::debug( "despawn eobj#{0}", getId() );
-
   pTarget->freeObjSpawnIndexForActorId( getId() );
 }
 

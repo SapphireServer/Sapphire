@@ -27,7 +27,8 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::Packets::WorldPackets::Client;
 
-void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -41,8 +42,8 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   std::string objName = eventMgr.getEventName( eventId );
 
   World::Manager::PlayerMgr::sendDebug( player, "Chara: {0} -> {1} \neventId: {2} ({3:08X})",
-                    actorId, eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
-                    eventId, eventId );
+                                        actorId, eventMgr.getActorBaseId( static_cast< uint32_t >( actorId ) ),
+                                        eventId, eventId );
 
 
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
@@ -60,10 +61,10 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   }
 
   eventMgr.checkEvent( player, eventId );
-
 }
 
-void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -80,7 +81,7 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   std::string objName = eventMgr.getEventName( eventId );
 
   World::Manager::PlayerMgr::sendDebug( player, "Chara: {0} -> {1} \neventId: {2} ({3:08X})",
-                                        actorId, eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
+                                        actorId, eventMgr.getActorBaseId( static_cast< uint32_t >( actorId ) ),
                                         eventId, eventId );
 
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
@@ -92,13 +93,15 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   {
     auto questInfo = exdData.getRow< Excel::Quest >( eventId );
     if( questInfo )
-      World::Manager::PlayerMgr::sendUrgent( player, "Quest not implemented: {0}", questInfo->getString( questInfo->data().Text.Name ) );
+      World::Manager::PlayerMgr::sendUrgent( player, "Quest not implemented: {0}",
+                                             questInfo->getString( questInfo->data().Text.Name ) );
   }
 
   eventMgr.checkEvent( player, eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                 Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -120,7 +123,8 @@ void Sapphire::Network::GameConnection::eventHandlerWithinRange( const Packets::
   eventMgr.checkEvent( player, eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                  Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -141,7 +145,8 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets:
   eventMgr.checkEvent( player, eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                    Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
@@ -162,24 +167,28 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
 
   if( auto instance = pZone->getAsInstanceContent() )
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getTerritoryTypeId() );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1,
+                         player.getTerritoryTypeId() );
     instance->onEnterTerritory( player, eventId, param1, param2 );
   }
   else if( auto qb = pZone->getAsQuestBattle() )
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getTerritoryTypeId() );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1,
+                         player.getTerritoryTypeId() );
     qb->onEnterTerritory( player, eventId, param1, param2 );
   }
   else
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getTerritoryTypeId() );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 0,
+                         player.getTerritoryTypeId() );
     scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
   }
 
   eventMgr.checkEvent( player, eventId );
 }
 
-void Sapphire::Network::GameConnection::returnEventSceneHeader( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventSceneHeader( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -191,7 +200,8 @@ void Sapphire::Network::GameConnection::returnEventSceneHeader( const Packets::F
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene2( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene2( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -203,7 +213,8 @@ void Sapphire::Network::GameConnection::returnEventScene2( const Packets::FFXIVA
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene4( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene4( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -215,7 +226,8 @@ void Sapphire::Network::GameConnection::returnEventScene4( const Packets::FFXIVA
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene8( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene8( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -227,7 +239,8 @@ void Sapphire::Network::GameConnection::returnEventScene8( const Packets::FFXIVA
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene16( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene16( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -239,7 +252,8 @@ void Sapphire::Network::GameConnection::returnEventScene16( const Packets::FFXIV
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene32( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene32( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -251,7 +265,8 @@ void Sapphire::Network::GameConnection::returnEventScene32( const Packets::FFXIV
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene64( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene64( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -263,7 +278,8 @@ void Sapphire::Network::GameConnection::returnEventScene64( const Packets::FFXIV
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene128( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene128( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                             Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -275,7 +291,8 @@ void Sapphire::Network::GameConnection::returnEventScene128( const Packets::FFXI
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::returnEventScene255( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::returnEventScene255( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                             Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -287,7 +304,8 @@ void Sapphire::Network::GameConnection::returnEventScene255( const Packets::FFXI
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventSceneHeader( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventSceneHeader( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                               Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -299,7 +317,8 @@ void Sapphire::Network::GameConnection::yieldEventSceneHeader( const Packets::FF
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene2( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene2( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -311,7 +330,8 @@ void Sapphire::Network::GameConnection::yieldEventScene2( const Packets::FFXIVAR
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene4( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene4( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -323,7 +343,8 @@ void Sapphire::Network::GameConnection::yieldEventScene4( const Packets::FFXIVAR
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene8( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene8( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -335,7 +356,8 @@ void Sapphire::Network::GameConnection::yieldEventScene8( const Packets::FFXIVAR
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene16( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene16( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -347,7 +369,8 @@ void Sapphire::Network::GameConnection::yieldEventScene16( const Packets::FFXIVA
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene32( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene32( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -359,7 +382,8 @@ void Sapphire::Network::GameConnection::yieldEventScene32( const Packets::FFXIVA
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene64( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene64( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                           Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -371,7 +395,8 @@ void Sapphire::Network::GameConnection::yieldEventScene64( const Packets::FFXIVA
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene128( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene128( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -383,7 +408,8 @@ void Sapphire::Network::GameConnection::yieldEventScene128( const Packets::FFXIV
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventScene255( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventScene255( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                            Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -395,13 +421,14 @@ void Sapphire::Network::GameConnection::yieldEventScene255( const Packets::FFXIV
   eventMgr.handleYieldEventScene( player, data.handlerId, data.sceneId, data.yieldId, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   std::string inString;
 
-  uint16_t type = *( ( uint16_t* ) ( &inPacket.data[ 2 ] ) );
+  uint16_t type = *( ( uint16_t * ) ( &inPacket.data[ 2 ] ) );
   switch( type )
   {
     case Packets::WorldPackets::Client::ClientZoneIpcType::YieldEventSceneString8:
@@ -427,12 +454,12 @@ void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVAR
   const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString8 >( inPacket );
   auto& data = packet.data();
   eventMgr.handleYieldStringEventScene( player, data.handlerId, data.sceneId, data.yieldId, inString );
-
 }
 
-void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                                     Entity::Player& player )
 {
-  auto &eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   std::string inString;
   const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneIntAndString >( inPacket );
@@ -442,7 +469,8 @@ void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packe
   eventMgr.handleYieldStringIntEventScene( player, data.handlerId, data.sceneId, data.yieldId, inString, data.integer );
 }
 
-void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                              Entity::Player& player )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
@@ -456,7 +484,7 @@ void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFX
   std::string objName = eventMgr.getEventName( eventId );
 
   World::Manager::PlayerMgr::sendDebug( player, "Chara: {0} -> {1} \neventId: {2} ({3:08X})",
-                                        actorId, eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
+                                        actorId, eventMgr.getActorBaseId( static_cast< uint32_t >( actorId ) ),
                                         eventId, eventId );
 
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
@@ -464,7 +492,6 @@ void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFX
   scriptMgr.onSay( player, actorId, eventId, sayId );
 
   eventMgr.checkEvent( player, eventId );
-
 }
 
 void Sapphire::Network::GameConnection::startUiEvent( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -486,6 +513,3 @@ void Sapphire::Network::GameConnection::startUiEvent( const Packets::FFXIVARR_PA
 
   scriptMgr.onTalk( player, player.getId(), eventId );
 }
-
-
-

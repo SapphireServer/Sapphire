@@ -1,7 +1,9 @@
 #include "CrashHandler.h"
 
 #include <signal.h>
-#include <Logging/Logger.h>
+#include <string>
+// Note: Avoid including Sapphire::Logger here because using spdlog from a signal handler is unsafe
+// #include <Logging/Logger.h>
 
 #ifndef _WIN32
 #include <execinfo.h>
@@ -16,18 +18,45 @@
 
 inline std::string basename( const std::string& file )
 {
-    size_t i = file.find_last_of( "\\/" );
-    if ( i == std::string::npos )
-    {
-        return file;
-    }
-    else
-    {
-        return file.substr( i + 1 );
-    }
+  size_t i = file.find_last_of( "\\/" );
+  if( i == std::string::npos )
+  {
+    return file;
+  }
+  else
+  {
+    return file.substr( i + 1 );
+  }
 }
 
 #endif
+
+#include <cstdio>
+#include <cstdarg>
+#include <string>
+
+// Minimal, crash-safe logging (avoid spdlog in signal handlers)
+static void safe_log_line( const char *msg )
+{
+#ifdef _WIN32
+  OutputDebugStringA( msg );
+  OutputDebugStringA( "\n" );
+#endif
+  std::fputs( msg, stderr );
+  std::fputc( '\n', stderr );
+  std::fflush( stderr );
+}
+
+static void safe_logf( const char *fmt, ... )
+{
+  char buf[ 2048 ];
+  va_list args;
+  va_start( args, fmt );
+  std::vsnprintf( buf, sizeof( buf ), fmt, args );
+  va_end( args );
+  buf[ sizeof( buf ) - 1 ] = '\0';
+  safe_log_line( buf );
+}
 
 using namespace Sapphire::Common;
 
@@ -49,7 +78,7 @@ Util::CrashHandler::CrashHandler()
 void Util::CrashHandler::signalHandler( int sigNum )
 {
 #define ADD_SIGNAL_MAP( x ) case x: name = #x; break;
-  const char* name = nullptr;
+  const char *name = nullptr;
   switch( sigNum )
   {
     ADD_SIGNAL_MAP( SIGABRT );
@@ -57,19 +86,19 @@ void Util::CrashHandler::signalHandler( int sigNum )
     ADD_SIGNAL_MAP( SIGILL );
     ADD_SIGNAL_MAP( SIGFPE );
 #ifndef _WIN32
-    // SIGBUS not supported on windows
-    ADD_SIGNAL_MAP( SIGBUS );
+      // SIGBUS not supported on windows
+      ADD_SIGNAL_MAP( SIGBUS );
 #endif
   }
 #undef ADD_SIGNAL_MAP
 
   if( name )
   {
-    Logger::fatal( "Caught signal {} ({})", sigNum, name );
+    safe_logf( "Caught signal %d (%s)", sigNum, name );
   }
   else
   {
-    Logger::fatal( "Caught signal {}", sigNum );
+    safe_logf( "Caught signal %d", sigNum );
   }
 
   printStackTrace();
@@ -80,48 +109,48 @@ void Util::CrashHandler::signalHandler( int sigNum )
 
 void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 {
-  Logger::fatal( "Stack trace:" );
+  safe_logf( "Stack trace:" );
 
 #ifndef _WIN32
 
   // used as is from: https://oroboro.com/stack-trace-on-crash/
   // only changes output slightly
 
-  void* addrlist[ max_frames + 1 ];
+  void *addrlist[ max_frames + 1 ];
 
-  int addrlen = backtrace( addrlist, sizeof( addrlist ) / sizeof( void* ) );
+  int addrlen = backtrace( addrlist, sizeof( addrlist ) / sizeof( void * ) );
 
-  if ( addrlen == 0 )
+  if( addrlen == 0 )
   {
-    Logger::fatal( "No stack addresses available." );
+    safe_logf( "No stack addresses available." );
     return;
   }
 
-  char** symbollist = backtrace_symbols( addrlist, addrlen );
+  char **symbollist = backtrace_symbols( addrlist, addrlen );
 
   size_t funcnamesize = 1024;
-  char funcname[1024];
+  char funcname[ 1024 ];
 
   // iterate over the returned symbol lines. skip the first, it is the
   // address of this function.
-  for ( unsigned int i = 0; i < addrlen; i++ )
+  for( unsigned int i = 0; i < addrlen; i++ )
   {
-    char* begin_name   = NULL;
-    char* begin_offset = NULL;
-    char* end_offset   = NULL;
+    char *begin_name = NULL;
+    char *begin_offset = NULL;
+    char *end_offset = NULL;
 
     // find parentheses and +address offset surrounding the mangled name
-    for ( char *p = symbollist[i]; *p; ++p )
+    for( char *p = symbollist[ i ]; *p; ++p )
     {
-      if ( *p == '(' )
+      if( *p == '(' )
         begin_name = p;
-      else if ( *p == '+' )
+      else if( *p == '+' )
         begin_offset = p;
-      else if ( *p == ')' && ( begin_offset || begin_name ))
+      else if( *p == ')' && ( begin_offset || begin_name ) )
         end_offset = p;
     }
 
-    if ( begin_name && end_offset && ( begin_name < end_offset ))
+    if( begin_name && end_offset && ( begin_name < end_offset ) )
     {
       *begin_name++ = '\0';
       *end_offset++ = '\0';
@@ -133,21 +162,21 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
       // __cxa_demangle():
 
       int status = 0;
-      char* ret = abi::__cxa_demangle( begin_name, funcname,
+      char *ret = abi::__cxa_demangle( begin_name, funcname,
                                        &funcnamesize, &status );
-      char* fname = begin_name;
+      char *fname = begin_name;
       if( status == 0 )
         fname = ret;
 
-      const char* format = " {} {:40} {} + {}";
+      const char *format = " {} {:40} {} + {}";
 
       if( begin_offset )
       {
-        Logger::fatal( format, end_offset, symbollist[ i ], fname, begin_offset );
+        safe_logf( "%s %40s %s + %s", end_offset, symbollist[ i ], fname, begin_offset );
       }
       else
       {
-        Logger::fatal( format, end_offset, symbollist[ i ], fname, "" );
+        safe_logf( "%s %40s %s", end_offset, symbollist[ i ], fname );
       }
     }
   }
@@ -184,7 +213,7 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
     std::string fileName;
     int lineNum = 0;
 
-    char moduelBuff[MAX_PATH];
+    char moduelBuff[ MAX_PATH ];
     if( moduleBase && GetModuleFileNameA( ( HINSTANCE ) moduleBase, moduelBuff, MAX_PATH ) )
     {
       moduleName = basename( moduelBuff );
@@ -196,7 +225,7 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 
 
     DWORD64 offset = 0;
-    char symbolBuffer[sizeof( IMAGEHLP_SYMBOL ) + 255];
+    char symbolBuffer[ sizeof( IMAGEHLP_SYMBOL ) + 255 ];
     PIMAGEHLP_SYMBOL symbol = ( PIMAGEHLP_SYMBOL ) symbolBuffer;
     symbol->SizeOfStruct = sizeof( IMAGEHLP_SYMBOL ) + 255;
     symbol->MaxNameLength = 254;
@@ -220,7 +249,8 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
       lineNum = line.LineNumber;
     }
 
-    Logger::fatal( "[{:x}] {}({}): {} ({})", frame.AddrPC.Offset, fileName, lineNum, funcName, moduleName );
+    safe_logf( "[0x%llx] %s(%d): %s (%s)", ( unsigned long long ) frame.AddrPC.Offset, fileName.c_str(), lineNum,
+               funcName.c_str(), moduleName.c_str() );
   }
 
   SymCleanup( process );

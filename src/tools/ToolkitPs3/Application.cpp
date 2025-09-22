@@ -17,7 +17,7 @@
 
 #include <utility>
 
-#include "EditorState.h"
+#include "ServerState.h"
 
 #include <Util/Paths.h>
 
@@ -180,7 +180,7 @@ bool Engine::Application::init()
 void Engine::Application::initStates()
 {
   onInitStates();
-  auto menuState = std::make_shared< Client::EditorState >( m_context );
+  auto menuState = std::make_shared< Client::ServerState >( m_context );
   menuState->load();
   m_context->pStateStack->push( menuState );
 }

@@ -5,6 +5,7 @@
 #include <Util/CrashHandler.h>
 #include <Service.h>
 
+#include "Logging/Logger.h"
 #include "Util/Util.h"
 
 using namespace Sapphire;
@@ -15,6 +16,8 @@ Common::Util::CrashHandler crashHandler;
 
 int main( int32_t argc, char* argv[] )
 {
+  Logger::init( "log/world" );
+
   auto pServer = std::make_shared< WorldServer >( "world.ini" );
 
   Common::Service< WorldServer >::set( pServer );
@@ -28,6 +31,5 @@ int main( int32_t argc, char* argv[] )
   }
 
   pServer->shutdown();
-
   return 0;
 }

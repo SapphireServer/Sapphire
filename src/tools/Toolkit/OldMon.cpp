@@ -11,7 +11,7 @@
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
 
-#include "EditorState.h"
+#include "ServerState.h"
 
 #include "Engine/GfxApi.h"
 #include "Engine/ResourceManager.h"

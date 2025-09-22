@@ -88,6 +88,8 @@ add_subdirectory( "src/common" )
 add_subdirectory( "src/api" )
 add_subdirectory( "src/lobby" )
 add_subdirectory( "src/world" )
+add_subdirectory( "src/server_console" )
+add_subdirectory( "src/server_gui" )
 add_subdirectory( "src/dbm" )
 
 set( CMAKE_FOLDER "scripts" )

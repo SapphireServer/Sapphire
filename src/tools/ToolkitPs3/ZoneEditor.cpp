@@ -9,7 +9,7 @@
 #include "ExdData.h"
 #include <datReaderPs3/Exd/Structs.h>
 
-#include "EditorState.h"
+#include "ServerState.h"
 
 #include "Engine/GfxApi.h"
 #include "Engine/ResourceManager.h"
