@@ -815,6 +815,37 @@ bool Player::loadInventory()
     }
   }
 
+  auto crystalRes = db.query(fmt::format("SELECT storageId, "
+    "container_0, container_1, container_2, container_3, container_4, "
+    "container_5, container_6, container_7, container_8, container_9, "
+    "container_10, container_11, container_12, container_13, "
+    "container_14, container_15, container_16 "
+    "FROM charaitemcrystal " \
+    "WHERE CharacterId = {0} " \
+    "ORDER BY storageId ASC;", std::to_string(m_characterId)));
+
+  while( crystalRes->next() )
+  {
+    uint16_t storageId = crystalRes->getUInt16( 1 );
+    for( uint16_t i = 2; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
+    {
+      uint32_t crystal = crystalRes->getUInt( i );
+      uint16_t slot = i - 2;
+      auto currItem = m_storageMap[ Crystal ]->getItem( i );
+
+      if( crystal == 0 )
+        continue;
+
+      if( !currItem )
+      {
+        currItem = createItem( i );
+        m_storageMap[ Crystal ]->setItem( slot, currItem );
+      }
+
+      m_storageMap[ Crystal ]->getItem( slot )->setStackSize( crystal );
+    }
+  }
+
   return true;
 }
 

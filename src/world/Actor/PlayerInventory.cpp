@@ -54,10 +54,10 @@ void Player::initInventory()
   setupContainer( GearSet0, 13, "charaitemgearset", true );
 
   // gil contianer
-  setupContainer( Currency, 11, "charaiteminventory", true );
+  setupContainer( Currency, 11, "charaitemcurrency", true );
 
   // crystals??
-  setupContainer( Crystal, 11, "charaiteminventory", true );
+  setupContainer( Crystal, 16, "charaitemcrystal", true );
 
   // armory weapons - 0
   setupContainer( ArmoryMain, inventorySize, "charaiteminventory", true );
@@ -303,23 +303,40 @@ uint32_t Player::currencyTypeToItem( Common::CurrencyType type ) const
   }
 }
 
+void Player::setItemAmount( uint16_t storageId, uint8_t slot, uint32_t amount, bool justCreated )
+{
+  auto currItem = m_storageMap[ storageId ]->getItem( slot );
+
+  if( justCreated )
+    currItem->setStackSize( amount );
+  else
+  {
+    uint32_t currentAmount = currItem->getStackSize();
+
+    if( amount < 0 && -( amount ) > currentAmount )
+      currItem->setStackSize( 0 );
+    else
+      currItem->setStackSize( currentAmount + amount );
+  }
+}
+
 // TODO: these next functions are so similar that they could likely be simplified
 void Player::addCurrency( CurrencyType type, uint32_t amount )
 {
   auto slot = static_cast< uint8_t >( static_cast< uint8_t >( type ) - 1 );
   auto currItem = m_storageMap[ Currency ]->getItem( slot );
+  bool newItem = false;
 
   if( !currItem )
   {
     currItem = createItem( currencyTypeToItem( type ) );
     m_storageMap[ Currency ]->setItem( slot, currItem );
+    newItem = true;
   }
 
-  uint32_t currentAmount = currItem->getStackSize();
-  currItem->setStackSize( currentAmount + amount );
-  writeCurrencyItem( type );
+  setItemAmount( Currency, slot, amount, newItem );
 
-  updateContainer( Currency, slot, currItem );
+  writeDedicatedItem( Currency, type - 1 );
 
   auto seq = getNextInventorySequence();
 
@@ -344,18 +361,15 @@ void Player::addCurrency( CurrencyType type, uint32_t amount )
 
 void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 {
-
-  auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto slot = static_cast< uint8_t >( type ) - 1;
+  auto currItem = m_storageMap[ Currency ]->getItem( slot );
 
   if( !currItem )
     return;
 
-  uint32_t currentAmount = currItem->getStackSize();
-  if( amount > currentAmount )
-    currItem->setStackSize( 0 );
-  else
-    currItem->setStackSize( currentAmount - amount );
-  writeCurrencyItem( type );
+  setItemAmount( Currency, slot, -amount, false );
+
+  writeDedicatedItem( Currency, type - 1 );
 
   auto seq = getNextInventorySequence();
 
@@ -378,21 +392,20 @@ void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 
 void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
-  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) );
+  auto slot = static_cast< uint8_t >( type ) - 2;
+  auto currItem = m_storageMap[ Crystal ]->getItem( slot );
+  bool newItem = false;
 
   if( !currItem )
   {
-    currItem = createItem( static_cast< uint8_t >( type ) );
-    m_storageMap[ Crystal ]->setItem( static_cast< uint8_t >( type ), currItem );
+    currItem = createItem( static_cast< uint32_t >( type ) );
+    m_storageMap[ Crystal ]->setItem( slot, currItem );
+    newItem = true;
   }
 
-  uint32_t currentAmount = currItem->getStackSize();
+  setItemAmount( Crystal, slot, amount, newItem );
 
-  currItem->setStackSize( currentAmount + amount );
-
-  writeItem( currItem );
-
-  writeInventory( Crystal );
+  writeDedicatedItem( Crystal, type - 2 );
 
   auto seq = getNextInventorySequence();
 
@@ -400,7 +413,7 @@ void Player::addCrystal( Common::CrystalType type, uint32_t amount )
   invUpdate->data().contextId = seq;
   invUpdate->data().srcStorageId = InventoryType::Crystal;
   invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type );
+  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 2;
   invUpdate->data().srcEntity = getId();
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
@@ -416,26 +429,23 @@ void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 
 void Player::removeCrystal( Common::CrystalType type, uint32_t amount )
 {
-  auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
+  auto slot = static_cast< uint8_t >( type ) - 2;
+  auto currItem = m_storageMap[ Crystal ]->getItem( slot );
 
   if( !currItem )
     return;
 
-  uint32_t currentAmount = currItem->getStackSize();
-  if( amount > currentAmount )
-    currItem->setStackSize( 0 );
-  else
-    currItem->setStackSize( currentAmount - amount );
+  setItemAmount( Crystal, slot, -amount, false );
 
-  writeItem( currItem );
+  writeDedicatedItem( Crystal, type - 2 );
 
   auto seq = getNextInventorySequence();
 
   auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
   invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = Common::InventoryType::Currency;
+  invUpdate->data().srcStorageId = Common::InventoryType::Crystal;
   invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 1;
+  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 2;
   invUpdate->data().srcEntity = getId();
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
@@ -509,10 +519,18 @@ ItemPtr Player::getItemAt( uint16_t containerId, uint16_t slotId )
   return m_storageMap[ containerId ]->getItem( slotId );
 }
 
+uint32_t Player::getDedicatedStackSize(uint16_t storageId, uint8_t type)
+{
+  auto currItem = m_storageMap[ storageId ]->getItem( static_cast< uint8_t >( type ) );
+
+  if( !currItem )
+    return 0;
+
+  return currItem->getStackSize();
+}
 
 uint32_t Player::getCurrency( CurrencyType type )
 {
-
   auto currItem = m_storageMap[ Currency ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
   if( !currItem )
@@ -524,7 +542,6 @@ uint32_t Player::getCurrency( CurrencyType type )
 
 uint32_t Player::getCrystal( CrystalType type )
 {
-
   auto currItem = m_storageMap[ Crystal ]->getItem( static_cast< uint8_t >( type ) - 1 );
 
   if( !currItem )
@@ -579,15 +596,16 @@ void Player::writeItem( ItemPtr pItem ) const
   db.directExecute( stmt );
 }
 
-void Player::writeCurrencyItem( CurrencyType type )
+void Player::writeDedicatedItem( InventoryType inventoryType, uint8_t type )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto money = m_storageMap[ Currency ]->getItem( static_cast< uint16_t >( type ) - 1 )->getStackSize();
+  auto storage = m_storageMap[ inventoryType ];
+  auto item = storage->getItem( static_cast< uint16_t >( type ) )->getStackSize();
 
   std::string query = fmt::format(
-    "UPDATE charaitemcurrency SET container_{0} = {1} WHERE CharacterId = {2};",
-    std::to_string( static_cast< int16_t >( type ) - 1 ), std::to_string( money ), std::to_string( getCharacterId() ) );
+          "UPDATE {0} SET container_{1} = {2} WHERE CharacterId = {3};",
+          storage->getTableName(), std::to_string( static_cast< int16_t >( type ) ), std::to_string( item ), std::to_string( getCharacterId() ) );
 
   db.execute( query );
 }
@@ -605,7 +623,6 @@ void Player::deleteItemDb( ItemPtr item ) const
 
 bool Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
-
   return true;
 }
 
@@ -631,7 +648,7 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
   if (itemInfo->data().UICategory == 59)
   {
     this->addCrystal( static_cast< CrystalType >( catalogId ), quantity );
-    return nullptr;
+    return m_storageMap[ Crystal ]->getItem( static_cast< CrystalType >( catalogId ) );
   }
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
@@ -970,26 +987,42 @@ void Player::discardItem( uint16_t fromInventoryId, uint16_t fromSlotId )
 
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
 
-  deleteItemDb( fromItem );
+  switch (fromInventoryId)
+  {
+    case( InventoryType::Currency ):
+    {
+      this->removeCurrency( static_cast< CurrencyType >( fromItem->getId() ), 0xFFFF );
+      break;
+    }
+    case( InventoryType::Crystal ):
+    {
+      this->removeCrystal( static_cast< CrystalType >( fromItem->getId() ), 0xFFFF );
+      break;
+    }
+    default:
+    {
+      deleteItemDb( fromItem );
 
-  m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
-  updateContainer( fromInventoryId, fromSlotId, nullptr );
+      m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
+      updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-  auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invTransPacket->data().contextId = sequence;
-  invTransPacket->data().srcEntity = getId();
-  invTransPacket->data().srcStorageId = fromInventoryId;
-  invTransPacket->data().srcCatalogId = fromItem->getId();
-  invTransPacket->data().srcStack = fromItem->getStackSize();
-  invTransPacket->data().srcContainerIndex = fromSlotId;
-  invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  server().queueForPlayer( getCharacterId(), invTransPacket );
+      auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( getId() );
+      invTransPacket->data().contextId = sequence;
+      invTransPacket->data().srcEntity = getId();
+      invTransPacket->data().srcStorageId = fromInventoryId;
+      invTransPacket->data().srcCatalogId = fromItem->getId();
+      invTransPacket->data().srcStack = fromItem->getStackSize();
+      invTransPacket->data().srcContainerIndex = fromSlotId;
+      invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
+      server().queueForPlayer( getCharacterId(), invTransPacket );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = sequence;
-  invTransFinPacket->data().operationId = sequence;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+      auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
+      invTransFinPacket->data().contextId = sequence;
+      invTransFinPacket->data().operationId = sequence;
+      invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
+      server().queueForPlayer( getCharacterId(), invTransFinPacket );
+    }
+  }
 }
 
 uint16_t Player::calculateItemLevel()

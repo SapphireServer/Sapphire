@@ -161,6 +161,8 @@ namespace Sapphire::Api
 
     void createCurrencyDbContainer() const;
 
+    void createCrystalDbContainer() const;
+
     uint32_t m_modelEquip[10];
 
     uint64_t getNextUId64() const;

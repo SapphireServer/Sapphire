@@ -175,6 +175,8 @@ namespace Sapphire::Entity
 
     uint32_t currencyTypeToItem( Common::CurrencyType type ) const;
 
+    void setItemAmount( uint16_t storageId, uint8_t slot, uint32_t amount, bool justCreated );
+
     void updateModels( Common::GearSetSlot equipSlotId, const Item& item );
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
@@ -739,9 +741,17 @@ namespace Sapphire::Entity
 
     void writeItem( ItemPtr pItem ) const;
 
+    /*! Used to update records for dedicated items - used for currency and crystal */
+    void writeDedicatedItem( Common::InventoryType inventoryType, uint8_t type );
+
     void writeCurrencyItem( Common::CurrencyType type );
 
+    void writeCrystalItem( Common::CrystalType type );
+
     void deleteItemDb( ItemPtr pItem ) const;
+
+    /* !return the dedicated item amount for storage - used for currency and crystal */
+    uint32_t getDedicatedStackSize( uint16_t storageId, uint8_t type );
 
     /*! return the crystal amount of currency of type */
     uint32_t getCrystal( Common::CrystalType type );
