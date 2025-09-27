@@ -819,7 +819,7 @@ bool Player::loadInventory()
     "container_0, container_1, container_2, container_3, container_4, "
     "container_5, container_6, container_7, container_8, container_9, "
     "container_10, container_11, container_12, container_13, "
-    "container_14, container_15, container_16 "
+    "container_14, container_15, container_16, container_17 "
     "FROM charaitemcrystal " \
     "WHERE CharacterId = {0} " \
     "ORDER BY storageId ASC;", std::to_string(m_characterId)));

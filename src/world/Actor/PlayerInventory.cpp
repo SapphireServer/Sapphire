@@ -57,7 +57,7 @@ void Player::initInventory()
   setupContainer( Currency, 11, "charaitemcurrency", true );
 
   // crystals??
-  setupContainer( Crystal, 16, "charaitemcrystal", true );
+  setupContainer( Crystal, 17, "charaitemcrystal", true );
 
   // armory weapons - 0
   setupContainer( ArmoryMain, inventorySize, "charaiteminventory", true );
@@ -266,6 +266,42 @@ void Player::unequipSoulCrystal()
   playerMgr().onClassJobChanged( *this, parentClass );
 }
 
+Common::CurrencyType Player::itemToCurrencyType( uint32_t itemId ) const
+{
+  switch (itemId)
+  {
+    case 1:
+      return Common::CurrencyType::Gil;
+    case 20:
+      return Common::CurrencyType::StormSeal;
+    case 21:
+      return Common::CurrencyType::SerpentSeal;
+    case 22:
+      return Common::CurrencyType::FlameSeal;
+    case 23:
+      return Common::CurrencyType::TomestonePhilo;
+    case 24:
+      return Common::CurrencyType::TomestoneMytho;
+    case 25:
+      return Common::CurrencyType::WolfMark;
+    case 26:
+      return Common::CurrencyType::TomestoneSold;
+    case 27:
+      return Common::CurrencyType::AlliedSeal;
+    case 28:
+      return Common::CurrencyType::TomestonePoet;
+    case 29:
+      return Common::CurrencyType::Mgp;
+    case 30:
+      return Common::CurrencyType::TomestoneLaw;
+    case 31:
+      return Common::CurrencyType::TomestoneEso;
+    case 32:
+      return Common::CurrencyType::TomestoneLore;
+  }
+ 
+}
+
 uint32_t Player::currencyTypeToItem( Common::CurrencyType type ) const
 {
   switch( type )
@@ -340,23 +376,9 @@ void Player::addCurrency( CurrencyType type, uint32_t amount )
 
   auto seq = getNextInventorySequence();
 
-  auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = Common::InventoryType::Currency;
-  invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 1;
-  invUpdate->data().srcEntity = getId();
-  invUpdate->data().srcCatalogId = currItem->getId();
-  invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
+  Network::Util::Packet::sendItemOperation( *this, getId(), currItem, Currency, type - 1, ITEM_OPERATION_TYPE_UPDATEITEM, seq );
 
-  server().queueForPlayer( getCharacterId(), invUpdate );
-
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
 }
 
 void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
@@ -373,20 +395,10 @@ void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 
   auto seq = getNextInventorySequence();
 
-  auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = Common::InventoryType::Currency;
-  invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 1;
-  invUpdate->data().srcCatalogId = currItem->getId();
-  invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invUpdate );
+  Network::Util::Packet::sendItemOperation( *this, getId(), currItem, Currency, type - 1, ITEM_OPERATION_TYPE_UPDATEITEM, seq );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
+
 }
 
 
@@ -409,21 +421,10 @@ void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 
   auto seq = getNextInventorySequence();
 
-  auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = InventoryType::Crystal;
-  invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 2;
-  invUpdate->data().srcEntity = getId();
-  invUpdate->data().srcCatalogId = currItem->getId();
-  invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invUpdate );
+  Network::Util::Packet::sendItemOperation( *this, getId(), currItem, Crystal, type - 2, ITEM_OPERATION_TYPE_UPDATEITEM, seq );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
+
   server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ), amount ) );
 }
 
@@ -441,21 +442,9 @@ void Player::removeCrystal( Common::CrystalType type, uint32_t amount )
 
   auto seq = getNextInventorySequence();
 
-  auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invUpdate->data().contextId = seq;
-  invUpdate->data().srcStorageId = Common::InventoryType::Crystal;
-  invUpdate->data().srcStack = currItem->getStackSize();
-  invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 2;
-  invUpdate->data().srcEntity = getId();
-  invUpdate->data().srcCatalogId = currItem->getId();
-  invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invUpdate );
+  Network::Util::Packet::sendItemOperation( *this, getId(), currItem, Crystal, type - 2, ITEM_OPERATION_TYPE_UPDATEITEM, seq );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
 }
 
 void Player::sendInventory()
@@ -645,10 +634,19 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
 
   std::pair< uint16_t, uint16_t > freeBagSlot;
   bool foundFreeSlot = false;
-  if (itemInfo->data().UICategory == 59)
+  if( itemInfo->data().UICategory == 59 )
   {
-    this->addCrystal( static_cast< CrystalType >( catalogId ), quantity );
-    return m_storageMap[ Crystal ]->getItem( static_cast< CrystalType >( catalogId ) );
+    auto crystal = static_cast< CrystalType >( catalogId );
+
+    this->addCrystal( crystal, quantity );
+    return m_storageMap[ Crystal ]->getItem( crystal );
+  }
+  else if( itemInfo->data().UICategory == 63 )
+  {
+    auto currency = itemToCurrencyType( catalogId );
+
+    this->addCurrency( currency, quantity );
+    return m_storageMap[ Currency ]->getItem( currency );
   }
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
@@ -705,11 +703,7 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
         auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item, seq );
         server().queueForPlayer( getCharacterId(), slotUpdate );
 
-        auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-        invTransFinPacket->data().contextId = seq;
-        invTransFinPacket->data().operationId = seq;
-        invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-        server().queueForPlayer( getCharacterId(), invTransFinPacket );
+        Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
 
         // return existing stack if we have no overflow - items fit into a preexisting stack
         if( quantity == 0 )
@@ -744,21 +738,10 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
     auto seq = getNextInventorySequence();
 
     // send inv update
-    auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-    invTransPacket->data().contextId = seq;
-    invTransPacket->data().dstEntity = getId();
-    invTransPacket->data().dstStorageId = freeBagSlot.first;
-    invTransPacket->data().dstCatalogId = item->getId();
-    invTransPacket->data().dstStack = item->getStackSize();
-    invTransPacket->data().dstContainerIndex = freeBagSlot.second;
-    invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_CREATEITEM;
-    server().queueForPlayer( getCharacterId(), invTransPacket );
+    Network::Util::Packet::sendItemOperationDst( *this, getId(), item, freeBagSlot.first, freeBagSlot.second, ITEM_OPERATION_TYPE_CREATEITEM, seq );
 
-    auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-    invTransFinPacket->data().contextId = seq;
-    invTransFinPacket->data().operationId = seq;
-    invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_CREATEITEM;
-    server().queueForPlayer( getCharacterId(), invTransFinPacket );
+    Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_CREATEITEM );
+
     server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
   }
 
@@ -1006,21 +989,10 @@ void Player::discardItem( uint16_t fromInventoryId, uint16_t fromSlotId )
       m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
       updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-      auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-      invTransPacket->data().contextId = sequence;
-      invTransPacket->data().srcEntity = getId();
-      invTransPacket->data().srcStorageId = fromInventoryId;
-      invTransPacket->data().srcCatalogId = fromItem->getId();
-      invTransPacket->data().srcStack = fromItem->getStackSize();
-      invTransPacket->data().srcContainerIndex = fromSlotId;
-      invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-      server().queueForPlayer( getCharacterId(), invTransPacket );
+      
+      Network::Util::Packet::sendItemOperation( *this, getId(), fromItem, fromInventoryId, fromSlotId, ITEM_OPERATION_TYPE_DELETEITEM, sequence );
 
-      auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-      invTransFinPacket->data().contextId = sequence;
-      invTransFinPacket->data().operationId = sequence;
-      invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-      server().queueForPlayer( getCharacterId(), invTransFinPacket );
+      Network::Util::Packet::sendItemOperationBatch( *this, getId(), sequence, ITEM_OPERATION_TYPE_DELETEITEM );
     }
   }
 }
@@ -1159,21 +1131,9 @@ ItemPtr Player::dropInventoryItem( Sapphire::Common::InventoryType storageId, ui
   auto seq = getNextInventorySequence();
 
   // send inv update
-  auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( getId() );
-  invTransPacket->data().contextId = seq;
-  invTransPacket->data().dstEntity = getId();
-  invTransPacket->data().dstStorageId = storageId;
-  invTransPacket->data().dstCatalogId = item->getId();
-  invTransPacket->data().dstStack = item->getStackSize();
-  invTransPacket->data().dstContainerIndex = slotId;
-  invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  server().queueForPlayer( getCharacterId(), invTransPacket );
+  Network::Util::Packet::sendItemOperationDst( *this, getId(), item, storageId, slotId, ITEM_OPERATION_TYPE_DELETEITEM, seq );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_DELETEITEM );
 
   return item;
 }
@@ -1234,11 +1194,7 @@ void Player::insertInventoryItem( Common::InventoryType type, uint16_t slot, con
   auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item, seq );
   server().queueForPlayer( getCharacterId(), slotUpdate );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
-  invTransFinPacket->data().contextId = seq;
-  invTransFinPacket->data().operationId = seq;
-  invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
 }
 
 bool Player::findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location, std::initializer_list< InventoryType > bags )

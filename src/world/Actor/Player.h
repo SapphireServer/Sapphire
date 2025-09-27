@@ -173,6 +173,8 @@ namespace Sapphire::Entity
     /*! return the current amount of crystals of type */
     uint32_t getCrystal( uint8_t type ) const;
 
+    Common::CurrencyType itemToCurrencyType( uint32_t itemId ) const;
+
     uint32_t currencyTypeToItem( Common::CurrencyType type ) const;
 
     void setItemAmount( uint16_t storageId, uint8_t slot, uint32_t amount, bool justCreated );
