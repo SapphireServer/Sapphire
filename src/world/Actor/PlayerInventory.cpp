@@ -910,24 +910,19 @@ void Player::mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
   uint32_t stackSize = fromItem->getStackSize() + toItem->getStackSize();
   uint32_t stackOverflow = stackSize - std::min< uint32_t >( fromItem->getMaxStackSize(), stackSize );
 
+  toItem->setStackSize( stackSize );
+  updateContainer( toInventoryId, toSlot, toItem );
+  writeItem( toItem );
+
   // we can destroy the original stack if there's no overflow
   if( stackOverflow == 0 )
-  {
-    m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
-    deleteItemDb( fromItem );
-  }
+    discardItem( fromInventoryId, fromSlotId );
   else
   {
     fromItem->setStackSize( stackOverflow );
+    updateContainer( fromInventoryId, fromSlotId, fromItem );
     writeItem( fromItem );
   }
-
-
-  toItem->setStackSize( stackSize );
-  writeItem( toItem );
-
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
-  updateContainer( toInventoryId, toSlot, toItem );
 }
 
 void Player::swapItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot )
