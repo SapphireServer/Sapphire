@@ -888,11 +888,10 @@ void Player::splitItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
   if( !newItem )
     return;
 
-  fromItem->setStackSize( fromItem->getStackSize() - itemCount );
-
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
   updateContainer( toInventoryId, toSlot, newItem );
 
+  fromItem->setStackSize( fromItem->getStackSize() - itemCount );
+  updateContainer( fromInventoryId, fromSlotId, fromItem );
   writeItem( fromItem );
 }
 
