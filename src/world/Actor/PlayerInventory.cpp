@@ -36,7 +36,6 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-
 void Player::initInventory()
 {
   const uint8_t inventorySize = 25;
@@ -298,6 +297,8 @@ Common::CurrencyType Player::itemToCurrencyType( uint32_t itemId ) const
       return Common::CurrencyType::TomestoneEso;
     case 32:
       return Common::CurrencyType::TomestoneLore;
+    default:
+      return Common::CurrencyType::NotACurrency;
   }
  
 }
@@ -645,8 +646,11 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
   {
     auto currency = itemToCurrencyType( catalogId );
 
-    this->addCurrency( currency, quantity );
-    return m_storageMap[ Currency ]->getItem( currency );
+    if( currency && !currency == CurrencyType::NotACurrency )
+    {
+      this->addCurrency( currency, quantity );
+      return m_storageMap[ Currency ]->getItem( currency );
+    }
   }
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
@@ -1119,8 +1123,7 @@ ItemPtr Player::dropInventoryItem( Sapphire::Common::InventoryType storageId, ui
     return nullptr;
 
   // unlink item
-  container->removeItem( slotId, false );
-  updateContainer( storageId, slotId, nullptr );
+  discardItem( storageId, slotId );
 
   auto seq = getNextInventorySequence();
 

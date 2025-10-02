@@ -725,7 +725,7 @@ bool Player::loadInventory()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // load active gearset
-  auto res = db.query( "SELECT storageId, container_0, container_1, container_2, container_3, "
+  auto gearRes = db.query( "SELECT storageId, container_0, container_1, container_2, container_3, "
                          "container_4, container_5, container_6, container_7, "
                          "container_8, container_9, container_10, container_11, "
                          "container_12, container_13 "
@@ -733,13 +733,13 @@ bool Player::loadInventory()
                                "WHERE CharacterId =  " + std::to_string( m_characterId ) + " " \
                                "ORDER BY storageId ASC;" );
 
-  while( res->next() )
+  while( gearRes->next() )
   {
-    uint16_t storageId = res->getUInt16( 1 );
+    uint16_t storageId = gearRes->getUInt16( 1 );
 
     for( uint32_t i = 1; i <= 14; i++ )
     {
-      uint64_t uItemId = res->getUInt64( i + 1 );
+      uint64_t uItemId = gearRes->getUInt64( i + 1 );
       if( uItemId == 0 )
         continue;
 
@@ -785,6 +785,8 @@ bool Player::loadInventory()
     }
   }
 
+  // Load currency
+
   auto currencyRes = db.query(fmt::format("SELECT storageId, "
     "container_0, container_1, container_2, container_3, container_4, "
     "container_5, container_6, container_7, container_8, container_9, "
@@ -793,28 +795,55 @@ bool Player::loadInventory()
     "WHERE CharacterId = {0} " \
     "ORDER BY storageId ASC;", std::to_string(m_characterId)));
 
-  while ( currencyRes->next() )
+  std::vector< std::pair < uint32_t, uint64_t > > idsToLoad;
+
+  while( currencyRes->next() )
   {
     uint16_t storageId = currencyRes->getUInt16( 1 );
-    for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
+    for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize() + 1; i++ )
     {
-      uint32_t money = currencyRes->getUInt( i + 1 );
-      auto slot = i - 1;
-      auto currItem = m_storageMap[ Currency ]->getItem( slot );
-
-      if( money == 0 )
-        continue;
-
-      if( !currItem )
-      {
-        currItem = createItem( currencyTypeToItem( static_cast< Common::CurrencyType >( i ) ) );
-        m_storageMap[ Currency ]->setItem( slot, currItem );
-      }
-
-      m_storageMap[ Currency ]->getItem( slot )->setStackSize( money );
+      auto itemQty = currencyRes->getUInt64( i + 1 );
+      if( itemQty != 0 )
+        idsToLoad.push_back( { i, itemQty } );
     }
   }
 
+  if( !idsToLoad.empty() )
+  {
+    uint64_t itemId;
+    ItemPtr pItem;
+
+    for( const auto& itemData : idsToLoad )
+    {
+      auto idToLoad = itemData.first;
+      auto itemQty = itemData.second;
+
+      auto itemRow = db.query( fmt::format( "SELECT itemId FROM charaglobalitem WHERE CharacterId = {0} AND catalogId = {1};",
+        std::to_string( m_characterId ),
+        std::to_string( currencyTypeToItem( static_cast< Common::CurrencyType >( idToLoad ) ) ) ) );
+
+      itemId = 0;
+      pItem = nullptr;
+
+      while( itemRow->next() )
+      {
+        itemId = itemRow->getUInt64( "itemId" );
+      }
+
+      Common::CurrencyType currType = static_cast< Common::CurrencyType >( idToLoad );
+
+      pItem = itemId == 0 ? createItem( currencyTypeToItem( currType ) ) : itemMgr.loadItem( itemId );
+
+      if( pItem == nullptr )
+        continue;
+
+      pItem->setStackSize( itemQty );
+
+      m_storageMap[ Currency ]->getItemMap()[ currType - 1 ] = pItem;
+    }
+  }
+
+  // Load crystals
   auto crystalRes = db.query(fmt::format("SELECT storageId, "
     "container_0, container_1, container_2, container_3, container_4, "
     "container_5, container_6, container_7, container_8, container_9, "
@@ -824,27 +853,70 @@ bool Player::loadInventory()
     "WHERE CharacterId = {0} " \
     "ORDER BY storageId ASC;", std::to_string(m_characterId)));
 
+  idsToLoad.clear();
+
   while( crystalRes->next() )
   {
     uint16_t storageId = crystalRes->getUInt16( 1 );
-    for( uint16_t i = 2; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
+    for( uint32_t i = 2; i <= m_storageMap[ storageId ]->getMaxSize() + 2; i++ )
     {
-      uint32_t crystal = crystalRes->getUInt( i );
-      uint16_t slot = i - 2;
-      auto currItem = m_storageMap[ Crystal ]->getItem( i );
-
-      if( crystal == 0 )
-        continue;
-
-      if( !currItem )
-      {
-        currItem = createItem( i );
-        m_storageMap[ Crystal ]->setItem( slot, currItem );
-      }
-
-      m_storageMap[ Crystal ]->getItem( slot )->setStackSize( crystal );
+      auto itemQty = crystalRes->getUInt64( i );
+      if( itemQty != 0 )
+        idsToLoad.push_back( { i, itemQty } );
     }
   }
+
+  if( !idsToLoad.empty() )
+  {
+    uint64_t itemId;
+    ItemPtr pItem;
+
+    for( const auto& itemData : idsToLoad )
+    {
+
+      auto idToLoad = itemData.first;
+      auto itemQty = itemData.second;
+
+      auto itemRow = db.query( fmt::format( "SELECT itemId FROM charaglobalitem WHERE CharacterId = {0} AND catalogId = {1};",
+        std::to_string( m_characterId ),
+        std::to_string( idToLoad ) ) );
+
+      itemId = 0;
+      pItem = nullptr;
+
+      while( itemRow->next() )
+      {
+        itemId = itemRow->getUInt64( "itemId" );
+      }
+
+      pItem = itemId == 0 ? createItem( idToLoad ) : itemMgr.loadItem( itemId );
+
+      if( pItem == nullptr )
+        continue;
+
+      pItem->setStackSize( itemQty );
+
+      m_storageMap[ Crystal ]->getItemMap()[ idToLoad - 2 ] = pItem;
+    }
+  }
+
+  /* while( crystalRes->next() )
+  {
+    uint16_t storageId = crystalRes->getUInt16( 1 );
+    for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
+    {
+      uint64_t uItemId = crystalRes->getUInt64( i + 1 );
+      if( uItemId == 0 )
+        continue;
+
+      ItemPtr pItem = itemMgr.loadItem( uItemId );
+
+      if( pItem == nullptr )
+        continue;
+
+      m_storageMap[ storageId ]->getItemMap()[ i - 1 ] = pItem;
+    }
+  }*/
 
   return true;
 }

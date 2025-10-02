@@ -132,17 +132,17 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
 
   try
   {
-    auto itemInfo = exdData.getRow< Excel::Item >( itemRes->getUInt( 1 ) );
-    bool isHq = itemRes->getUInt( 3 ) == 1;
+    auto itemInfo = exdData.getRow< Excel::Item >( itemRes->getUInt( "catalogId" ) );
+    bool isHq = itemRes->getUInt( "reservedFlag" ) == 1;
 
     ItemPtr pItem = make_Item( uId,
-                               itemRes->getUInt( 1 ),
+                               itemRes->getUInt( "catalogId" ),
                                isHq );
 
-    pItem->setStackSize( itemRes->getUInt( 2 ) );
-    pItem->setStain( itemRes->getUInt16( 13 ) );
-    pItem->setPattern( itemRes->getUInt( 14 ) );
-    pItem->setDurability( itemRes->getInt16( 6 ) );
+    pItem->setStackSize( itemRes->getUInt( "stack" ) );
+    pItem->setStain( itemRes->getUInt16( "stain" ) );
+    pItem->setPattern( itemRes->getUInt( "pattern" ) );
+    pItem->setDurability( itemRes->getInt16( "durability" ) );
     pItem->setGlamModelIds();
 
     return pItem;

@@ -561,6 +561,7 @@ namespace Sapphire::Common
 
   enum CurrencyType : uint8_t
   {
+    NotACurrency = 0x00,
     Gil = 0x01,
     StormSeal = 0x02,
     SerpentSeal = 0x03,
