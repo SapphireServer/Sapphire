@@ -25,12 +25,12 @@
 
 namespace Client
 {
-  class EditorState : public Engine::State, public std::enable_shared_from_this< EditorState >
+  class ServerState : public Engine::State, public std::enable_shared_from_this< ServerState >
   {
   public:
-    EditorState( std::shared_ptr< Engine::ApplicationContext > pContext );
+    ServerState( std::shared_ptr< Engine::ApplicationContext > pContext );
 
-    ~EditorState() = default;
+    ~ServerState() = default;
 
     void update( double deltaTime ) override;
 

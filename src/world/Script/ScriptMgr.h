@@ -11,7 +11,6 @@
 
 namespace Sapphire::Scripting
 {
-
   class ScriptMgr
   {
   private:
@@ -20,7 +19,7 @@ namespace Sapphire::Scripting
      */
     std::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
 
-    std::function< std::string( Entity::Player & ) > m_onFirstEnterWorld;
+    std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
 
     /*!
      * @brief Used to ignore the first change notification that Watchdog emits.
@@ -43,6 +42,9 @@ namespace Sapphire::Scripting
      */
     bool init();
 
+    // Gracefully stop watching and unload all scripts so that a new init() can reload them cleanly.
+    void shutdown();
+
     /*!
      * @brief Called on each tick or at a regular interval. Allows for the NativeScriptMgr to process module loading and reloading.
      */
@@ -57,7 +59,8 @@ namespace Sapphire::Scripting
 
     bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
 
-    bool onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString, uint64_t resultInt );
+    bool onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                  const std::string& resultString, uint64_t resultInt );
 
     bool onSay( Entity::Player& player, uint64_t actorId, uint32_t eventId, uint32_t sayId );
 
@@ -71,7 +74,8 @@ namespace Sapphire::Scripting
 
     bool onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint64_t targetId );
 
-    bool onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, Common::FFXIVARR_POSITION3 pos );
+    bool onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId,
+                            Common::FFXIVARR_POSITION3 pos );
 
     bool onBNpcKill( Entity::Player& player, Entity::BNpc& bnpc );
 

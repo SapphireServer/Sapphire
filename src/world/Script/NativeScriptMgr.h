@@ -5,12 +5,12 @@
 #include <set>
 #include <queue>
 #include <mutex>
+#include <string>
 
 #include "ScriptLoader.h"
 
 namespace Sapphire::Scripting
 {
-
   /*!
    * @brief Contains all the functionality for easily loading, unloading, reloading and generally accessing scripts.
    */
@@ -20,7 +20,7 @@ namespace Sapphire::Scripting
     /*!
      * @brief An internal list that maps script types to another list containing scripts indexed by their assoicated id
      */
-    std::unordered_map< std::size_t, std::unordered_map< uint32_t, Sapphire::ScriptAPI::ScriptObject* > > m_scripts;
+    std::unordered_map< std::size_t, std::unordered_map< uint32_t, Sapphire::ScriptAPI::ScriptObject * > > m_scripts;
 
 
     ScriptLoader m_loader;
@@ -40,10 +40,13 @@ namespace Sapphire::Scripting
      * @param info A pointer to the ScriptInfo object that is to be erased
      * @return true if successful, false if not
      */
-    bool unloadScript( ScriptInfo* info );
+    bool unloadScript( ScriptInfo *info );
 
   public:
-    NativeScriptMgr();
+    explicit NativeScriptMgr( const std::string& cachePath );
+
+    // Unload all loaded scripts and clear internal state for a clean restart
+    void unloadAll();
 
     /*!
      * @brief Loads a script from a path
@@ -79,7 +82,7 @@ namespace Sapphire::Scripting
      * @param scripts a set of ScriptInfo ptrs
      * @param search the search term
      */
-    void findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search );
+    void findScripts( std::set< Sapphire::Scripting::ScriptInfo * >& scripts, const std::string& search );
 
     /*!
      * @brief Called on a regular interval, allows for scripts to be loaded from the internal load queue.
@@ -109,7 +112,7 @@ namespace Sapphire::Scripting
      * @return T* if successful, nullptr if the script doesn't exist
      */
     template< typename T >
-    T* getScript( uint32_t scriptId )
+    T *getScript( uint32_t scriptId )
     {
       auto type = typeid( T ).hash_code();
 
@@ -117,7 +120,7 @@ namespace Sapphire::Scripting
       if( script == m_scripts[ type ].end() )
         return nullptr;
 
-      return dynamic_cast< T* >( script->second );
+      return dynamic_cast< T * >( script->second );
     }
   };
 
@@ -127,7 +130,7 @@ namespace Sapphire::Scripting
    *
    * @return a std::shared_ptr to NativeScriptMgr
    */
-  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
+  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( const std::string& cachePath );
 }
 
 #endif

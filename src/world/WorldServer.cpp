@@ -1,4 +1,3 @@
-
 #include <Connection.h>
 #include <Network/Connection.h>
 #include <Network/Hive.h>
@@ -24,6 +23,8 @@
 #include "Task/TestTask.h"
 
 #include "Script/ScriptMgr.h"
+#include "Action/Action.h"
+#include "StatusEffect/StatusEffect.h"
 
 #include "Linkshell/Linkshell.h"
 #include "FreeCompany/FreeCompany.h"
@@ -52,6 +53,8 @@
 #include "Manager/WarpMgr.h"
 #include "Manager/FreeCompanyMgr.h"
 #include "Manager/MapMgr.h"
+#include "Action/ActionLutData.h"
+#include "Action/ActionShapeLutData.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -72,12 +75,66 @@ WorldServer::WorldServer( const std::string& configName ) :
 {
 }
 
+std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()
+{
+  std::vector< std::string > result;
+  std::lock_guard< std::mutex > lock( m_sessionMutex );
+  result.reserve( m_sessionMapByCharacterId.size() );
+
+  const auto nowMs = Common::Util::getTimeMs();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+  for( const auto& kv : m_sessionMapByCharacterId )
+  {
+    const auto& pSession = kv.second;
+    if( !pSession )
+      continue;
+    if( !pSession->isValid() )
+      continue;
+    auto pPlayer = pSession->getPlayer();
+    if( !pPlayer )
+      continue;
+
+    const auto name = pPlayer->getName();
+    const auto cid = pPlayer->getCharacterId();
+
+    // Territory name resolution
+    std::string territoryName = "Unknown";
+    uint32_t tTypeId = pPlayer->getTerritoryTypeId();
+    if( auto tInfo = teriMgr.getTerritoryDetail( tTypeId ) )
+    {
+      auto tStr = tInfo->getString( tInfo->data().Name );
+      if( !tStr.empty() )
+        territoryName = tStr;
+    }
+
+    // Connected duration
+    uint64_t connectMs = 0;
+    // guard against older sessions without the new field initialized
+    connectMs = pSession->getConnectTimeMs();
+    uint64_t durMs = ( nowMs > connectMs && connectMs != 0 ) ? ( nowMs - connectMs ) : 0;
+    auto toHHMMSS = []( uint64_t ms )
+    {
+      uint64_t totalSec = ms / 1000ULL;
+      uint64_t h = totalSec / 3600ULL;
+      uint64_t m = ( totalSec % 3600ULL ) / 60ULL;
+      uint64_t s = totalSec % 60ULL;
+      return fmt::format( "{:02}:{:02}:{:02}", ( unsigned ) h, ( unsigned ) m, ( unsigned ) s );
+    };
+
+    auto entry = fmt::format( "{} ({})  —  {}  —  Connected {}", name, cid, territoryName, toHHMMSS( durMs ) );
+    result.emplace_back( std::move( entry ) );
+  }
+  std::sort( result.begin(), result.end() );
+  return result;
+}
+
 size_t WorldServer::getSessionCount() const
 {
   return m_sessionMapById.size();
 }
 
-bool WorldServer::loadSettings( int32_t argc, char* argv[] )
+bool WorldServer::loadSettings( int32_t argc, char *argv[ ] )
 {
   auto& configMgr = Common::Service< Common::ConfigMgr >::ref();
 
@@ -101,7 +158,7 @@ bool WorldServer::loadSettings( int32_t argc, char* argv[] )
   if( failedLoad )
   {
     Logger::fatal( "If this is the first time starting the server, "
-                   "we've copied the default configs for your editing pleasure." );
+      "we've copied the default configs for your editing pleasure." );
     return false;
   }
 
@@ -120,7 +177,8 @@ bool WorldServer::loadSettings( int32_t argc, char* argv[] )
   m_config.motd = configMgr.getValue< std::string >( "General", "MotD", "" );
   m_config.skipOpening = configMgr.getValue( "General", "SkipOpening", false );
 
-  m_config.housing.defaultEstateName = configMgr.getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
+  m_config.housing.defaultEstateName = configMgr.getValue<
+    std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
 
   m_port = m_config.network.listenPort;
   m_ip = m_config.network.listenIp;
@@ -128,40 +186,14 @@ bool WorldServer::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-std::string readFileToString( const std::string& filename )
-{
-  // Open the file for reading
-  std::ifstream file( filename );
 
-  // Check if the file was opened successfully
-  if( !file )
-  {
-    throw std::runtime_error( "Failed to open file" );
-  }
-
-  // Read the contents of the file into a string
-  std::string fileContents( ( std::istreambuf_iterator< char >( file ) ),
-                              std::istreambuf_iterator< char >() );
-
-  // Close the file
-  file.close();
-
-  // Remove all newlines from the file contents
-  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\n' ), fileContents.end() );
-  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\r' ), fileContents.end() );
-
-
-  // Return the file contents as a string
-  return fileContents;
-}
-
-void WorldServer::run( int32_t argc, char* argv[] )
+void WorldServer::init( int32_t argc, char *argv[ ] )
 {
   using namespace Sapphire;
 
   auto start = Common::Util::getTimeMs();
 
-  Logger::init( "log/world" );
+  // Logger::init( "log/world" );
 
   printBanner();
 
@@ -181,14 +213,14 @@ void WorldServer::run( int32_t argc, char* argv[] )
   try
   {
     auto verPath = dataPath + "/../ffxivgame.ver";
-    auto verString = readFileToString( verPath );
+    auto verString = Common::Util::readFileToString( verPath );
     if( verString != m_config.global.general.dataVersion )
     {
-      Logger::fatal( "Sqpack version {} does not match expected version {}!", verString, m_config.global.general.dataVersion );
+      Logger::fatal( "Sqpack version {} does not match expected version {}!", verString,
+                     m_config.global.general.dataVersion );
       return;
     }
-  }
-  catch ( const std::exception& e )
+  } catch( const std::exception& e )
   {
     Logger::fatal( e.what() );
     return;
@@ -272,12 +304,13 @@ void WorldServer::run( int32_t argc, char* argv[] )
   auto pActionMgr = std::make_shared< Manager::ActionMgr >();
 
   Logger::info( "ActionMgr: Caching action LUT" );
-  if( !pActionMgr->cacheActionLut() )
+  // Use reload to ensure a clean state across restarts
+  if( !Action::ActionLutData::reloadActions() )
   {
     Logger::fatal( "Unable to cache actions!" );
     return;
   }
-  if( !pActionMgr->cacheActionShapeLut() )
+  if( !Action::ActionShapeLutData::reloadShapes() )
   {
     Logger::fatal( "Unable to cache action shapes!" );
     return;
@@ -335,18 +368,17 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
 
 
-  Network::HivePtr hive( new Network::Hive() );
+  m_hive = std::make_shared< Network::Hive >();
   try
   {
-    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, m_hive );
   } catch( std::exception& e )
   {
     Logger::fatal( "Error starting server: {0}", e.what() );
     return;
   }
 
-  std::vector< std::thread > thread_list;
-  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
+  m_threadList.emplace_back( std::thread( std::bind( &Network::Hive::run, m_hive.get() ) ) );
 
   auto pDebugCom = std::make_shared< DebugCommandMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
@@ -375,15 +407,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
   Logger::debug( "Initialization took {0}ms", Common::Util::getTimeMs() - start );
 
-  Logger::info( "World server running on {0}:{1}", m_ip, m_port );
-
-  mainLoop();
-
-  for( auto& thread_entry : thread_list )
-  {
-    thread_entry.join();
-  }
-
+  Logger::info( "World server ready on {0}:{1}", m_ip, m_port );
 }
 
 uint16_t WorldServer::getWorldId() const
@@ -406,37 +430,68 @@ void WorldServer::printBanner() const
   Logger::info( "===========================================================" );
 }
 
-void WorldServer::mainLoop()
+void WorldServer::update( uint64_t tickCount )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
   auto& contentFinder = Common::Service< ContentFinder >::ref();
-
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
 
-  while( isRunning() )
+  auto currTime = Common::Util::getTimeSeconds();
+  taskMgr.update( tickCount );
+  updateSessions( currTime );
+
+  m_lastServerTick = tickCount;
+
+  terriMgr.updateTerritoryInstances( tickCount );
+  scriptMgr.update();
+  contentFinder.update();
+
+  DbKeepAlive( currTime );
+}
+
+void WorldServer::shutdown()
+{
+  // Mark server as no longer running so external loops can exit promptly
+  m_bRunning = false;
+
+  // Ask ScriptMgr to unload scripts so a subsequent init() can reload cleanly
   {
-    auto tickCount = Common::Util::getTimeMs();
-
-    auto currTime = Common::Util::getTimeSeconds();
-    taskMgr.update( tickCount );
-    updateSessions( currTime );
-
-    if( tickCount - m_lastServerTick < 300 )
+    auto w = Common::Service< Scripting::ScriptMgr >::get();
+    if( auto sm = w.lock() )
     {
-    //  std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-    //  continue;
+      sm->shutdown();
     }
-    m_lastServerTick = tickCount;
-
-    terriMgr.updateTerritoryInstances( tickCount );
-    scriptMgr.update();
-    contentFinder.update();
-
-
-    DbKeepAlive( currTime );
   }
+
+  // Stop network hive to end IO service loop
+  if( m_hive )
+  {
+    m_hive->stop();
+  }
+
+  // Close all sessions gracefully
+  {
+    std::lock_guard< std::mutex > lock( m_sessionMutex );
+    for( auto& [ id, session ] : m_sessionMapById )
+    {
+      if( session )
+      {
+        session->close();
+      }
+    }
+    m_sessionMapByCharacterId.clear();
+    m_sessionMapById.clear();
+  }
+
+  // Join any background threads (e.g., network hive thread)
+  for( auto& thread_entry : m_threadList )
+  {
+    if( thread_entry.joinable() )
+      thread_entry.join();
+  }
+
+  m_threadList.clear();
 }
 
 void WorldServer::DbKeepAlive( uint32_t currTime )
@@ -586,7 +641,8 @@ void WorldServer::queueChatForPlayer( uint64_t characterId, Sapphire::Network::P
     pChatCon->queueOutPacket( pPacket );
 }
 
-void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
+void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds,
+                                   Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
   if( characterIds.empty() )
     return;
@@ -595,7 +651,8 @@ void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, Sap
     queueForPlayer( characterId, pPacket );
 }
 
-void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
+void WorldServer::queueForPlayer( uint64_t characterId,
+                                  std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
 {
   auto pSession = getSession( characterId );
   if( !pSession )
@@ -609,7 +666,8 @@ void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::N
     }
 }
 
-void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
+void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds,
+                                   std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
 {
   for( auto& characterId : characterIds )
     for( auto& packet : packets )
@@ -618,7 +676,8 @@ void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, std
     }
 }
 
-void WorldServer::queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList )
+void WorldServer::queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket,
+                                     std::set< uint64_t > exceptionCharIdList )
 {
   auto lsMgr = Common::Service< Manager::LinkshellMgr >::ref();
 
@@ -635,10 +694,10 @@ void WorldServer::queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::
 
     queueForPlayer( memberId, pPacket );
   }
-
 }
 
-void WorldServer::queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList )
+void WorldServer::queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket,
+                                       std::set< uint64_t > exceptionCharIdList )
 {
   auto fcMgr = Common::Service< Manager::FreeCompanyMgr >::ref();
 
@@ -655,5 +714,4 @@ void WorldServer::queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets
 
     queueForPlayer( memberId, pPacket );
   }
-
 }

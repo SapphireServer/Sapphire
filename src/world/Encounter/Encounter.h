@@ -20,12 +20,30 @@ namespace Sapphire
     SUCCESS
   };
 
+  enum class EncounterShape
+  {
+    BOX,
+    CYLINDER
+  };
+
   struct EncounterActor
   {
     uint32_t layoutId;
     uint32_t hp;
     Common::BNpcType type;
     uint32_t flags;
+  };
+
+  struct EncounterSetup
+  {
+    std::string timelineName;
+    std::vector< EncounterActor > actorSetupList;
+    EncounterShape encounterShape;
+    // for BOX shape, this would be m_position = min, m_position2 = max
+    // for CYLINDER m_position = center, m_position2.x radius, position2.y height
+    Common::FFXIVARR_POSITION3 position;
+    Common::FFXIVARR_POSITION3 position2;
+    bool hasLockout{false};
   };
 
   class Encounter : public std::enable_shared_from_this< Encounter >
@@ -65,19 +83,21 @@ namespace Sapphire
 
     void setInitialActorSetup( const std::vector< EncounterActor >& actorSetupList );
 
+    EncounterSetup& getSetup();
+
   protected:
     uint64_t m_startTime{ 0 };
-    std::string m_timelineName;
+
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
-
     EncounterStatus m_status{ EncounterStatus::IDLE };
-
     Event::DirectorPtr m_pDirector;
     TerritoryPtr m_pTeri;
-
-    std::vector< EncounterActor > m_actorSetupList;
     std::shared_ptr< TimelinePack > m_pTimeline;
+
+    // encountersetup
+    EncounterSetup m_setup;
+
   };
 
 

@@ -25,6 +25,7 @@ Sapphire::World::Session::Session( uint32_t entityId ) :
   m_isReplaying( false ),
   m_lastPing( 0 )
 {
+  m_connectTimeMs = Common::Util::getTimeMs();
 }
 
 void Sapphire::World::Session::setZoneConnection( Network::GameConnectionPtr pZoneCon )
@@ -173,10 +174,10 @@ void Sapphire::World::Session::stopReplay()
 void Sapphire::World::Session::processReplay()
 {
   int at = 0;
-  test:
+test:
   for( const auto& set : m_replayCache )
   {
-    if( (std::get< 0 >( set ) ) <= Common::Util::getTimeMs() )
+    if( ( std::get< 0 >( set ) ) <= Common::Util::getTimeMs() )
     {
       m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
       m_replayCache.erase( m_replayCache.begin() + at );
@@ -185,7 +186,6 @@ void Sapphire::World::Session::processReplay()
       goto test;
     }
     at++;
-
   }
 
   if( m_replayCache.empty() )
@@ -247,7 +247,6 @@ void Sapphire::World::Session::update()
 
   processOutQueue();
   processChatQueues();
-
 }
 
 Sapphire::Entity::PlayerPtr Sapphire::World::Session::getPlayer() const
@@ -263,4 +262,9 @@ void Sapphire::World::Session::setLastPing( uint32_t ping )
 uint32_t Sapphire::World::Session::getLastPing() const
 {
   return m_lastPing;
+}
+
+uint64_t Sapphire::World::Session::getConnectTimeMs() const
+{
+  return m_connectTimeMs;
 }

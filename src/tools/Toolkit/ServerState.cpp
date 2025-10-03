@@ -16,7 +16,7 @@
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
 
-#include "EditorState.h"
+#include "ServerState.h"
 
 #include "Engine/GfxApi.h"
 #include "Engine/ResourceManager.h"
@@ -57,7 +57,7 @@ using namespace Client;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
-EditorState::EditorState( std::shared_ptr< Engine::ApplicationContext > pContext ) : State( pContext )
+ServerState::ServerState( std::shared_ptr< Engine::ApplicationContext > pContext ) : State( pContext )
 {
   // Load config defaults from the server config
   auto executableDir = Sapphire::Common::Util::executableDir();
@@ -86,7 +86,7 @@ void framebuffer_size_callback( GLFWwindow *window, int width, int height )
   Engine::Rendering::Graphics::setViewport( 0, 0, width, height );
 }
 
-bool EditorState::initGameData()
+bool ServerState::initGameData()
 {
   auto exdData = std::make_shared< Sapphire::Data::ExdData >();
   if( !exdData->init( m_datLocation ) )
@@ -108,7 +108,7 @@ bool EditorState::initGameData()
   return false;
 }
 
-bool EditorState::initMySQLConnection()
+bool ServerState::initMySQLConnection()
 {
   Sapphire::Db::DbLoader loader;
   Sapphire::Db::ConnectionInfo database;
@@ -129,7 +129,7 @@ bool EditorState::initMySQLConnection()
   return true;
 }
 
-void EditorState::load()
+void ServerState::load()
 {
   Sapphire::Logger::init( "logger" );
   auto& graphics = Engine::Service< Engine::Rendering::Graphics >::ref();
@@ -157,6 +157,7 @@ void EditorState::load()
     m_zoneEditor.init();
     m_lgbViewer.init();
     m_oldMon.init();
+    m_exdViewer.init();
   }
 
   if( !initMySQLConnection() )
@@ -166,11 +167,11 @@ void EditorState::load()
   }
 }
 
-void EditorState::update( double deltaTime )
+void ServerState::update( double deltaTime )
 {
 }
 
-void EditorState::loadConfig()
+void ServerState::loadConfig()
 {
   std::ifstream configFile( m_configFile );
   if( !configFile.is_open() )
@@ -268,7 +269,7 @@ void EditorState::loadConfig()
   configFile.close();
 }
 
-void EditorState::saveConfig()
+void ServerState::saveConfig()
 {
   std::ofstream configFile( m_configFile );
   if( !configFile.is_open() )
@@ -301,7 +302,7 @@ void EditorState::saveConfig()
 
 // Add this helper function to the EditorState class
 #ifdef _WIN32
-std::string EditorState::openFolderDialog( const std::string& title )
+std::string ServerState::openFolderDialog( const std::string& title )
 {
   BROWSEINFO bi = { 0 };
   bi.lpszTitle = title.c_str();
@@ -328,7 +329,7 @@ std::string EditorState::openFolderDialog( const std::string& title )
 }
 #endif
 
-void EditorState::showSettingsDialog()
+void ServerState::showSettingsDialog()
 {
   if( !m_showSettingsDialog ) return;
 
@@ -787,7 +788,7 @@ void EditorState::showSettingsDialog()
 }
 
 // Helper method to revert settings buffers
-void EditorState::revertSettingsBuffers()
+void ServerState::revertSettingsBuffers()
 {
   strncpy( m_datLocationBuffer, m_datLocation.c_str(), sizeof( m_datLocationBuffer ) - 1 );
   m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
@@ -811,7 +812,7 @@ void EditorState::revertSettingsBuffers()
 }
 
 // Helper method to restore default settings
-void EditorState::restoreDefaultSettings()
+void ServerState::restoreDefaultSettings()
 {
   // Game Data defaults
   strcpy( m_datLocationBuffer, "" );
@@ -827,7 +828,7 @@ void EditorState::restoreDefaultSettings()
   strcpy( m_navMeshPathBuffer, "navi" );
 }
 
-void EditorState::renderMainMenu()
+void ServerState::renderMainMenu()
 {
   if( ImGui::BeginMainMenuBar() )
   {
@@ -859,6 +860,10 @@ void EditorState::renderMainMenu()
       {
         m_editorMode = EditorMode::OLDMON;
       }
+      if( ImGui::MenuItem( "Exd" ) )
+      {
+        m_editorMode = EditorMode::EXD;
+      }
 
       ImGui::EndMenu();
     }
@@ -872,7 +877,7 @@ void EditorState::renderMainMenu()
 
 bool dockInitialized = false;
 
-void EditorState::render( double deltaTime )
+void ServerState::render( double deltaTime )
 {
   auto ident = Engine::mat4( 1.0f );
 
@@ -904,6 +909,10 @@ void EditorState::render( double deltaTime )
   {
     m_oldMon.show();
   }
+  else if( m_editorMode == EditorMode::EXD )
+  {
+    m_exdViewer.show();
+  }
 
   if( !dockInitialized )
   {
@@ -923,11 +932,13 @@ void EditorState::render( double deltaTime )
     ImGui::DockBuilderDockWindow( "Lgb Viewer", down_id );
     ImGui::DockBuilderDockWindow( "Map Viewer", top_id );
     ImGui::DockBuilderDockWindow( "Capture Select", down_id );
+    ImGui::DockBuilderDockWindow( "EXD File Selector", down_id );
 
 
     ImGui::DockBuilderSplitNode( right_id, ImGuiDir_Left, 0.4, &left1_id, &right1_id );
     ImGui::DockBuilderDockWindow( "Navmesh Viewer", left1_id );
     ImGui::DockBuilderDockWindow( "Packet Viewer", left1_id );
+    ImGui::DockBuilderDockWindow( "Exd Details", left1_id );
 
 
     ImGui::DockBuilderDockWindow( "BNPC Editor", right1_id );
@@ -953,7 +964,7 @@ void EditorState::render( double deltaTime )
 }
 
 
-ImGuiID EditorState::setupDockspace( bool& p_open, ImGuiIO& io ) const
+ImGuiID ServerState::setupDockspace( bool& p_open, ImGuiIO& io ) const
 {
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
@@ -983,12 +994,12 @@ ImGuiID EditorState::setupDockspace( bool& p_open, ImGuiIO& io ) const
   return dockspace_id;
 }
 
-void EditorState::unload()
+void ServerState::unload()
 {
 }
 
 
-void EditorState::handleInput( double deltaTime )
+void ServerState::handleInput( double deltaTime )
 {
   Engine::Input::updateMousePosition();
   // if( m_modelViewActive )
@@ -1002,7 +1013,7 @@ void EditorState::handleInput( double deltaTime )
   }
 }
 
-void EditorState::reEnter()
+void ServerState::reEnter()
 {
   Engine::Input::showMouseCursor();
 }

@@ -3,8 +3,7 @@ file( GLOB_RECURSE SOURCES
         *.cpp
   *.h
 )
-
-add_executable( world ${SOURCES} )
+add_library( world ${SOURCES} )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 set_target_properties( world PROPERTIES

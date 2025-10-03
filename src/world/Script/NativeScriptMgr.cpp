@@ -1,12 +1,9 @@
 #include "NativeScriptMgr.h"
 
 #include <Crypt/md5.h>
-#include <Service.h>
-#include "WorldServer.h"
 
 namespace Sapphire::Scripting
 {
-
   bool NativeScriptMgr::loadScript( const std::string& path )
   {
     std::scoped_lock lock( m_mutex );
@@ -65,7 +62,7 @@ namespace Sapphire::Scripting
     return unloadScript( info );
   }
 
-  bool NativeScriptMgr::unloadScript( ScriptInfo* info )
+  bool NativeScriptMgr::unloadScript( ScriptInfo *info )
   {
     std::scoped_lock lock( m_mutex );
 
@@ -120,7 +117,7 @@ namespace Sapphire::Scripting
     }
   }
 
-  void NativeScriptMgr::findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search )
+  void NativeScriptMgr::findScripts( std::set< Sapphire::Scripting::ScriptInfo * >& scripts, const std::string& search )
   {
     std::scoped_lock lock( m_mutex );
 
@@ -134,17 +131,36 @@ namespace Sapphire::Scripting
     return m_loader.isModuleLoaded( name );
   }
 
-  NativeScriptMgr::NativeScriptMgr()
+  NativeScriptMgr::NativeScriptMgr( const std::string& cachePath )
   {
-    auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+    m_loader.setCachePath( cachePath );
+  }
 
-    m_loader.setCachePath( server.getConfig().scripts.cachePath );
+  void NativeScriptMgr::unloadAll()
+  {
+    std::scoped_lock lock( m_mutex );
+
+    // Collect all currently loaded modules
+    std::set< Sapphire::Scripting::ScriptInfo * > modules;
+    m_loader.findScripts( modules, "" );
+
+    // Unload each module (this will erase entries from m_scripts and delete ScriptObject instances)
+    for( auto *info : modules )
+    {
+      if( info )
+        unloadScript( info );
+    }
+
+    // Clear any leftover type->id map entries (should be empty after unloadScript loop, but ensure)
+    m_scripts.clear();
+
+    // Clear pending reload queue
+    while( !m_scriptLoadQueue.empty() ) m_scriptLoadQueue.pop();
   }
 
 
-  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
+  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( const std::string& cachePath )
   {
-    return std::make_shared< NativeScriptMgr >();
+    return std::make_shared< NativeScriptMgr >( cachePath );
   }
 }
-

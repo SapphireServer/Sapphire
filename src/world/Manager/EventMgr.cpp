@@ -89,7 +89,6 @@ std::string EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::QuestBattleDirector:
     {
-
       auto qbInfo = exdData.getRow< Excel::QuestBattle >( eventId & 0xFFFF );
       if( !qbInfo )
         return "unknown";
@@ -120,7 +119,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
         }
       }
 
-      return unknown + "Warp";//who know
+      return unknown + "Warp"; //who know
     }
 
     case Event::EventHandler::EventHandlerType::Shop:
@@ -226,7 +225,7 @@ std::string EventMgr::getErrorCodeName( uint8_t errorCode )
   }
 }
 
-uint32_t EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
+uint32_t EventMgr::getActorBaseId( uint32_t eventActorId )
 {
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -350,7 +349,8 @@ void EventMgr::handleYieldEventScene( Entity::Player& player, uint32_t eventId, 
   }
 }
 
-void EventMgr::handleYieldStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString )
+void EventMgr::handleYieldStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId,
+                                            uint8_t resumeId, const std::string& resultString )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   std::string eventName = getEventName( eventId );
@@ -364,7 +364,8 @@ void EventMgr::handleYieldStringEventScene( Entity::Player& player, uint32_t eve
   }
 }
 
-void EventMgr::handleYieldStringIntEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+void EventMgr::handleYieldStringIntEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId,
+                                               uint8_t resumeId,
                                                const std::string& resultString, uint64_t resultInt )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
@@ -379,7 +380,8 @@ void EventMgr::handleYieldStringIntEventScene( Entity::Player& player, uint32_t 
   }
 }
 
-void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString )
+void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId,
+                                             const std::string& resultString )
 {
   std::string eventName = getEventName( eventId );
 
@@ -456,11 +458,13 @@ void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t ev
   checkEvent( player, eventId );
 }
 
-void EventMgr::handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString, uint64_t resultInt )
+void EventMgr::handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId,
+                                                   const std::string& resultString, uint64_t resultInt )
 {
   std::string eventName = getEventName( eventId );
 
-  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, string: {2}, resultInt: {3}", eventId, sceneId, resultString, resultInt );
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, string: {2}, resultInt: {3}", eventId, sceneId,
+                        resultString, resultInt );
 
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
   auto pEvent = player.getEvent( eventId );
@@ -520,7 +524,9 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
   {
     case Event::EventHandler::Nest:
     {
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< EventFinishPacket >( player.getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
+      server.queueForPlayer( player.getCharacterId(),
+                             std::make_shared< EventFinishPacket >( player.getId(), pEvent->getId(),
+                                                                    pEvent->getEventType(), pEvent->getEventParam() ) );
       player.removeEvent( pEvent->getId() );
 
       auto callback = pEvent->getEventFinishCallback();
@@ -535,8 +541,9 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
           if( !it.second->hasPlayedScene() )
           {
             server.queueForPlayer( player.getCharacterId(),
-                                   std::make_shared< EventFinishPacket >( player.getId(), it.second->getId(), it.second->getEventType(),
-                                                                          it.second->getEventParam() ) );
+                                   std::make_shared< EventFinishPacket >(
+                                     player.getId(), it.second->getId(), it.second->getEventType(),
+                                     it.second->getEventParam() ) );
             player.removeEvent( it.second->getId() );
           }
         }
@@ -546,15 +553,16 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
     default:
     {
       server.queueForPlayer( player.getCharacterId(),
-                             std::make_shared< EventFinishPacket >( player.getId(), pEvent->getId(), pEvent->getEventType(), pEvent->getEventParam() ) );
+                             std::make_shared< EventFinishPacket >( player.getId(), pEvent->getId(),
+                                                                    pEvent->getEventType(), pEvent->getEventParam() ) );
       break;
     }
   }
 
   if( player.hasCondition( Common::PlayerCondition::WatchingCutscene ) )
     player.removeCondition( Common::PlayerCondition::WatchingCutscene );
-  
-  if( player.hasCondition( Common::PlayerCondition::Casting ))
+
+  if( player.hasCondition( Common::PlayerCondition::Casting ) )
     player.removeCondition( Common::PlayerCondition::Casting );
 
   player.removeEvent( pEvent->getId() );
@@ -563,7 +571,8 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
     player.removeCondition( Common::PlayerCondition::InNpcEvent );
 }
 
-void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventType, uint8_t eventParam1,
+void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t eventId,
+                           Event::EventHandler::EventType eventType, uint8_t eventParam1,
                            uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -574,14 +583,16 @@ void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t ev
   player.setCondition( Common::PlayerCondition::InNpcEvent );
 
   server.queueForPlayer( player.getCharacterId(), std::make_shared< EventStartPacket >( player.getId(), actorId,
-                                                                                        eventId, eventType, eventParam1, eventParam2 ) );
+                           eventId, eventType, eventParam1, eventParam2 ) );
 }
 
 void EventMgr::eventActionStart( Entity::Player& player, uint32_t eventId, uint32_t action,
-                                 World::Action::ActionCallback finishCallback, World::Action::ActionCallback interruptCallback,
+                                 World::Action::ActionCallback finishCallback,
+                                 World::Action::ActionCallback interruptCallback,
                                  uint64_t additional )
 {
-  auto pEventAction = World::Action::make_EventAction( player.getAsChara(), eventId, action, finishCallback, interruptCallback, additional );
+  auto pEventAction = World::Action::make_EventAction( player.getAsChara(), eventId, action, finishCallback,
+                                                       interruptCallback, additional );
 
   auto pEvent = player.getEvent( eventId );
 
@@ -616,34 +627,39 @@ void EventMgr::eventItemActionStart( Entity::Player& player, uint32_t eventId, u
     return;
   }
 
-  auto pEventItemAction = World::Action::make_EventItemAction( player.getAsChara(), eventId, exdData.getRow< Excel::EventItem >( action ), sequence, targetId );
+  auto pEventItemAction = World::Action::make_EventItemAction( player.getAsChara(), eventId,
+                                                               exdData.getRow< Excel::EventItem >( action ), sequence,
+                                                               targetId );
 
   player.setCurrentAction( pEventItemAction );
 
   pEventItemAction->onStart();
 }
 
-bool EventMgr::checkHitEobject( Entity::Player& player, Common::FFXIVARR_POSITION3 targetPos, Common::QuestEobject Eobject )
+bool EventMgr::checkHitEobject( Entity::Player& player, Common::FFXIVARR_POSITION3 targetPos,
+                                Common::QuestEobject Eobject )
 {
-  return player.getTerritoryTypeId() == Eobject.teri && Sapphire::Common::Util::distance( targetPos, Eobject.pos ) < 2.0f + Eobject.radius;
+  return player.getTerritoryTypeId() == Eobject.teri && Sapphire::Common::Util::distance( targetPos, Eobject.pos ) <
+         2.0f + Eobject.radius;
 }
 
 
-void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t flags, uint32_t param1, Event::EventHandler::SceneReturnCallback eventCallback )
+void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t flags, uint32_t param1,
+                            Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, flags );
   if( !pEvent )
     return;
 
-  if( param1 == 0 )//list items
+  if( param1 == 0 ) //list items
   {
     auto& shopMgr = Common::Service< ShopMgr >::ref();
     std::vector< uint32_t > params = std::vector< uint32_t >();
 
-    params.push_back( 201 );//unknown
-    params.push_back( 1 );  //command id
+    params.push_back( 201 ); //unknown
+    params.push_back( 1 ); //command id
     params.push_back( 40 ); //max items for sell
-    params.push_back( 0 );  //flag
+    params.push_back( 0 ); //flag
     uint8_t index;
     for( index = 0; index < 40; index++ )
     {
@@ -652,7 +668,7 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
       else
         break;
     }
-    params[ 2 ] = static_cast< uint32_t >( params.size() - 4 );//new max item size
+    params[ 2 ] = static_cast< uint32_t >( params.size() - 4 ); //new max item size
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
     for( auto it : *player.getSoldItems() )
@@ -665,14 +681,14 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
       params.push_back( 0 );                 //numOfMateria
       params.push_back( eventId );           //shopId
 
-      params.push_back( 0 );//signatureId
-      params.push_back( 0 );//signatureId
+      params.push_back( 0 ); //signatureId
+      params.push_back( 0 ); //signatureId
 
-      params.push_back( ( 1000 << 16 ) + 1000 );//durability + refine
-      params.push_back( 0 );                    //stain
-      params.push_back( 0 );                    //pattern
+      params.push_back( ( 1000 << 16 ) + 1000 ); //durability + refine
+      params.push_back( 0 ); //stain
+      params.push_back( 0 ); //pattern
 
-      for( uint8_t slot = 0; slot < 5; slot++ )//materia
+      for( uint8_t slot = 0; slot < 5; slot++ ) //materia
       {
         params.push_back( 0 );
       }
@@ -680,12 +696,13 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
 
     playScene( player, eventId, 40, flags, params, std::move( eventCallback ) );
   }
-  else if( param1 == 2 )//sell item
+  else if( param1 == 2 ) //sell item
   {
   }
 }
 
-void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, std::vector< uint32_t > values,
+void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,
+                          std::vector< uint32_t > values,
                           Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, flags );
@@ -700,7 +717,8 @@ void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t sce
   sendEventPlay( player, eventId, scene, flags );
 }
 
-void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint8_t yieldId, std::vector< uint32_t > values )
+void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint8_t yieldId,
+                            std::vector< uint32_t > values )
 {
   FFXIVPacketBasePtr pPacket = nullptr;
   size_t paramCount = values.size();
@@ -728,7 +746,8 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
   server.queueForPlayer( player.getCharacterId(), pPacket );
 }
 
-void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
+void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,
+                          Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, flags );
   if( !pEvent )
@@ -741,7 +760,8 @@ void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t sce
   sendEventPlay( player, eventId, scene, flags );
 }
 
-void EventMgr::playQuestScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, Event::EventHandler::QuestSceneReturnCallback eventCallback )
+void EventMgr::playQuestScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,
+                               Event::EventHandler::QuestSceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, flags );
   if( !pEvent )
@@ -768,7 +788,8 @@ void EventMgr::playSceneChain( Entity::Player& player, uint32_t eventId, uint32_
   sendEventPlay( player, eventId, scene, flags );
 }
 
-void EventMgr::playSceneChain( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, std::vector< uint32_t > values,
+void EventMgr::playSceneChain( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,
+                               std::vector< uint32_t > values,
                                Sapphire::Event::EventHandler::SceneChainCallback sceneChainCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, flags );
@@ -813,21 +834,29 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
   assert( paramCount <= 255 );
 
   if( paramCount < 2 )
-    pPacket = std::move( std::make_shared< EventPlayPacket2 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket2 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 4 )
-    pPacket = std::move( std::make_shared< EventPlayPacket4 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket4 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 8 )
-    pPacket = std::move( std::make_shared< EventPlayPacket8 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket8 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 16 )
-    pPacket = std::move( std::make_shared< EventPlayPacket16 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket16 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 32 )
-    pPacket = std::move( std::make_shared< EventPlayPacket32 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket32 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 64 )
-    pPacket = std::move( std::make_shared< EventPlayPacket64 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket64 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 128 )
-    pPacket = std::move( std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 255 )
-    pPacket = std::move( std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+    pPacket = std::move(
+      std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );
@@ -836,9 +865,9 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
 }
 
 
-Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& player, uint32_t eventId, uint32_t flags )
+Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& player, uint32_t eventId,
+                                                                uint32_t flags )
 {
-
   auto pEvent = player.getEvent( eventId );
   if( !pEvent )
   {
@@ -852,7 +881,8 @@ Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& 
   return pEvent;
 }
 
-void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 )
+void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, uint8_t numOfArgs,
+                                uint32_t var1, uint32_t var2 )
 {
   std::vector< uint32_t > args{ var1, var2 };
   auto noticePacket = std::make_shared< EventNotice2Packet >( player, questId, noticeId, args );

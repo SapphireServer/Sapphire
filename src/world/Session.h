@@ -7,7 +7,6 @@
 
 namespace Sapphire::World
 {
-
   class Session : public std::enable_shared_from_this< Session >
   {
   public:
@@ -57,6 +56,8 @@ namespace Sapphire::World
 
     Entity::PlayerPtr getPlayer() const;
 
+    uint64_t getConnectTimeMs() const; // when this session was created
+
     /*! set timestamp for last received ping */
     void setLastPing( uint32_t lastPing );
 
@@ -80,9 +81,8 @@ namespace Sapphire::World
     Network::GameConnectionPtr m_pZoneConnection;
     Network::GameConnectionPtr m_pChatConnection;
 
+    uint64_t m_connectTimeMs{ 0 };
   };
-
 }
 
 #endif
-

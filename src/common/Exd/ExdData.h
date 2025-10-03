@@ -74,6 +74,11 @@ namespace Sapphire::Data
       return m_data;
     }
 
+    std::shared_ptr< xiv::exd::ExdData > getExdData()
+    {
+      return m_exd_data;
+    }
+
   private:
     template< typename T >
     std::string getSheetName()
