@@ -4,6 +4,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Actor/Player.h>
 #include "Forwards.h"
+#include <Common.h>
 
 namespace Sapphire::Network::Util::Packet
 {
@@ -24,6 +25,19 @@ namespace Sapphire::Network::Util::Packet
   void sendHateList( Entity::Player& player );
 
   void sendMount( Entity::Player& player );
+
+  /* Inventory packets */
+
+  /*! send the ItemOperation packet to client with src attributes */
+  void sendItemOperation( Entity::Player& player, uint32_t id, ItemPtr item, uint16_t invType, int16_t type, Common::ITEM_OPERATION_TYPE opType, uint32_t seq );
+
+  /*! send the ItemOperation packet to client with dst attributes */
+  void sendItemOperationDst( Entity::Player& player, uint32_t id,  ItemPtr item, uint32_t storageId, int16_t slotId, Common::ITEM_OPERATION_TYPE opType, uint32_t seq );
+
+  /*! send the ItemOperationBatch packet to client */
+  void sendItemOperationBatch( Entity::Player& player, uint32_t id, uint32_t seq, Common::ITEM_OPERATION_TYPE opType );
+
+  /************/
 
   void sendEquip( Entity::Player& player );
 

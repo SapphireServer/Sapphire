@@ -251,7 +251,7 @@ void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId,
   uint8_t index = 0;
   for( auto r : results )
   {
-    PlayerMgr::sendDebug( player, "arg#{0}: {1} ({1:08X})", index++, r );
+    if( r ) PlayerMgr::sendDebug( player, "arg#{0}: {1} ({1:08X})", index++, r );
   }
 
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
@@ -674,12 +674,12 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
     for( auto it : *player.getSoldItems() )
     {
       auto item = exdData.getRow< Excel::Item >( it.first );
-      params.push_back( it.first ); //itemCatalogId
-      params.push_back( it.second ); //stack
-      params.push_back( item->data().Price ); //price
-      params.push_back( 0 ); //flag isHQ
-      params.push_back( 0 ); //numOfMateria
-      params.push_back( eventId ); //shopId
+      params.push_back( it.first );          //itemCatalogId
+      params.push_back( it.second );         //stack
+      params.push_back( item->data().PriceMin );//price
+      params.push_back( 0 );                 //flag isHQ
+      params.push_back( 0 );                 //numOfMateria
+      params.push_back( eventId );           //shopId
 
       params.push_back( 0 ); //signatureId
       params.push_back( 0 ); //signatureId

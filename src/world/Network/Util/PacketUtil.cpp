@@ -1,3 +1,4 @@
+#include <Common.h>
 #include "PacketUtil.h"
 
 #include <Exd/ExdData.h>
@@ -6,6 +7,8 @@
 #include <Manager/TerritoryMgr.h>
 
 #include <Territory/Territory.h>
+
+#include <Inventory/Item.h>
 
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -283,6 +286,48 @@ void Util::Packet::sendMount( Entity::Player& player )
   mountPacket->data().id = mountId;
   server().queueForPlayers( inRangePlayerIds, mountPacket );
 }
+
+/* Inventory packets */
+
+void Util::Packet::sendItemOperation( Entity::Player& player, uint32_t id, ItemPtr item, uint16_t invType, int16_t type, Common::ITEM_OPERATION_TYPE opType, uint32_t seq )
+{
+  auto invUpdate = makeZonePacket< FFXIVIpcItemOperation >( id );
+  invUpdate->data().contextId = seq;
+  invUpdate->data().srcStorageId = invType;
+  invUpdate->data().srcStack = item->getStackSize();
+  invUpdate->data().srcContainerIndex = type;
+  invUpdate->data().srcEntity = id;
+  invUpdate->data().srcCatalogId = item->getId();
+  invUpdate->data().operationType = opType;
+
+  server().queueForPlayer( player.getCharacterId(), invUpdate );
+}
+
+void Util::Packet::sendItemOperationDst( Entity::Player& player, uint32_t id, ItemPtr item, uint32_t storageId, int16_t slotId, Common::ITEM_OPERATION_TYPE opType, uint32_t seq )
+{
+  auto invTransPacket = makeZonePacket< FFXIVIpcItemOperation >( id );
+  invTransPacket->data().contextId = seq;
+  invTransPacket->data().dstEntity = id;
+  invTransPacket->data().dstStorageId = storageId;
+  invTransPacket->data().dstCatalogId = item->getId();
+  invTransPacket->data().dstStack = item->getStackSize();
+  invTransPacket->data().dstContainerIndex = slotId;
+  invTransPacket->data().operationType = opType;
+
+  server().queueForPlayer( player.getCharacterId(), invTransPacket );
+}
+
+void Util::Packet::sendItemOperationBatch( Entity::Player& player, uint32_t id, uint32_t seq, Common::ITEM_OPERATION_TYPE opType )
+{
+  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( id );
+  invTransFinPacket->data().contextId = seq;
+  invTransFinPacket->data().operationId = seq;
+  invTransFinPacket->data().operationType = opType;
+
+  server().queueForPlayer( player.getCharacterId(), invTransFinPacket );
+}
+
+/*************/
 
 void Util::Packet::sendEquip( Entity::Player& player )
 {
