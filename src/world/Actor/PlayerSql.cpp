@@ -900,24 +900,6 @@ bool Player::loadInventory()
     }
   }
 
-  /* while( crystalRes->next() )
-  {
-    uint16_t storageId = crystalRes->getUInt16( 1 );
-    for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
-    {
-      uint64_t uItemId = crystalRes->getUInt64( i + 1 );
-      if( uItemId == 0 )
-        continue;
-
-      ItemPtr pItem = itemMgr.loadItem( uItemId );
-
-      if( pItem == nullptr )
-        continue;
-
-      m_storageMap[ storageId ]->getItemMap()[ i - 1 ] = pItem;
-    }
-  }*/
-
   return true;
 }
 
