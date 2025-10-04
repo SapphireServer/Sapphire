@@ -1085,10 +1085,15 @@ namespace Sapphire::Common
   enum ItemActionType : uint16_t
   {
     KeyItemAction = 1,
+    ItemStatusEffectCure = 842,
+    ItemHpRecovery = 847,
+    ItemMpRecovery = 848,
+    ItemHpMpRecovery = 849,
     ItemActionVFX = 852,
     ItemActionCompanion = 853,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
+    ItemMGPCard = 3800,
     ItemActionSong = 5845,
   };
 

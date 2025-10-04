@@ -44,7 +44,22 @@ namespace Sapphire::World::Action
 
   enum ActionStatus
   {
+    Petrification = 1,
+    Stun = 2,
+    Sleep = 3,
+    Daze = 4,
+    Amnesia = 5,
+    Pacification = 6,
+    Silence = 7,
+    Haste = 8,
+    Slow = 9,
+    Confused = 11,
+    Levitation = 12,
     Bind = 13,
+    Heavy = 14,
+    Blind = 15,
+    Paralysis = 17,
+    Poison = 18,
     Defiance = 91,
     Unchained = 92,
     Wrath = 93,

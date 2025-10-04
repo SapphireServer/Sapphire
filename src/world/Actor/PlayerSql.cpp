@@ -735,7 +735,7 @@ bool Player::loadInventory()
 
   while( gearRes->next() )
   {
-    uint16_t storageId = gearRes->getUInt16( 1 );
+    uint16_t storageId = gearRes->getUInt16( "storageId" );
 
     for( uint32_t i = 1; i <= 14; i++ )
     {
@@ -769,7 +769,7 @@ bool Player::loadInventory()
 
   while( bagRes->next() )
   {
-    uint16_t storageId = bagRes->getUInt16( 1 );
+    uint16_t storageId = bagRes->getUInt16( "storageId" );
     for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
     {
       uint64_t uItemId = bagRes->getUInt64( i + 1 );
@@ -799,7 +799,7 @@ bool Player::loadInventory()
 
   while( currencyRes->next() )
   {
-    uint16_t storageId = currencyRes->getUInt16( 1 );
+    uint16_t storageId = currencyRes->getUInt16( "storageId" );
     for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize() + 1; i++ )
     {
       auto itemQty = currencyRes->getUInt64( i + 1 );
@@ -857,7 +857,7 @@ bool Player::loadInventory()
 
   while( crystalRes->next() )
   {
-    uint16_t storageId = crystalRes->getUInt16( 1 );
+    uint16_t storageId = crystalRes->getUInt16( "storageId" );
     for( uint32_t i = 2; i <= m_storageMap[ storageId ]->getMaxSize() + 2; i++ )
     {
       auto itemQty = crystalRes->getUInt64( i );

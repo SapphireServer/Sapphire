@@ -25,11 +25,17 @@ namespace Sapphire::World::Action
     void interrupt() override;
 
   private:
+    void handleStatusEffectCureItems();
+
+    void handleRestoreItem();
+
     void handleVFXItem();
 
     void handleCompanionItem();
 
     void handleMountItem();
+
+    void handleMGPCardItem();
 
     void handleSongItem();
 
