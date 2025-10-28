@@ -225,7 +225,13 @@ uint16_t Sapphire::Item::getSpiritbond() const
 
 void Sapphire::Item::setSpiritbond( uint16_t spiritbond )
 {
-  m_spiritBond = spiritbond;
+  if( m_spiritBond == 10000 )
+    return;
+
+  m_spiritBond = spiritbond > 10000 ? 10000 : spiritbond;
+
+}
+
 }
 
 uint32_t Sapphire::Item::getReservedFlag() const

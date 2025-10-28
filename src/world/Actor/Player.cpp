@@ -1438,6 +1438,132 @@ void Player::glamourItemFromGlamouringInfo()
     Network::Util::Packet::sendActorControlSelf( *this, getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
 }
 
+void Player::setMateriaInfo( uint32_t itemToInventoryContainer, uint32_t itemToInventorySlot )
+{
+  m_materiaInfo.itemToInventoryContainer = itemToInventoryContainer;
+  m_materiaInfo.itemToInventorySlot = itemToInventorySlot;
+}
+
+uint16_t Player::setMateriaTier( uint16_t itemLevel )
+{
+  auto tier = 0;
+
+  srand( time( 0 ) );
+  auto chance = rand() % 100;
+
+  if( itemLevel >= 1 && itemLevel <= 14 )
+    tier = 1;
+  else if( itemLevel >= 15 && itemLevel <= 29 )
+    tier = chance <= 90 ? 1 : 2;
+  else if( itemLevel >= 30 && itemLevel <= 44 )
+    tier = chance <= 90 ? 2 : 3;
+  else if( itemLevel >= 45 && itemLevel <= 60 )
+    tier = chance <= 90 ? 3 : 4;
+  else if( itemLevel >= 60 )
+    tier = 4;
+
+  return tier;
+}
+
+std::vector < uint16_t > Player::getAllMateriasForGearType( uint8_t itemClass )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto materiaInfo = exdData.getRows< Excel::Materia >();
+
+  std::vector< uint16_t > x;
+
+  for( auto materia : materiaInfo )
+  {
+    auto matIdx = materia.first;
+    auto matData = materia.second->data();
+
+    if( ( itemClass == 30 || itemClass == 31) && ( matIdx >= 8 && matIdx <= 16  ) )
+    {
+      x.push_back( matData.Item[ m_materiaInfo.materiaTier - 1 ] );
+      continue;
+    }
+
+    switch (itemClass)
+    {
+      case 30:
+      {
+        if( matIdx == 2 || matIdx == 4 || matIdx == 17 || matIdx == 24 )
+          x.push_back( matData.Item[ m_materiaInfo.materiaTier - 1 ] );
+        break;
+      }
+      case 31:
+      {
+        if( matIdx == 5 || matIdx == 6 || matIdx == 7 || matIdx == 25 )
+          x.push_back( matData.Item[ m_materiaInfo.materiaTier - 1 ] );
+        break;
+      }
+      case 32:
+      {
+        if( matIdx == 21 || matIdx == 22 || matIdx == 23 )
+          x.push_back( matData.Item[ m_materiaInfo.materiaTier - 1 ] );
+        break;
+      }
+      case 33:
+      {
+        if( matIdx == 18 || matIdx == 19 || matIdx == 20 )
+          x.push_back( matData.Item[ m_materiaInfo.materiaTier - 1 ] );
+        break;
+      }
+      default:
+        break;
+    }    
+  }
+
+  if( x.empty() )
+    x.push_back( 5604 ); // debug in caso di materia assente
+
+  return x;
+}
+
+uint16_t Player::setMateriaType( ItemPtr& item )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto itemInfo = exdData.getRow< Excel::Item >( item->getId() );
+
+  if( !itemInfo )
+    return 0;
+
+  auto itemClass = itemInfo->data().CondClassJob;
+  std::vector< uint16_t >  materias = getAllMateriasForGearType( itemClass );
+
+  if( materias.empty() )
+    return 0;// Non dovrebbe svilupparsi ma...
+  else if( materias.size() == 1 )
+    return materias[ materias.size() - 1 ]; // In caso non fosse andato a buon fine sopra
+
+  srand( time( 0 ) );
+
+  auto randomIdx = rand() % materias.size();
+
+  return materias[ randomIdx ];
+}
+
+void Player::materiaItemFromMateriaInfo()
+{
+  auto& playerMgr = Service< World::Manager::PlayerMgr >::ref();
+
+  uint32_t storageId = m_materiaInfo.itemToInventoryContainer;
+  uint32_t slotId = m_materiaInfo.itemToInventorySlot;
+
+  auto itemUsed = getItemAt( storageId, slotId );
+
+  m_materiaInfo.materiaTier = setMateriaTier( itemUsed->getItemLevel() );
+  m_materiaInfo.materiaId = setMateriaType( itemUsed );
+
+  Network::Util::Packet::sendCondition( *this );
+
+  addItem( m_materiaInfo.materiaId, 1, false, true, true );
+
+  auto seq = getNextInventorySequence();
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), MateriaConvertMsg, itemUsed->getId(), m_materiaInfo.materiaId, true );
+  Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_CREATEMATERIA );
+}
+
 void Player::resetObjSpawnIndex()
 {
   m_objSpawnIndexAllocator.freeAllSpawnIndexes();

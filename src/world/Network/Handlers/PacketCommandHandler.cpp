@@ -844,7 +844,11 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", data.Arg1, data.Arg2 );
       break;
     }*/
-
+    case PacketCommand::MATERIA_CREATION:
+    {
+      player.setMateriaInfo( data.Arg0, data.Arg1 );
+      break;
+    }
     default:
     {
       Logger::debug( "[{0}] Unhandled Command: {1:04X}", player.getId(), data.Id );

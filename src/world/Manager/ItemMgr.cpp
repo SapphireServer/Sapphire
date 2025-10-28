@@ -120,9 +120,10 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 refine, 8 materia_0, 9 materia_1,
-  //  10 materia_2, 11 materia_3, 12 materia_4, 13 stain, 14 pattern, 15 buffer_0, 16 buffer_1, 17 buffer_2,
-  //  18 buffer_3, 19 buffer_4
+  //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 spiritBond, 8 refine, 9 materia_0, 10 materia_1,
+  //  11 materia_2, 12 materia_3, 13 materia_4, 14 stain, 15 pattern, 16 buffer_0, 17 buffer_1, 18 buffer_2,
+  //  19 buffer_3, 20 buffer_4
+
   auto query = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
   query->setUInt64( 1, uId );
 
@@ -143,6 +144,7 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
     pItem->setStain( itemRes->getUInt16( "stain" ) );
     pItem->setPattern( itemRes->getUInt( "pattern" ) );
     pItem->setDurability( itemRes->getInt16( "durability" ) );
+    pItem->setSpiritbond( itemRes->getInt16( "spiritBond" ) );
     pItem->setGlamModelIds();
 
     return pItem;

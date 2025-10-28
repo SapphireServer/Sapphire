@@ -188,13 +188,13 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_ITEMGLOBAL_SELECT,
-                    "SELECT catalogId, stack, reservedFlag, signatureId, flags, durability, refine, materia_0, materia_1, "
+                    "SELECT catalogId, stack, reservedFlag, signatureId, flags, durability, spiritBond, refine, materia_0, materia_1, "
                     "materia_2, materia_3, materia_4, stain, pattern, buffer_0, buffer_1, buffer_2, buffer_3, buffer_4 "
                     "FROM charaglobalitem WHERE itemId = ?",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_ITEMGLOBAL_UP,
-                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ?, pattern = ? WHERE ItemId = ?;",
+                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ?, pattern = ?, spiritBond = ? WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,

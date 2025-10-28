@@ -1128,6 +1128,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t flags;
     uint8_t __padding1;
     uint16_t durability;
+    uint16_t spiritBond;
     uint16_t refine;
     uint8_t stain;
     uint8_t __padding2;

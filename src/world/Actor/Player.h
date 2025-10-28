@@ -181,6 +181,10 @@ namespace Sapphire::Entity
 
     void updateModels( Common::GearSetSlot equipSlotId, const Item& item );
 
+    void updateSpiritBond( ItemPtr& item, uint16_t spiritBond );
+
+    void getSpiritbondRateWithMap( uint8_t contentLvl );
+
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
     bool getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const;
@@ -343,6 +347,12 @@ namespace Sapphire::Entity
 
     void setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour );
     void glamourItemFromGlamouringInfo();
+
+    void setMateriaInfo( uint32_t itemToInventoryContainer, uint32_t itemToInventorySlot );
+    uint16_t setMateriaTier( uint16_t itemLevel );
+    std::vector< uint16_t > getAllMateriasForGearType( uint8_t itemClass );
+    uint16_t setMateriaType( ItemPtr& item );
+    void materiaItemFromMateriaInfo();
 
     /*! get player's title list (available titles) */
     TitleList& getTitleList();
@@ -764,6 +774,9 @@ namespace Sapphire::Entity
     /*! remove amount from the crystals of type */
     void removeCrystal( Common::CrystalType type, uint32_t amount );
 
+    /*! add materia item with amount */
+    void addMateria( uint32_t itemId, uint32_t amount );
+
     bool isObtainable( uint32_t catalogId, uint8_t quantity );
 
     uint32_t getNextInventorySequence();
@@ -966,6 +979,15 @@ namespace Sapphire::Entity
       uint32_t glamourBagSlot;
       bool shouldGlamour;
     } m_glamouringInfo{};
+
+
+    struct PlayerMateriaInfo
+    {
+      uint32_t itemToInventoryContainer;
+      uint32_t itemToInventorySlot;
+      uint16_t materiaTier;
+      uint16_t materiaId;
+    } m_materiaInfo{};
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

@@ -59,8 +59,8 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
       itemInfoPacket->data().item.stack = itM.second->getStackSize();
       itemInfoPacket->data().item.catalogId = itM.second->getId();
       itemInfoPacket->data().item.durability = itM.second->getDurability();
-//      itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
-//      itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
+      itemInfoPacket->data().item.spiritBond = itM.second->getSpiritbond();
+      //itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
       // todo: not sure if correct flag?
       itemInfoPacket->data().item.flags = static_cast< uint8_t >( itM.second->isHq() ? 1 : 0 );
       itemInfoPacket->data().item.stain = static_cast< uint8_t >( itM.second->getStain() );

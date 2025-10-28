@@ -206,6 +206,8 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcKill( player, bnpc );
 
+  player.getSpiritbondRateWithMap( bnpc.getLevel() );
+
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
     onUpdateHuntingLog( player, bnpc.getBNpcNameId() );
 }

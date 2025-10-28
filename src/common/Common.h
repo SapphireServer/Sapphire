@@ -545,6 +545,8 @@ namespace Sapphire::Common
     EmoteHuzzah = 225,
     EmoteEmbrace = 229,
     EmoteMostGentlemanly = 244,
+    Materia = 246,
+    MateriaEquip = 247,
     AetherialReduction = 256,
     EmoteFistBump = 259
   };

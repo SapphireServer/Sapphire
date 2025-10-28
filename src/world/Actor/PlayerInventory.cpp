@@ -55,7 +55,7 @@ void Player::initInventory()
   // gil contianer
   setupContainer( Currency, 11, "charaitemcurrency", true );
 
-  // crystals??
+  // crystals
   setupContainer( Crystal, 17, "charaitemcrystal", true );
 
   // armory weapons - 0
@@ -265,6 +265,53 @@ void Player::unequipSoulCrystal()
   playerMgr().onClassJobChanged( *this, parentClass );
 }
 
+const std::map< int, uint16_t > spiritbondTable = {
+  { -31, 0 },
+  { -20, 1 },
+  { -15, 20 },
+  { -10, 42 },
+  { -5, 52 },
+  { 0, 62 },
+  { 5, 100 },
+  { 10, 150 },
+  { 15, 100 },
+  { 20, 10 },
+  { 25, 5 },
+  { 30, 1 }
+};
+
+void Player::getSpiritbondRateWithMap( uint8_t contentLvl )
+{
+  for( auto slot = 0; slot < 14; slot++ )
+  {
+    auto item = m_storageMap[ GearSet0 ]->getItem( static_cast< uint16_t >( static_cast< GearSetSlot >( slot ) ) );
+
+    if( !item || item->getSpiritbond() >= 10000 ) continue;
+
+    auto itemLevelDiff = static_cast< uint16_t >(contentLvl) - item->getItemLevel();
+
+    if( itemLevelDiff < -30 || itemLevelDiff > 30 )
+      continue;
+
+    auto it = spiritbondTable.upper_bound( itemLevelDiff );
+
+    updateSpiritBond( item, std::prev( it )->second );
+  }
+
+  sendGearInventory();
+}
+
+void Player::updateSpiritBond( ItemPtr& item, uint16_t spiritBond )
+{
+  if( spiritBond == 0 ) return;
+
+  auto spBond = item->getSpiritbond() + spiritBond;
+
+  item->setSpiritbond( spBond );
+
+  writeItem( item );
+}
+
 Common::CurrencyType Player::itemToCurrencyType( uint32_t itemId ) const
 {
   switch (itemId)
@@ -300,7 +347,6 @@ Common::CurrencyType Player::itemToCurrencyType( uint32_t itemId ) const
     default:
       return Common::CurrencyType::NotACurrency;
   }
- 
 }
 
 uint32_t Player::currencyTypeToItem( Common::CurrencyType type ) const
@@ -402,7 +448,6 @@ void Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
 
 }
 
-
 void Player::addCrystal( Common::CrystalType type, uint32_t amount )
 {
   auto slot = static_cast< uint8_t >( type ) - 2;
@@ -446,6 +491,80 @@ void Player::removeCrystal( Common::CrystalType type, uint32_t amount )
   Network::Util::Packet::sendItemOperation( *this, getId(), currItem, Crystal, type - 2, ITEM_OPERATION_TYPE_UPDATEITEM, seq );
 
   Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
+}
+
+void Player::addMateria(uint32_t itemId, uint32_t amount)
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto itemInfo = exdData.getRow< Excel::Item >( itemId );
+
+  if( !itemInfo )
+    return;
+
+  amount = std::min< uint32_t >( amount, itemInfo->data().StackMax );
+
+  // used for item obtain notification
+  uint32_t originalQuantity = amount;
+
+  std::pair< uint16_t, uint16_t > freeBagSlot;
+  bool foundFreeSlot = false;
+
+  std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
+
+  uint16_t slot;
+
+  for (auto bag : bags)
+  {
+    auto storage = m_storageMap[ bag ];
+
+    for( uint16_t slot = 0; slot < storage->getMaxSize(); slot++ )
+    {
+      if( foundFreeSlot )
+        break;
+
+      auto item = storage->getItem( slot );
+
+      // add any items that are stackable
+      if( item && item->getMaxStackSize() > 0 && item->getId() == itemId )
+      {
+        uint32_t count = item->getStackSize();
+        uint32_t maxStack = item->getMaxStackSize();
+
+        // if slot is full, skip it
+        if( count >= maxStack )
+          continue;
+
+        // update stack
+        uint32_t newStackSize = count + amount;
+        if( newStackSize > maxStack )
+        {
+          amount = newStackSize - maxStack;
+          newStackSize = maxStack;
+        }
+        else
+          amount = 0;
+
+        item->setStackSize( newStackSize );
+        writeItem( item );
+
+        auto seq = getNextInventorySequence();
+
+        auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item, seq );
+        server().queueForPlayer( getCharacterId(), slotUpdate );
+
+        Network::Util::Packet::sendItemOperationBatch( *this, getId(), seq, ITEM_OPERATION_TYPE_UPDATEITEM );
+        seq = getNextInventorySequence();
+        //Network::Util::Packet::
+
+        // return existing stack if we have no overflow - items fit into a preexisting stack
+        if( amount == 0 )
+        {
+          server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, itemId, originalQuantity ) );
+          return;//item;
+        }
+      }
+    }
+  }
 }
 
 void Player::sendInventory()
@@ -580,8 +699,8 @@ void Player::writeItem( ItemPtr pItem ) const
   stmt->setInt( 2, pItem->getDurability() );
   stmt->setInt( 3, pItem->getStain() );
   stmt->setInt( 4, pItem->getPattern() );
-
-  stmt->setInt64( 5, pItem->getUId() );
+  stmt->setInt( 5, pItem->getSpiritbond() );
+  stmt->setInt64( 6, pItem->getUId() );
 
   db.directExecute( stmt );
 }
