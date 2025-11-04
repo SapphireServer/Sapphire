@@ -185,7 +185,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 1 );
+    eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setSeq( Seq3 );    
   }
 
@@ -212,7 +212,6 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -224,7 +223,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 2 );
+    eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setSeq( SeqFinish );
   }
 

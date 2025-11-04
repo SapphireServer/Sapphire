@@ -57,41 +57,34 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000( quest, player );
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+
         break;
       }
       case Actor1:
       {
-        Scene00100( quest, player );
+        if( quest.getSeq() == SeqFinish )
+          Scene00001( quest, player );
+
         break;
       }
-
     }
-  }
-
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
   }
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( bnpc.getBNpcNameId() )
+    if( quest.getSeq() == Seq1 )
     {
-      case Enemy0:
-      {
-        uint8_t currCount = quest.getUI8AL();
-        if( currCount + 1 >= 8 )
-        {
-          eventMgr().sendEventNotice( player, getId(), 0, 3, 8, 8 );
-          quest.setSeq( SeqFinish );
-        }
-        else
-        {
-          quest.setUI8AL( currCount + 1 );
-          eventMgr().sendEventNotice( player, getId(), 0, 3, currCount + 1, 8 );
-        }
-        break;
-      }
+      if( bnpc.getBNpcNameId() != Enemy0 )
+        return;
+
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 3, quest.getUI8AL(), 8 );
+
+      if( quest.getUI8AL() >= 8 )
+        quest.setSeq( SeqFinish );
     }
   }
 
@@ -111,8 +104,6 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
     {
       quest.setSeq( Seq1 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -124,8 +115,10 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    if( result.getResult( 0 ) == 1 )
+      Scene00100( quest, player );
+    else
+      Scene00099( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -138,7 +131,6 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -150,12 +142,10 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
 };

@@ -77,7 +77,7 @@ class ManWil005 : public Sapphire::ScriptAPI::QuestScript
         }
         else if (quest.getSeq() == SeqFinish)
         {
-         Scene00006( quest, player );
+          Scene00006( quest, player );
         }
           
         break;

@@ -157,21 +157,13 @@ private:
 
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentCC = quest.getUI8BH();
+    quest.setUI8BH( quest.getUI8BH() + 1 );
+    quest.setUI8AL( quest.getUI8AL() + 1 );
 
-    eventMgr().sendEventNotice( player, getId(), 1, 3, currentCC + 1, 6 );
+    eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AL(), 6, player.getQuestItemIcon( Item0 ) } );
 
-    if( currentCC + 1 >= 6 )
-    {
+    if( quest.getUI8AL() >= 6 )
       quest.setSeq( SeqFinish );
-      quest.setUI8BH( currentCC + 1 );
-      quest.setUI8AL( currentCC + 1 );
-    }
-    else
-    {
-      quest.setUI8BH( currentCC + 1 );
-      quest.setUI8AL( currentCC + 1 );
-    }
   }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
@@ -200,7 +192,6 @@ private:
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -219,10 +210,6 @@ private:
         quest.setSeq( Seq2 );
         warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 11.3f, 20.9f, 13.3f }, -2.3f );
       }
-    }
-    else
-    {
-      return;
     }
   }
 
@@ -414,12 +401,10 @@ private:
 
   void Scene00017Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
 };

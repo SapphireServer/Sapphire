@@ -111,6 +111,16 @@ public:
     }
   }
 
+  void onEnterTerritory( World::Quest& quest, Entity::Player& player, uint16_t param1, uint16_t param2 ) override
+  {
+    if( quest.getSeq() == Seq5 )
+    {
+      // The position doesn't chage
+      player.setRot( -1.808f );
+      player.setPos( { 410.59f, -5.46f, 68.8f } );
+      //Scene00025( quest, player );
+    }
+  }
 
   void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actor, uint32_t actionId ) override
   {
@@ -548,15 +558,13 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //TODO: QuestBattle
-      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
-      eventMgr().sendEventNotice( player, getId(), 3, 0 );
-      quest.setSeq( Seq5 );
+      if( result.getResult( 0 ) == 1 )
+      {
+        auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
-      /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-
-      eventMgr().eventFinish(player, result.eventId, 0);
-      pTeriMgr.createAndJoinQuestBattle(player, Questbattle0);*/
+        eventMgr().eventFinish( player, result.eventId, 0 );
+        pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+      }
     }
   }
 

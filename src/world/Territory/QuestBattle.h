@@ -68,6 +68,7 @@ namespace Sapphire
 
     void fail();
     void success();
+    void success( uint32_t returnScene );
 
     uint32_t getCountEnemyBNpc();
 

@@ -99,21 +99,13 @@ private:
 
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentCC = quest.getUI8AL();
+    quest.setUI8BH( quest.getUI8BH() + 1 );
+    quest.setUI8AL( quest.getUI8AL() + 1 );
 
-    eventMgr().sendEventNotice( player, getId(), 0, 3, currentCC + 1, 5 );
+    eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 5, player.getQuestItemIcon( Item0 ) } );
 
-    if( currentCC + 1 >= 5 )
-    {
+    if( quest.getUI8AL() >= 5 )
       quest.setSeq( SeqFinish );
-      quest.setUI8BH( currentCC + 1 );
-      quest.setUI8AL( currentCC + 1 );
-    }
-    else
-    {
-      quest.setUI8BH( currentCC + 1 );
-      quest.setUI8AL( currentCC + 1 );
-    }
   }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
