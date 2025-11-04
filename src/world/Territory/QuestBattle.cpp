@@ -336,21 +336,18 @@ void Sapphire::QuestBattle::success( uint32_t returnScene )
   eventMgr.eventStart( *m_pPlayer, m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
 
   eventMgr.playScene( *m_pPlayer, getDirectorId(), 60001, 0x40000,
-    [ &, returnScene ]( Entity::Player& player, const Event::SceneResult& result )
-    {
+    [ &, returnScene ]( Entity::Player& player, const Event::SceneResult& result ) {
       eventMgr.eventFinish( player, getDirectorId(), 1 );
       eventMgr.eventStart( player, player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
-      eventMgr.playScene( player, getDirectorId(), returnScene, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          eventMgr.eventFinish( player, getDirectorId(), 1 );
+      eventMgr.playScene( player, getDirectorId(), returnScene, HIDE_HOTBAR | NO_DEFAULT_CAMERA | HIDE_UI | FADE_OUT | CONDITION_CUTSCENE,
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            eventMgr.eventFinish( player, getDirectorId(), 1 );
 
-                          auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-                          scriptMgr.onDutyComplete( *this, *m_pPlayer );
+                            auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+                            scriptMgr.onDutyComplete( *this, *m_pPlayer );
 
-                          playerMgr().onExitInstance( player );
-                        } );
-
+                            playerMgr().onExitInstance( player );
+                          } );
     } );
 }
 

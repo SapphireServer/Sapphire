@@ -113,6 +113,7 @@ public:
     instance.addEObj( "Suspiciousthicket", 2004846, 0, 5101564, 4, { -181.445099f, 8.093226f, 101.304604f }, 0.991760f, 0.000048f, 0); 
 
   }
+
   enum vars
   {
     SUCCESS_CALLED,

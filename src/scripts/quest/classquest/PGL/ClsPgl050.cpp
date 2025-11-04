@@ -270,6 +270,7 @@ class ClsPgl050 : public Sapphire::ScriptAPI::QuestScript
     {
       quest.setUI8AH( quest.getUI8AH() + 1 );
       quest.setUI8DH( quest.getUI8DH() + 1 );
+
       eventMgr().sendNotice( player, getId(), 0, { player.getQuestItemIcon( Item0 ) } );
 
       if( quest.getUI8AH() >= 5 )
