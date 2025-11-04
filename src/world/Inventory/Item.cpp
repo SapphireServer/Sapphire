@@ -232,8 +232,6 @@ void Sapphire::Item::setSpiritbond( uint16_t spiritbond )
 
 }
 
-}
-
 uint32_t Sapphire::Item::getReservedFlag() const
 {
   return m_reservedFlag;
