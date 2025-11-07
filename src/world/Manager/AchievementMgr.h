@@ -117,7 +117,6 @@ namespace Sapphire::World::Manager
     inline void retrieveProgressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
   };
 
-  
   template<>
   inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::General >( Entity::Player& player, int32_t subtype, uint32_t progressCount )
   {
@@ -287,6 +286,8 @@ namespace Sapphire::World::Manager
     achvData.progressData[ dataKey.u32 ] = level;
 
     player.setAchievementData( achvData );
+
+    player.updateDbAchievement();
   }
 
   template<>
@@ -305,7 +306,6 @@ namespace Sapphire::World::Manager
 
     for( auto achvId : achvIdList )
     {
-
       if( hasAchievementUnlocked( player, achvId ) )
         continue;
 
@@ -316,6 +316,8 @@ namespace Sapphire::World::Manager
       if( allDiscovered )
         unlockAchievement( player, achvId );
     }
+
+    player.updateDbAchievement();
   }
 
   template<>
@@ -330,5 +332,7 @@ namespace Sapphire::World::Manager
     achvData.progressData[ dataKey.u32 ] = discovered;
 
     player.setAchievementData( achvData );
+    player.updateDbAchievement();
   }
+
 }

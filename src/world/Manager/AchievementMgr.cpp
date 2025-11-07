@@ -27,7 +27,8 @@ bool AchievementMgr::cacheAchievements()
     // verify if achievement type has subtype
     if( achvType == Common::Achievement::Type::General ||
         achvType == Common::Achievement::Type::Classjob ||
-        achvType == Common::Achievement::Type::InstanceContent )
+        achvType == Common::Achievement::Type::InstanceContent ||
+        achvType == Common::Achievement::Type::MapDiscovery )
     {
       int32_t subtype = achvExdData->data().ConditionArg[ 0 ];
       if( subtype != 0 )
@@ -109,12 +110,17 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
     {
       case Common::Achievement::Type::Classjob:
       {
-        retrieveProgressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+        progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
         break;
       }
       case Common::Achievement::Type::MapDiscovery:
       {
         retrieveProgressAchievementByType< Common::Achievement::Type::MapDiscovery >( player, achvData.ConditionArg[0] );
+        break;
+      }
+      case Common::Achievement::Type::General:
+      {
+        //retrieveProgressAchievementByType< Common::Achievement::Type::General >( player, achvData.ConditionArg[ 0 ] );
         break;
       }
     }
@@ -124,7 +130,6 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
 
   // get achievement progress data, if it exists (otherwise pass 0)
   uint32_t currProg = 0;
-  auto test = achvDataList[ dataKey.u32 ];
   auto check = achvDataList.count( dataKey.u32 );
   if( achvDataList.count( dataKey.u32 ) )
     currProg = achvDataList[ dataKey.u32 ];
@@ -200,6 +205,8 @@ std::vector< uint32_t > AchievementMgr::getAchievementIdByType( Common::Achievem
 {
   return getAchievementIdByType( static_cast< uint32_t >( type ) );
 }
+
+//uint32_t AchievementMgr::getAchievementConditionByCategory( Common::Achievement::GeneralSubtype )
 
 std::vector< uint32_t > AchievementMgr::getAchievementIdByType( uint32_t type ) const
 {
