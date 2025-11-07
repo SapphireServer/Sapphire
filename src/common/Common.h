@@ -1241,7 +1241,90 @@ namespace Sapphire::Common
         SynthCookingLv31to40Recipes = 61,
         SynthCookingLv41to50Recipes = 62,
 
-        // TODO: Map gathering subtypes 63 to 128
+        // Miner - Gathering Lv1
+        MinerLv1to10Noscea = 63,
+        MinerLv1to10Shroud = 64,
+        MinerLv1to10Thanalan = 65,
+        QuarryLv1to10Noscea = 66,
+        QuarryLv1to10Shroud = 67,
+        QuarryLv1to10Thanalan = 68,
+        LogLv1to10Noscea = 69,
+        LogLv1to10Shroud = 70,
+        LogLv1to10Thanalan = 71,
+        HarvestLv1to10Noscea = 72,
+        HarvestLv1to10Shroud = 73,
+        HarvestLv1to10Thanalan = 74,
+        FishLv1to10Noscea = 75,
+        FishLv1to10Shroud = 76,
+        FishLv1to10Thanalan = 77,
+
+        // Miner - Gathering Lv2
+        MinerLv11to20Noscea = 78,
+        MinerLv11to20Shroud = 79,
+        MinerLv11to20Thanalan = 80,
+        QuarryLv11to20Noscea = 81,
+        QuarryLv11to20Shroud = 82,
+        QuarryLv11to20Thanalan = 83,
+        LogLv11to20Noscea = 84,
+        LogLv11to20Shroud = 85,
+        LogLv11to20Thanalan = 86,
+        HarvestLv11to20Noscea = 87,
+        HarvestLv11to20Shroud = 88,
+        HarvestLv11to20Thanalan = 89,
+        FishLv11to20Noscea = 90,
+        FishLv11to20Shroud = 91,
+        FishLv11to20Thanalan = 92,
+
+        // Miner - Gathering Lv3
+        MinerLv21to30Noscea = 93,
+        MinerLv21to30Shroud = 94,
+        MinerLv21to30Thanalan = 95,
+        QuarryLv21to30Noscea = 96,
+        QuarryLv21to30Shroud = 97,
+        QuarryLv21to30Thanalan = 98,
+        LogLv21to30Noscea = 99,
+        LogLv21to30Shroud = 100,
+        LogLv21to30Thanalan = 101,
+        HarvestLv21to30Noscea = 102,
+        HarvestLv21to30Shroud = 103,
+        HarvestLv21to30Thanalan = 104,
+        FishLv21to30Noscea = 105,
+        FishLv21to30Shroud = 106,
+        FishLv21to30Thanalan = 107,
+
+        // Miner - Gathering Lv4
+        MinerLv31to40Noscea = 108,
+        MinerLv31to40Shroud = 109,
+        MinerLv31to40Thanalan = 110,
+        QuarryLv31to40Noscea = 111,
+        QuarryLv31to40Shroud = 112,
+        QuarryLv31to40Thanalan = 113,
+        LogLv31to40Noscea = 114,
+        LogLv31to40Shroud = 115,
+        LogLv31to40Thanalan = 116,
+        HarvestLv31to40Noscea = 117,
+        HarvestLv31to40Shroud = 118,
+        HarvestLv31to40Thanalan = 119,
+        FishLv31to40Noscea = 120,
+        FishLv31to40Shroud = 121,
+        FishLv31to40Thanalan = 122,
+
+        // Miner - Gathering Lv5
+        MinerLv41to50Noscea = 123,
+        MinerLv41to50Shroud = 124,
+        MinerLv41to50Thanalan = 125,
+        QuarryLv41to50Noscea = 126,
+        QuarryLv41to50Shroud = 127,
+        QuarryLv41to50Thanalan = 128,
+        LogLv41to50Noscea = 129,
+        LogLv41to50Shroud = 130,
+        LogLv41to50Thanalan = 131,
+        HarvestLv41to50Noscea = 132,
+        HarvestLv41to50Shroud = 133,
+        HarvestLv41to50Thanalan = 134,
+        FishLv41to50Noscea = 135,
+        FishLv41to50Shroud = 136,
+        FishLv41to50Thanalan = 137,
 
         GCStormSeals = 138,
         GCSerpentSeals = 139,
@@ -1264,11 +1347,44 @@ namespace Sapphire::Common
         FieldLevequestCompleted = 179,
         UniqueBattleLevequestCompleted = 180,
 
-        // TODO: Map leve subtypes 181 to 201
+        // Unique LeveQuests
+        UniqueCarpenterLeveQuest = 181,
+        UniqueBlacksmithLeveQuest = 182,
+        UniqueArmorerLeveQuest = 183,
+        UniqueGoldsmithLeveQuest = 184,
+        UniqueLeatherworkLeveQuest = 185,
+        UniqueWeaverLeveQuest = 186,
+        UniqueAlchemistLeveQuest = 187,
+        UniqueCulinarianLeveQuest = 188,
+        UniqueMinerLeveQuest = 189,
+        UniqueBotanistLeveQuest = 190,
+        UniqueFisherLeveQuest = 191,
 
-        UniqueFishCaughtCount = 202,
+        // Recipes
+        CarpenterRecipes = 192,
+        BlacksmithRecipes = 193,
+        ArmorerRecipes = 194,
+        GoldsmithRecipes = 195,
+        LeatherworkRecipes = 196,
+        WeaverRecipes = 197,
+        AlchemistRecipes = 198,
+        CulinarianRecipes = 199,
+        MinerRecipes = 200,
+        BotanistRecipes = 201,
+        FishCaughtCount = 202,
 
-        // TODO: Map craft subtypes 203 to 213
+        // Craft
+        CarpenterHQCraft = 203,
+        BlacksmithHQCraft = 204,
+        ArmorerHQCraft = 205,
+        GoldsmithHQCraft = 206,
+        LeatherworkHQCraft = 207,
+        WeaverHQCraft = 208,
+        AlchemistHQCraft = 209,
+        CulinarianHQCraft = 210,
+        MinerHQCraft = 211,
+        BotanistHQCraft = 212,
+        FishHQCaught = 213,
 
         UniqueQuestsCompleted = 214,
         InstanceContentCompleted = 215,      // Instanced dungeons, raids or trials
@@ -1278,7 +1394,25 @@ namespace Sapphire::Common
         UniqueGuildhestCompleted = 218,
         FateCompleted = 219,
 
-        // TODO: Map subtypes 220 to 235
+        // FATE Highest Rating pt1
+        HeTakethItwithHisEyes = 220,
+        SteelReign = 221,
+        GoGoGorgimera = 222,
+        TheEyesHaveIt = 223,
+        ItsNotLupus = 224,
+        LazyForYou = 225,
+        DarkDevices = 226,
+        SvarasFall = 227,
+        ClearingtheHive = 228,
+        AttackonHighbridgeActIII = 229,
+        PoorMaidsMisfortune = 230,
+
+        // Seasonal Events
+        CascadierReborn = 231,
+        MyBodyIsaTemple = 232,
+        DressLikeaPirateDay = 233,
+        AMummerinMotley = 234,
+        IMakeThisLookGood = 235,
 
         ChocoboRidePimpedOut = 236,
 
@@ -1292,7 +1426,15 @@ namespace Sapphire::Common
 
         CommendationCount = 244,
 
-        // TODO: Map subtypes 245 to 250
+        // Treasure Hunt I - IV
+        Dig3LeatherTreasures = 245,
+        Dig5GoatskinTreasures = 246,
+        Dig10ToadskinTreasures = 247,
+        Dig20BoarskinTreasures = 248,
+        Dig20PeisteskinTreasures = 249,
+
+        // SeasonalEvent - Snow man
+        ColdasIce = 250,
 
         ResurrectStrangers = 251,
         SecondCoilCompleted = 266,
@@ -1340,16 +1482,172 @@ namespace Sapphire::Common
 
         FrontlineEnemyDispatched = 362,
 
-        GATECompleted = 363,
+        // Gold Saucer
+        GATECompletedCount = 363,
+        AnyWaytheWindBlowsCompleted = 364,
+        MGPJumboCactpotWins = 365,
+        MGPMiniCactpotWins = 366,
 
-        // TODO: Map subtypes 364 to 368
+        // Tools
+        DisciplineHandLucisTool = 367,
+        DisciplineLandLucisTool = 368,
 
         HighLvlDutyDarkKnightCompleted = 369,
 
         GordiasCompleted = 370,
         GordiasSavageCompleted = 371,
 
-        // TODO: Map subtypes 372 to X
+        // Collectables
+        SynthesizeCollectables = 372,
+        ObtainCollectables = 373,
+        SubmitCollectables = 374,
+
+        // Treasure Hunt V-VII
+        Dig20ArchaeoskinTreasures = 375,
+        Dig20WyvernskinTreasures = 376,
+        Dig20DragonskinTreasures = 377,
+
+        // Synth 51 - 60 Recipes
+        SynthWoodworkingLv51to60Recipes = 378,
+        SynthSmithingLv51to60Recipes = 379,
+        SynthArmorcraftLv51to60Recipes = 380,
+        SynthGoldsmithingLv51to60Recipes = 381,
+        SynthLeatherworkingLv51to60Recipes = 382,
+        SynthClothcraftLv51to60Recipes = 383,
+        SynthAlchemyLv51to60Recipes = 384,
+        SynthCookingLv51to60Recipes = 385,
+
+        MinerLv51to60 = 386,
+        LogLv51to60 = 387,
+        FishLv51to60 = 388,
+
+        TomelithSealRock = 423,
+
+        // FATE Highest Rating pt2
+        CoeurlsChaseBoysChaseCoeurls = 425,
+        VedrfolnirDevoteth = 426,
+        WeFoughtaDzu = 427,
+        SpecialTarasqueForce = 428,
+        MetalGearsRevengeance2 = 429,
+        DarkscaleDevoureth = 430,
+        OnDangerousGround = 431,
+
+        HeavenswardEntries1_42 = 432,
+
+        WinSealRock = 433,
+
+        WinLordVerminion = 444,
+        WinLordVerminionTournament = 445,
+
+        HeavenswardEntries43_62 = 446,
+
+        // Companion
+        JibanyanObtain = 447,
+        KomasanObtain = 448,
+        WhisperObtain = 449,
+        BlizzariaObtain = 450,
+        KyubiObtain = 451,
+        KomajiroObtain = 452,
+        ManjimuttObtain = 453,
+        NokoObtain = 454,
+        VenoctObtain = 455,
+        ShogunyanObtain = 456,
+        HovernyanObtain = 457,
+        RobonyanFTypeObtain = 458,
+        UsapyonObtain = 459,
+
+        // Diadem Exploration missions
+        EasyDiademObjCount = 460,
+        NormalDiademObjCount = 461,
+        HardDiademObjCount = 462,
+        DiademNotoriousSlayCount = 463,
+
+        UniqueMusicRolls= 464,
+
+        // Feast
+        FeastMatchesCount = 465,
+        FeastMatchesWinCount = 466,
+        FeastWinsAsTank = 467,
+        FeastWinsAsMeeleDPS = 468,
+        FeastWinsAsRangedPhyDPS = 469,
+        FeastWinsAsRangedMagDPS = 470,
+        FeastWinsAsHealer = 471,
+
+        MentorDutiesCompleteCount = 472,
+
+        AlexanderMidas = 473,
+        AlexanderMidasSavage = 474,
+
+        ChocoChallengeRacesCount = 475,
+
+        PawOfTheCrimsonCat = 476,
+        CaneOfTheShrineGuardian = 477,
+        BowOfTheWhiteWisp = 478,
+        StaffOfTheSnowMaiden = 479,
+        TwintailsOfTheFlameFox = 480,
+
+        BookOfTheEerieMutt = 481,
+        CodexOfTheShrineGuardian = 482,
+        GlobeOfTheLuckySnake = 483,
+        SpearOfTheSparkSerpent = 484,
+
+        WhiskerAndBucklerCat = 485,
+        FangFearlessCat = 486,
+        MusketMetalCat = 487,
+
+        EarsMoonRabbit = 488,
+        AllYoKaiWeapons = 489,
+
+        // Solo Feast Ranked
+        SoloFeastSeasonRank1 = 490,
+        SoloFeastSeasonRank2_10 = 491,
+        SoloFeastSeasonRank11_100 = 492,
+        SoloFeastSeasonRankBronze = 493,
+        SoloFeastSeasonRankSilver = 494,
+        SoloFeastSeasonRankGold = 495,
+        SoloFeastSeasonRankPlat = 496,
+        SoloFeastSeasonRankDiam = 497,
+
+        AquapolisRaid = 498,
+        DeepestRoomAquapolis = 499,
+
+        ChocoboCargo500 = 500,
+
+        WinFieldsOfGlory = 501,
+
+        // Group Feast Ranked
+        GroupFeastSeasonRank1 = 502,
+        GroupFeastSeasonRank2_10 = 503,
+        GroupFeastSeasonRank11_100 = 504,
+        GroupFeastSeasonRankBronze = 505,
+        GroupFeastSeasonRankSilver = 506,
+        GroupFeastSeasonRankGold = 507,
+        GroupFeastSeasonRankPlat = 508,
+        GroupFeastSeasonRankDiam = 509,
+
+        ObtainAllYoKaiMinions = 510,
+
+        // Palace of Dead
+        PalaceOfDead10Floors = 513,
+        PalaceOfDead20Floors = 514,
+        PalaceOfDead30Floors = 515,
+        PalaceOfDead40Floors = 516,
+        PalaceOfDead50Floors = 517,
+
+        // Padjali weapons
+        PadjaliBladeAndShield = 518,
+        PadjaliKnuckles = 519,
+        PadjaliAxe = 520,
+        PadjaliLongbow = 521,
+        PadjaliDaggers = 522,
+        PadjaliGreatsword = 523,
+        PadjaliRevolver = 524,
+        PadjaliCane = 525,
+        PadjaliRob = 526,
+        PadjaliGrimoire = 527,
+        PadjaliCodex = 528,
+        PadjaliCodex = 529,
+        PadjaliAstromer = 530
       };
     }
   }
