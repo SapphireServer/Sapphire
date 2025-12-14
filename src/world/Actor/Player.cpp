@@ -915,7 +915,9 @@ uint8_t Sapphire::Entity::Player::getLevel() const
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
-  return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
+
+  return static_cast<uint8_t>(m_classArray[classJobIndex]);
+  
 }
 
 uint8_t Sapphire::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const

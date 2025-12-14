@@ -631,6 +631,8 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcPlayerSpawn : FFXIVIpcBasePacket< PlayerSpawn >
   {
+    uint64_t accountId;
+    uint64_t contentId;
     uint16_t title;
     uint16_t u1b;
     uint16_t currentWorldId;
@@ -647,21 +649,19 @@ namespace Sapphire::Network::Packets::Server
     uint8_t u5c;
 
     uint64_t targetId;
-    uint32_t u6;
-    uint32_t u7;
+    uint64_t fcData;
     uint64_t mainWeaponModel;
     uint64_t secWeaponModel;
     uint64_t craftToolModel;
 
-    uint32_t u14;
-    uint32_t u15;
+    uint64_t u14;
     uint32_t bNPCBase;
     uint32_t bNPCName;
-    uint32_t u18;
-    uint32_t u19;
+    uint32_t layoutId;
+    uint32_t companionOwnerId;
     uint32_t directorId;
     uint32_t ownerId;
-    uint32_t u22;
+    uint32_t tetherId;
     uint32_t hPMax;
     uint32_t hPCurr;
     uint32_t displayFlags;
@@ -676,34 +676,35 @@ namespace Sapphire::Network::Packets::Server
     uint8_t u23;
     uint8_t u24;
     uint8_t u25;
-    uint8_t u26; 
+    uint8_t u26;
+    uint8_t u27;
+    uint8_t u28;
     uint8_t spawnIndex;
     uint8_t state;
     uint8_t persistentEmote;
     uint8_t modelType;
-    uint8_t subtype;
     uint8_t voice;
+    uint8_t unk27;
     uint8_t enemyType;
-    uint8_t u27;
     uint8_t level;
     uint8_t classJob;
-    uint8_t u28;
-    uint8_t u29;
-    uint8_t u30;
+    uint8_t unk28;
+    uint8_t unk29;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
     uint8_t elementData[6];
+    uint8_t padding2[3];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
     uint8_t unknown6_58[10];
+    uint8_t padding3[4];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
-    uint8_t padding[6];
   };
 
   /**
@@ -939,6 +940,7 @@ namespace Sapphire::Network::Packets::Server
     Common::FFXIVARR_POSITION3 pos;
     uint32_t unknown14[3];
     uint32_t unknown15;
+    uint32_t unknown16; // Added in Dawntrail
   };
 
 
@@ -959,29 +961,31 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown1C;
     uint32_t fishCaught;
     uint32_t useBaitCatalogId;
-    uint32_t unknown28;
-    uint16_t unknownPvp2C;
-    uint16_t unknown2E;
+    uint32_t spearFishCaught;
+    uint32_t unknownPvp2C;
     uint32_t pvpFrontlineOverallCampaigns;
-    uint32_t unknownTimestamp34;
-    uint32_t unknownTimestamp38;
-    uint32_t unknown3C;
-    uint32_t unknown40;
-    uint32_t unknown44;
-    float companionTimePassed;
-    uint32_t unknown4C;
-    uint16_t unknown50;
-    uint16_t unknownPvp52[4];
+    int32_t squadronMissionCompletionTimestamp;
+    int32_t squadronTrainingCompletionTimestamp;
+    uint32_t unknown_timestamp38;
+    uint8_t weeklyBingoTaskStatus[4];
+    uint32_t weeklyBingoFlags;
+    uint8_t unknown44[18];
     uint16_t pvpSeriesExp;
     uint16_t playerCommendations; // verified
-    uint16_t unknown64[8];
+    uint16_t unknown64[2];
+    uint16_t frontlineWeeklyMatches;
+    uint16_t unknown2;
+    uint16_t activeGCArmyExpedition;
+    uint16_t activeGCArmyTraining;
+    uint16_t unknown2a;
+    uint16_t weeklyBingoStickers;
     uint16_t pvpRivalWingsTotalMatches;
     uint16_t pvpRivalWingsTotalVictories;
     uint16_t pvpRivalWingsWeeklyMatches;
     uint16_t pvpRivalWingsWeeklyVictories;
     uint8_t maxLevel; // verified
     uint8_t expansion; // verified
-    uint8_t unknown76;
+    uint8_t hasPremiumSaddlebag;
     uint8_t unknown77;
     uint8_t unknown78;
     uint8_t race; // verified
@@ -1005,70 +1009,98 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown97[5];
     uint8_t sightseeing21To80Unlock;
     uint8_t sightseeingHeavenswardUnlock;
-    uint8_t unknown9E[26];
-    uint32_t exp[32]; // verified
-    uint32_t pvpTotalExp;
-    uint32_t unknownPvp124;
-    uint32_t pvpExp;
-    uint32_t pvpFrontlineOverallRanks[3];
-    uint32_t unknown138;
-    uint16_t levels[32]; // verified
-    uint8_t unknown194[218];
+    uint8_t unknown9e;
+    uint8_t meisterFlag;
+    uint8_t uknown10e;
+    uint8_t aetherCurrentCompFlgSetBitmask;
+    uint8_t unknownAfterAether;
+    uint8_t hasNewGCArmyCandidate;
+    uint16_t unknownauahab;
+    uint8_t supplySeed;
+    uint8_t unknown4;
+    uint8_t unknown5;
+    uint8_t mentorVersion;
+    uint8_t weeklyBingoExpMultiplier;
+    uint8_t weeklyBingoUnknown63;
+    uint8_t seriesCurrentRank;
+    uint8_t seriesClaimedRank;
+    uint8_t previousSeriesClaimedRank;
+    uint8_t previousSeriesRank;
+    uint8_t unknowna3[7];
+    uint32_t exp[35]; // verified
+    uint8_t unknownAfterExp;
+    uint32_t pvpExperience[3];
+    uint8_t unknown138[12];
+    uint32_t unknownUnixTimestamp;
+    uint16_t levels[35]; // verified
+    uint16_t activeFestivalIds[4];
+    uint16_t activeFestivalPhases[4];
+    uint8_t unknown194[176];
+    uint16_t beastReputationValue[20];
+    uint16_t questManagerRelatedUnknowns[5];
+    uint8_t questPadding[6];
+    uint16_t supplySatisfaction[11];
     char companionName[21]; // verified
     uint8_t companionDefRank; // verified
     uint8_t companionAttRank; // verified
     uint8_t companionHealRank; // verified
-    uint8_t mountGuideMask[33];
-    uint8_t ornamentMask[4];
-    uint8_t unknown281[23];
+    uint8_t mountGuideMask[41];
+    uint8_t ornamentMask[7];
+    uint8_t unknown281;
+    uint8_t glassesStylesMask[5];
+    uint8_t framersKitMastk[33];
     char name[32]; // verified
-    uint8_t unknown293[16];
-    uint8_t unknown2A3[16];
-    uint8_t unlockBitmask[64];
-    uint8_t aetheryte[26];
+    char online_id[32];
+    uint8_t unlockBitmask[92];
+    uint8_t aetheryte[30];
+    uint8_t unknownAfterAtheryte;
     uint16_t favoriteAetheryteIds[4]; // verified
     uint16_t freeAetheryteId;
     uint16_t psPlusFreeAetheryteId;
-    uint8_t discovery[480]; // verified
-    uint8_t howto[36]; // verified
-    uint8_t unknown554[4];
-    uint8_t minions[60];
+    uint8_t discovery[508]; // verified
+    uint8_t seenActiveHelp[37]; // verified
+    uint8_t minions[71];
     uint8_t chocoboTaxiMask[12];
-    uint8_t watchedCutscenes[159];
-    uint8_t companionBardingMask[12];
+    uint8_t watchedCutscenes[173];
+    uint8_t unknown6ff;
+    uint8_t companionBardingMask[13];
     uint8_t companionEquippedHead; // verified
     uint8_t companionEquippedBody; // verified
     uint8_t companionEquippedLegs; // verified
-    uint8_t unknownMask[287];
-    uint8_t pose[7]; // verified
-    uint8_t unknown6DF[3];
-    uint8_t challengeLogComplete[13];
-    uint8_t secretRecipeBookMask[12];
-    uint8_t unknownMask6F7[29];
-    uint8_t relicCompletion[12];
-    uint8_t sightseeingMask[37];
-    uint8_t huntingMarkMask[102];
-    uint8_t tripleTriadCards[45];
-    uint8_t unknown895;
-    uint8_t unknown7D7[15];
-    uint8_t unknown7D8;
-    uint8_t unknown7E6[49];
-    uint8_t regionalFolkloreMask[6];
-    uint8_t orchestrionMask[87];
-    uint8_t hallOfNoviceCompletion[3]; // verified
-    uint8_t animaCompletion[11];
-    uint8_t unknown85E[41];
-    uint8_t unlockedRaids[28]; // verified
-    uint8_t unlockedDungeons[18]; // verified
-    uint8_t unlockedGuildhests[10]; // verified
-    uint8_t unlockedTrials[12]; // verified
-    uint8_t unlockedPvp[5];
-    uint8_t clearedRaids[28]; // verified
-    uint8_t clearedDungeons[18]; // verified
-    uint8_t clearedGuildhests[10]; // verified
-    uint8_t clearedTrials[12]; // verified
-    uint8_t clearedPvp[5];
-    uint8_t unknown948[15];
+    uint8_t unknownMask[15];
+    uint8_t caughtFishMask[182];
+    uint8_t unlockedFishingSpots[41];
+    uint8_t fishingSpotsPadding;
+    uint8_t caughtSpearFishMask[38];
+    uint8_t unlockedSpearfishingNotebooks[8];
+    uint8_t paddingSpearfishing;
+    uint8_t rankMaelstrom;
+    uint8_t rankTwinAdder;
+    uint8_t rankImmortalFlames;
+    uint8_t beastReputationRank[20];
+    uint8_t content_roulette_completion[10];
+    uint8_t unknownMask2[8];
+    uint8_t playerStateFlags1;
+    uint8_t playerStateFlags2;
+    uint8_t playerStateFlags3;
+    uint8_t contentsNoteCompletionFlags[8];
+    uint8_t paddingAfterContent[6];
+    uint8_t unlockedSecretRecipeBooks[14];
+    uint8_t unknown879[28];
+    uint8_t monsterProgress[10];
+    uint8_t objectiveProgress;
+    uint8_t paddingAfterObjective;
+    uint8_t adventureMask[43];
+    uint8_t huntMarkMask[124];
+    uint8_t tripleTriadCards[57];
+    uint8_t unknown[17];
+    uint8_t aetherCurrentCompFlgSetBitmask2[3];
+    uint8_t aetherCurrentsMask[56];
+    uint8_t unlockedMinerFolkloreTomes[2];
+    uint8_t unlockedBotanistFolkloreTomes[2];
+    uint8_t unlockedFisherFolkloreTomes[2];
+    uint8_t tiredIjustwanttherightsizeforthepacketalready[324];
+    
   };
 
 

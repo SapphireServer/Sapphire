@@ -57,6 +57,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "get", &DebugCommandMgr::get, "Executes GET commands.", 1 );
   registerCommand( "add", &DebugCommandMgr::add, "Executes ADD commands.", 1 );
   registerCommand( "inject", &DebugCommandMgr::injectPacket, "Loads and injects a premade packet.", 1 );
+  registerCommand("injectnow", &DebugCommandMgr::injectSinglePacketNow, "Loads and injects a premade packet.", 1);
   registerCommand( "injectc", &DebugCommandMgr::injectChatPacket, "Loads and injects a premade chat packet.", 1 );
   registerCommand( "replay", &DebugCommandMgr::replay, "Replays a saved capture folder.", 1 );
   registerCommand( "nudge", &DebugCommandMgr::nudge, "Nudges you forward/up/down.", 1 );
@@ -703,8 +704,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
 }
 
-void
-Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
+void Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
                                                          std::shared_ptr< DebugCommand > command )
 {
   auto& serverMgr = Common::Service< World::ServerMgr >::ref();
@@ -712,6 +712,16 @@ Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Pla
   auto pSession = serverMgr.getSession( player.getId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::injectSinglePacketNow(char* data, Entity::Player& player,
+  std::shared_ptr< DebugCommand > command)
+{
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto pSession = serverMgr.getSession(player.getId());
+  if (pSession)
+    pSession->getZoneConnection()->injectPacket(data + 10, player, true);
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,

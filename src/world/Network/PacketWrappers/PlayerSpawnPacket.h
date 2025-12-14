@@ -150,7 +150,7 @@ namespace Sapphire::Network::Packets::Server
         m_data.directorId = d->getDirectorId();
       }
       m_data.ownerId = 0xE0000000;
-      m_data.u22 = 0xE0000000;
+      m_data.tetherId = 0xE0000000;
     };
   };
 

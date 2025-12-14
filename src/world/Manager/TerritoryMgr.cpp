@@ -37,8 +37,8 @@ void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
   for( auto id : idList )
   {
     auto teri1 = exdData.get< Sapphire::Data::TerritoryType >( id );
-
-    if( !teri1->name.empty() )
+    if (teri1 != nullptr)
+     if( !teri1->name.empty() )
       m_territoryTypeDetailCacheMap[ id ] = teri1;
   }
 
@@ -821,40 +821,40 @@ void Sapphire::World::Manager::TerritoryMgr::createAndJoinQuestBattle( Entity::P
 
 std::unordered_map< uint32_t, Sapphire::World::Manager::TerritoryMgr::InstanceSpawnInfo > Sapphire::World::Manager::TerritoryMgr::instanceSpawnInfo =
 {
-  { 212, { { 30, 1, 0 }, static_cast< float >(-3.1416) } },
-  { 210, { { 0, -0.2, 8 }, static_cast< float >(-3.1416) } },
-  { 198, { { 0, 1.605, 0 }, static_cast< float >(-3.1416) } },
-  { 204, { { 0, 0.5, 0 }, static_cast< float >(-3.1416) } },
-  { 205, { { 31, 1.6, 25.5 }, static_cast< float >(-2.68533) } },
-  { 331, { { -102.31, 3.9, -33.8 }, static_cast< float >(1.568) } },
-  { 335, { { -555.5, -3.21, -344.4 }, static_cast< float >(0.715) } },
-  { 351, { { -0, -2, 25 }, static_cast< float >(3.1416) } },
-  { 395, { { -4, 0, 9 }, static_cast< float >(-3.1416) } },
-  { 433, { { 0, 0, 10 }, static_cast< float >(-3.1416) } },
-  { 428, { { 0, 0, 8 }, static_cast< float >(-3.1416) } },
-  { 462, { { 0, 0, 0 }, static_cast< float >(0) } },
-  { 463, { { 11.7, 37.43, -20.4 }, static_cast< float >(0.2) } },
-  { 507, { { -0.7, 0, 11.5 }, static_cast< float >(3.1415) } },
-  { 636, { { 0, 0, 8 }, static_cast< float >(-3.1416) } },
-  { 680, { { 0, 16.35, -16.46 }, static_cast< float >(0) } },
-  { 639, { { 0, 0, 10 }, static_cast< float >(-3.14) } },
-  { 681, { { 20, -1, 15 }, static_cast< float >(-2.25) } },
-  { 682, { { 144.15, -4.178, 55 }, static_cast< float >(0) } },
-  { 683, { { 0, -5.169, 30 }, static_cast< float >(-3.14) } },
-  { 727, { { -454, 383, -127 }, static_cast< float >(1.578) } },
-  { 738, { { 0, -2, 55 }, static_cast< float >(-3.14) } },
-  { 737, { { 250, 122, -346 }, static_cast< float >(-3.14) } },
-  { 744, { { 0, 0, 0 }, static_cast< float >(-3.14) } },
-  { 786, { { 0, -8, 43.5 }, static_cast< float >(3.14) } },
-  { 829, { { -500, 107.7, 161.6 }, static_cast< float >(2.75) } },
-  { 842, { { -66.5, 4.32, 72.36 }, static_cast< float >(2.53) } },
-  { 877, { { 442.5, 4.95, 274 }, static_cast< float >(0.85) } },
-  { 844, { { 0, 0, 0 }, static_cast< float >(-3.14) } },
-  { 880, { { 100, 0, 100 }, static_cast< float >(3.14) } },
-  { 881, { { 100, 0, 100 }, static_cast< float >(0) } },
-  { 918, { { 0, -200, -410 }, static_cast< float >(-3.1415) } },
-  { 393, { { 3, 2.64, -95 }, static_cast< float >(-3.1415) } },
-  { 569, { { 0, 0, 0 }, static_cast< float >(0) } },
+  { 212, { { 30, 1, 0 }, -3.1416 } },
+  { 210, { { 0, -0.2, 8 }, -3.1416 } },
+  { 198, { { 0, 1.605, 0 }, -3.1416 } },
+  { 204, { { 0, 0.5, 0 }, -3.1416 } },
+  { 205, { { 31, 1.6, 25.5 }, -2.68533 } },
+  { 331, { { -102.31, 3.9, -33.8 }, 1.568 } },
+  { 335, { { -555.5, -3.21, -344.4 }, 0.715 } },
+  { 351, { { -0, -2, 25 }, 3.1416 } },
+  { 395, { { -4, 0, 9 }, -3.1416 } },
+  { 433, { { 0, 0, 10 }, -3.1416 } },
+  { 428, { { 0, 0, 8 }, -3.1416 } },
+  { 462, { { 0, 0, 0 }, 0 } },
+  { 463, { { 11.7, 37.43, -20.4 }, 0.2 } },
+  { 507, { { -0.7, 0, 11.5 }, 3.1415 } },
+  { 636, { { 0, 0, 8 }, -3.1416 } },
+  { 680, { { 0, 16.35, -16.46 }, 0 } },
+  { 639, { { 0, 0, 10 }, -3.14 } },
+  { 681, { { 20, -1, 15 }, -2.25 } },
+  { 682, { { 144.15, -4.178, 55 }, 0 } },
+  { 683, { { 0, -5.169, 30 }, -3.14 } },
+  { 727, { { -454, 383, -127 }, 1.578 } },
+  { 738, { { 0, -2, 55 }, -3.14 } },
+  { 737, { { 250, 122, -346 }, -3.14 } },
+  { 744, { { 0, 0, 0 }, -3.14 } },
+  { 786, { { 0, -8, 43.5 }, 3.14 } },
+  { 829, { { -500, 107.7, 161.6 }, 2.75 } },
+  { 842, { { -66.5, 4.32, 72.36 }, 2.53 } },
+  { 877, { { 442.5, 4.95, 274 }, 0.85 } },
+  { 844, { { 0, 0, 0 }, -3.14 } },
+  { 880, { { 100, 0, 100 }, 3.14 } },
+  { 881, { { 100, 0, 100 }, 0 } },
+  { 918, { { 0, -200, -410 }, -3.1415 } },
+  { 393, { { 3, 2.64, -95 }, -3.1415 } },
+  { 569, { { 0, 0, 0 }, 0 } },
 };
 
 std::unordered_map< uint32_t, uint32_t > Sapphire::World::Manager::TerritoryMgr::instanceExitEvent =

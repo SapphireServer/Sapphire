@@ -93,7 +93,7 @@ namespace Sapphire::Network
 
     void sendSinglePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
 
-    void injectPacket( const std::string& packetpath, Entity::Player& player );
+    void injectPacket( const std::string& packetpath, Entity::Player& player, bool now = false );
 
     DECLARE_HANDLER( initHandler );
 

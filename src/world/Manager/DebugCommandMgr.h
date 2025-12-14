@@ -41,6 +41,8 @@ namespace Sapphire::World::Manager
 
     void injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void injectSinglePacketNow(char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command);
+
     void injectChatPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );

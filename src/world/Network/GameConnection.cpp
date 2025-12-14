@@ -347,7 +347,7 @@ void Sapphire::Network::GameConnection::sendSinglePacket( Sapphire::Network::Pac
   sendPackets( &pRP );
 }
 
-void Sapphire::Network::GameConnection::injectPacket( const std::string& packetpath, Sapphire::Entity::Player& player )
+void Sapphire::Network::GameConnection::injectPacket( const std::string& packetpath, Sapphire::Entity::Player& player, bool now )
 {
 
   char packet[ 0x11570 ];
@@ -377,6 +377,8 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   for( int32_t k = 0x18; k < size; )
   {
     uint32_t tmpId = player.getId();
+    uint32_t Timenow = static_cast< uint32_t >(Common::Util::getTimeSeconds());
+
     // replace ids in the entryheader if needed
     if( !memcmp( packet + k + 0x04, packet + k + 0x08, 4 ) )
     {
@@ -385,6 +387,11 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
     }
     else
       memcpy( packet + k + 0x08, &tmpId, 4 );
+
+    if (now)
+    {
+      memcpy(packet + k + 0x18, &Timenow, 4);
+    }
 
     uint16_t pSize = *reinterpret_cast< uint16_t* >( packet + k );
     // queue packet to the session

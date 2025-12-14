@@ -156,7 +156,6 @@ struct ChocoboTaxi;
 struct ChocoboTaxiStand;
 struct CircleActivity;
 struct ClassJob;
-struct ClassJobActionSort;
 struct ClassJobCategory;
 struct CollectablesShop;
 struct CollectablesShopItem;
@@ -188,7 +187,6 @@ struct ContentEventItem;
 struct ContentExAction;
 struct ContentFinderCondition;
 struct ContentFinderConditionTransient;
-struct ContentFinderParamTable;
 struct ContentGauge;
 struct ContentGaugeColor;
 struct ContentMemberType;
@@ -206,7 +204,6 @@ struct ContentTalkParam;
 struct ContentType;
 struct CraftAction;
 struct CraftLeve;
-struct CraftLevelDifference;
 struct CraftLeveTalk;
 struct CraftType;
 struct Credit;
@@ -462,7 +459,6 @@ struct InclusionShopWelcomText;
 struct IndividualWeather;
 struct InstanceContent;
 struct InstanceContentBuff;
-struct InstanceContentCSBonus;
 struct InstanceContentGuide;
 struct InstanceContentQICData;
 struct InstanceContentTextData;
@@ -523,7 +519,6 @@ struct Materia;
 struct MateriaGrade;
 struct MateriaJoinRate;
 struct MateriaJoinRateGatherCraft;
-struct MateriaTomestoneRate;
 struct McGuffin;
 struct McGuffinUIData;
 struct MiniGameRA;
@@ -2403,10 +2398,22 @@ struct ClassJob
   uint16_t modifierIntelligence;
   uint16_t modifierMind;
   uint16_t modifierPiety;
+  uint16_t unknown2;
+  uint16_t unknown3;
+  uint16_t unknown4;
+  uint16_t unknown5;
+  uint16_t unknown6;
+  uint16_t unknown7;
+  int32_t unknown_70_1;
+  int32_t unknown_70_2;
+  int32_t unknown9;
+  uint8_t pvpBaseParamValue;
   uint8_t pvPActionSortRow;
+  uint8_t pvpInitialSelectActionTrait;
   uint8_t classJobParent;
   std::string nameEnglish;
   int32_t itemStartingWeapon;
+  int32_t itemStartingWeaponOffHand;
   uint8_t role;
   uint8_t startingTown;
   int8_t monsterNote;
@@ -2421,16 +2428,11 @@ struct ClassJob
   uint32_t prerequisite;
   uint8_t startingLevel;
   uint8_t partyBonus;
+  uint8_t jobType;
   bool isLimitedJob;
   bool canQueueForDuty;
 
   ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct ClassJobActionSort
-{
-
-  ClassJobActionSort( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ClassJobCategory
@@ -2827,12 +2829,6 @@ struct ContentFinderConditionTransient
   ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct ContentFinderParamTable
-{
-
-  ContentFinderParamTable( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct ContentGauge
 {
   std::string name;
@@ -3019,12 +3015,6 @@ struct CraftLeve
   CraftLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct CraftLevelDifference
-{
-  int16_t difference;
-
-  CraftLevelDifference( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
 
 struct CraftLeveTalk
 {
@@ -5501,14 +5491,6 @@ struct InstanceContentBuff
   InstanceContentBuff( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct InstanceContentCSBonus
-{
-  uint16_t instance;
-  uint32_t item;
-
-  InstanceContentCSBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct InstanceContentGuide
 {
   uint32_t instance;
@@ -6180,13 +6162,6 @@ struct MateriaJoinRateGatherCraft
   std::vector< float > HQOvermeldSlot;
 
   MateriaJoinRateGatherCraft( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct MateriaTomestoneRate
-{
-  uint32_t rate;
-
-  MateriaTomestoneRate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct McGuffin
@@ -8620,10 +8595,14 @@ struct TerritoryType
   uint8_t exclusiveType;
   uint8_t territoryIntendedUse;
   uint16_t contentFinderCondition;
+  bool unknown6;
   uint8_t weatherRate;
+  bool unknown7;
+  uint8_t unknown1;
   bool pCSearch;
   bool stealth;
   bool mount;
+  bool unknown8;
   uint16_t bGM;
   int32_t placeNameRegionIcon;
   int32_t placeNameIcon;
@@ -8635,7 +8614,19 @@ struct TerritoryType
   int8_t achievementIndex;
   bool isPvpZone;
   uint8_t exVersion;
+  uint8_t unknown2;
+  uint8_t zoneSharedGroup;
+  uint8_t aetherCurrentComplFlgSet;
   uint8_t mountSpeed;
+  bool unknown9;
+  bool isInUse;
+  uint8_t individualWeather;
+  bool unknown11;
+  bool unknown12;
+  bool unknown13;
+  bool unknown14;
+  bool unknown15;
+  bool unknown16;
   uint16_t notoriousMonsterTerritory;
 
   TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -9465,7 +9456,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ChocoboTaxiStandDat;
      xiv::exd::Exd m_CircleActivityDat;
      xiv::exd::Exd m_ClassJobDat;
-     xiv::exd::Exd m_ClassJobActionSortDat;
      xiv::exd::Exd m_ClassJobCategoryDat;
      xiv::exd::Exd m_CollectablesShopDat;
      xiv::exd::Exd m_CollectablesShopItemDat;
@@ -9497,7 +9487,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ContentExActionDat;
      xiv::exd::Exd m_ContentFinderConditionDat;
      xiv::exd::Exd m_ContentFinderConditionTransientDat;
-     xiv::exd::Exd m_ContentFinderParamTableDat;
      xiv::exd::Exd m_ContentGaugeDat;
      xiv::exd::Exd m_ContentGaugeColorDat;
      xiv::exd::Exd m_ContentMemberTypeDat;
@@ -9515,7 +9504,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ContentTypeDat;
      xiv::exd::Exd m_CraftActionDat;
      xiv::exd::Exd m_CraftLeveDat;
-     xiv::exd::Exd m_CraftLevelDifferenceDat;
      xiv::exd::Exd m_CraftLeveTalkDat;
      xiv::exd::Exd m_CraftTypeDat;
      xiv::exd::Exd m_CreditDat;
@@ -9771,7 +9759,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_IndividualWeatherDat;
      xiv::exd::Exd m_InstanceContentDat;
      xiv::exd::Exd m_InstanceContentBuffDat;
-     xiv::exd::Exd m_InstanceContentCSBonusDat;
      xiv::exd::Exd m_InstanceContentGuideDat;
      xiv::exd::Exd m_InstanceContentQICDataDat;
      xiv::exd::Exd m_InstanceContentTextDataDat;
@@ -9832,7 +9819,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MateriaGradeDat;
      xiv::exd::Exd m_MateriaJoinRateDat;
      xiv::exd::Exd m_MateriaJoinRateGatherCraftDat;
-     xiv::exd::Exd m_MateriaTomestoneRateDat;
      xiv::exd::Exd m_McGuffinDat;
      xiv::exd::Exd m_McGuffinUIDataDat;
      xiv::exd::Exd m_MiniGameRADat;
@@ -10275,7 +10261,6 @@ struct ZoneSharedGroup
      using ChocoboTaxiStandPtr = std::shared_ptr< ChocoboTaxiStand >;
      using CircleActivityPtr = std::shared_ptr< CircleActivity >;
      using ClassJobPtr = std::shared_ptr< ClassJob >;
-     using ClassJobActionSortPtr = std::shared_ptr< ClassJobActionSort >;
      using ClassJobCategoryPtr = std::shared_ptr< ClassJobCategory >;
      using CollectablesShopPtr = std::shared_ptr< CollectablesShop >;
      using CollectablesShopItemPtr = std::shared_ptr< CollectablesShopItem >;
@@ -10307,7 +10292,6 @@ struct ZoneSharedGroup
      using ContentExActionPtr = std::shared_ptr< ContentExAction >;
      using ContentFinderConditionPtr = std::shared_ptr< ContentFinderCondition >;
      using ContentFinderConditionTransientPtr = std::shared_ptr< ContentFinderConditionTransient >;
-     using ContentFinderParamTablePtr = std::shared_ptr< ContentFinderParamTable >;
      using ContentGaugePtr = std::shared_ptr< ContentGauge >;
      using ContentGaugeColorPtr = std::shared_ptr< ContentGaugeColor >;
      using ContentMemberTypePtr = std::shared_ptr< ContentMemberType >;
@@ -10325,7 +10309,6 @@ struct ZoneSharedGroup
      using ContentTypePtr = std::shared_ptr< ContentType >;
      using CraftActionPtr = std::shared_ptr< CraftAction >;
      using CraftLevePtr = std::shared_ptr< CraftLeve >;
-     using CraftLevelDifferencePtr = std::shared_ptr< CraftLevelDifference >;
      using CraftLeveTalkPtr = std::shared_ptr< CraftLeveTalk >;
      using CraftTypePtr = std::shared_ptr< CraftType >;
      using CreditPtr = std::shared_ptr< Credit >;
@@ -10581,7 +10564,6 @@ struct ZoneSharedGroup
      using IndividualWeatherPtr = std::shared_ptr< IndividualWeather >;
      using InstanceContentPtr = std::shared_ptr< InstanceContent >;
      using InstanceContentBuffPtr = std::shared_ptr< InstanceContentBuff >;
-     using InstanceContentCSBonusPtr = std::shared_ptr< InstanceContentCSBonus >;
      using InstanceContentGuidePtr = std::shared_ptr< InstanceContentGuide >;
      using InstanceContentQICDataPtr = std::shared_ptr< InstanceContentQICData >;
      using InstanceContentTextDataPtr = std::shared_ptr< InstanceContentTextData >;
@@ -10642,7 +10624,6 @@ struct ZoneSharedGroup
      using MateriaGradePtr = std::shared_ptr< MateriaGrade >;
      using MateriaJoinRatePtr = std::shared_ptr< MateriaJoinRate >;
      using MateriaJoinRateGatherCraftPtr = std::shared_ptr< MateriaJoinRateGatherCraft >;
-     using MateriaTomestoneRatePtr = std::shared_ptr< MateriaTomestoneRate >;
      using McGuffinPtr = std::shared_ptr< McGuffin >;
      using McGuffinUIDataPtr = std::shared_ptr< McGuffinUIData >;
      using MiniGameRAPtr = std::shared_ptr< MiniGameRA >;
@@ -11085,7 +11066,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ChocoboTaxiStandIdList;
      std::set< uint32_t > m_CircleActivityIdList;
      std::set< uint32_t > m_ClassJobIdList;
-     std::set< uint32_t > m_ClassJobActionSortIdList;
      std::set< uint32_t > m_ClassJobCategoryIdList;
      std::set< uint32_t > m_CollectablesShopIdList;
      std::set< uint32_t > m_CollectablesShopItemIdList;
@@ -11117,7 +11097,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ContentExActionIdList;
      std::set< uint32_t > m_ContentFinderConditionIdList;
      std::set< uint32_t > m_ContentFinderConditionTransientIdList;
-     std::set< uint32_t > m_ContentFinderParamTableIdList;
      std::set< uint32_t > m_ContentGaugeIdList;
      std::set< uint32_t > m_ContentGaugeColorIdList;
      std::set< uint32_t > m_ContentMemberTypeIdList;
@@ -11135,7 +11114,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ContentTypeIdList;
      std::set< uint32_t > m_CraftActionIdList;
      std::set< uint32_t > m_CraftLeveIdList;
-     std::set< uint32_t > m_CraftLevelDifferenceIdList;
      std::set< uint32_t > m_CraftLeveTalkIdList;
      std::set< uint32_t > m_CraftTypeIdList;
      std::set< uint32_t > m_CreditIdList;
@@ -11391,7 +11369,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_IndividualWeatherIdList;
      std::set< uint32_t > m_InstanceContentIdList;
      std::set< uint32_t > m_InstanceContentBuffIdList;
-     std::set< uint32_t > m_InstanceContentCSBonusIdList;
      std::set< uint32_t > m_InstanceContentGuideIdList;
      std::set< uint32_t > m_InstanceContentQICDataIdList;
      std::set< uint32_t > m_InstanceContentTextDataIdList;
@@ -11452,7 +11429,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MateriaGradeIdList;
      std::set< uint32_t > m_MateriaJoinRateIdList;
      std::set< uint32_t > m_MateriaJoinRateGatherCraftIdList;
-     std::set< uint32_t > m_MateriaTomestoneRateIdList;
      std::set< uint32_t > m_McGuffinIdList;
      std::set< uint32_t > m_McGuffinUIDataIdList;
      std::set< uint32_t > m_MiniGameRAIdList;
@@ -12565,12 +12541,6 @@ const std::set< uint32_t >& getClassJobIdList()
       loadIdList( m_ClassJobDat, m_ClassJobIdList );
    return m_ClassJobIdList;
 }
-const std::set< uint32_t >& getClassJobActionSortIdList()
-{
-   if( m_ClassJobActionSortIdList.size() == 0 )
-      loadIdList( m_ClassJobActionSortDat, m_ClassJobActionSortIdList );
-   return m_ClassJobActionSortIdList;
-}
 const std::set< uint32_t >& getClassJobCategoryIdList()
 {
    if( m_ClassJobCategoryIdList.size() == 0 )
@@ -12757,12 +12727,6 @@ const std::set< uint32_t >& getContentFinderConditionTransientIdList()
       loadIdList( m_ContentFinderConditionTransientDat, m_ContentFinderConditionTransientIdList );
    return m_ContentFinderConditionTransientIdList;
 }
-const std::set< uint32_t >& getContentFinderParamTableIdList()
-{
-   if( m_ContentFinderParamTableIdList.size() == 0 )
-      loadIdList( m_ContentFinderParamTableDat, m_ContentFinderParamTableIdList );
-   return m_ContentFinderParamTableIdList;
-}
 const std::set< uint32_t >& getContentGaugeIdList()
 {
    if( m_ContentGaugeIdList.size() == 0 )
@@ -12864,12 +12828,6 @@ const std::set< uint32_t >& getCraftLeveIdList()
    if( m_CraftLeveIdList.size() == 0 )
       loadIdList( m_CraftLeveDat, m_CraftLeveIdList );
    return m_CraftLeveIdList;
-}
-const std::set< uint32_t >& getCraftLevelDifferenceIdList()
-{
-   if( m_CraftLevelDifferenceIdList.size() == 0 )
-      loadIdList( m_CraftLevelDifferenceDat, m_CraftLevelDifferenceIdList );
-   return m_CraftLevelDifferenceIdList;
 }
 const std::set< uint32_t >& getCraftLeveTalkIdList()
 {
@@ -14401,12 +14359,6 @@ const std::set< uint32_t >& getInstanceContentBuffIdList()
       loadIdList( m_InstanceContentBuffDat, m_InstanceContentBuffIdList );
    return m_InstanceContentBuffIdList;
 }
-const std::set< uint32_t >& getInstanceContentCSBonusIdList()
-{
-   if( m_InstanceContentCSBonusIdList.size() == 0 )
-      loadIdList( m_InstanceContentCSBonusDat, m_InstanceContentCSBonusIdList );
-   return m_InstanceContentCSBonusIdList;
-}
 const std::set< uint32_t >& getInstanceContentGuideIdList()
 {
    if( m_InstanceContentGuideIdList.size() == 0 )
@@ -14767,12 +14719,7 @@ const std::set< uint32_t >& getMateriaJoinRateGatherCraftIdList()
       loadIdList( m_MateriaJoinRateGatherCraftDat, m_MateriaJoinRateGatherCraftIdList );
    return m_MateriaJoinRateGatherCraftIdList;
 }
-const std::set< uint32_t >& getMateriaTomestoneRateIdList()
-{
-   if( m_MateriaTomestoneRateIdList.size() == 0 )
-      loadIdList( m_MateriaTomestoneRateDat, m_MateriaTomestoneRateIdList );
-   return m_MateriaTomestoneRateIdList;
-}
+
 const std::set< uint32_t >& getMcGuffinIdList()
 {
    if( m_McGuffinIdList.size() == 0 )

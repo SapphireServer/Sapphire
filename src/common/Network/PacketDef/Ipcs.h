@@ -42,269 +42,269 @@ enum ClientLobbyIpcType :
 enum ServerZoneIpcType :
   uint16_t
 {
-  Ping = 0x1D9, // updated 6.58 hotfix 2
-  Init = 0x12A, // updated 6.58 hotfix 2
+  Ping = 0x1D9, // Endwalker Definition
+  Init = 0x277, // updated 7.38
 
-  ActorFreeSpawn = 0x195, // updated 6.58 hotfix 2
+  ActorFreeSpawn = 0x195, // Endwalker Definition
 
-  InitZone = 0x02D1, // updated 6.58 hotfix 2
-  PrepareZoning = 0x0124, // updated 6.58 hotfix 2
+  InitZone = 0x02B1, // Endwalker Definition
+  PrepareZoning = 0x0124, // Endwalker Definition
 
-  EffectResult = 0x0336, // updated 6.58 hotfix 2
-  EffectResultBasic = 0x023A, // updated 6.58 hotfix 2
+  EffectResult = 0x0336, // Endwalker Definition
+  EffectResultBasic = 0x023A, // Endwalker Definition
 
-  ActorControl = 0x0148, // updated 6.58 hotfix 2
-  ActorControlTarget = 0x032C, // updated 6.58 hotfix 2
-  ActorControlSelf = 0x025D, // updated 6.58 hotfix 2
-  ActorCast = 0x01BB, // updated 6.58 hotfix 2
-  ActorSetPos = 0x029D, // updated 6.58 hotfix 2
-  ActorMove = 0x011C, // updated 6.58 hotfix 2
-  ActorGauge = 0x03B3, // updated 6.58 hotfix 2
+  ActorControl = 0x0148, // Endwalker Definition
+  ActorControlTarget = 0x032C, // Endwalker Definition
+  ActorControlSelf = 0x0254, // updated 7.38
+  ActorCast = 0x01BB, // Endwalker Definition
+  ActorSetPos = 0x029D, // Endwalker Definition
+  ActorMove = 0x011C, // Endwalker Definition
+  ActorGauge = 0x0365,  // updated 7.38
 
   /*!
    * @brief Used when resting
    */
-  UpdateHpMpTp = 0x007D, // updated 6.58 hotfix 2
-  UpdateClassInfo = 0x0172, // updated 6.58 hotfix 2
+  UpdateHpMpTp = 0x007D, // Endwalker Definition
+  UpdateClassInfo = 0x0204,  // updated 7.38
 
   ///////////////////////////////////////////////////
 
   ChatBanned = 0xF06B,
-  Playtime = 0x03DE, // updated 6.58 hotfix 2
-  Logout = 0x0378, // updated 6.58 hotfix 2
-  CFNotify = 0x0279, // updated 6.58 hotfix 2
-  CFMemberStatus = 0x21F, // updated 6.58 hotfix 2?
-  CFDutyInfo = 0x2E8, // updated 6.58 hotfix 2?
+  Playtime = 0x03DE, // Endwalker Definition
+  Logout = 0x0312, // updated 7.38
+  CFNotify = 0x0279, // Endwalker Definition
+  CFMemberStatus = 0x21F, // Endwalker Definition?
+  CFDutyInfo = 0x2E8, // Endwalker Definition?
   CFPlayerInNeed = 0xF07F,
-  CFPreferredRole = 0x282,  // updated 6.58 hotfix 2
-  CFCancel = 0x384,        // updated 6.58 hotfix 2
-  CFUnk = 0x196, // updated 6.58 hotfix 2
+  CFPreferredRole = 0x282,  // Endwalker Definition
+  CFCancel = 0x384,        // Endwalker Definition
+  CFUnk = 0x196, // Endwalker Definition
   SocialRequestError = 0xF0AD,
 
-  CFRegistered = 0x029F,          // updated 5.58h
-  SocialInviteResponse = 0x322,  // updated 6.58 hotfix 2
-  SocialInviteUpdate = 0x01C1, // updated 6.58 hotfix 2
-  SocialInviteResult = 0x031B, // updated 6.58 hotfix 2
-  CancelAllianceForming = 0xF0C6, // updated 4.2
+  CFRegistered = 0x029F,          // Legacy Definition
+  SocialInviteResponse = 0x322,  // Endwalker Definition
+  SocialInviteUpdate = 0x01C1, // Endwalker Definition
+  SocialInviteResult = 0x031B, // Endwalker Definition
+  CancelAllianceForming = 0xF0C6, // Legacy Definition
 
-  LogMessage = 0x19C, // updated 6.58 hotfix 2?
+  LogMessage = 0x19C, // Endwalker Definition?
 
-  Chat = 0x0325, // updated 6.58 hotfix 2
+  Chat = 0x0325, // Endwalker Definition
 
   WorldVisitList = 0xF0FE, // added 4.5
 
-  SocialList = 0x1F2, // updated 6.58 hotfix 2
+  SocialList = 0x25E, // updated 7.38
 
-  ExamineSearchInfo = 0x014A, // updated 6.58 hotfix 2
-  UpdateSearchInfo = 0x00CF, // updated 6.58 hotfix 2
-  InitSearchInfo = 0x329,       // updated 6.58 hotfix 2
-  ExamineSearchComment = 0x244, // updated 6.58 hotfix 2?
+  ExamineSearchInfo = 0x014A, // Endwalker Definition
+  UpdateSearchInfo = 0x00CF, // Endwalker Definition
+  InitSearchInfo = 0x329,       // Endwalker Definition
+  ExamineSearchComment = 0x244, // Endwalker Definition?
 
-  ServerNoticeShort = 0xF333, // updated 5.58h
-  ServerNotice = 0x33B,       // updated 6.58 hotfix 2
-  SetOnlineStatus = 0x285,    // updated 6.58 hotfix 2
+  ServerNoticeShort = 0xF333, // Legacy Definition
+  ServerNotice = 0x1CD,       // updated 7.38
+  SetOnlineStatus = 0x3CF,   // updated 7.38
 
-  CountdownInitiate = 0x376, // updated 6.58 hotfix 2
-  CountdownCancel = 0x2B7,    // updated 6.58 hotfix 2
+  CountdownInitiate = 0x376, // Endwalker Definition
+  CountdownCancel = 0x2B7,    // Endwalker Definition
 
-  PlayerAddedToBlacklist = 0xe2,     // updated 6.48
-  PlayerRemovedFromBlacklist = 0x201, // updated 6.58 hotfix 2?
-  BlackList = 0x38A,                   // updated 6.58 hotfix 2
+  PlayerAddedToBlacklist = 0xe2,     // Endwalker Definition
+  PlayerRemovedFromBlacklist = 0x201, // Endwalker Definition?
+  BlackList = 0xF38A,                   // Endwalker Definition
 
-  LinkshellList = 0x2B2,           // updated 6.58 hotfix 2
-  CrossWorldLinkshellList = 0x3D5, // updated 6.58 hotfix 2
-  FellowshipList = 0x373,          // updated 6.58 hotfix 2
+  LinkshellList = 0x2B2,           // Endwalker Definition
+  CrossWorldLinkshellList = 0x2C8, // updated 7.38
+  FellowshipList = 0x373,          // Endwalker Definition
 
-  MailDeleteRequest = 0x168, // updated 6.58 hotfix 2?
+  MailDeleteRequest = 0x168, // Endwalker Definition?
 
   // 12D - 137 - constant gap between 4.5x -> 5.0
-  ReqMoogleMailList = 0xF138,      // updated 5.0
-  ReqMoogleMailLetter = 0xF139,    // updated 5.0
-  MailLetterNotification = 0x013A, // updated 5.0
+  ReqMoogleMailList = 0xF138,      // Legacy Definition
+  ReqMoogleMailLetter = 0xF139,    // Legacy Definition
+  MailLetterNotification = 0x013A, // Legacy Definition
 
   MarketTaxRates = 0x01F8, // updated 5.35h
 
-  MarketBoardSearchResult = 0x0161, // updated 6.58 hotfix 2
-  MarketBoardItemListingCount = 0x0286, // updated 6.58 hotfix 2
-  MarketBoardItemListingHistory = 0x0229, // updated 6.58 hotfix 2
-  MarketBoardItemListing = 0x03E3, // updated 6.58 hotfix 2
-  MarketBoardPurchase = 0x0143, // updated 6.58 hotfix 2
-  ItemMarketBoardInfo = 0x01BC, // updated 6.58 hotfix 2
+  MarketBoardSearchResult = 0x0161, // Endwalker Definition
+  MarketBoardItemListingCount = 0x0286, // Endwalker Definition
+  MarketBoardItemListingHistory = 0x0229, // Endwalker Definition
+  MarketBoardItemListing = 0x03E3, // Endwalker Definition
+  MarketBoardPurchase = 0x0143, // Endwalker Definition
+  ItemMarketBoardInfo = 0x01BC, // Endwalker Definition
 
   CharaFreeCompanyTag = 0x013B,   // updated 4.5
-  FreeCompanyBoardMsg = 0x03DB,   // updated 5.58h
-  FreeCompanyInfo = 0x02D5, // updated 6.58 hotfix 2
-  FreeCompanyDialog = 0x029F, // updated 6.58 hotfix 2
-  ExamineFreeCompanyInfo = 0x158, // updated 6.48
+  FreeCompanyBoardMsg = 0x023B,   // updated 7.38
+  FreeCompanyInfo = 0x02D5, // Endwalker Definition
+  FreeCompanyDialog = 0x029F, // Endwalker Definition
+  ExamineFreeCompanyInfo = 0x158, // Endwalker Definition
 
   FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
 
-  StatusEffectList = 0x0383, // updated 6.58 hotfix 2
-  EurekaStatusEffectList = 0x3A8, // updated 6.58 hotfix 2
-  BossStatusEffectList = 0x28C,   // updated 6.58 hotfix 2
-  StatusEffectList2 = 0x0369, // updated 6.58 hotfix 2
-  StatusEffectList3 = 0x0163, // updated 6.58 hotfix 2
-  Effect = 0x037D, // updated 6.58 hotfix 2
-  AoeEffect8 = 0x0F4, // updated 6.58 hotfix 2
-  AoeEffect16 = 0x121, // updated 6.58 hotfix 2
-  AoeEffect24 = 0x2E3, // updated 6.58 hotfix 2
-  AoeEffect32 = 0x1FB, // updated 6.58 hotfix 2
-  PersistantEffect = 0x163, // updated 6.58 hotfix 2
+  StatusEffectList = 0x0383, // Endwalker Definition
+  EurekaStatusEffectList = 0x3A8, // Endwalker Definition
+  BossStatusEffectList = 0x28C,   // Endwalker Definition
+  StatusEffectList2 = 0x0369, // Endwalker Definition
+  StatusEffectList3 = 0x010A, // Endwalker Definition
+  Effect = 0x037D, // Endwalker Definition
+  AoeEffect8 = 0x0F4, // Endwalker Definition
+  AoeEffect16 = 0x121, // Endwalker Definition
+  AoeEffect24 = 0x2E3, // Endwalker Definition
+  AoeEffect32 = 0x1FB, // Endwalker Definition
+  PersistantEffect = 0x163, // Endwalker Definition
 
-  PlaceFieldMarker = 0x02E4, // updated 6.58 hotfix 2
-  PlaceFieldMarkerPreset = 0x030A, // updated 6.58 hotfix 2
+  PlaceFieldMarker = 0xF2E4, // Endwalker Definition
+  PlaceFieldMarkerPreset = 0xF30A, // Endwalker Definition
 
-  GCAffiliation = 0x35D, // updated 6.58 hotfix 2
+  GCAffiliation = 0x06A, // updated 7.38
 
-  PlayerSpawn = 0x039C, // updated 6.58 hotfix 2
-  NpcSpawn = 0x00A7, // updated 6.58 hotfix 2
-  NpcSpawn2 = 0x338,   // updated 6.58 hotfix 2?
+  PlayerSpawn = 0x0270, // updated 7.38
+  NpcSpawn = 0x02C9,  // updated 7.38
+  NpcSpawn2 = 0x338,   // Endwalker Definition?
 
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-  PartyList = 0x164,         // updated 6.58 hotfix 2
-  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2
-  HateRank = 0x2A7,            // updated 6.58 hotfix 2
-  HateList = 0x26B,            // updated 6.58 hotfix 2
-  ObjectSpawn = 0x03B8, // updated 6.58 hotfix 2
-  ObjectDespawn = 0x1D8,      // updated 6.58 hotfix 2
-  SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-  PlayerSetup = 0x035F, // updated 6.58 hotfix 2
-  PlayerStats = 0x034F, // updated 6.58 hotfix 2
-  ActorOwner = 0x2c3,         // updated 6.58 hotfix 2
-  PlayerStateFlags = 0x1B6,   // updated 6.58 hotfix 2
-  PlayerClassInfo = 0x238,    // updated 6.58 hotfix 2
-  PlayerUpdateLook = 0xa8,    // updated 6.48
-  CharaVisualEffect = 0x0C1,  // updated 6.58 hotfix 2
+  PartyList = 0x164,         // Endwalker Definition
+  PartyUpdate = 0x2D8,       // Endwalker Definition
+  HateRank = 0x2A7,            // Endwalker Definition
+  HateList = 0x26B,            // Endwalker Definition
+  ObjectSpawn = 0x02B9,  // updated 7.38
+  ObjectDespawn = 0x1D8,      // Endwalker Definition
+  SilentSetClassJob = 0xF18E, // Legacy Definition - seems to be the case, not sure if it's actually used for anything
+  PlayerSetup = 0x039A, // updated 7.38
+  PlayerStats = 0x02C4, // updated 7.38
+  ActorOwner = 0x2c3,         // Endwalker Definition
+  PlayerStateFlags = 0x1DF,   // updated 7.38
+  PlayerClassInfo = 0x0125,    // updated 7.38
+  PlayerUpdateLook = 0xa8,    // Endwalker Definition
+  CharaVisualEffect = 0x0C1,  // Endwalker Definition
 
-  ModelEquip = 0x27D,    // updated 6.58 hotfix 2
-  Examine = 0x02C0, // updated 6.58 hotfix 2
-  CharaNameReq = 0x33C, // updated 6.58 hotfix 2?
+  ModelEquip = 0x27D,    // Endwalker Definition
+  Examine = 0x02C0, // Endwalker Definition
+  CharaNameReq = 0x33C, // Endwalker Definition?
 
   // nb: see #565 on github
-  UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
-  RetainerSaleHistory = 0x23d,          // updated 6.48
-  RetainerInformation = 0x00ED, // updated 6.58 hotfix 2
+  UpdateRetainerItemSalePrice = 0xF19F, // Legacy Definition
+  RetainerSaleHistory = 0xf23d,          // Endwalker Definition
+  RetainerInformation = 0x00ED, // Endwalker Definition
 
   SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-  ItemInfo = 0x02F0, // updated 6.58 hotfix 2
-  ContainerInfo = 0x0069, // updated 6.58 hotfix 2
-  InventoryTransactionFinish = 0x009C, // updated 6.58 hotfix 2
-  InventoryTransaction = 0x02BD, // updated 6.58 hotfix 2
-  CurrencyCrystalInfo = 0x02DE, // updated 6.58 hotfix 2
+  ItemInfo = 0x01E7, // updated 7.38
+  ContainerInfo = 0x021E, // updated 7.38
+  InventoryTransactionFinish = 0x00EC, // updated 7.38
+  InventoryTransaction = 0x0117, // updated 7.38
+  CurrencyCrystalInfo = 0x03C1, // updated 7.38
 
-  InventoryActionAck = 0x00DD, // updated 6.58 hotfix 2
-  UpdateInventorySlot = 0x034D, // updated 6.58 hotfix 2
+  InventoryActionAck = 0x02CC, // updated 7.38
+  UpdateInventorySlot = 0xF34D, // Endwalker Definition
 
-  HuntingLogEntry = 0x388, // updated 6.58 hotfix 2
+  HuntingLogEntry = 0x1E3, // updated 7.38
 
-  EventPlay = 0x0155, // updated 6.58 hotfix 2
-  EventPlay4 = 0x00D0, // updated 6.58 hotfix 2
-  EventPlay8 = 0x022B, // updated 6.58 hotfix 2
-  EventPlay16 = 0x00D2, // updated 6.58 hotfix 2
-  EventPlay32 = 0x02CF, // updated 6.58 hotfix 2
-  EventPlay64 = 0x01D4, // updated 6.58 hotfix 2
-  EventPlay128 = 0x039F, // updated 6.58 hotfix 2
-  EventPlay255 = 0x0073, // updated 6.58 hotfix 2
-  EventStart = 0x0146, // updated 6.58 hotfix 2
-  EventFinish = 0x0339, // updated 6.58 hotfix 2
+  EventPlay = 0x0155, // Endwalker Definition
+  EventPlay4 = 0x00D0, // Endwalker Definition
+  EventPlay8 = 0x022B, // Endwalker Definition
+  EventPlay16 = 0x00D2, // Endwalker Definition
+  EventPlay32 = 0x02CF, // Endwalker Definition
+  EventPlay64 = 0x01D4, // Endwalker Definition
+  EventPlay128 = 0x039F, // Endwalker Definition
+  EventPlay255 = 0x0073, // Endwalker Definition
+  EventStart = 0x0146, // Endwalker Definition
+  EventFinish = 0x0339, // Endwalker Definition
 
-  EventReturn = 0x1F3, // updated 6.58 hotfix 2
+  EventReturn = 0x1F3, // Endwalker Definition
 
   EventLinkshell = 0x1169,
 
-  QuestActiveList = 0x247,   // updated 6.58 hotfix 2
-  QuestUpdate = 0x1A4,       // updated 6.58 hotfix 2
-  QuestCompleteList = 0x352, // updated 6.58 hotfix 2
+  QuestActiveList = 0x2DD,   // updated 7.38
+  QuestUpdate = 0x1A4,       // Endwalker Definition
+  QuestCompleteList = 0x38A, // updated 7.38
 
-  QuestFinish = 0x2BB,         // updated 6.58 hotfix 2
-  MSQTrackerComplete = 0x1A9,  // updated 6.58 hotfix 2
+  QuestFinish = 0x2BB,         // Endwalker Definition
+  MSQTrackerComplete = 0x166,  // updated 7.38
   MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-  QuestMessage = 0x06B, // updated 6.58 hotfix 2
+  QuestMessage = 0x06B, // Endwalker Definition
 
-  QuestTracker = 0x27C, // updated 6.58 hotfix 2
+  QuestTracker = 0x3A7, // updated 7.38
 
-  Mount = 0x09F, // updated 6.58 hotfix 2
+  Mount = 0x09F, // Endwalker Definition
 
-  DirectorVars = 0x3A6,   // updated 6.58 hotfix 2
-  DirectorMsg1 = 0xF084,  // updated 5.18
-  DirectorMsg2 = 0xF0C1,  // updated 5.18
-  DirectorMsg4 = 0x3A9,  // updated 6.58 hotfix 2
-  DirectorMsg8 = 0xF28A,  // updated 5.18
-  DirectorMsg16 = 0xF28C, // updated 5.18
-  DirectorPopUp2 = 0x300,     // updated 6.58 hotfix 2
-  DirectorPopUp4 = 0xF19B,    // updated 5.58h
-  DirectorPopUp8 = 0xF271,    // updated 5.58h
+  DirectorVars = 0x3A6,   // Endwalker Definition
+  DirectorMsg1 = 0xF084,  // Legacy Definition
+  DirectorMsg2 = 0xF0C1,  // Legacy Definition
+  DirectorMsg4 = 0x3A9,  // Endwalker Definition
+  DirectorMsg8 = 0xF28A,  // Legacy Definition
+  DirectorMsg16 = 0xF28C, // Legacy Definition
+  DirectorPopUp2 = 0x300,     // Endwalker Definition
+  DirectorPopUp4 = 0xF19B,    // Legacy Definition
+  DirectorPopUp8 = 0xF271,    // Legacy Definition
 
-  CFAvailableContents = 0xF1FD, // updated 4.2
+  CFAvailableContents = 0xF1FD, // Legacy Definition
 
-  WeatherChange = 0x021D, // updated 6.58 hotfix 2
-  PlayerTitleList = 0x1FF, // updated 6.58 hotfix 2?
-  Discovery = 0x11E,       // updated 6.58 hotfix 2
+  WeatherChange = 0x02F8, // updated 7.38
+  PlayerTitleList = 0x1FF, // Endwalker Definition?
+  Discovery = 0x11E,       // Endwalker Definition
 
-  EorzeaTimeOffset = 0x398, // updated 6.58 hotfix 2?
+  EorzeaTimeOffset = 0x398, // Endwalker Definition?
 
-  EquipDisplayFlags = 0x33A, // updated 6.58 hotfix 2
+  EquipDisplayFlags = 0x33A, // Endwalker Definition
 
   MiniCactpotInit = 0x0286, // added 5.31
-  ShopMessage = 0x016F,     // updated 6.58 hotfix 2
-  LootMessage = 0x265,      // updated 6.58 hotfix 2
-  ResultDialog = 0x0362, // updated 6.58 hotfix 2
-  DesynthResult = 0x007F, // updated 6.58 hotfix 2
+  ShopMessage = 0x016F,     // Endwalker Definition
+  LootMessage = 0x265,      // Endwalker Definition
+  ResultDialog = 0x0362, // Endwalker Definition
+  DesynthResult = 0x007F, // Endwalker Definition
 
   /// Housing //////////////////////////////////////
 
-  LandSetInitialize = 0x1C9,            // updated 6.58 hotfix 2
-  LandUpdate = 0x1AB,                   // updated 6.58 hotfix 2?
-  LandAvailability = 0x236,            // updated 6.58 hotfix 2
-  YardObjectSpawn = 0x0D1,              // updated 6.58 hotfix 2?
-  HousingIndoorInitialize = 0x084,      // updated 6.58 hotfix 2?
-  LandPriceUpdate = 0x0F1,              // updated 6.58 hotfix 2
-  LandInfoSign = 0x15F,                 // updated 6.58 hotfix 2
-  LandRename = 0x09B,                   // updated 6.58 hotfix 2?
-  HousingEstateGreeting = 0x298,        // updated 6.58 hotfix 2?
-  HousingUpdateLandFlagsSlot = 0x151,   // updated 6.58 hotfix 2?
-  HousingLandFlags = 0x330,             // updated 6.58 hotfix 2
-  HousingShowEstateGuestAccess = 0x0E6, // updated 6.58 hotfix 2?
+  LandSetInitialize = 0x1CC,            // updated 7.38
+  LandUpdate = 0x1AB,                   // Endwalker Definition?
+  LandAvailability = 0x236,            // Endwalker Definition
+  YardObjectSpawn = 0x0D1,              // Endwalker Definition?
+  HousingIndoorInitialize = 0x084,      // Endwalker Definition?
+  LandPriceUpdate = 0x0F1,              // Endwalker Definition
+  LandInfoSign = 0x15F,                 // Endwalker Definition
+  LandRename = 0x09B,                   // Endwalker Definition?
+  HousingEstateGreeting = 0x298,        // Endwalker Definition?
+  HousingUpdateLandFlagsSlot = 0x151,   // Endwalker Definition?
+  HousingLandFlags = 0x214,             // updated 7.38
+  HousingShowEstateGuestAccess = 0x0E6, // Endwalker Definition?
 
-  HousingObjectInitialize = 0x1AA,    // updated 6.58 hotfix 2
-  HousingInternalObjectSpawn = 0x2D7, // updated 6.58 hotfix 2?
+  HousingObjectInitialize = 0x260,    // updated 7.38
+  HousingInternalObjectSpawn = 0x2D7, // Endwalker Definition?
 
-  HousingWardInfo = 0x327,  // updated 6.58 hotfix 2?
-  HousingObjectMove = 0x21b, // updated 6.48
-  HousingObjectDye = 0x333,  // updated 6.58 hotfix 2?
+  HousingWardInfo = 0x327,  // Endwalker Definition?
+  HousingObjectMove = 0x21b, // Endwalker Definition
+  HousingObjectDye = 0x333,  // Endwalker Definition?
 
-  SharedEstateSettingsResponse = 0x25B, // updated 6.58 hotfix 2?
+  SharedEstateSettingsResponse = 0x25B, // Endwalker Definition?
 
-  LandUpdateHouseName = 0x0B5, // updated 6.58 hotfix 2?
-  LandSetMap = 0x32B,         // updated 6.58 hotfix 2
+  LandUpdateHouseName = 0x0B5, // Endwalker Definition?
+  LandSetMap = 0x386,         // updated 7.38
 
-  CeremonySetActorAppearance = 0x140, // updated 6.58 hotfix 2?
+  CeremonySetActorAppearance = 0x140, // Endwalker Definition?
 
   //////////////////////////////////////////////////
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
-  PerformNote = 0x266,    // updated 6.58 hotfix 2?
+  PerformNote = 0x266,    // Endwalker Definition?
 
-  DutyGauge = 0x02E5, // updated 5.58h
+  DutyGauge = 0x02E5, // Legacy Definition
 
   // daily quest info -> without them sent,  login will take longer...
-  DailyQuests = 0x2EF,           // updated 6.58 hotfix 2
-  DailyQuestRepeatFlags = 0x134, // updated 6.58 hotfix 2
+  DailyQuests = 0x11D,           // updated 7.38
+  DailyQuestRepeatFlags = 0x122, // updated 7.38
 
-  MapUpdate = 0x0FF,    // updated 6.58 hotfix 2
-  MapUpdate4 = 0x345,  // updated 6.58 hotfix 2
-  MapUpdate8 = 0x114,  // updated 6.58 hotfix 2
-  MapUpdate16 = 0x2CE, // updated 6.58 hotfix 2
-  MapUpdate32 = 0x205, // updated 6.58 hotfix 2
-  MapUpdate64 = 0x1FC, // updated 6.58 hotfix 2
-  MapUpdate128 = 0x158, // updated 6.58 hotfix 2
+  MapUpdate = 0x0FF,    // Endwalker Definition
+  MapUpdate4 = 0x345,  // Endwalker Definition
+  MapUpdate8 = 0x114,  // Endwalker Definition
+  MapUpdate16 = 0x2CE, // Endwalker Definition
+  MapUpdate32 = 0x205, // Endwalker Definition
+  MapUpdate64 = 0x1FC, // Endwalker Definition
+  MapUpdate128 = 0x158, // Endwalker Definition
 
   /// Doman Mahjong //////////////////////////////////////
   MahjongOpenGui = 0x02A4,       // only available in mahjong instance
-  MahjongNextRound = 0x02BD,     // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
+  MahjongNextRound = 0xF2BD,     // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
   MahjongPlayerAction = 0x02BE,  // tsumo(as in drawing a tile) called chi/pon/kan/riichi
   MahjongEndRoundTsumo = 0x02BF, // called tsumo
   MahjongEndRoundRon = 0x2C0,    // called ron or double ron (waiting for action must be flagged from discard packet to call)
@@ -315,19 +315,19 @@ enum ServerZoneIpcType :
   MahjongEndGame = 0x02C6,      // finished oorasu(all-last) round; shows a result screen.
 
   /// Airship & Submarine //////////////////////////////////////
-  AirshipTimers = 0x0123, // updated 6.58 hotfix 2
-  AirshipStatus = 0x0291, // updated 6.58 hotfix 2
-  AirshipStatusList = 0x023B, // updated 6.58 hotfix 2
-  AirshipExplorationResult = 0x01BD, // updated 6.58 hotfix 2
+  AirshipTimers = 0x0123, // Endwalker Definition
+  AirshipStatus = 0x0291, // Endwalker Definition
+  AirshipStatusList = 0x023B, // Endwalker Definition
+  AirshipExplorationResult = 0x01BD, // Endwalker Definition
 
-  SubmarineTimers = 0x0185, // updated 6.58 hotfix 2
-  SubmarineProgressionStatus = 0x02DD, // updated 6.58 hotfix 2
-  SubmarineStatusList = 0x03E2, // updated 6.58 hotfix 2
-  SubmarineExplorationResult = 0x02AA, // updated 6.58 hotfix 2
+  SubmarineTimers = 0x0185, // Endwalker Definition
+  SubmarineProgressionStatus = 0xF2DD, // Endwalker Definition
+  SubmarineStatusList = 0x03E2, // Endwalker Definition
+  SubmarineExplorationResult = 0x02AA, // Endwalker Definition
 
-  EnvironmentControl = 0x02FC, // updated 6.58 hotfix 2
-  RSVData = 0x065,             // updated 6.58 hotfix 2?
-  IslandWorkshopSupplyDemand = 0x013C, // updated 6.58 hotfix 2
+  EnvironmentControl = 0x02FC, // Endwalker Definition
+  RSVData = 0x065,             // Endwalker Definition?
+  IslandWorkshopSupplyDemand = 0x013C, // Endwalker Definition
 };
 
 /**
@@ -336,108 +336,108 @@ enum ServerZoneIpcType :
 enum ClientZoneIpcType :
   uint16_t
 {
-  PingHandler = 0x2AE, // updated 6.58 hotfix 2
-  InitHandler = 0x1CE, // updated 6.58 hotfix 2
+  PingHandler = 0x2AE, // Endwalker Definition
+  InitHandler = 0x157, // updated 7.38
 
-  FinishLoadingHandler = 0x12A, // updated 6.58 hotfix 2
+  FinishLoadingHandler = 0x3E2, // updated 7.38
 
-  CFCommenceHandler = 0x0242, // updated 6.58 hotfix 2
+  CFCommenceHandler = 0x0242, // Endwalker Definition
 
-  CFCancelHandler = 0x02B2,    // updated 5.58h
-  CFRegisterDuty = 0x0312,     // updated 6.58 hotfix 2
-  CFRegisterRoulette = 0x037A, // updated 5.58h
-  PlayTimeHandler = 0x0378,    // updated 6.58 hotfix 2
-  LogoutHandler = 0x384,       // updated 6.58 hotfix 2
-  CancelLogout = 0x01e3,       // updated 6.31h
-  CFDutyInfoHandler = 0xF078,  // updated 4.2
+  CFCancelHandler = 0x02B2,    // Legacy Definition
+  CFRegisterDuty = 0x0312,     // Endwalker Definition
+  CFRegisterRoulette = 0x037A, // Legacy Definition
+  PlayTimeHandler = 0x0378,    // Endwalker Definition
+  LogoutHandler = 0x1CF,       // updated 7.38
+  CancelLogout = 0x01e3,       // Endwalker Definition
+  CFDutyInfoHandler = 0xF078,  // Legacy Definition
 
-  SocialInviteHandler = 0x00F5, // updated 6.58 hotfix 2
-  SocialReplyHandler = 0x0160, // updated 6.58 hotfix 2
-  CreateCrossWorldLS = 0x9999,    // updated 5.58h
+  SocialInviteHandler = 0x00F5, // Endwalker Definition
+  SocialReplyHandler = 0x0160, // Endwalker Definition
+  CreateCrossWorldLS = 0x9999,    // Legacy Definition
 
-  ChatHandler = 0x246, // updated 6.58 hotfix 2
-  PartyChangeLeaderHandler = 0x0E4, // updated 6.58 hotfix 2
-  PartyLeaveHandler = 0x0373, // updated 6.58 hotfix 2
-  PartyKickHandler = 0x013F, // updated 6.58 hotfix 2
-  PartyDisbandHandler = 0x03BF, // updated 6.58 hotfix 2
+  ChatHandler = 0x246, // Endwalker Definition
+  PartyChangeLeaderHandler = 0x0E4, // Endwalker Definition
+  PartyLeaveHandler = 0x0373, // Endwalker Definition
+  PartyKickHandler = 0x013F, // Endwalker Definition
+  PartyDisbandHandler = 0x03BF, // Endwalker Definition
 
-  SocialListHandler = 0x10B,               // updated 6.58 hotfix 2
-  SetSearchInfoHandler = 0x01A0, // updated 6.58 hotfix 2
-  ReqSearchInfoHandler = 0x0235,           // updated 6.58 hotfix 2
-  ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
+  SocialListHandler = 0x0CD,     // updated 7.38
+  SetSearchInfoHandler = 0x01A0, // Endwalker Definition
+  ReqSearchInfoHandler = 0x0235,           // Endwalker Definition
+  ReqExamineSearchCommentHandler = 0x00E7, // Legacy Definition
 
-  ReqRemovePlayerFromBlacklist = 0x00B4, // updated 5.58h
-  BlackListHandler = 0x284,              // updated 6.58 hotfix 2
-  PlayerSearchHandler = 0x037D,          // updated 5.58h
+  ReqRemovePlayerFromBlacklist = 0x00B4, // Legacy Definition
+  BlackListHandler = 0x284,              // Endwalker Definition
+  PlayerSearchHandler = 0x037D,          // Legacy Definition
 
-  LinkshellListHandler = 0x0302, // updated 6.58 hotfix 2
+  LinkshellListHandler = 0x0302, // Endwalker Definition
 
-  MarketBoardRequestItemListingInfo = 0x00F4,  // updated 5.58h
-  MarketBoardRequestItemListings = 0x0122,     // updated 5.58h
-  MarketBoardSearch = 0x0082,                  // updated 5.58h
-  MarketBoardPurchaseHandler = 0x0322, // updated 6.58 hotfix 2
+  MarketBoardRequestItemListingInfo = 0x00F4,  // Legacy Definition
+  MarketBoardRequestItemListings = 0x0122,     // Legacy Definition
+  MarketBoardSearch = 0x0082,                  // Legacy Definition
+  MarketBoardPurchaseHandler = 0x0322, // Endwalker Definition
 
-  ReqExamineFcInfo = 0xF37B, // updated 5.58h (prepended F. Conflicts with FinishLoadingHandler 6.38)
+  ReqExamineFcInfo = 0xF37B, // Legacy Definition (prepended F. Conflicts with FinishLoadingHandler 6.38)
 
-  FcInfoReqHandler = 0x33B, // updated 6.58 hotfix 2
+  FcInfoReqHandler = 0x33B, // Endwalker Definition
 
   FreeCompanyUpdateShortMessageHandler = 0x0123, // added 5.0
 
-  ReqMarketWishList = 0x00C3, // updated 5.58h
+  ReqMarketWishList = 0x00C3, // Legacy Definition
 
-  ReqJoinNoviceNetwork = 0x0129, // updated 4.2
+  ReqJoinNoviceNetwork = 0x0129, // Legacy Definition
 
-  ReqCountdownInitiate = 0x03E3, // updated 6.58 hotfix 2
-  ReqCountdownCancel = 0xF23a,   // updated 6.31h
+  ReqCountdownInitiate = 0x03E3, // Endwalker Definition
+  ReqCountdownCancel = 0xF23a,   // Endwalker Definition
 
-  ZoneLineHandler = 0x326,   // updated 6.58 hotfix 2
-  ClientTrigger = 0x035C, // updated 6.58 hotfix 2
-  ClientTriggerEnvironment = 0x0295, // updated 6.58 hotfix 2
-  DiscoveryHandler = 0x0129, // updated 6.58 hotfix 2
+  ZoneLineHandler = 0x326,   // Endwalker Definition
+  ClientTrigger = 0x0215, // updated 7.38
+  ClientTriggerEnvironment = 0x0295, // Endwalker Definition
+  DiscoveryHandler = 0x0129, // Endwalker Definition
 
-  SkillHandler = 0x07C,   // updated 6.58 hotfix 2
-  GMCommand1 = 0x152,      // updated 6.58 hotfix 2
-  GMCommand2 = 0x306,     // updated 6.58 hotfix 2
-  AoESkillHandler = 0x0FC, // updated 6.58 hotfix 2
+  SkillHandler = 0x07C,   // Endwalker Definition
+  GMCommand1 = 0x02D4,      // updated 7.38
+  GMCommand2 = 0x306,     // Endwalker Definition
+  AoESkillHandler = 0x0FC, // Endwalker Definition
 
-  UpdatePositionHandler = 0x0256, // updated 6.58 hotfix 2
+  UpdatePositionHandler = 0x0256, // Endwalker Definition
 
-  InventoryModifyHandler = 0x023E, // updated 6.58 hotfix 2
+  InventoryModifyHandler = 0x023E, // Endwalker Definition
 
-  InventoryEquipRecommendedItems = 0x355, // updated 6.58 hotfix 2
+  InventoryEquipRecommendedItems = 0x355, // Endwalker Definition
 
-  ReqPlaceHousingItem = 0x032D, // updated 6.58 hotfix 2
-  BuildPresetHandler = 0x0D9,  // updated 6.58 hotfix 2
+  ReqPlaceHousingItem = 0x032D, // Endwalker Definition
+  BuildPresetHandler = 0x0D9,  // Endwalker Definition
 
-  TalkEventHandler = 0x23A,         // updated 6.58 hotfix 2
-  SayEventHandler = 0x25D,         // updated 6.58 hotfix 2
-  EmoteEventHandler = 0x1B5,        // updated 6.58 hotfix 2
-  WithinRangeEventHandler = 0x38E,  // updated 6.58 hotfix 2
-  OutOfRangeEventHandler = 0x200,   // updated 6.58 hotfix 2
-  EnterTeriEventHandler = 0x105,    // updated 6.58 hotfix 2
-  ShopEventHandler = 0x0148,        // updated 6.58 hotfix 2
-  ReturnEventHandler = 0x07D,       // updated 6.58 hotfix 2
-  TradeReturnEventHandler = 0x166,  // updated 6.58 hotfix 2
-  TradeReturnEventHandler2 = 0x37D, // updated 6.58 hotfix 2
-  EventYield2Handler = 0x0273,      // updated 6.58 hotfix 2
-  EventYield16Handler = 0x0207,     // updated 5.58h
+  TalkEventHandler = 0x23A,         // Endwalker Definition
+  SayEventHandler = 0x25D,         // Endwalker Definition
+  EmoteEventHandler = 0x1B5,        // Endwalker Definition
+  WithinRangeEventHandler = 0x38E,  // Endwalker Definition
+  OutOfRangeEventHandler = 0x200,   // Endwalker Definition
+  EnterTeriEventHandler = 0x105,    // Endwalker Definition
+  ShopEventHandler = 0x0148,        // Endwalker Definition
+  ReturnEventHandler = 0x07D,       // Endwalker Definition
+  TradeReturnEventHandler = 0x166,  // Endwalker Definition
+  TradeReturnEventHandler2 = 0x37D, // Endwalker Definition
+  EventYield2Handler = 0x0273,      // Endwalker Definition
+  EventYield16Handler = 0x0207,     // Legacy Definition
 
   LinkshellEventHandler = 0x9999,  // unknown
   LinkshellEventHandler1 = 0x9999, // unknown
 
-  ReqEquipDisplayFlagsChange = 0x0150, // updated 6.58 hotfix 2
+  ReqEquipDisplayFlagsChange = 0x0150, // Endwalker Definition
 
-  LandRenameHandler = 0x03B7,           // updated 6.58 hotfix 2
-  HousingUpdateHouseGreeting = 0x03A7,  // updated 6.58 hotfix 2
-  HousingUpdateObjectPosition = 0x0157, // updated 6.58 hotfix 2
-  HousingEditExterior = 0x028C,         // updated 6.58 hotfix 2
-  HousingEditInterior = 0x0336,         // updated 6.58 hotfix 2
+  LandRenameHandler = 0x03B7,           // Endwalker Definition
+  HousingUpdateHouseGreeting = 0x03A7,  // Endwalker Definition
+  HousingUpdateObjectPosition = 0xF157, // Endwalker Definition
+  HousingEditExterior = 0x028C,         // Endwalker Definition
+  HousingEditInterior = 0x0336,         // Endwalker Definition
 
-  SetSharedEstateSettings = 0x00D2, // updated 5.58h
+  SetSharedEstateSettings = 0x00D2, // Legacy Definition
 
-  UpdatePositionInstance = 0x0227, // updated 6.58 hotfix 2
+  UpdatePositionInstance = 0x0227, // Endwalker Definition
 
-  PerformNoteHandler = 0x0243, // updated 5.58h
+  PerformNoteHandler = 0x0243, // Legacy Definition
   Dive = 0x018C,                    // updated 6.30h
 };
 

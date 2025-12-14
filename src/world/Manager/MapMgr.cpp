@@ -82,10 +82,10 @@ void Sapphire::World::Manager::MapMgr::updateAll( Entity::Player& player )
                 eventData.iconId = exdData.get< Data::EventIconType >( 5 )->mapIconAvailable + 1;
 
                 if( player.isQuestCompleted( guildLeve->quest[ 0 ] ) ||
-                    ( ( guildLeve->typeId == 2 || npcData == 393217 || npcData == 393223 || npcData == 393225 ) && // Leve npc locations: Bentbranch / Horizon / Swiftperch
+                    ( (  npcData == 393217 || npcData == 393223 || npcData == 393225 ) && // Leve npc locations: Bentbranch / Horizon / Swiftperch
                     ( player.isQuestCompleted( 220 ) || player.isQuestCompleted( 687 ) || player.isQuestCompleted( 693 ) ) ) )
                 {
-                  if( guildLeve->typeId == 2 )
+                  /*if (guildLeve->typeId == 2)
                   {
                     if( player.getGc() != 0 )
                     {
@@ -98,8 +98,8 @@ void Sapphire::World::Manager::MapMgr::updateAll( Entity::Player& player )
                         }
                       }
                     }
-                  }
-                  else
+                  }*/
+                  //else
                   {
                     mapData.insert( eventData );
                   }
