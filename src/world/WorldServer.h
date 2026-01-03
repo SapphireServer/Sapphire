@@ -2,6 +2,7 @@
 
 #include <Common.h>
 
+#include <thread>
 #include <mutex>
 #include <map>
 #include <set>
