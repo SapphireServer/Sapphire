@@ -330,32 +330,32 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     {
       case 8:
       {
-        quest.setBitFlag8( questBit, true );
+        quest.setBitFlag8( questBit, !quest.getBitFlag8( questBit ) );
         break;
       }
       case 16:
       {
-        quest.setBitFlag16( questBit, true );
+        quest.setBitFlag16( questBit, !quest.getBitFlag16( questBit ) );
         break;
       }
       case 24:
       {
-        quest.setBitFlag24( questBit, true );
+        quest.setBitFlag24( questBit, !quest.getBitFlag24( questBit ) );
         break;
       }
       case 32:
       {
-        quest.setBitFlag32( questBit, true );
+        quest.setBitFlag32( questBit, !quest.getBitFlag32( questBit ) );
         break;
       }
       case 40:
       {
-        quest.setBitFlag40( questBit, true );
+        quest.setBitFlag40( questBit, !quest.getBitFlag40( questBit ) );
         break;
       }
       case 48:
       {
-        quest.setBitFlag48( questBit, true );
+        quest.setBitFlag48( questBit, !quest.getBitFlag48( questBit ) );
         break;
       }
     }
