@@ -26,5 +26,6 @@ target_include_directories( common PUBLIC
 target_include_directories( common SYSTEM PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include"
   "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/nlohmann/include"
 )
 
