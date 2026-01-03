@@ -9,6 +9,7 @@
 #include <Common.h>
 
 #include "Actor/Player.h"
+#include "Manager/PlayerMgr.h"
 
 namespace Sapphire::World::Manager
 {
@@ -48,6 +49,14 @@ namespace Sapphire::World::Manager
     void progressAchievementByType( Entity::Player& player, int32_t argument, uint32_t progressCount = 1 )
     {
       progressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
+    }
+
+    // Similar to progressAchievementByType but update player's m_achievementData with the actual achievement value.
+    // Used to return the value of packet ACHIEVEMENT_REQUEST_RATE in case of player.getAchievementData().progressData empty
+    template< auto AchievementType >
+    void retrieveProgressAchievementByType( Entity::Player& player, int32_t argument, uint32_t progressCount = 1 )
+    {
+      retrieveProgressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
     }
 
     /// <summary>
@@ -104,9 +113,10 @@ namespace Sapphire::World::Manager
 
     template< typename AchievementTypeT, AchievementTypeT achievementType >
     inline void progressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
+    template< typename AchievementTypeT, AchievementTypeT achievementType >
+    inline void retrieveProgressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
   };
 
-  
   template<>
   inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::General >( Entity::Player& player, int32_t subtype, uint32_t progressCount )
   {
@@ -169,6 +179,20 @@ namespace Sapphire::World::Manager
       if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvData.progressData[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
     }
+  }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::Classjob >( Entity::Player& player, int32_t classJob, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::Classjob, classJob );
+
+    auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
+
+    achvData.progressData[ dataKey.u32 ] = level;
+
+    player.setAchievementData( achvData );
   }
 
   template<>
@@ -249,4 +273,66 @@ namespace Sapphire::World::Manager
       }
     }
   }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::Quest >( Entity::Player& player, int32_t classJob, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::Classjob, classJob );
+
+    auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
+
+    achvData.progressData[ dataKey.u32 ] = level;
+
+    player.setAchievementData( achvData );
+
+    player.updateDbAchievement();
+  }
+
+  template<>
+  inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::MapDiscovery >( Entity::Player& player, int32_t mapId, uint32_t allDiscovered )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::MapDiscovery, mapId );
+
+    if( !achvData.progressData.count( dataKey.u32 ) )
+      achvData.progressData[ dataKey.u32 ] = 0;
+
+    achvData.progressData[ dataKey.u32 ] = allDiscovered;
+
+    const auto achvIdList = getAchievementIdByType( Common::Achievement::Type::MapDiscovery );
+
+    for( auto achvId : achvIdList )
+    {
+      if( hasAchievementUnlocked( player, achvId ) )
+        continue;
+
+      auto pAchv = getAchievementDetail( achvId );
+      if( !pAchv || pAchv->_data.ConditionArg[0] != mapId )
+        continue;
+
+      if( allDiscovered )
+        unlockAchievement( player, achvId );
+    }
+
+    player.updateDbAchievement();
+  }
+
+  template<>
+  inline void AchievementMgr::retrieveProgressAchievement< Common::Achievement::Type, Common::Achievement::Type::MapDiscovery >( Entity::Player& player, int32_t mapId, uint32_t unused )
+  {
+    auto achvData = player.getAchievementData();
+
+    auto dataKey = getKeyFromType( Common::Achievement::Type::MapDiscovery, mapId );
+
+    bool discovered = playerMgr().isAllAreaDiscovered( player, mapId );
+
+    achvData.progressData[ dataKey.u32 ] = discovered;
+
+    player.setAchievementData( achvData );
+    player.updateDbAchievement();
+  }
+
 }
