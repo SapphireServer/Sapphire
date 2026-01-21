@@ -82,116 +82,104 @@ public:
 
   void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( bnpc.getBNpcNameId() != Enemy0 && bnpc.getBNpcNameId() != Enemy1 )
-      return;
-
-    auto currentKC5 = quest.getUI8AL() + 1;
-    auto currentKC32 = quest.getUI8BH() + 1;
-
-    switch( bnpc.getBNpcNameId() )
+    if( quest.getSeq() == Seq3 )
     {
-      case Enemy0:
-      {
-        if( currentKC5 >= 8 )
-        {
-          quest.setUI8AL( currentKC5 );
-          checkQuestCompletion( quest, player, 2 );
-          eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC5, 8 );
-        }
-        else if( currentKC5 < 8 )
-        {
-          quest.setUI8AL( currentKC5 );
-          eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC5, 8 );
-        }
+      if( bnpc.getBNpcNameId() != Enemy0 && bnpc.getBNpcNameId() != Enemy1 )
+        return;
 
-        break;
-      }
-      case Enemy1:
+      switch( bnpc.getBNpcNameId() )
       {
-        if( currentKC32 >= 8 )
+        case Enemy0:
         {
-          quest.setUI8BH( currentKC32 );
-          checkQuestCompletion( quest, player, 2 );
-          eventMgr().sendEventNotice( player, getId(), 3, 2, currentKC32, 8 );
-        }
-        else if( currentKC32 < 8 )
-        {
-          quest.setUI8BH( currentKC32 );
-          eventMgr().sendEventNotice( player, getId(), 3, 2, currentKC32, 8 );
-        }
+          if( quest.getUI8AL() >= 8 )
+            break;
 
-        break;
+          quest.setUI8AL( quest.getUI8AL() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 2, 2, quest.getUI8AL(), 8 );
+
+          break;
+        }
+        case Enemy1:
+        {
+          if( quest.getUI8BH() >= 8 )
+            break;
+
+          quest.setUI8BH( quest.getUI8BH() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 3, 2, quest.getUI8BH(), 8 );
+
+          break;
+        }
       }
+
+      checkQuestCompletion( quest, player );
     }
   }
 
   void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId ) override
   {
-     switch( actorId )
+    eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+
+    switch( actorId )
     {
       case Eobject0:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00001( quest, player );
         break;
       case Eobject1:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00002( quest, player );
         break;
       case Eobject2:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00003( quest, player );
         break;
       case Eobject3:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00004( quest, player );
         break;
       case Eobject4:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00005( quest, player );
         break;
       case Eobject5:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00006( quest, player );
         break;
       case Eobject6:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00007( quest, player );
         break;
       case Eobject7:
-        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
+        //eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00008( quest, player );
         break;
     }
   }
 
 private:
-  void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    if( varIdx == 1 )
+    switch( quest.getSeq() )
     {
-      auto currentCC = quest.getUI8AL();
-
-      eventMgr().sendEventNotice( player, getId(), 0, 2, currentCC + 1, 6 );
-      quest.setUI8AL( currentCC + 1 );
-
-      if( currentCC + 1 >= 6 )
+      case Seq1:
       {
-        quest.setSeq( Seq2 );
-        quest.setUI8AL( 0 );
+        quest.setUI8AL( quest.getUI8AL() + 1 );
+        eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 6 );
+
+        if( quest.getUI8AL() >= 6 )
+        {
+          quest.setSeq( Seq2 );
+          quest.setUI8AL( 0 );
+        }
+
+        break;
       }
-      else
+      case Seq3:
       {
-        quest.setUI8AL( currentCC + 1 );
-      }
-    }
-    else if( varIdx == 2 )
-    {
-      auto QUEST_ONKILL_5 = quest.getUI8AL();
-      auto QUEST_ONKILL_32 = quest.getUI8BH();
+        if( quest.getUI8AL() >= 8 && quest.getUI8BH() >= 8 )
+          quest.setSeq( SeqFinish );
 
-      if( QUEST_ONKILL_5 == 8 && QUEST_ONKILL_32 == 8 )
-      {
-        quest.setSeq( SeqFinish );
+        break;
       }
     }
   }
@@ -221,7 +209,7 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 1, true );
   }
 
@@ -234,7 +222,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 2, true );
   }
 
@@ -247,7 +235,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 3, true );
   }
 
@@ -260,7 +248,7 @@ private:
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 4, true );
   }
 
@@ -273,7 +261,7 @@ private:
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 5, true );
   }
 
@@ -286,7 +274,7 @@ private:
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 6, true );
   }
 
@@ -299,7 +287,7 @@ private:
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 7, true );
   }
 
@@ -312,7 +300,7 @@ private:
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion( quest, player, 1 );
+    checkQuestCompletion( quest, player );
     quest.setBitFlag8( 8, true );
   }
 

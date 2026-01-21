@@ -118,7 +118,6 @@ public:
   {
   }
 
-
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
@@ -202,6 +201,7 @@ private:
     eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setUI8BH( 1 );
     quest.setSeq( Seq3 );
+    quest.setBitFlag8( 1, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -215,13 +215,10 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      /* auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+      auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );*/
-      playerMgr().sendUrgent( player, "I can't get this QuestBattle to work. Skipping~~" );
-      eventMgr().sendEventNotice( player, getId(), 2, 0 );
-      quest.setSeq( Seq4 );
+      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
     }
   }
 

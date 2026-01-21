@@ -1,5 +1,9 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
+#include "Action/Action.h"
 
 using namespace Sapphire;
 
@@ -11,7 +15,8 @@ private:
   static constexpr auto LOC_POS_ACTOR1 = 3884694;
   static constexpr auto LOC_ACTOR0 = 1003064;
   static constexpr auto BNPC_NAME_01 = 750;
-  static constexpr auto DEF_ACTION_SAND_BREATH = 445;
+  static constexpr auto DEF_ACTION_SAND_BREATH = 445; //True Grit
+  // Paincracker 482
   static constexpr auto DEF_BLIND = 15;
   static constexpr auto CUT_SCENE_01 = 69;
   static constexpr auto LOC_TALKSHAPE1 = 8;
@@ -109,15 +114,69 @@ public:
 
   }
 
+  enum vars
+  {
+    SUCCESS_CALLED,
+  };
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -1.59f );
+    player.setPos( { 257.f, 24.f, 191.f } );
+  }
+
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto pPlayer = instance.getPlayerPtr();
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_01 );
+    auto successCalled = instance.getDirectorVar( SUCCESS_CALLED );
 
+    uint32_t bossHpPercent = 0;
+    if( boss )
+      bossHpPercent = boss->getHpPercent();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setDirectorVar( SUCCESS_CALLED, 1 );
+      instance.success( 9 );
+      return;
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
+    eventMgr().playScene( player, instance.getDirectorId(), 1,
+                          NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                  DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                  // todo: wtf is 0x00100000
+                                  DISABLE_CANCEL_EMOTE,
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            player.setOnEnterEventDone( true );
+                          } );
+  }
 
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_01, 75000, Common::BNpcType::Enemy );
+    boss->setFlag( Entity::NoDeaggro );
+    boss->hateListAdd( player.getAsPlayer(), 1 );
+  }
+
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    quest.setSeq( 4 );
   }
 
 };

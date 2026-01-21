@@ -62,20 +62,16 @@ public:
 
   void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    switch( bnpc.getBNpcNameId() )
+    if( quest.getSeq() == Seq1 )
     {
-      case Enemy0:
-      {
-        auto currentKC = quest.getUI8AL();
-        if( currentKC < 6 )
-        {
-          quest.setUI8AL( currentKC + 1 );
-          eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 6 );
-        }
+      if( bnpc.getBNpcNameId() != Enemy0 )
+        return;
 
-        if( currentKC + 1 >= 6 )
-          quest.setSeq( SeqFinish );
-      }
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 6 );
+
+      if( quest.getUI8AL() >= 6 )
+        quest.setSeq( SeqFinish );
     }
   }
 
