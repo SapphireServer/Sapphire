@@ -42,36 +42,36 @@ enum ClientLobbyIpcType :
 enum ServerZoneIpcType :
   uint16_t
 {
-  Ping = 0x1D9, // Endwalker Definition
-  Init = 0x277, // updated 7.38
+  Ping = 0x2A6, // 7.41
+  Init = 0x2CC, // 7.41
 
   ActorFreeSpawn = 0x195, // Endwalker Definition
 
-  InitZone = 0x02B1, // Endwalker Definition
-  PrepareZoning = 0x0124, // Endwalker Definition
+  InitZone = 0x1A4, // 7.41
+  PrepareZoning = 0x333, // 7.41
 
-  EffectResult = 0x0336, // Endwalker Definition
+  EffectResult = 0x114, // 7.41
   EffectResultBasic = 0x023A, // Endwalker Definition
 
-  ActorControl = 0x0148, // Endwalker Definition
-  ActorControlTarget = 0x032C, // Endwalker Definition
-  ActorControlSelf = 0x0254, // updated 7.38
+  ActorControl = 0x2C8, // 7.41
+  ActorControlTarget = 0xE0, // 7.41
+  ActorControlSelf = 0x2B3, // 7.41
   ActorCast = 0x01BB, // Endwalker Definition
   ActorSetPos = 0x029D, // Endwalker Definition
   ActorMove = 0x011C, // Endwalker Definition
-  ActorGauge = 0x0365,  // updated 7.38
+  ActorGauge = 0x1CC,  // 7.41
 
   /*!
    * @brief Used when resting
    */
-  UpdateHpMpTp = 0x007D, // Endwalker Definition
-  UpdateClassInfo = 0x0204,  // updated 7.38
+  UpdateHpMpTp = 0xEA, // 7.42
+  UpdateClassInfo = 0x2BB,  // 7.41
 
   ///////////////////////////////////////////////////
 
   ChatBanned = 0xF06B,
-  Playtime = 0x03DE, // Endwalker Definition
-  Logout = 0x0312, // updated 7.38
+  Playtime = 0x190, // 7.41
+  Logout = 0x211, // 7.41
   CFNotify = 0x0279, // Endwalker Definition
   CFMemberStatus = 0x21F, // Endwalker Definition?
   CFDutyInfo = 0x2E8, // Endwalker Definition?
@@ -93,7 +93,7 @@ enum ServerZoneIpcType :
 
   WorldVisitList = 0xF0FE, // added 4.5
 
-  SocialList = 0x25E, // updated 7.38
+  SocialList = 0x31B, // 7.41
 
   ExamineSearchInfo = 0x014A, // Endwalker Definition
   UpdateSearchInfo = 0x00CF, // Endwalker Definition
@@ -101,18 +101,18 @@ enum ServerZoneIpcType :
   ExamineSearchComment = 0x244, // Endwalker Definition?
 
   ServerNoticeShort = 0xF333, // Legacy Definition
-  ServerNotice = 0x1CD,       // updated 7.38
-  SetOnlineStatus = 0x3CF,   // updated 7.38
+  ServerNotice = 0x67,       // 7.41
+  SetOnlineStatus = 0x329,   // 7.41
 
   CountdownInitiate = 0x376, // Endwalker Definition
   CountdownCancel = 0x2B7,    // Endwalker Definition
 
   PlayerAddedToBlacklist = 0xe2,     // Endwalker Definition
   PlayerRemovedFromBlacklist = 0x201, // Endwalker Definition?
-  BlackList = 0xF38A,                   // Endwalker Definition
+  BlackList = 0xE7,                   // 7.41
 
   LinkshellList = 0x2B2,           // Endwalker Definition
-  CrossWorldLinkshellList = 0x2C8, // updated 7.38
+  CrossWorldLinkshellList = 0x1E8, // 7.41
   FellowshipList = 0x373,          // Endwalker Definition
 
   MailDeleteRequest = 0x168, // Endwalker Definition?
@@ -156,8 +156,8 @@ enum ServerZoneIpcType :
 
   GCAffiliation = 0x06A, // updated 7.38
 
-  PlayerSpawn = 0x0270, // updated 7.38
-  NpcSpawn = 0x02C9,  // updated 7.38
+  PlayerSpawn = 0x13E, // 7.41
+  NpcSpawn = 0x2E8,  // 7.41
   NpcSpawn2 = 0x338,   // Endwalker Definition?
 
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
@@ -166,14 +166,14 @@ enum ServerZoneIpcType :
   PartyUpdate = 0x2D8,       // Endwalker Definition
   HateRank = 0x2A7,            // Endwalker Definition
   HateList = 0x26B,            // Endwalker Definition
-  ObjectSpawn = 0x02B9,  // updated 7.38
+  ObjectSpawn = 0x11C,  // 7.41
   ObjectDespawn = 0x1D8,      // Endwalker Definition
   SilentSetClassJob = 0xF18E, // Legacy Definition - seems to be the case, not sure if it's actually used for anything
-  PlayerSetup = 0x039A, // updated 7.38
-  PlayerStats = 0x02C4, // updated 7.38
+  PlayerSetup = 0xD7, // 7.41
+  PlayerStats = 0x2F0, // 7.41
   ActorOwner = 0x2c3,         // Endwalker Definition
   PlayerStateFlags = 0x1DF,   // updated 7.38
-  PlayerClassInfo = 0x0125,    // updated 7.38
+  PlayerClassInfo = 0x2BB,    // 7.41
   PlayerUpdateLook = 0xa8,    // Endwalker Definition
   CharaVisualEffect = 0x0C1,  // Endwalker Definition
 
@@ -188,13 +188,13 @@ enum ServerZoneIpcType :
 
   SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-  ItemInfo = 0x01E7, // updated 7.38
-  ContainerInfo = 0x021E, // updated 7.38
-  InventoryTransactionFinish = 0x00EC, // updated 7.38
-  InventoryTransaction = 0x0117, // updated 7.38
-  CurrencyCrystalInfo = 0x03C1, // updated 7.38
+  ItemInfo = 0x94, // 7.41
+  ContainerInfo = 0x20D, // 7.41
+  InventoryTransactionFinish = 0x34D, // 7.41
+  InventoryTransaction = 0x1A9, // 7.41
+  CurrencyCrystalInfo = 0x262, // 7.41
 
-  InventoryActionAck = 0x02CC, // updated 7.38
+  InventoryActionAck = 0x39B, // 7.41
   UpdateInventorySlot = 0xF34D, // Endwalker Definition
 
   HuntingLogEntry = 0x1E3, // updated 7.38
@@ -214,9 +214,9 @@ enum ServerZoneIpcType :
 
   EventLinkshell = 0x1169,
 
-  QuestActiveList = 0x2DD,   // updated 7.38
+  QuestActiveList = 0x99,   // 7.41
   QuestUpdate = 0x1A4,       // Endwalker Definition
-  QuestCompleteList = 0x38A, // updated 7.38
+  QuestCompleteList = 0x2FB, // 7.41
 
   QuestFinish = 0x2BB,         // Endwalker Definition
   MSQTrackerComplete = 0x166,  // updated 7.38
@@ -224,7 +224,7 @@ enum ServerZoneIpcType :
 
   QuestMessage = 0x06B, // Endwalker Definition
 
-  QuestTracker = 0x3A7, // updated 7.38
+  QuestTracker = 0x99, // 7.41
 
   Mount = 0x09F, // Endwalker Definition
 
@@ -240,7 +240,7 @@ enum ServerZoneIpcType :
 
   CFAvailableContents = 0xF1FD, // Legacy Definition
 
-  WeatherChange = 0x02F8, // updated 7.38
+  WeatherChange = 0x92, // updated 7.41
   PlayerTitleList = 0x1FF, // Endwalker Definition?
   Discovery = 0x11E,       // Endwalker Definition
 
@@ -291,8 +291,8 @@ enum ServerZoneIpcType :
   DutyGauge = 0x02E5, // Legacy Definition
 
   // daily quest info -> without them sent,  login will take longer...
-  DailyQuests = 0x11D,           // updated 7.38
-  DailyQuestRepeatFlags = 0x122, // updated 7.38
+  DailyQuests = 0x12E,           // 7.41
+  DailyQuestRepeatFlags = 0x2CF, // 7.41
 
   MapUpdate = 0x0FF,    // Endwalker Definition
   MapUpdate4 = 0x345,  // Endwalker Definition
@@ -336,10 +336,10 @@ enum ServerZoneIpcType :
 enum ClientZoneIpcType :
   uint16_t
 {
-  PingHandler = 0x2AE, // Endwalker Definition
-  InitHandler = 0x157, // updated 7.38
+  PingHandler = 0x349, // 7.41
+  InitHandler = 0x1B4, // 7.41
 
-  FinishLoadingHandler = 0x3E2, // updated 7.38
+  FinishLoadingHandler = 0xB9, // 7.41
 
   CFCommenceHandler = 0x0242, // Endwalker Definition
 
@@ -347,7 +347,7 @@ enum ClientZoneIpcType :
   CFRegisterDuty = 0x0312,     // Endwalker Definition
   CFRegisterRoulette = 0x037A, // Legacy Definition
   PlayTimeHandler = 0x0378,    // Endwalker Definition
-  LogoutHandler = 0x1CF,       // updated 7.38
+  LogoutHandler = 0x211,       // 7.41
   CancelLogout = 0x01e3,       // Endwalker Definition
   CFDutyInfoHandler = 0xF078,  // Legacy Definition
 
@@ -361,16 +361,16 @@ enum ClientZoneIpcType :
   PartyKickHandler = 0x013F, // Endwalker Definition
   PartyDisbandHandler = 0x03BF, // Endwalker Definition
 
-  SocialListHandler = 0x0CD,     // updated 7.38
+  SocialListHandler = 0x293,     // 7.41
   SetSearchInfoHandler = 0x01A0, // Endwalker Definition
   ReqSearchInfoHandler = 0x0235,           // Endwalker Definition
   ReqExamineSearchCommentHandler = 0x00E7, // Legacy Definition
 
   ReqRemovePlayerFromBlacklist = 0x00B4, // Legacy Definition
-  BlackListHandler = 0x284,              // Endwalker Definition
+  BlackListHandler = 0x1B0,              // 7.41
   PlayerSearchHandler = 0x037D,          // Legacy Definition
 
-  LinkshellListHandler = 0x0302, // Endwalker Definition
+  LinkshellListHandler = 0x0302, // 7.41
 
   MarketBoardRequestItemListingInfo = 0x00F4,  // Legacy Definition
   MarketBoardRequestItemListings = 0x0122,     // Legacy Definition
@@ -391,13 +391,13 @@ enum ClientZoneIpcType :
   ReqCountdownCancel = 0xF23a,   // Endwalker Definition
 
   ZoneLineHandler = 0x326,   // Endwalker Definition
-  ClientTrigger = 0x0215, // updated 7.38
+  ClientTrigger = 0xAD, // 7.41
   ClientTriggerEnvironment = 0x0295, // Endwalker Definition
   DiscoveryHandler = 0x0129, // Endwalker Definition
 
   SkillHandler = 0x07C,   // Endwalker Definition
-  GMCommand1 = 0x02D4,      // updated 7.38
-  GMCommand2 = 0x306,     // Endwalker Definition
+  GMCommand1 = 0xE5,      // 7.41
+  GMCommand2 = 0x3AE,     // 7.41
   AoESkillHandler = 0x0FC, // Endwalker Definition
 
   UpdatePositionHandler = 0x0256, // Endwalker Definition
