@@ -41,7 +41,8 @@ namespace Sapphire::World::AI
       AllianceB,
       AllianceC,
 
-      IsDead
+      IsDead,
+      SameEncounter
     };
 
   protected:
@@ -242,6 +243,18 @@ namespace Sapphire::World::AI
       TargetSelectFilter( Type::IsDead )
     {
     }
+
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
+  };
+
+  class SameEncounterFilter : public TargetSelectFilter
+  {
+  public:
+    SameEncounterFilter() :
+      TargetSelectFilter( Type::SameEncounter )
+    {
+    }
+
     bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 

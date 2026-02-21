@@ -16,8 +16,16 @@ public:
 
   void setupEncounter( InstanceContent& instance, EncounterPtr pEncounter )
   {
-    std::vector< EncounterActor > actors { { NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-    pEncounter->setInitialActorSetup( actors );
+    EncounterSetup setup;
+    setup.type = EncounterType::Trial;
+    setup.timelineName = "IfritNormal";
+    setup.encounterShape = EncounterShape::CYLINDER;
+    setup.position = { 0, 0, 0 };   // centre
+    setup.position2 = { 40, 10, 0 };// radius, height, unused
+    setup.hasLockout = true;
+    setup.bnpcSetupList = { { NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
+
+    pEncounter->setEncounterSetup( setup );
     pEncounter->init();
   }
 
@@ -26,6 +34,7 @@ public:
     auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
     auto director = std::static_pointer_cast< Event::Director >( instanceContent );
     instance.addEObj( "Entrance", 2000182, 4177874, 4177871, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0);
+
     auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "IfritNormal" );
     setupEncounter( instance, pEncounter );
 

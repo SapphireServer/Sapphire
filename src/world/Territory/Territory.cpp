@@ -965,6 +965,11 @@ uint32_t Territory::getNextActionResultId()
   return m_effectCounter++;
 }
 
+uint32_t Territory::getNextEncounterId()
+{
+  return ++m_nextEncounterId;
+}
+
 Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,
                                                    uint32_t triggerOwnerId )
 {

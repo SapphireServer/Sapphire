@@ -50,6 +50,11 @@ public:
 
   void removeActors();
 
+  const ActorSet& getActors() const
+  {
+    return m_actors;
+  }
+
   ActorSet::iterator begin()
   {
     return m_actors.begin();

@@ -39,6 +39,8 @@
 #include "Job/Warrior.h"
 #include "Job/Bard.h"
 
+#include "AI/TargetHelper.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -427,6 +429,7 @@ void Action::Action::interrupt()
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1.
     // This enables the cast interrupt effect.
+    // todo: use the correct interrupt effect for players locked out
     auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, interruptEffect );
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
@@ -445,8 +448,27 @@ void Action::Action::onInterrupt()
 void Action::Action::execute()
 {
   assert( m_pSource );
+
+  bool shouldInterrupt = false;
+
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
   if( !consumeResources() )
+    shouldInterrupt = true;
+
+  if( !m_pTarget )
+  {
+    shouldInterrupt = true;
+  }
+  else if( m_pTarget )
+  {
+    if( m_pSource->getTerritoryId() != m_pTarget->getTerritoryId() )
+      shouldInterrupt = true;
+    // todo: is this correct?
+    if( m_pSource->getBoundEncounterId() != m_pTarget->getBoundEncounterId() )
+      shouldInterrupt = true;
+  }
+  
+  if( shouldInterrupt )
   {
     interrupt();
     return;
@@ -1055,9 +1077,15 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
 
   auto kind = actor.getObjKind();
   auto pChara = actor.getAsChara();
+  auto pSrc = m_pSource->getAsChara();
 
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
+    return false;
+
+  // todo: is this correct?
+  static auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
+  if( !pEncounterFilter->isApplicable( pSrc, pChara ) )
     return false;
 
   bool actorApplicable = false;

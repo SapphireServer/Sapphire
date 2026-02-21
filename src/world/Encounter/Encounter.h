@@ -26,7 +26,24 @@ namespace Sapphire
     CYLINDER
   };
 
-  struct EncounterActor
+  enum class EncounterType
+  {
+    Fate,
+    DungeonBoss,
+    Trial
+  };
+
+  struct EncounterEObj
+  {
+    uint32_t eobjId;
+    Common::FFXIVARR_POSITION3 pos;
+    float rot;
+    float scale{ 1.0 };
+    uint8_t permissionInvisibility{ 0 };
+    uint8_t state{ 0 };
+  };
+
+  struct EncounterBNpc
   {
     uint32_t layoutId;
     uint32_t hp;
@@ -37,13 +54,16 @@ namespace Sapphire
 
   struct EncounterSetup
   {
+    EncounterType type;
     std::string timelineName;
-    std::vector< EncounterActor > actorSetupList;
+    std::vector< EncounterBNpc > bnpcSetupList;
+    std::vector< EncounterEObj > eobjSetupList;
     EncounterShape encounterShape;
     // for BOX shape, this would be m_position = min, m_position2 = max
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
     Common::FFXIVARR_POSITION3 position;
     Common::FFXIVARR_POSITION3 position2;
+    uint64_t duration{ 0 };
     bool hasLockout{false};
   };
 
@@ -56,7 +76,11 @@ namespace Sapphire
 
     virtual ~Encounter() = default;
 
+    uint32_t getId() const;
+
     void init();
+
+    void setEncounterSetup( const EncounterSetup& setup );
 
     virtual void start();
 
@@ -78,17 +102,46 @@ namespace Sapphire
 
     void removeBNpc( uint32_t layoutId );
 
+    void addPlayer( Entity::PlayerPtr pPlayer, bool bind = false );
+
+    void removePlayer( Entity::PlayerPtr pPlayer );
+
+    const std::set< Entity::PlayerPtr >& getPlayers() const;
+
     TerritoryPtr getTeriPtr();
 
     Event::DirectorPtr getDirector();
 
-    void setInitialActorSetup( const std::vector< EncounterActor >& actorSetupList );
-
     EncounterSetup& getSetup();
 
-  protected:
-    uint64_t m_startTime{ 0 };
+    uint32_t getLockoutTime() const;
 
+    // todo:
+    virtual void onEnterRange( Entity::GameObjectPtr pActor );
+
+    virtual void onExitRange( Entity::GameObjectPtr pActor );
+
+    virtual void onChangeStatus( EncounterStatus oldStatus, EncounterStatus newStatus );
+
+    bool canBindActors() const;
+    void bindActor( Entity::GameObjectPtr pActor );
+    void unbindActor( Entity::GameObjectPtr pActor );
+    void unbindActors();
+
+  protected:
+    uint32_t m_id{ 0 };
+    EncounterType m_type;
+    uint64_t m_startTime{ 0 };
+    uint64_t m_duration{ 0 }; // 0 for unlimited duration
+    uint64_t m_lastTick{ 0 };
+    uint64_t m_lastRangeTick{ 0 };
+    uint64_t m_lockoutTime{ 0 };
+    uint64_t m_failTime{ 0 };
+    uint64_t m_finishTime{ 0 };
+
+    Common::FFXIVARR_POSITION3 m_position;
+
+    std::set< Entity::GameObjectPtr > m_boundActors;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bossBnpcs;

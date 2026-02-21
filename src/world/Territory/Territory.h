@@ -71,6 +71,7 @@ namespace Sapphire
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
+    uint32_t m_nextEncounterId{ 1 };
 
     std::vector< SpawnInfo > m_spawnInfo;
 
@@ -209,6 +210,8 @@ namespace Sapphire
     void updateSpawnPoints();
 
     uint32_t getNextActionResultId();
+
+    uint32_t getNextEncounterId();
 
     std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };

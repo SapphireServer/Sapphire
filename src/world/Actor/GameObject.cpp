@@ -373,6 +373,16 @@ void GameObject::setPermissionInvisibility( uint8_t permissionInvisibility )
   m_permissionInvisibility = permissionInvisibility;
 }
 
+uint32_t GameObject::getBoundEncounterId() const
+{
+  return m_boundEncounterId;
+}
+
+void GameObject::setBoundEncounterId( uint32_t id )
+{
+  m_boundEncounterId = id;
+}
+
 /*!
 Get the current cellId of a region the actor is in
 

@@ -153,7 +153,7 @@ namespace Sapphire::World::AI
         pChara = topIt->get()->getAsChara();
 
       ret = pChara == pTarget;
-      */
+      //*/
     }
     return m_negate ? !ret : ret;
   }
@@ -199,6 +199,20 @@ namespace Sapphire::World::AI
     {
       ret = true;
     }
+    return m_negate ? !ret : ret;
+  }
+
+  bool SameEncounterFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  {
+    bool ret = false;
+
+    if( pSrc->getBoundEncounterId() == pTarget->getBoundEncounterId() )
+      ret = true;
+
+    if( pSrc->isPlayer() && pTarget->isBattleNpc() )
+      if( pTarget->getBoundEncounterId() == 0 || pTarget->getAsBNpc()->getTriggerOwnerId() == pSrc->getId() )
+        ret = true;
+
     return m_negate ? !ret : ret;
   }
 
