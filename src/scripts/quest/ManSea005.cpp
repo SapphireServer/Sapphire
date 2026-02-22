@@ -131,7 +131,7 @@ class ManSea005 : public Sapphire::ScriptAPI::QuestScript
     if( result.getResult( 0 ) == 1 )
     {
       eventMgr().eventFinish( player, result.eventId, 1 );
-      teriMgr().createAndJoinQuestBattle( player, 35 );
+      teriMgr().createAndJoinQuestBattle( player, m_id, 35 );
     }
   }
 
