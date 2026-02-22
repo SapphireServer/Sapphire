@@ -417,6 +417,12 @@ int TiledNavmeshGenerator::rasterizeTileLayers(
                           ( unsigned char ) vols[ i ].area, *rc.chf );
   }
 
+  if( !rcBuildRegionsMonotone( m_ctx, *rc.chf, cfg.borderSize, cfg.minRegionArea, cfg.mergeRegionArea ) )
+  {
+    printf( "[Navmesh] buildNavigation: Could not build monotone regions.\n" );
+    return 0;
+  }
+
   rc.lset = rcAllocHeightfieldLayerSet();
   if( !rc.lset )
   {
@@ -501,18 +507,18 @@ bool TiledNavmeshGenerator::buildTiledCache()
   // Generation params.
   rcConfig cfg;
   memset( &cfg, 0, sizeof( cfg ) );
-  cfg.cs = m_cellSize;
+  cfg.cs = 0.4;//m_cellSize;
   cfg.ch = m_cellHeight;
-  cfg.walkableSlopeAngle = m_agentMaxSlope;
-  cfg.walkableHeight = ( int ) ceilf( m_agentHeight / cfg.ch );
-  cfg.walkableClimb = ( int ) floorf( m_agentMaxClimb / cfg.ch );
+  cfg.walkableSlopeAngle = 60;//m_agentMaxSlope;
+  cfg.walkableHeight = 2.0;//( int ) ceilf( m_agentHeight / cfg.ch );
+  cfg.walkableClimb = 2.0;// ( int ) floorf( m_agentMaxClimb / cfg.ch );
   cfg.walkableRadius = ( int ) ceilf( m_agentRadius / cfg.cs );
-  cfg.maxEdgeLen = ( int ) ( m_edgeMaxLen / m_cellSize );
+  cfg.maxEdgeLen = 0; //( int ) ( m_edgeMaxLen / m_cellSize );
   cfg.maxSimplificationError = m_edgeMaxError;
-  cfg.minRegionArea = ( int ) rcSqr( m_regionMinSize );    // Note: area = size*size
-  cfg.mergeRegionArea = ( int ) rcSqr( m_regionMergeSize );// Note: area = size*size
+  cfg.minRegionArea = 8000;                                    //( int ) rcSqr( m_regionMinSize );    // Note: area = size*size
+  cfg.mergeRegionArea = 0; //( int ) rcSqr( m_regionMergeSize );// Note: area = size*size
   cfg.maxVertsPerPoly = ( int ) m_vertsPerPoly;
-  cfg.tileSize = ( int ) m_tileSize;
+  cfg.tileSize = 64;//( int ) m_tileSize;
   cfg.borderSize = cfg.walkableRadius + 3;// Reserve enough padding.
   cfg.width = cfg.tileSize + cfg.borderSize * 2;
   cfg.height = cfg.tileSize + cfg.borderSize * 2;
@@ -525,7 +531,7 @@ bool TiledNavmeshGenerator::buildTiledCache()
   dtTileCacheParams tcparams;
   memset( &tcparams, 0, sizeof( tcparams ) );
   rcVcopy( tcparams.orig, bmin );
-  tcparams.cs = m_cellSize;
+  tcparams.cs = 0.4;//m_cellSize;
   tcparams.ch = m_cellHeight;
   tcparams.width = ( int ) m_tileSize;
   tcparams.height = ( int ) m_tileSize;
