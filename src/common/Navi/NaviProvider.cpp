@@ -526,127 +526,101 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
     return false;
   }
 
+  if( !fp ) return false;
+
   // Read header.
   TileCacheSetHeader header;
-
-  size_t readLen = fread( &header, sizeof( TileCacheSetHeader ), 1, fp );
-  if( readLen != 1 )
+  size_t headerReadReturnCode = fread( &header, sizeof( TileCacheSetHeader ), 1, fp );
+  if( headerReadReturnCode != 1 )
   {
+    // Error or early EOF
     fclose( fp );
-    Logger::error( "Couldn't read NavMeshSetHeader for {0}", path );
     return false;
   }
-
   if( header.magic != TILECACHESET_MAGIC )
   {
     fclose( fp );
-    Logger::error( "'{0}' has an incorrect NavMeshSet header.", path );
     return false;
   }
-
   if( header.version != TILECACHESET_VERSION )
   {
     fclose( fp );
-    Logger::error( "'{0}' has an incorrect NavMeshSet version. Expected '{1}', got '{2}'", path, TILECACHESET_VERSION, header.version );
     return false;
   }
 
+  m_naviMesh = dtAllocNavMesh();
   if( !m_naviMesh )
   {
-    m_naviMesh = dtAllocNavMesh();
-    if( !m_naviMesh )
-    {
-      fclose( fp );
-      Logger::error( "Couldn't allocate dtNavMesh" );
-      return false;
-    }
-
-    dtStatus status = m_naviMesh->init( &header.meshParams );
-    if( dtStatusFailed( status ) )
-    {
-      fclose( fp );
-      Logger::error( "Couldn't initialise dtNavMesh" );
-      return false;
-    }
+    fclose( fp );
+    return false;
   }
-  // init dtTileCache
+  dtStatus status = m_naviMesh->init( &header.meshParams );
+  if( dtStatusFailed( status ) )
+  {
+    fclose( fp );
+    return false;
+  }
 
   m_tileCache = dtAllocTileCache();
+  if( !m_tileCache )
+  {
+    fclose( fp );
+    return false;
+  }
+  if( m_talloc )
+    delete m_talloc;
+  if( m_tcomp )
+    delete m_tcomp;
+  if( m_tmproc )
+    delete m_tmproc;
+
   m_talloc = new LinearAllocator( 32000 );
   m_tcomp = new FastLZCompressor();
   m_tmproc = new MeshProcess();
 
-  // Example: Setup for a typical humanoid agent
-  dtTileCacheParams tileCacheParams;
-  memset( &tileCacheParams, 0, sizeof( tileCacheParams ) );
-
-  // World bounds and cell sizes (Must match your baked NavMesh)
-  dtVcopy( tileCacheParams.orig, header.cacheParams.orig );
-  tileCacheParams.cs = 0.2f;                        // Cell size
-  tileCacheParams.ch = 0.2f;                        // Cell height
-  tileCacheParams.width = header.meshParams.tileWidth;  // Tile width in cells
-  tileCacheParams.height = header.meshParams.tileHeight;// Tile height in cells
-
-  // Agent settings for the "Walkable" check
-  tileCacheParams.walkableHeight = 2.0f;
-  tileCacheParams.walkableRadius = 0.5f;
-  tileCacheParams.walkableClimb = 0.6f;
-
-  // Capacity limits
-  tileCacheParams.maxObstacles = 256;               // Max concurrent doors/obstacles
-  tileCacheParams.maxTiles = header.meshParams.maxTiles;// Max tiles supported in the cache
-
-  dtStatus status = m_tileCache->init( &tileCacheParams, m_talloc, m_tcomp, m_tmproc );
-  if( !dtStatusSucceed( status ) )
+  status = m_tileCache->init( &header.cacheParams, m_talloc, m_tcomp, m_tmproc );
+  if( dtStatusFailed( status ) )
   {
+    fclose( fp );
     return false;
   }
 
   // Read tiles.
-  for( int32_t i = 0; i < header.numTiles; ++i )
+  for( int i = 0; i < header.numTiles; ++i )
   {
     TileCacheTileHeader tileHeader;
-    readLen = fread( &tileHeader, sizeof( tileHeader ), 1, fp );
-    if( readLen != 1 )
+    size_t tileHeaderReadReturnCode = fread( &tileHeader, sizeof( tileHeader ), 1, fp );
+    if( tileHeaderReadReturnCode != 1 )
     {
+      // Error or early EOF
       fclose( fp );
-      Logger::error( "Couldn't read NavMeshTileHeader from '{0}'", path );
       return false;
     }
-
     if( !tileHeader.tileRef || !tileHeader.dataSize )
       break;
 
-    auto data = reinterpret_cast< uint8_t* >( dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM ) );
-    if( !data )
-      break;
+    unsigned char* data = ( unsigned char* ) dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM );
+    if( !data ) break;
     memset( data, 0, tileHeader.dataSize );
-    readLen = fread( data, tileHeader.dataSize, 1, fp );
-    if( readLen != 1 )
+    size_t tileDataReadReturnCode = fread( data, tileHeader.dataSize, 1, fp );
+    if( tileDataReadReturnCode != 1 )
     {
+      // Error or early EOF
       dtFree( data );
       fclose( fp );
-
-      Logger::error( "Couldn't read tile data from '{0}'", path );
       return false;
     }
 
     dtCompressedTileRef tile = 0;
-    dtStatus status = m_tileCache->addTile( data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile );
-    if( !dtStatusSucceed( status ) )
+    dtStatus addTileStatus = m_tileCache->addTile( data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile );
+    if( dtStatusFailed( addTileStatus ) )
     {
+      Logger::error( "[Navmesh] Unable to add tile to cache for {0}", path );
       dtFree( data );
-      fclose( fp );
-
-      Logger::error( "Couldn't add tile data to TileCache '{0}'", path );
-      return false;
     }
 
     if( tile )
-    {
       m_tileCache->buildNavMeshTile( tile, m_naviMesh );
-    }
-    // m_naviMesh->addTile( data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0 );
   }
 
   fclose( fp );

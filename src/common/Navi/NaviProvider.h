@@ -147,14 +147,14 @@ namespace Sapphire::Common::Navi
     std::string m_internalName;
     std::string m_naviPath;
 
-    dtNavMesh* m_naviMesh;
-    dtTileCache* m_tileCache;
-    LinearAllocator* m_talloc;
-    FastLZCompressor* m_tcomp;
-    MeshProcess* m_tmproc;
+    dtNavMesh* m_naviMesh{ nullptr };
+    dtTileCache* m_tileCache{ nullptr };
+    LinearAllocator* m_talloc{ nullptr };
+    FastLZCompressor* m_tcomp{ nullptr };
+    MeshProcess* m_tmproc{ nullptr };
 
-    dtNavMeshQuery* m_naviMeshQuery;
-    dtObstacleAvoidanceDebugData* m_vod;
+    dtNavMeshQuery* m_naviMeshQuery{ nullptr };
+    dtObstacleAvoidanceDebugData* m_vod{ nullptr };
     std::unique_ptr< dtCrowd > m_pCrowd;
 
     float m_polyFindRange[ 3 ];
