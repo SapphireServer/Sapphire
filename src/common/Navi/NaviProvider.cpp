@@ -12,9 +12,6 @@
 #include <filesystem>
 #include <Service.h>
 
-// todo: yeah
-#include <FastLZ/fastlz.c>
-
 Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
   m_naviMesh( nullptr ),
   m_naviMeshQuery( nullptr ),
