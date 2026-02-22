@@ -16,27 +16,6 @@ namespace Sapphire::Common::Navi
   const int32_t MAX_POLYS = 32;
   const int32_t MAX_SMOOTH = 2048;
 
-  const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
-  const int32_t NAVMESHSET_VERSION = 1;
-
-  struct TileCacheSetHeader {
-    int magic;
-    int version;
-    int numTiles;
-    dtNavMeshParams meshParams;
-    dtTileCacheParams cacheParams;
-  };
-
-  struct TileCacheData {
-    unsigned char* data;
-    int dataSize;
-  };
-
-  struct TileCacheTileHeader {
-    dtCompressedTileRef tileRef;
-    int dataSize;
-  };
-
   /** 1. Memory Allocator for Tile Cache **/
   struct LinearAllocator : public dtTileCacheAlloc {
     unsigned char* buffer;

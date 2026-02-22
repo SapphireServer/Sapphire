@@ -540,17 +540,17 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
     return false;
   }
 
-  if( header.magic != NAVMESHSET_MAGIC )
+  if( header.magic != TILECACHESET_MAGIC )
   {
     fclose( fp );
     Logger::error( "'{0}' has an incorrect NavMeshSet header.", path );
     return false;
   }
 
-  if( header.version != NAVMESHSET_VERSION )
+  if( header.version != TILECACHESET_VERSION )
   {
     fclose( fp );
-    Logger::error( "'{0}' has an incorrect NavMeshSet version. Expected '{1}', got '{2}'", path, NAVMESHSET_VERSION, header.version );
+    Logger::error( "'{0}' has an incorrect NavMeshSet version. Expected '{1}', got '{2}'", path, TILECACHESET_VERSION, header.version );
     return false;
   }
 
