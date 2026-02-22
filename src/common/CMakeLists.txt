@@ -12,6 +12,7 @@ target_link_libraries( common PUBLIC
   xivdat
   mysqlConnector
   mysql
+  fastlz
   Threads::Threads
   DetourCrowd
   DetourTileCache
