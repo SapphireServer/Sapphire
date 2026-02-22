@@ -45,6 +45,11 @@ EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInsta
   m_permissionInvisibility = permissionInv;
 }
 
+void EventObject::setEventObjectType( EventObjectType type )
+{
+  m_eobjType = type;
+}
+
 uint32_t EventObject::getBoundInstanceId() const
 {
   return m_boundInstanceId;
@@ -164,9 +169,22 @@ void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
   m_permissionInvisibility = permissionInvisibility;
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
+
+  if( auto pNavi = m_parentInstance->getNaviProvider() )
+  {
+    if( m_eobjType == EventObjectType::Door )
+      pNavi->toggleDoor( getObstacleRef(), m_pos, { 50.f, 10.f, 2.f }, m_rot, permissionInvisibility == 0 );
+    else
+      pNavi->toggleObstacle( getObstacleRef(), m_pos, m_scale, m_scale, permissionInvisibility == 0 );
+  }
 }
 
 uint32_t Sapphire::Entity::EventObject::getOwnerId() const
 {
   return m_ownerId;
+}
+
+uint32_t& Sapphire::Entity::EventObject::getObstacleRef()
+{
+  return m_obstacleRef;
 }

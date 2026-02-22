@@ -209,10 +209,6 @@ namespace Sapphire::World::AI
     if( pSrc->getBoundEncounterId() == pTarget->getBoundEncounterId() )
       ret = true;
 
-    if( pSrc->isPlayer() && pTarget->isBattleNpc() )
-      if( pTarget->getBoundEncounterId() == 0 || pTarget->getAsBNpc()->getTriggerOwnerId() == pSrc->getId() )
-        ret = true;
-
     return m_negate ? !ret : ret;
   }
 

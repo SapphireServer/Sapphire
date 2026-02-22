@@ -38,7 +38,7 @@ using namespace Sapphire;
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "C:\\Data\\Dev\\ffxiv3.35\\game\\sqpack" );
+std::string gamePath( "H:\\Games\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 

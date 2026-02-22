@@ -584,7 +584,7 @@ bool Territory::update( uint64_t tickCount )
   auto dt = static_cast< float >( std::difftime( tickCount, m_lastUpdate ) / 1000.f );
 
   if( m_pNaviProvider )
-    m_pNaviProvider->updateCrowd( dt );
+    m_pNaviProvider->update( dt );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );

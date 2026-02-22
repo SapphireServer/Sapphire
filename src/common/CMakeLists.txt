@@ -14,6 +14,7 @@ target_link_libraries( common PUBLIC
   mysql
   Threads::Threads
   DetourCrowd
+  DetourTileCache
 )
 
 target_include_directories( common PUBLIC

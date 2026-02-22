@@ -35,7 +35,7 @@ namespace Sapphire
 
   struct EncounterEObj
   {
-    uint32_t eobjId;
+    uint32_t eobjId{ 0xE0000000 };
     Common::FFXIVARR_POSITION3 pos;
     float rot;
     float scale{ 1.0 };
@@ -58,6 +58,8 @@ namespace Sapphire
     std::string timelineName;
     std::vector< EncounterBNpc > bnpcSetupList;
     std::vector< EncounterEObj > eobjSetupList;
+    EncounterEObj lockoutEntrance;
+    EncounterEObj lockoutExit;
     EncounterShape encounterShape;
     // for BOX shape, this would be m_position = min, m_position2 = max
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
@@ -123,6 +125,10 @@ namespace Sapphire
 
     virtual void onChangeStatus( EncounterStatus oldStatus, EncounterStatus newStatus );
 
+    void setEntranceEObjLocked( bool locked );
+
+    void setExitEObjLocked( bool locked );
+
     bool canBindActors() const;
     void bindActor( Entity::GameObjectPtr pActor );
     void unbindActor( Entity::GameObjectPtr pActor );
@@ -140,6 +146,9 @@ namespace Sapphire
     uint64_t m_finishTime{ 0 };
 
     Common::FFXIVARR_POSITION3 m_position;
+
+    Entity::EventObjectPtr m_pEntranceEObj;
+    Entity::EventObjectPtr m_pExitEObj;
 
     std::set< Entity::GameObjectPtr > m_boundActors;
     std::set< Entity::PlayerPtr > m_playerList;

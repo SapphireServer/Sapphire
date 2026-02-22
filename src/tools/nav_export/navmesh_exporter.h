@@ -40,7 +40,7 @@ public:
       return;
     }
 
-    if( !gen.buildNavmesh() )
+    if( !gen.buildTiledCache() )
     {
       printf( "[Navmesh] Failed to build navmesh for '%s'\n", zone.name.c_str() );
       return;

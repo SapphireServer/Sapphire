@@ -12,6 +12,9 @@
 #include <filesystem>
 #include <Service.h>
 
+// todo: yeah
+#include <FastLZ/fastlz.c>
+
 Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
   m_naviMesh( nullptr ),
   m_naviMeshQuery( nullptr ),
@@ -527,9 +530,9 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   }
 
   // Read header.
-  NavMeshSetHeader header;
+  TileCacheSetHeader header;
 
-  size_t readLen = fread( &header, sizeof( NavMeshSetHeader ), 1, fp );
+  size_t readLen = fread( &header, sizeof( TileCacheSetHeader ), 1, fp );
   if( readLen != 1 )
   {
     fclose( fp );
@@ -561,7 +564,7 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
       return false;
     }
 
-    dtStatus status = m_naviMesh->init( &header.params );
+    dtStatus status = m_naviMesh->init( &header.meshParams );
     if( dtStatusFailed( status ) )
     {
       fclose( fp );
@@ -569,11 +572,43 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
       return false;
     }
   }
+  // init dtTileCache
+
+  m_tileCache = dtAllocTileCache();
+  m_talloc = new LinearAllocator( 32000 );
+  m_tcomp = new FastLZCompressor();
+  m_tmproc = new MeshProcess();
+
+  // Example: Setup for a typical humanoid agent
+  dtTileCacheParams tileCacheParams;
+  memset( &tileCacheParams, 0, sizeof( tileCacheParams ) );
+
+  // World bounds and cell sizes (Must match your baked NavMesh)
+  dtVcopy( tileCacheParams.orig, header.cacheParams.orig );
+  tileCacheParams.cs = 0.2f;                        // Cell size
+  tileCacheParams.ch = 0.2f;                        // Cell height
+  tileCacheParams.width = header.meshParams.tileWidth;  // Tile width in cells
+  tileCacheParams.height = header.meshParams.tileHeight;// Tile height in cells
+
+  // Agent settings for the "Walkable" check
+  tileCacheParams.walkableHeight = 2.0f;
+  tileCacheParams.walkableRadius = 0.5f;
+  tileCacheParams.walkableClimb = 0.6f;
+
+  // Capacity limits
+  tileCacheParams.maxObstacles = 256;               // Max concurrent doors/obstacles
+  tileCacheParams.maxTiles = header.meshParams.maxTiles;// Max tiles supported in the cache
+
+  dtStatus status = m_tileCache->init( &tileCacheParams, m_talloc, m_tcomp, m_tmproc );
+  if( !dtStatusSucceed( status ) )
+  {
+    return false;
+  }
 
   // Read tiles.
   for( int32_t i = 0; i < header.numTiles; ++i )
   {
-    NavMeshTileHeader tileHeader;
+    TileCacheTileHeader tileHeader;
     readLen = fread( &tileHeader, sizeof( tileHeader ), 1, fp );
     if( readLen != 1 )
     {
@@ -599,7 +634,22 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
       return false;
     }
 
-    m_naviMesh->addTile( data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0 );
+    dtCompressedTileRef tile = 0;
+    dtStatus status = m_tileCache->addTile( data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile );
+    if( !dtStatusSucceed( status ) )
+    {
+      dtFree( data );
+      fclose( fp );
+
+      Logger::error( "Couldn't add tile data to TileCache '{0}'", path );
+      return false;
+    }
+
+    if( tile )
+    {
+      m_tileCache->buildNavMeshTile( tile, m_naviMesh );
+    }
+    // m_naviMesh->addTile( data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0 );
   }
 
   fclose( fp );
@@ -652,11 +702,13 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
 }
 
-void Sapphire::Common::Navi::NaviProvider::updateCrowd( float timeInSeconds )
+void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
 {
   dtCrowdAgentDebugInfo info{};
   info.idx = -1;
   info.vod = m_vod;
+
+  m_tileCache->update( timeInSeconds, m_naviMesh );
   m_pCrowd->update( timeInSeconds, &info );
 }
 
@@ -770,4 +822,41 @@ void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAg
     return;
 
   ag->params.updateFlags &= ~flags;
+}
+
+void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, const Common::FFXIVARR_POSITION3& pos,
+                                                       const Common::FFXIVARR_POSITION3& halfExtents, float rot, bool closed )
+{
+  float fpos[ 3 ] = { pos.x, pos.y, pos.z };
+  // Half-extents: Width, Height, Depth
+  float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
+
+  if( closed && doorRef == 0 )
+  {
+    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &doorRef );
+  }
+  else if( !closed && doorRef != 0 )
+  {
+    // REMOVE: Use the previously assigned doorRef to identify the obstacle
+    m_tileCache->removeObstacle( doorRef );
+    // RESET: Clear the handle so the system knows the door is "free"
+    doorRef = 0;
+  }
+}
+
+void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::FFXIVARR_POSITION3& pos, float radius, float height, bool closed )
+{
+  float fpos[ 3 ] = { pos.x, pos.y, pos.z };
+
+  if( closed && obstacleRef == 0 )
+  {
+    m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
+  }
+  else if( !closed && obstacleRef != 0 )
+  {
+    // REMOVE: Use the previously assigned doorRef to identify the obstacle
+    m_tileCache->removeObstacle( obstacleRef );
+    // RESET: Clear the handle so the system knows the door is "free"
+    obstacleRef = 0;
+  }
 }

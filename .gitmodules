@@ -22,3 +22,6 @@
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "deps/FastLZ"]
+	path = deps/FastLZ
+	url = https://github.com/ariya/FastLZ

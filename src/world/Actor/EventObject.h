@@ -4,6 +4,11 @@
 
 namespace Sapphire::Entity
 {
+  enum EventObjectType : uint32_t
+  {
+    Obstacle,
+    Door
+  };
 
   class EventObject : public GameObject
   {
@@ -12,6 +17,8 @@ namespace Sapphire::Entity
                  Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
+
+    void setEventObjectType( EventObjectType type );
 
     uint32_t getBoundInstanceId() const;
 
@@ -53,7 +60,11 @@ namespace Sapphire::Entity
 
     uint32_t getOwnerId() const;
 
+    // this is set and modified by NaviProvider
+    uint32_t& getObstacleRef();
+
   protected:
+    EventObjectType m_eobjType;
     uint32_t m_instanceId;
     uint32_t m_housingLink;
     uint32_t m_boundInstanceId;
@@ -61,6 +72,7 @@ namespace Sapphire::Entity
     uint32_t m_ownerId;
     uint8_t m_state;
     float m_scale{};
+    uint32_t m_obstacleRef{ 0 };
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;

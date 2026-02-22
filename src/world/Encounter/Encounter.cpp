@@ -77,6 +77,48 @@ namespace Sapphire
         bindActor( pEObj );
       }
     }
+
+    // setup entrance eobj if we have a valid one
+    if( m_setup.lockoutEntrance.eobjId != 0xE0000000 )
+    {
+      auto eobj = m_setup.lockoutEntrance;
+
+      auto pEObj = m_pTeri->getEObj( eobj.eobjId );
+      if( !pEObj )
+      {
+      }
+      // todo:
+      if( pEObj )
+      {
+        pEObj->setPos( eobj.pos );
+        pEObj->setRot( eobj.rot );
+        pEObj->setScale( eobj.scale );
+        pEObj->setState( eobj.state );
+        pEObj->setPermissionInvisibility( eobj.permissionInvisibility );
+        bindActor( pEObj );
+      }
+    }
+
+    // setup exit eobj if we have a valid one
+    if( m_setup.lockoutExit.eobjId != 0xE0000000 )
+    {
+      auto eobj = m_setup.lockoutEntrance;
+
+      auto pEObj = m_pTeri->getEObj( eobj.eobjId );
+      if( !pEObj )
+      {
+      }
+      // todo:
+      if( pEObj )
+      {
+        pEObj->setPos( eobj.pos );
+        pEObj->setRot( eobj.rot );
+        pEObj->setScale( eobj.scale );
+        pEObj->setState( eobj.state );
+        pEObj->setPermissionInvisibility( eobj.permissionInvisibility );
+        bindActor( pEObj );
+      }
+    }
   }
 
   void Encounter::setEncounterSetup( const EncounterSetup& setup )
@@ -122,6 +164,11 @@ namespace Sapphire
         for( auto& pActor : inRange )
         {
           auto distance = Common::Util::distance( m_position, pActor->getPos() );
+
+          // dont bind bnpcs that we didnt spawn
+          if( pActor->isBattleNpc() && m_bnpcs.find( pActor->getAsBNpc()->getLayoutId() ) == m_bnpcs.end() )
+            continue;
+
           // if( pActor->isPlayer() || pActor->isBattleNpc() )
           {
             auto dY = std::abs( m_position.y - pActor->getPos().y );
@@ -312,6 +359,38 @@ namespace Sapphire
       m_finishTime = Common::Util::getTimeMs();
     }
   }
+
+  void Encounter::setEntranceEObjLocked( bool locked )
+  {
+    if( m_pEntranceEObj )
+    {
+      // todo: pNaviProvider->toggleDoor(
+      if( locked )
+      {
+        m_pEntranceEObj->setPermissionInvisibility( 0 );
+      }
+      else
+      {
+        m_pEntranceEObj->setPermissionInvisibility( 1 );
+      }
+    }
+  }
+
+  void Encounter::setExitEObjLocked( bool locked )
+  {
+    if( m_pExitEObj )
+    {
+      if( locked )
+      {
+        m_pExitEObj->setPermissionInvisibility( 0 );
+      }
+      else
+      {
+        m_pExitEObj->setPermissionInvisibility( 1 );
+      }
+    }
+  }
+
 
   bool Encounter::canBindActors() const
   {
