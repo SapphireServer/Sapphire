@@ -31,7 +31,9 @@ namespace Sapphire::World::Manager
       All = 0x3F
     };
 
-    MapMgr() = default;
+    explicit MapMgr( bool eagerENpcEObjCache = true ) : m_eagerENpcEObjCache( eagerENpcEObjCache )
+    {
+    }
 
     bool loadQuests();
 
@@ -71,6 +73,11 @@ namespace Sapphire::World::Manager
     QuestMap m_questCacheMap;
     ENpcDataCache m_eNpcCacheMap;
     EObjDataCache m_eObjCacheMap;
+    bool m_eagerENpcEObjCache;
+
+    std::shared_ptr< Excel::ExcelStruct< Excel::Quest > > getQuestRow( uint32_t questId );
+    std::shared_ptr< Excel::ExcelStruct< Excel::ENpcBase > > getENpcBaseRow( uint32_t eNpcBaseId );
+    std::shared_ptr< Excel::ExcelStruct< Excel::EObj > > getEObjRow( uint32_t eObjBaseId );
 
     void insertQuest( Entity::Player& player, uint32_t questId, uint32_t layoutId, EventSet& mapData );
 

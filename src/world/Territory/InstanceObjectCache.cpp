@@ -13,6 +13,7 @@
 
 #include <Logging/Logger.h>
 #include <Service.h>
+#include <Util/Util.h>
 #include <Util/UtilMath.h>
 
 #include "DatCategories/DatCommon.h"
@@ -20,14 +21,30 @@
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
+  const auto startMs = Common::Util::getTimeMs();
+
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
   auto teriList = exdData.getRows< Excel::TerritoryType >();
+  LGB_FILE::AssetTypeFilter lgbAssetFilter = []( eAssetType type )
+  {
+    switch( type )
+    {
+      case eAssetType::MapRange:
+      case eAssetType::ExitRange:
+      case eAssetType::PopRange:
+      case eAssetType::EventObject:
+      case eAssetType::EventNPC:
+      case eAssetType::EventRange:
+        return true;
+      default:
+        return false;
+    }
+  };
 
-  size_t count = 0;
+  size_t scannedTerritoryCount = 0;
+  size_t parsedTerritoryCount = 0;
   for( const auto& [ id, territoryType ] : teriList ) {
-    // show some loading indication...
-    if( count++ % 10 == 0 )
-      std::cout << ".";
+    ++scannedTerritoryCount;
 
     auto path = territoryType->getString( territoryType->data().LVB );
 
@@ -58,6 +75,10 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       else
         continue;
 
+      if( !exdData.getGameData()->doesFileExist( planmapLgbPath ) ||
+          !exdData.getGameData()->doesFileExist( planeventLgbPath ) )
+        continue;
+
       planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
       planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
     }
@@ -67,38 +88,97 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       continue;
     }
 
+    ++parsedTerritoryCount;
+
     bgSection = bgFile->access_data_sections().at( 0 );
     planmapSection = planmap_file->access_data_sections().at( 0 );
     planeventSection = planevent_file->access_data_sections().at( 0 );
 
-    std::vector< std::string > stringList;
+    LGB_FILE bgLgb( &bgSection[ 0 ], "bg", &lgbAssetFilter );
+    LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap", &lgbAssetFilter );
+    LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent", &lgbAssetFilter );
 
-    uint32_t offset1 = 0x20;
-
-    LGB_FILE bgLgb( &bgSection[ 0 ], "bg" );
-    LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap" );
-    LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent" );
-
-    uint32_t max_index = 0;
-
-    std::vector< LGB_FILE > lgbList;
+    std::vector< const LGB_FILE* > lgbList;
 
     try
     {
-      planner_file = exdData.getGameData()->getFile( plannerLgbPath );
-      plannerSection = planner_file->access_data_sections().at( 0 );
-      LGB_FILE plannerLgb( &plannerSection[ 0 ], "planner" );
+      if( exdData.getGameData()->doesFileExist( plannerLgbPath ) )
+      {
+        planner_file = exdData.getGameData()->getFile( plannerLgbPath );
+        plannerSection = planner_file->access_data_sections().at( 0 );
+        LGB_FILE plannerLgb( &plannerSection[ 0 ], "planner", &lgbAssetFilter );
 
-      lgbList = { bgLgb, planmapLgb, planeventLgb, plannerLgb };
+        lgbList = { &bgLgb, &planmapLgb, &planeventLgb, &plannerLgb };
+
+        for( const auto* lgb : lgbList )
+        {
+          for( const auto& group : lgb->groups )
+          {
+            for( const auto& pEntry : group.entries )
+            {
+              switch( pEntry->getType() )
+              {
+                case eAssetType::MapRange:
+                {
+                  auto pMapRange = std::reinterpret_pointer_cast< MapRangeEntry >( pEntry );
+                  m_mapRangeCache.insert( id, pMapRange );
+
+                  break;
+                }
+                case eAssetType::ExitRange:
+                {
+                  auto pExitRange = std::reinterpret_pointer_cast< ExitRangeEntry >( pEntry );
+                  m_exitRangeCache.insert( id, pExitRange );
+
+                  break;
+                }
+                case eAssetType::PopRange:
+                {
+                  auto pPopRange = std::reinterpret_pointer_cast< PopRangeEntry >( pEntry );
+                  m_popRangeCache.insert( id, pPopRange );
+                  break;
+                }
+                case eAssetType::CollisionBox:
+                {
+                  break;
+                }
+                case eAssetType::EventObject:
+                {
+                  auto pEObj = std::reinterpret_pointer_cast< EventObjectEntry >( pEntry );
+                  m_eobjCache.insert( 0, pEObj );
+                  m_eobjBaseInstanceMap.emplace( std::make_pair( id, pEObj->header.BaseId ), pEObj->header.InstanceID );
+                  break;
+                }
+                case eAssetType::EventNPC:
+                {
+                  auto pENpc = std::reinterpret_pointer_cast< EventNPCEntry >( pEntry );
+                  m_enpcCache.insert( id, pENpc );
+                  break;
+                }
+                case eAssetType::EventRange:
+                {
+                  auto pEventRange = std::reinterpret_pointer_cast< EventRangeEntry >( pEntry );
+                  m_eventRangeCache.insert( 0, pEventRange );
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        continue;
+      }
+
+      lgbList = { &bgLgb, &planmapLgb, &planeventLgb };
     }
     catch( std::runtime_error& )
     {
-      lgbList = { bgLgb, planmapLgb, planeventLgb };
+      lgbList = { &bgLgb, &planmapLgb, &planeventLgb };
     }
 
-    for( const auto& lgb : lgbList )
+    for( const auto* lgb : lgbList )
     {
-      for( const auto& group : lgb.groups )
+      for( const auto& group : lgb->groups )
       {
         for( const auto& pEntry : group.entries )
         {
@@ -156,7 +236,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     }
   }
 
-  std::cout << std::endl;
+  Logger::info(
+    "InstanceObjectCache: scanned {} territories, parsed {} with scene data in {}ms",
+    scannedTerritoryCount,
+    parsedTerritoryCount,
+    Common::Util::getTimeMs() - startMs );
 
   Logger::debug(
     "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventObj: {} EventNpc: {} EventRange: {}",

@@ -118,9 +118,9 @@ namespace Sapphire::World::Manager
 
     TerritoryPtr createInstanceContent( uint32_t contentFinderId );
 
-    TerritoryPtr createQuestBattle( uint32_t contentFinderConditionId );
+    TerritoryPtr createQuestBattle( uint32_t questId, uint16_t questBattleId );
 
-    void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
+    void createAndJoinQuestBattle( Entity::Player& player, uint32_t questId, uint16_t questBattleId );
 
     TerritoryPtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 

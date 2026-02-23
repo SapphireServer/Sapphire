@@ -77,7 +77,6 @@ void Territory::loadServerPaths()
   // Check if JSON file exists
   if( !std::filesystem::exists( jsonPath ) )
   {
-    Logger::debug( "No paths JSON file found for zone: {}", m_internalName );
     return;
   }
 
@@ -187,12 +186,17 @@ void Territory::loadWeatherRates()
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Excel::WeatherRate >().size()
-                            ? uint8_t{ 0 }
-                            : m_territoryTypeInfo->data().WeatherRate;
+  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate;
+  auto weatherRate = exdData.getRow< Excel::WeatherRate >( weatherRateId );
+  if( !weatherRate )
+  {
+    weatherRateId = 0;
+    weatherRate = exdData.getRow< Excel::WeatherRate >( weatherRateId );
+    if( !weatherRate )
+      return;
+  }
 
   uint8_t sumPc = 0;
-  auto weatherRate = exdData.getRow< Excel::WeatherRate >( weatherRateId );
   for( size_t i = 0; i < 8; ++i )
   {
     int32_t weatherId = weatherRate->data().WeatherId[ i ];
@@ -209,6 +213,7 @@ Territory::~Territory() = default;
 
 bool Territory::init()
 {
+  const auto startMs = Common::Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   if( scriptMgr.onZoneInit( *this ) )
@@ -226,6 +231,12 @@ bool Territory::init()
   if( !m_pNaviProvider )
   {
     Logger::warn( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
+  }
+
+  const auto elapsedMs = Common::Util::getTimeMs() - startMs;
+  if( elapsedMs >= 25 )
+  {
+    Logger::debug( "Territory::init TerritoryType#{} GuId#{} took {}ms", getTerritoryTypeId(), getGuId(), elapsedMs );
   }
 
   return true;
@@ -1060,7 +1071,6 @@ bool Territory::loadBNpcs()
   // Check if JSON file exists
   if( !std::filesystem::exists( jsonPath ) )
   {
-    Logger::debug( "No BNPC JSON file found for zone: {}", m_internalName );
     return true; // Not an error, just no BNPCs for this zone
   }
 
