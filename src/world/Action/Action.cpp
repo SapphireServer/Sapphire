@@ -455,11 +455,7 @@ void Action::Action::execute()
   if( !consumeResources() )
     shouldInterrupt = true;
 
-  if( !m_pTarget )
-  {
-    shouldInterrupt = true;
-  }
-  else if( m_pTarget )
+  if( m_pTarget )
   {
     if( m_pSource->getTerritoryId() != m_pTarget->getTerritoryId() )
       shouldInterrupt = true;
