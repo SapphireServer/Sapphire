@@ -25,7 +25,6 @@
 #include "Script/ScriptMgr.h"
 
 #include "NativeScriptMgr.h"
-#include "WorldServer.h"
 
 #include "Quest/Quest.h"
 
@@ -246,7 +245,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
       }
     }
   }
-
+  
   // check for a direct eventid match first, otherwise default to base type
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
@@ -257,11 +256,11 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   else
   {
     script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
-    if( !script )
-      return false;
-
-    script->onTalk( eventId, player, actorId );
-    return true;
+    if( script )
+    {
+      script->onTalk( eventId, player, actorId );
+      return true;
+    }
   }
 
   // check for instance script
