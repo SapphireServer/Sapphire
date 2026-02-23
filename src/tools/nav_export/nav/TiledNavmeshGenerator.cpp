@@ -417,11 +417,13 @@ int TiledNavmeshGenerator::rasterizeTileLayers(
                           ( unsigned char ) vols[ i ].area, *rc.chf );
   }
 
+  /*
   if( !rcBuildRegionsMonotone( m_ctx, *rc.chf, cfg.borderSize, cfg.minRegionArea, cfg.mergeRegionArea ) )
   {
     printf( "[Navmesh] buildNavigation: Could not build monotone regions.\n" );
     return 0;
   }
+  //*/
 
   rc.lset = rcAllocHeightfieldLayerSet();
   if( !rc.lset )
@@ -512,7 +514,7 @@ bool TiledNavmeshGenerator::buildTiledCache()
   cfg.walkableSlopeAngle = m_agentMaxSlope;
   cfg.walkableHeight = ( int ) ceilf( m_agentHeight / cfg.ch );
   cfg.walkableClimb = ( int ) floorf( m_agentMaxClimb / cfg.ch );
-  cfg.walkableRadius = 8.0;// ( int ) ceilf( m_agentRadius / cfg.cs );
+  cfg.walkableRadius = ( int ) ceilf( m_agentRadius / cfg.cs );
   cfg.maxEdgeLen = ( int ) ( m_edgeMaxLen / m_cellSize );
   cfg.maxSimplificationError = m_edgeMaxError;
   cfg.minRegionArea = ( int ) rcSqr( m_regionMinSize );    // Note: area = size*size

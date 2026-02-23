@@ -136,6 +136,7 @@ namespace Sapphire::Common::Navi
 
     void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
+    const dtTileCache* getTileCache() const { return m_tileCache; }
 
     std::string getNaviPath() const { return m_naviPath; }
 

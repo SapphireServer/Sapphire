@@ -643,6 +643,21 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     achvMgr.progressAchievementByType< Common::Achievement::Type::General >( player, achvSubtype, progress );
   }
+  else if( subCommand == "obstacle" )
+  {
+    uint32_t radius;
+    sscanf( params.c_str(), "%u", &radius );
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      uint32_t obstacleRef = 0;
+      if( player.getObstacleRef() != 0 )
+        pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, false );
+
+      pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, true );
+    }
+  }
   else
   {
     PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );

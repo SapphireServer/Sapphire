@@ -35,6 +35,8 @@ namespace Sapphire::Entity
     uint8_t m_permissionInvisibility{ 0 };
     /*! Bound Encounter ID, 0 for none */
     uint32_t m_boundEncounterId{ 0 };
+    /*! Obstacle ref used by NaviProvider */
+    uint32_t m_obstacleRef{ 0 };
     /*! list of various actors in range */
     std::set< GameObjectPtr > m_inRangeActor;
     std::set< PlayerPtr > m_inRangePlayers;
@@ -143,6 +145,8 @@ namespace Sapphire::Entity
 
     uint32_t getBoundEncounterId() const;
     void setBoundEncounterId( uint32_t id );
+
+    uint32_t& getObstacleRef();
 
     // get the current cell of a region the actor is in
     Common::CellId getCellId() const;

@@ -60,8 +60,6 @@ namespace Sapphire::Entity
 
     uint32_t getOwnerId() const;
 
-    // this is set and modified by NaviProvider
-    uint32_t& getObstacleRef();
 
   protected:
     EventObjectType m_eobjType;
@@ -72,7 +70,6 @@ namespace Sapphire::Entity
     uint32_t m_ownerId;
     uint8_t m_state;
     float m_scale{};
-    uint32_t m_obstacleRef{ 0 };
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;

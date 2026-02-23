@@ -802,6 +802,9 @@ void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, c
   // Half-extents: Width, Height, Depth
   float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
 
+  if( doorRef != 0 && closed )
+    m_tileCache->removeObstacle( doorRef );
+
   if( closed && doorRef == 0 )
   {
     m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &doorRef );
@@ -818,6 +821,9 @@ void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, c
 void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::FFXIVARR_POSITION3& pos, float radius, float height, bool closed )
 {
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
+
+  if( obstacleRef != 0 && closed )
+    m_tileCache->removeObstacle( obstacleRef );
 
   if( closed && obstacleRef == 0 )
   {

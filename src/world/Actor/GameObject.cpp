@@ -383,6 +383,11 @@ void GameObject::setBoundEncounterId( uint32_t id )
   m_boundEncounterId = id;
 }
 
+uint32_t& GameObject::getObstacleRef()
+{
+  return m_obstacleRef;
+}
+
 /*!
 Get the current cellId of a region the actor is in
 
