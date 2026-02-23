@@ -204,7 +204,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjectPosition( Entity::Player& sourcePlayer,
                                                                                                  uint16_t slot,
-                                                                                                 Common::FFXIVARR_POSITION3 pos,
+                                                                                                 Common::Vector3 pos,
                                                                                                  uint16_t rot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();

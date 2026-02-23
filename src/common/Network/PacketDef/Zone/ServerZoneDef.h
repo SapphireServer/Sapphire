@@ -1956,7 +1956,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint8_t Args;
     uint32_t Args2;
     uint32_t Args3;
-    Common::FFXIVARR_POSITION3 Pos;
+    Common::Vector3 Pos;
   };
 
   struct FFXIVIpcDeleteObject : FFXIVIpcBasePacket< DeleteObject >

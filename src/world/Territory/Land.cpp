@@ -130,7 +130,7 @@ void Sapphire::Land::setHouse( Sapphire::HousePtr house )
   m_pHouse = house;
 }
 
-FFXIVARR_POSITION3 Sapphire::Land::getMapMarkerPosition()
+Vector3 Sapphire::Land::getMapMarkerPosition()
 {
   return m_mapMarkerPosition;
 }

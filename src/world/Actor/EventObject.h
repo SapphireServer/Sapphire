@@ -14,7 +14,7 @@ namespace Sapphire::Entity
   {
   public:
     EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
-                 Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
+                 Common::Vector3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
 
@@ -60,8 +60,6 @@ namespace Sapphire::Entity
 
     uint32_t getOwnerId() const;
 
-    // this is set and modified by NaviProvider
-    uint32_t& getObstacleRef();
 
   protected:
     EventObjectType m_eobjType;
@@ -72,7 +70,6 @@ namespace Sapphire::Entity
     uint32_t m_ownerId;
     uint8_t m_state;
     float m_scale{};
-    uint32_t m_obstacleRef{ 0 };
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;

@@ -497,7 +497,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId,
-                                                        Common::FFXIVARR_POSITION3 pos )
+                                                        Common::Vector3 pos )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   std::string eventName = "onEventGroundItem";

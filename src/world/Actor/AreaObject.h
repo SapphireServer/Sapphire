@@ -9,7 +9,7 @@ namespace Sapphire::Entity
   {
   public:
     AreaObject( uint32_t actorId, uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale,
-      GameObjectPtr pOwner, const Common::FFXIVARR_POSITION3& pos );
+      GameObjectPtr pOwner, const Common::Vector3& pos );
 
     void spawn( PlayerPtr pTarget ) override;
 

@@ -13,11 +13,11 @@ namespace Sapphire::Inventory
     void setRot( float rot );
     float getRot() const;
 
-    void setPos( Common::FFXIVARR_POSITION3 pos );
-    Common::FFXIVARR_POSITION3 getPos() const;
+    void setPos( Common::Vector3 pos );
+    Common::Vector3 getPos() const;
 
   private:
-    Common::FFXIVARR_POSITION3 m_position;
+    Common::Vector3 m_position;
     float m_rotation;
   };
 }

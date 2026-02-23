@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <memory>
 
 #include "ext/MeshLoaderObj.h"
 #include "ext/ChunkyTriMesh.h"
@@ -210,7 +211,7 @@ private:
   float m_lastBuiltTileBmax[ 3 ];
 
   // options
-  float m_tileSize = 160.f;
+  float m_tileSize = 64.f;
   float m_cellSize = 0.2f;
   float m_cellHeight = 0.2f;
 

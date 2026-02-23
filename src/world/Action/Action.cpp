@@ -178,12 +178,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( const Common::FFXIVARR_POSITION3& pos )
+void Action::Action::setPos( const Common::Vector3& pos )
 {
   m_pos = pos;
 }
 
-const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
+const Common::Vector3& Action::Action::getPos() const
 {
   return m_pos;
 }
@@ -455,11 +455,7 @@ void Action::Action::execute()
   if( !consumeResources() )
     shouldInterrupt = true;
 
-  if( !m_pTarget )
-  {
-    shouldInterrupt = true;
-  }
-  else if( m_pTarget )
+  if( m_pTarget )
   {
     if( m_pSource->getTerritoryId() != m_pTarget->getTerritoryId() )
       shouldInterrupt = true;

@@ -25,7 +25,7 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 AreaObject::AreaObject( uint32_t actorId, uint32_t actionId, uint32_t actionPotency, uint32_t vfxId,
-    float scale, GameObjectPtr pOwner, const Common::FFXIVARR_POSITION3& pos ) :
+    float scale, GameObjectPtr pOwner, const Common::Vector3& pos ) :
   GameObject( ObjKind::Area ),
   m_actionId( actionId ),
   m_actionPotency( actionPotency ),

@@ -305,7 +305,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto landInfo = info->_data.Lands[ landId ];
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
 
-  FFXIVARR_POSITION3 pos{ 0, 10, 0 };
+  Vector3 pos{ 0, 10, 0 };
   auto eObjInfo = instanceObjectCache.getEObj( landInfo.SignboardEObj );
   if( eObjInfo )
   {

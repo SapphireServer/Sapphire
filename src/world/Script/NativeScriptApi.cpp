@@ -163,7 +163,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestScript::onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos )
+  void QuestScript::onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::Vector3 pos )
   {
   }
 

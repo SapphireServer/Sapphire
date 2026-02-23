@@ -50,7 +50,7 @@ public:
         auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
         auto exitRange = instanceObjectCache.getPopRange( landInfo.ExitPopRange );
 
-        Common::FFXIVARR_POSITION3 pos{ exitRange->header.Transformation.Translation.x, exitRange->header.Transformation.Translation.y, exitRange->header.Transformation.Translation.z };
+        Common::Vector3 pos{ exitRange->header.Transformation.Translation.x, exitRange->header.Transformation.Translation.y, exitRange->header.Transformation.Translation.z };
         float rot = Common::Util::eulerToDirection( { exitRange->header.Transformation.Rotation.x, exitRange->header.Transformation.Rotation.y, exitRange->header.Transformation.Rotation.z } );
 
         warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, landIdent.territoryTypeId << 16 | landIdent.wardNum, pos, rot );

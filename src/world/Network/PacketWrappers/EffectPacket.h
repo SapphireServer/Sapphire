@@ -91,7 +91,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ResultId = static_cast< uint32_t >( resultId );
     }
 
-    void setTargetPosition( Common::FFXIVARR_POSITION3& pos )
+    void setTargetPosition( Common::Vector3& pos )
     {
       m_data.TargetPos[ 0 ] = Common::Util::floatToUInt16( pos.x );
       m_data.TargetPos[ 1 ] = Common::Util::floatToUInt16( pos.y );

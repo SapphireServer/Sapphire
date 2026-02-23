@@ -643,6 +643,21 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     achvMgr.progressAchievementByType< Common::Achievement::Type::General >( player, achvSubtype, progress );
   }
+  else if( subCommand == "obstacle" )
+  {
+    uint32_t radius;
+    sscanf( params.c_str(), "%u", &radius );
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      uint32_t obstacleRef = 0;
+      if( player.getObstacleRef() != 0 )
+        pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, false );
+
+      pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, true );
+    }
+  }
   else
   {
     PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );
@@ -681,6 +696,29 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
     PlayerMgr::sendServerNotice( player, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                                  player.getPos().x, player.getPos().y, player.getPos().z,
                                  player.getRot(), map_id, player.getTerritoryTypeId() );
+  }
+  else if( subCommand == "los" )
+  {
+    auto targetId = player.getTargetId();
+    bool los = false;
+    bool naviLos = false;
+    auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+    auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    for( auto pActor : player.getInRangeActors() )
+    {
+      if( auto pChara = pActor->getAsChara(); pChara && pChara->getId() == targetId )
+      {
+        if( auto pNavi = pTeri->getNaviProvider() )
+        {
+          los = player.isFacingTarget( *pChara );
+          naviLos = pNavi->hasLineOfSight( player.getPos(), pChara->getPos() );
+        }
+        break;
+      }
+    }
+
+    PlayerMgr::sendServerNotice( player, "Facing: {0} NaviLos: {1}\n", los ? "true" : "false", naviLos ? "true" : "false" );
   }
   else
   {

@@ -22,7 +22,7 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 MoveTerritoryTask::MoveTerritoryTask( Entity::Player& player, Common::WarpType warpType,
-                                      uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot, uint64_t delayTime ) : Task( delayTime )
+                                      uint32_t targetTerritoryId, Common::Vector3 targetPos, float targetRot, uint64_t delayTime ) : Task( delayTime )
 {
   m_playerId = player.getId();
   m_warpInfo = { targetTerritoryId, warpType, targetPos, targetRot };

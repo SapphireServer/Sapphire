@@ -816,7 +816,7 @@ namespace Sapphire::Common
   {
     uint32_t id;
     uint32_t teri;
-    FFXIVARR_POSITION3 pos;
+    Vector3 pos;
     float radius;
   };
 

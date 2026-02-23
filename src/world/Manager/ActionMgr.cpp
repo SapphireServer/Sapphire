@@ -29,7 +29,7 @@ bool ActionMgr::cacheActionShapeLut()
   return Action::ActionShapeLutData::cacheShapes();
 }
 
-void ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::FFXIVARR_POSITION3 pos, uint16_t requestId, uint64_t targetId )
+void ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::Vector3 pos, uint16_t requestId, uint64_t targetId )
 {
   auto action = Action::make_Action( chara.getAsChara(), actionId, requestId );
 
@@ -113,7 +113,7 @@ void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_
 
 void ActionMgr::handlePlacedEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
                                              Excel::ExcelStructPtr< Excel::EventItem > itemActionData,
-                                             uint32_t sequence, Common::FFXIVARR_POSITION3 targetPos )
+                                             uint32_t sequence, Common::Vector3 targetPos )
 {
   auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetPos, Common::CastType::Circle );
   action->init();

@@ -193,7 +193,7 @@ namespace Sapphire::Entity
 
     std::string getName() const;
 
-    bool face( const Common::FFXIVARR_POSITION3& p );
+    bool face( const Common::Vector3& p );
 
     Common::Stance getStance() const;
 
@@ -235,7 +235,7 @@ namespace Sapphire::Entity
 
     bool isAlive() const;
 
-    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
 
     virtual void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
 
@@ -301,7 +301,7 @@ namespace Sapphire::Entity
 
     virtual void update( uint64_t tickCount );
 
-    Common::FFXIVARR_POSITION3 getForwardVector() const;
+    Common::Vector3 getForwardVector() const;
 
     bool isFacingTarget( const Chara& other, float threshold = 0.95f );
 
@@ -324,9 +324,9 @@ namespace Sapphire::Entity
 
     Common::BaseParam getPrimaryStat() const;
 
-    void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
+    void knockback( const Common::Vector3& origin, float distance, bool ignoreNav = false );
 
-    void createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::FFXIVARR_POSITION3& pos );
+    void createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale, const Common::Vector3& pos );
     void removeAreaObject();
     const AreaObjectPtr getAreaObject() const;
   };

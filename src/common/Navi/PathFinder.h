@@ -36,8 +36,8 @@ namespace Sapphire::Common::Navigation
 
   struct PathfindingRequest
   {
-    Common::FFXIVARR_POSITION3 start;
-    Common::FFXIVARR_POSITION3 end;
+    Common::Vector3 start;
+    Common::Vector3 end;
     float agentRadius = 1.0f;
     bool allowDoors = true;
     std::function< bool( uint32_t ) > doorAccessCheck = nullptr; // Callback for door permission checks
@@ -46,7 +46,7 @@ namespace Sapphire::Common::Navigation
   struct PathfindingResponse
   {
     PathfindingResult result;
-    std::vector< Common::FFXIVARR_POSITION3 > waypoints;
+    std::vector< Common::Vector3 > waypoints;
     std::vector< uint32_t > doorsUsed; // Door IDs that need to be opened for this path
     float totalDistance = 0.0f;
     std::string errorMessage;
@@ -65,7 +65,7 @@ namespace Sapphire::Common::Navigation
   struct DoorInfo
   {
     uint32_t doorId;
-    Common::FFXIVARR_POSITION3 position;
+    Common::Vector3 position;
     DoorState state = DoorState::Closed;
     std::vector< dtPolyRef > connectedPolys; // Polygons this door connects
     float interactionRange = 2.0f;
@@ -102,31 +102,31 @@ namespace Sapphire::Common::Navigation
     // Pathfinding methods
     PathfindingResponse findPath( const PathfindingRequest& request );
 
-    std::vector< Common::FFXIVARR_POSITION3 > findStraightPath(
-      const Common::FFXIVARR_POSITION3& start,
-      const Common::FFXIVARR_POSITION3& end
+    std::vector< Common::Vector3 > findStraightPath(
+      const Common::Vector3& start,
+      const Common::Vector3& end
     );
 
     // Utility methods
-    Common::FFXIVARR_POSITION3 findNearestWalkablePosition( const Common::FFXIVARR_POSITION3& position,
+    Common::Vector3 findNearestWalkablePosition( const Common::Vector3& position,
                                                             float searchRadius = 5.0f );
 
-    Common::FFXIVARR_POSITION3 findRandomPositionInRadius( const Common::FFXIVARR_POSITION3& center, float radius );
+    Common::Vector3 findRandomPositionInRadius( const Common::Vector3& center, float radius );
 
-    bool isPositionWalkable( const Common::FFXIVARR_POSITION3& position, float tolerance = 1.0f );
+    bool isPositionWalkable( const Common::Vector3& position, float tolerance = 1.0f );
 
-    float calculateDistance( const Common::FFXIVARR_POSITION3& start, const Common::FFXIVARR_POSITION3& end ) const;
+    float calculateDistance( const Common::Vector3& start, const Common::Vector3& end ) const;
 
     // Agent management (for crowd simulation)
-    int32_t createAgent( const Common::FFXIVARR_POSITION3& position, const AgentParameters& params = {} );
+    int32_t createAgent( const Common::Vector3& position, const AgentParameters& params = {} );
 
     bool removeAgent( int32_t agentId );
 
-    bool setAgentDestination( int32_t agentId, const Common::FFXIVARR_POSITION3& destination );
+    bool setAgentDestination( int32_t agentId, const Common::Vector3& destination );
 
     bool resetAgentDestination( int32_t agentId );
 
-    Common::FFXIVARR_POSITION3 getAgentPosition( int32_t agentId );
+    Common::Vector3 getAgentPosition( int32_t agentId );
 
     bool isAgentActive( int32_t agentId ) const;
 
@@ -138,14 +138,14 @@ namespace Sapphire::Common::Navigation
     void updateCrowdSimulation( float deltaTime );
 
     // Door system (for future expansion)
-    void registerDoor( uint32_t doorId, const Common::FFXIVARR_POSITION3& position,
+    void registerDoor( uint32_t doorId, const Common::Vector3& position,
                        const std::vector< dtPolyRef >& connectedPolys );
 
     void setDoorState( uint32_t doorId, DoorState state );
 
     DoorState getDoorState( uint32_t doorId ) const;
 
-    std::vector< uint32_t > getDoorsNearPosition( const Common::FFXIVARR_POSITION3& position,
+    std::vector< uint32_t > getDoorsNearPosition( const Common::Vector3& position,
                                                   float radius = 10.0f ) const;
 
     void clearAllDoors();
@@ -173,7 +173,7 @@ namespace Sapphire::Common::Navigation
     void setupObstacleAvoidanceParams();
 
     // Pathfinding utilities
-    std::optional< dtPolyRef > findNearestPoly( const Common::FFXIVARR_POSITION3& position,
+    std::optional< dtPolyRef > findNearestPoly( const Common::Vector3& position,
                                                 const float *extents = nullptr );
 
     bool getSteerTarget( const float *startPos, const float *endPos, const float minTargetDist,
@@ -193,9 +193,9 @@ namespace Sapphire::Common::Navigation
     std::vector< uint32_t > findRequiredDoorsForPath( const dtPolyRef *polys, int32_t polyCount ) const;
 
     // Coordinate conversion
-    void toDetourCoords( const Common::FFXIVARR_POSITION3& position, float *out ) const;
+    void toDetourCoords( const Common::Vector3& position, float *out ) const;
 
-    Common::FFXIVARR_POSITION3 fromDetourCoords( const float *coords ) const;
+    Common::Vector3 fromDetourCoords( const float *coords ) const;
 
     // Agent validation
     bool isValidAgentId( int32_t agentId ) const;

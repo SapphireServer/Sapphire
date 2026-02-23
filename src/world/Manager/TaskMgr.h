@@ -15,13 +15,13 @@ namespace Sapphire::World::Manager
     Common::WarpType m_warpType;
     uint64_t m_characterId;
     uint16_t m_targetZoneId;
-    Common::FFXIVARR_POSITION3 m_targetPosition;
+    Common::Vector3 m_targetPosition;
     float m_targetRotation;
     uint64_t m_delayTimeMs;
     uint64_t m_timeQueuedMs;
 
     QueuedWarp( uint64_t characterId, Common::WarpType warpType, uint16_t targetZoneId,
-                const Common::FFXIVARR_POSITION3& targetPosition, float targetRotation, uint64_t delayTime ) :
+                const Common::Vector3& targetPosition, float targetRotation, uint64_t delayTime ) :
       m_characterId( characterId ),
       m_warpType( warpType ),
       m_targetZoneId( targetZoneId ),

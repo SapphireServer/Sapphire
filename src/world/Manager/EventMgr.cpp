@@ -636,7 +636,7 @@ void EventMgr::eventItemActionStart( Entity::Player& player, uint32_t eventId, u
   pEventItemAction->onStart();
 }
 
-bool EventMgr::checkHitEobject( Entity::Player& player, Common::FFXIVARR_POSITION3 targetPos,
+bool EventMgr::checkHitEobject( Entity::Player& player, Common::Vector3 targetPos,
                                 Common::QuestEobject Eobject )
 {
   return player.getTerritoryTypeId() == Eobject.teri && Sapphire::Common::Util::distance( targetPos, Eobject.pos ) <

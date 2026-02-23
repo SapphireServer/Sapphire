@@ -971,7 +971,7 @@ bool HousingMgr::isPlacedItemsInventory( Sapphire::Common::InventoryType type )
 }
 
 void HousingMgr::reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId,
-                                      Common::FFXIVARR_POSITION3 pos, float rotation )
+                                      Common::Vector3 pos, float rotation )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -1256,7 +1256,7 @@ void HousingMgr::sendInternalEstateInventoryBatch( Entity::Player& player, bool 
   }
 }
 
-void HousingMgr::reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot, Common::FFXIVARR_POSITION3 pos, float rot )
+void HousingMgr::reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot, Common::Vector3 pos, float rot )
 {
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
@@ -1283,7 +1283,7 @@ void HousingMgr::reqMoveHousingItem( Entity::Player& player, Common::LandIdent i
 }
 
 bool HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ident, Territory::Housing::HousingInteriorTerritory& terri, uint8_t slot,
-                                   Common::FFXIVARR_POSITION3 pos, float rot )
+                                   Common::Vector3 pos, float rot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -1329,7 +1329,7 @@ bool HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ide
   return true;
 }
 
-bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot, HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot )
+bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot, HousingZone& terri, Common::Vector3 pos, float rot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 

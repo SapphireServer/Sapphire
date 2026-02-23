@@ -41,7 +41,7 @@ EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t ev
 
 EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
                                   std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > eventItemActionData,
-                                  uint32_t requestId, Common::FFXIVARR_POSITION3 pos, Common::CastType castType ) : m_eventItemAction( std::move( eventItemActionData ) )
+                                  uint32_t requestId, Common::Vector3 pos, Common::CastType castType ) : m_eventItemAction( std::move( eventItemActionData ) )
 {
   m_id = eventItemId;
   m_eventItem = eventItemId;
