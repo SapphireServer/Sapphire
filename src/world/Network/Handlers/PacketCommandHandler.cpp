@@ -661,6 +661,16 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.removeQuest( static_cast< uint16_t >( data.Arg0 ) );
       break;
     }
+    case PacketCommand::FISHING:
+    {
+      auto fishingState = static_cast< uint8_t >( data.Arg0 );
+      if( fishingState == 0 )
+        player.setStatus( ActorStatus::Gathering ); // todo: event start
+      else
+        player.setStatus( ActorStatus::Idle ); // event finish
+
+      break;
+    }
     case PacketCommand::HOUSING_LOCK_LAND_BY_BUILD:
     {
       auto hZone = std::dynamic_pointer_cast< HousingZone >( pZone );
