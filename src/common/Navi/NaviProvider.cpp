@@ -254,8 +254,8 @@ static float frand()
 }
 
 
-Sapphire::Common::FFXIVARR_POSITION3
-  Sapphire::Common::Navi::NaviProvider::findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
+Sapphire::Common::Vector3
+  Sapphire::Common::Navi::NaviProvider::findRandomPositionInCircle( const Sapphire::Common::Vector3& startPos,
                                                                    float maxRadius )
 {
   dtStatus status;
@@ -304,7 +304,7 @@ Sapphire::Common::FFXIVARR_POSITION3
 
 
 
-Sapphire::Common::FFXIVARR_POSITION3
+Sapphire::Common::Vector3
   Sapphire::Common::Navi::NaviProvider::findNearestPosition( float x, float z )
 {
   dtStatus status;
@@ -349,14 +349,14 @@ Sapphire::Common::FFXIVARR_POSITION3
   return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
 }
 
-std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
-  Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
-                                                       const Common::FFXIVARR_POSITION3& endPos )
+std::vector< Sapphire::Common::Vector3 >
+  Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::Vector3& startPos,
+                                                       const Common::Vector3& endPos )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::runtime_error( "No navimesh loaded" );
 
-  auto resultCoords = std::vector< Common::FFXIVARR_POSITION3 >();
+  auto resultCoords = std::vector< Common::Vector3 >();
 
   dtPolyRef startRef, endRef = 0;
 
@@ -510,7 +510,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
 
     for( int32_t i = 0; i < numSmoothPath; i += 3 )
     {
-      resultCoords.emplace_back( Common::FFXIVARR_POSITION3{ smoothPath[ i ], smoothPath[ i + 1 ], smoothPath[ i + 2 ] } );
+      resultCoords.emplace_back( Common::Vector3{ smoothPath[ i ], smoothPath[ i + 1 ], smoothPath[ i + 2 ] } );
     }
   }
 
@@ -628,7 +628,7 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   return true;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::FFXIVARR_POSITION3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& pos, float radius, float speed )
 {
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
@@ -702,7 +702,7 @@ void Sapphire::Common::Navi::NaviProvider::resetMoveTarget( int32_t naviAgentId 
 }
 
 void Sapphire::Common::Navi::NaviProvider::setMoveTarget( int32_t naviAgentId,
-                                                         const Sapphire::Common::FFXIVARR_POSITION3& endPos )
+                                                         const Sapphire::Common::Vector3& endPos )
 {
   // Find nearest point on navmesh and set move request to that location.
   dtNavMeshQuery* navquery = m_naviMeshQuery;
@@ -731,7 +731,7 @@ void Sapphire::Common::Navi::NaviProvider::setMoveTarget( int32_t naviAgentId,
   }
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Common::Navi::NaviProvider::getAgentPos( int32_t naviAgentId )
+Sapphire::Common::Vector3 Sapphire::Common::Navi::NaviProvider::getAgentPos( int32_t naviAgentId )
 {
   const dtCrowdAgent* ag = m_pCrowd->getAgent( naviAgentId );
   if( !ag )
@@ -767,7 +767,7 @@ bool Sapphire::Common::Navi::NaviProvider::hasTargetState( int32_t naviAgentId )
   return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed )
 {
   resetMoveTarget( naviAgentId );
   removeAgent( naviAgentId );
@@ -795,8 +795,8 @@ void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAg
   ag->params.updateFlags &= ~flags;
 }
 
-void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, const Common::FFXIVARR_POSITION3& pos,
-                                                       const Common::FFXIVARR_POSITION3& halfExtents, float rot, bool closed )
+void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, const Common::Vector3& pos,
+                                                       const Common::Vector3& halfExtents, float rot, bool closed )
 {
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
   // Half-extents: Width, Height, Depth
@@ -818,7 +818,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, c
   }
 }
 
-void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::FFXIVARR_POSITION3& pos, float radius, float height, bool closed )
+void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool closed )
 {
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
 
@@ -836,4 +836,27 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
     // RESET: Clear the handle so the system knows the door is "free"
     obstacleRef = 0;
   }
+}
+
+bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos )
+{
+  dtQueryFilter filter;
+  // 1. DETOUR CHECK: Is the path clear on the NavMesh?
+  dtPolyRef startRef{ 0 };
+  float nearestPt[ 3 ];
+  float extents[ 3 ] = { 2.0f, 4.0f, 2.0f };
+  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, nearestPt );
+
+  dtRaycastHit navHit{ 0 };
+  m_naviMeshQuery->raycast( startRef, fstartPos, fendPos, &filter, 0, &navHit );
+
+  // If navHit.t < 1.0, the ray hit a NavMesh boundary (a wall or a hole)
+  if( navHit.t < 1.0f )
+  {
+    return false;
+  }
+
+  return true;// Both checks passed
 }

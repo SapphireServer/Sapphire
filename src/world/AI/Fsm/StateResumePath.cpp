@@ -61,7 +61,7 @@ void AI::Fsm::StateResumePath::onEnter( Entity::BNpc& bnpc )
 
   for( uint8_t i = currentIndex; i < path->points.size(); ++i )
   {
-    auto pointPos = Common::FFXIVARR_POSITION3{
+    auto pointPos = Common::Vector3{
       path->position.x + path->points[ i ].Translation.x,
       path->position.y + path->points[ i ].Translation.y,
       path->position.z + path->points[ i ].Translation.z

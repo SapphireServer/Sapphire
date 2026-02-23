@@ -13,7 +13,7 @@ class MoveTerritoryTask : public Task
 {
 public:
   MoveTerritoryTask( Entity::Player& player, Common::WarpType warpType,
-                     uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot, uint64_t delayTime );
+                     uint32_t targetTerritoryId, Common::Vector3 targetPos, float targetRot, uint64_t delayTime );
 
   void onQueue() override;
   void execute() override;

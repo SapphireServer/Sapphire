@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <memory>
 
 #include "ext/MeshLoaderObj.h"
 #include "ext/ChunkyTriMesh.h"

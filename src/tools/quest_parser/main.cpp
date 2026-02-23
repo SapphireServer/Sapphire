@@ -584,7 +584,7 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
     scriptEntry +=  "  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override\n"
             "  {\n"
             "  }\n\n"
-            "  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override\n"
+            "  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::Vector3 pos ) override\n"
             "  {\n"
             "  }\n\n";
   }

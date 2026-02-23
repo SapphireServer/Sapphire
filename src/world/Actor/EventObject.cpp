@@ -27,7 +27,7 @@ using namespace Sapphire::Network::ActorControl;
 
 EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
                           uint8_t initialState,
-                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName,
+                          Vector3 pos, float rotation, const std::string& givenName,
                           uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
   m_boundInstanceId( boundInstanceId ),

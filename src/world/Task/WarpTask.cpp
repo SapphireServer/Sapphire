@@ -15,7 +15,7 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 WarpTask::WarpTask( Entity::Player& player, Common::WarpType warpType,
-                    Common::FFXIVARR_POSITION3 targetPos, float targetRot, uint64_t delayTime ) : Task( delayTime )
+                    Common::Vector3 targetPos, float targetRot, uint64_t delayTime ) : Task( delayTime )
 {
   m_playerId = player.getId();
   m_warpInfo = { 0, warpType, targetPos, targetRot };

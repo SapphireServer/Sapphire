@@ -923,7 +923,7 @@ uint32_t Territory::getNextActorId()
 
 Entity::EventObjectPtr Territory::addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId,
                                            uint32_t instanceId,
-                                           uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                           uint8_t state, Common::Vector3 pos, float scale,
                                            float rotation, uint8_t permissionInv )
 {
   auto eObj = Entity::make_EventObject( getNextEObjId(), baseId, boundInstanceId, instanceId, state, pos, rotation, name,

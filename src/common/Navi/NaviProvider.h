@@ -100,19 +100,19 @@ namespace Sapphire::Common::Navi
     bool loadMesh( const std::string& path );
     void initQuery();
 
-    void toDetourPos( const Common::FFXIVARR_POSITION3& position, float* out );
-    Common::FFXIVARR_POSITION3 toGamePos( float* pos );
+    void toDetourPos( const Common::Vector3& position, float* out );
+    Common::Vector3 toGamePos( float* pos );
 
-    std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
-                                                              const Common::FFXIVARR_POSITION3& endPos );
-    Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Common::FFXIVARR_POSITION3& startPos,
+    std::vector< Common::Vector3 > findFollowPath( const Common::Vector3& startPos,
+                                                              const Common::Vector3& endPos );
+    Common::Vector3 findRandomPositionInCircle( const Common::Vector3& startPos,
                                                            float maxRadius );
 
-    Common::FFXIVARR_POSITION3 findNearestPosition( float x, float z );
+    Common::Vector3 findNearestPosition( float x, float z );
 
     bool hasNaviMesh() const;
 
-    int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius, float speed = 1.0f );
+    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f );
 
     void removeAgent( int32_t naviAgentId );
 
@@ -120,16 +120,16 @@ namespace Sapphire::Common::Navi
 
     static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
 
-    void setMoveTarget( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& endPos );
+    void setMoveTarget( int32_t naviAgentId, const Common::Vector3& endPos );
     void resetMoveTarget( int32_t naviAgentId );
 
-    Common::FFXIVARR_POSITION3 getAgentPos( int32_t naviAgentId );
+    Common::Vector3 getAgentPos( int32_t naviAgentId );
     float getAgentSpeed( int32_t naviAgentId );
 
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;
 
-    int32_t updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius, float speed );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed );
 
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
@@ -141,8 +141,9 @@ namespace Sapphire::Common::Navi
     std::string getNaviPath() const { return m_naviPath; }
 
     // halfExtents: { width, height, depth } 
-    void toggleDoor( dtObstacleRef& doorRef, const Common::FFXIVARR_POSITION3& pos, const Common::FFXIVARR_POSITION3& halfExtents, float rot, bool closed );
-    void toggleObstacle( dtObstacleRef& obstacleRef, const Common::FFXIVARR_POSITION3& pos, float radius, float height, bool closed );
+    void toggleDoor( dtObstacleRef& doorRef, const Common::Vector3& pos, const Common::Vector3& halfExtents, float rot, bool closed );
+    void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool closed );
+    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
 
   protected:
     std::string m_internalName;

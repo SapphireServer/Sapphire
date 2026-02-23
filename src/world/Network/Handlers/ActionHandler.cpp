@@ -126,7 +126,7 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
       PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
                             type, requestId, actionId, pos.x, pos.y, pos.z );
 
-      Common::FFXIVARR_POSITION3 targetPos = { pos.x, pos.y, pos.z };
+      Common::Vector3 targetPos = { pos.x, pos.y, pos.z };
       auto action = exdData.getRow< Excel::EventItem >( actionId );
       assert( action );
       actionMgr.handlePlacedEventItemAction( player, actionId, action, requestId, targetPos );

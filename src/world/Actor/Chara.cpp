@@ -196,7 +196,7 @@ bool Chara::isAlive() const
   return ( m_hp > 0 );
 }
 
-void Chara::setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate )
 {
   GameObject::setPos( pos, broadcastUpdate );
   m_dirtyFlag |= DirtyFlag::Position;
@@ -323,7 +323,7 @@ position
 
 \param Position to look towards
 */
-bool Chara::face( const FFXIVARR_POSITION3& p )
+bool Chara::face( const Vector3& p )
 {
   float oldRot = getRot();
 
@@ -992,9 +992,9 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
 }
 
 // Compute forward direction based on rotation angle (assuming rotation around Z axis)
-FFXIVARR_POSITION3 Chara::getForwardVector() const
+Vector3 Chara::getForwardVector() const
 {
-  return Common::Util::normalize( FFXIVARR_POSITION3{ std::sin( getRot() ), 0, std::cos( getRot() ) } );
+  return Common::Util::normalize( Vector3{ std::sin( getRot() ), 0, std::cos( getRot() ) } );
 }
 
 // Function to check if actor is facing target
@@ -1072,7 +1072,7 @@ void Chara::onTick()
   }
 }
 
-void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ignoreNav )
+void Chara::knockback( const Vector3& origin, float distance, bool ignoreNav )
 {
   auto kbPos = Common::Util::getKnockbackPosition( origin, m_pos, distance );
   auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
@@ -1083,7 +1083,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
     auto pNav = pTeri->getNaviProvider();
     auto path = pNav->findFollowPath( m_pos, kbPos );
 
-    FFXIVARR_POSITION3 navPos{ origin };
+    Vector3 navPos{ origin };
     float prevDistance{ 1000.f };
     for( const auto& point : path )
     {
@@ -1119,7 +1119,7 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
 }
 
 void Chara::createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale,
-                              const Common::FFXIVARR_POSITION3& pos )
+                              const Common::Vector3& pos )
 {
   removeAreaObject();
   removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );

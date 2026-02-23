@@ -155,7 +155,7 @@ namespace Sapphire::World::Manager
     bool initHouseModels( Entity::Player& player, LandPtr land, uint32_t presetCatalogId );
 
     void reqPlaceHousingItem( Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId,
-                              Common::FFXIVARR_POSITION3 pos, float rotation );
+                              Common::Vector3 pos, float rotation );
 
     void reqPlaceItemInStore( Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId );
 
@@ -168,7 +168,7 @@ namespace Sapphire::World::Manager
 
 
     void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
-                             Common::FFXIVARR_POSITION3 pos, float rot );
+                             Common::Vector3 pos, float rot );
 
 
     void reqRemoveHousingItem( Sapphire::Entity::Player& player, uint16_t plot,
@@ -228,7 +228,7 @@ namespace Sapphire::World::Manager
      * @return true if moved successfully
      */
     bool moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
-                           Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot );
+                           Sapphire::HousingZone& terri, Common::Vector3 pos, float rot );
 
     /*!
      * @brief Processes the movement of an item placed inside a HousingInteriorTerritory
@@ -245,7 +245,7 @@ namespace Sapphire::World::Manager
      */
     bool moveInternalItem( Entity::Player& player, Common::LandIdent ident,
                            Territory::Housing::HousingInteriorTerritory& terri, uint8_t slot,
-                           Common::FFXIVARR_POSITION3 pos, float rot );
+                           Common::Vector3 pos, float rot );
 
     /*!
      * @brief Processes the spawning and linking of a newly placed housing item for external items

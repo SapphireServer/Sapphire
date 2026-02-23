@@ -20,7 +20,7 @@ namespace Sapphire::Entity
 
   protected:
     /*! Position of the object */
-    Common::FFXIVARR_POSITION3 m_pos{};
+    Common::Vector3 m_pos{};
     /*! Rotation of the object */
     float m_rot{};
     /*! Id of the actor */
@@ -60,10 +60,10 @@ namespace Sapphire::Entity
 
     Common::ObjKind getObjKind() const;
 
-    Common::FFXIVARR_POSITION3& getPos();
-    const Common::FFXIVARR_POSITION3& getPos() const;
+    Common::Vector3& getPos();
+    const Common::Vector3& getPos() const;
 
-    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true );
 
     virtual void setPos( float x, float y, float z, bool broadcastUpdate = true );
 

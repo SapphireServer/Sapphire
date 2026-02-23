@@ -14,7 +14,7 @@ namespace Sapphire::Entity
   {
   public:
     EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
-                 Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
+                 Common::Vector3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
 

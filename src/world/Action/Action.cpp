@@ -178,12 +178,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( const Common::FFXIVARR_POSITION3& pos )
+void Action::Action::setPos( const Common::Vector3& pos )
 {
   m_pos = pos;
 }
 
-const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
+const Common::Vector3& Action::Action::getPos() const
 {
   return m_pos;
 }

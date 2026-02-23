@@ -44,7 +44,7 @@ struct FFXIVIpcUpdatePosition : FFXIVIpcBasePacket< Move >
   uint8_t flag2;
   uint8_t flag_unshared;
   uint8_t __padding1;
-  Common::FFXIVARR_POSITION3 pos;
+  Common::Vector3 pos;
 };
   
 struct FFXIVIpcUpdatePositionInstance : FFXIVIpcBasePacket< MovePvP >
@@ -56,8 +56,8 @@ struct FFXIVIpcUpdatePositionInstance : FFXIVIpcBasePacket< MovePvP >
     uint8_t flag2;
     uint8_t flag_unshared;
     uint8_t __padding1;
-    Common::FFXIVARR_POSITION3 pos;
-    Common::FFXIVARR_POSITION3 predictedPos;
+    Common::Vector3 pos;
+    Common::Vector3 predictedPos;
 };
 
 struct FFXIVIpcActionRequest : FFXIVIpcBasePacket< ActionRequest >
@@ -84,7 +84,7 @@ struct FFXIVIpcSelectGroundActionRequest :  FFXIVIpcBasePacket< SelectGroundActi
   uint32_t RequestId;
   uint16_t Dir;
   uint16_t DirTarget;
-  Common::FFXIVARR_POSITION3 Pos;
+  Common::Vector3 Pos;
 };
 
 struct FFXIVIpcZoneJump : FFXIVIpcBasePacket< ZoneJump >
@@ -295,7 +295,7 @@ struct FFXIVIpcEventHandlerOutsideRange :
 {
   /* 0000 */ uint32_t param1;
   /* 0004 */ uint32_t eventId;
-  /* 0008 */ Common::FFXIVARR_POSITION3 position;
+  /* 0008 */ Common::Vector3 position;
 };
 
 struct FFXIVIpcEventHandlerWithinRange :
@@ -303,7 +303,7 @@ struct FFXIVIpcEventHandlerWithinRange :
 {
   /* 0000 */ uint32_t param1;
   /* 0004 */ uint32_t eventId;
-  /* 0008 */ Common::FFXIVARR_POSITION3 position;
+  /* 0008 */ Common::Vector3 position;
 };
 
 struct FFXIVIpcEventHandlerEmote :
@@ -523,7 +523,7 @@ struct FFXIVIpcHousingPlaceYardItem : FFXIVIpcBasePacket< HousingPlaceYardItem >
   Common::LandIdent landIdOrIndex;
   uint16_t StorageId;
   int16_t ContainerIndex;
-  Common::FFXIVARR_POSITION3 Pos;
+  Common::Vector3 Pos;
   float Rotation;
   uint32_t UserData;
 };

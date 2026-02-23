@@ -102,11 +102,11 @@ namespace Sapphire::Entity
     uint64_t getLastNaviMoveRequest() const;
     bool getNaviIsPathing() const;
     void setNaviIsPathing( bool pathing );
-    Common::FFXIVARR_POSITION3 getNaviLastMoveTarget() const;
-    Common::FFXIVARR_POSITION3 getNaviMoveTarget() const;
+    Common::Vector3 getNaviLastMoveTarget() const;
+    Common::Vector3 getNaviMoveTarget() const;
 
     // return true if it reached the position
-    bool moveTo( const Common::FFXIVARR_POSITION3& pos );
+    bool moveTo( const Common::Vector3& pos );
 
     bool moveTo( const Entity::Chara& targetChara );
 
@@ -146,7 +146,7 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
     void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
 
     void restHp();
@@ -186,12 +186,12 @@ namespace Sapphire::Entity
     void setRoamTargetReached( bool reached );
     bool isRoamTargetReached() const;
 
-    void setRoamTargetPos( const Common::FFXIVARR_POSITION3& targetPos );
+    void setRoamTargetPos( const Common::Vector3& targetPos );
 
     void updateAggroTarget();
 
-    const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
-    const Common::FFXIVARR_POSITION3& getSpawnPos() const;
+    const Common::Vector3& getRoamTargetPos() const;
+    const Common::Vector3& getSpawnPos() const;
     float getSpawnRot() const;
 
     void initFsm();
@@ -227,7 +227,7 @@ namespace Sapphire::Entity
     float m_naviTargetReachedDistance;
     uint64_t m_naviLastMoveRequest{ 0 };
     bool m_naviIsPathing{ false };
-    Common::FFXIVARR_POSITION3 m_naviLastTarget{ 0 };
+    Common::Vector3 m_naviLastTarget;
 
     std::shared_ptr< Common::BNPCData > m_pInfo;
 
@@ -235,10 +235,10 @@ namespace Sapphire::Entity
     uint32_t m_lastRoamTargetReachedTime;
     bool m_roamTargetReached{ false };
 
-    Common::FFXIVARR_POSITION3 m_spawnPos;
+    Common::Vector3 m_spawnPos;
     float m_spawnRot;
-    Common::FFXIVARR_POSITION3 m_roamPos;
-    Common::FFXIVARR_POSITION3 m_lastPos;
+    Common::Vector3 m_roamPos;
+    Common::Vector3 m_lastPos;
     float m_lastRot;
     uint64_t m_lastPosUpdate{0};
 
@@ -247,9 +247,9 @@ namespace Sapphire::Entity
     bool m_canSwapTarget{ true };
 
     uint64_t m_naviLastUpdate;
-    std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;
+    std::vector< Common::Vector3 > m_naviLastPath;
     uint8_t m_naviPathStep;
-    Common::FFXIVARR_POSITION3 m_naviTarget;
+    Common::Vector3 m_naviTarget;
 
     CharaPtr m_pOwner;
     World::AI::GambitPackPtr m_pGambitPack;

@@ -36,7 +36,7 @@ namespace Sapphire
   struct EncounterEObj
   {
     uint32_t eobjId{ 0xE0000000 };
-    Common::FFXIVARR_POSITION3 pos;
+    Common::Vector3 pos;
     float rot;
     float scale{ 1.0 };
     uint8_t permissionInvisibility{ 0 };
@@ -63,8 +63,8 @@ namespace Sapphire
     EncounterShape encounterShape;
     // for BOX shape, this would be m_position = min, m_position2 = max
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
-    Common::FFXIVARR_POSITION3 position;
-    Common::FFXIVARR_POSITION3 position2;
+    Common::Vector3 position;
+    Common::Vector3 position2;
     uint64_t duration{ 0 };
     bool hasLockout{false};
   };
@@ -145,7 +145,7 @@ namespace Sapphire
     uint64_t m_failTime{ 0 };
     uint64_t m_finishTime{ 0 };
 
-    Common::FFXIVARR_POSITION3 m_position;
+    Common::Vector3 m_position;
 
     Entity::EventObjectPtr m_pEntranceEObj;
     Entity::EventObjectPtr m_pExitEObj;

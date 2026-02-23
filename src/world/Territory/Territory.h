@@ -181,7 +181,7 @@ namespace Sapphire
     void updateSessions( uint64_t tickCount, bool changedWeather );
 
     Entity::EventObjectPtr addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
-                                    uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                    uint8_t state, Common::Vector3 pos, float scale,
                                     float rotation, uint8_t permissionInv );
 
     void addEObj( Entity::EventObjectPtr object );
