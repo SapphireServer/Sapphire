@@ -374,6 +374,8 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
     else
       m_bNpcAreaObjects[ pArea->getOwnerId() ] = pArea;
   }
+  pActor->setTerritoryId( getGuId() );
+  pActor->setTerritoryTypeId( getTerritoryTypeId() );
 }
 
 void Territory::removeActor( const Entity::GameObjectPtr& pActor )
