@@ -97,6 +97,7 @@ GameConnection::GameConnection( Sapphire::Network::HivePtr pHive, Sapphire::Netw
   setZoneHandler( StartWithinRangeEvent, "StartWithinRangeEvent", &GameConnection::eventHandlerWithinRange );
   setZoneHandler( StartOutsideRangeEvent, "StartOutsideRangeEvent", &GameConnection::eventHandlerOutsideRange );
   setZoneHandler( StartEnterTerritoryEvent, "StartEnterTerritoryEvent", &GameConnection::eventHandlerEnterTerritory );
+  setZoneHandler( StartActionResultEvent, "StartActionResultEvent", &GameConnection::startActionResultEvent );
 
   setZoneHandler( ReturnEventSceneHeader, "ReturnEventSceneHeader", &GameConnection::returnEventSceneHeader );
   setZoneHandler( ReturnEventScene2, "ReturnEventScene2", &GameConnection::returnEventScene2 );

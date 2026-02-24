@@ -150,6 +150,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( eventHandlerOutsideRange );
 
     DECLARE_HANDLER( eventHandlerEnterTerritory );
+    DECLARE_HANDLER( startActionResultEvent );
 
     DECLARE_HANDLER( returnEventSceneHeader );
     DECLARE_HANDLER( returnEventScene2 );

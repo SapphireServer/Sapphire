@@ -9,6 +9,7 @@
 #include "Network/GameConnection.h"
 
 #include "Manager/ActionMgr.h"
+#include "Manager/FishingMgr.h"
 #include "Manager/PlayerMgr.h"
 
 using namespace Sapphire::Common;
@@ -32,6 +33,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+  auto& fishingMgr = Common::Service< World::Manager::FishingMgr >::ref();
 
   switch( type )
   {
@@ -87,6 +89,12 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       auto action = exdData.getRow< Excel::Action >( 4 );
       assert( action );
       actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, requestId );
+      break;
+    }
+
+    case Common::ActionKind::ACTION_KIND_FISHING:
+    {
+      fishingMgr.onFishingActionRequest( player, actionId, requestId, targetId );
       break;
     }
   }
