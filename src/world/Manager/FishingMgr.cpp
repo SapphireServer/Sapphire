@@ -50,12 +50,12 @@ void FishingMgr::startFishing( Entity::Player& player )
                        } );
 
   Logger::debug( "[FishingMgr] Player {} start -> event {} scene {}", characterId, PrototypeEventId,
-                 SceneStart );
+                 static_cast< uint32_t >( FishingState::CastingOut ) );
 
-  eventMgr.playScene( player, PrototypeEventId, SceneStart, SceneFlags, { 3u, 275u, 278u, 0u },
+  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::CastingOut ), SceneFlags, { 3u, 275u, 278u, 0u },
                       [this]( Entity::Player& cbPlayer, const Event::SceneResult& result )
                       {
-                        onStartSceneReturn( cbPlayer, result );
+                        onCastSceneReturn( cbPlayer, result );
                       } );
 }
 
@@ -87,16 +87,16 @@ void FishingMgr::quitFishing( Entity::Player& player )
   }
 
   Logger::debug( "[FishingMgr] Player {} quit -> event {} scene {}", characterId, PrototypeEventId,
-                 SceneQuit );
+                 static_cast< uint32_t >( FishingState::Quitting ) );
 
-  eventMgr.playScene( player, PrototypeEventId, SceneQuit, SceneFlags, { 1u, 273u },
+  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::Quitting ), SceneFlags, { 1u, 273u },
                       [this]( Entity::Player& cbPlayer, const Event::SceneResult& result )
                       {
                         onQuitSceneReturn( cbPlayer, result );
                       } );
 }
 
-void FishingMgr::onStartSceneReturn( Entity::Player& player, const Event::SceneResult& result )
+void FishingMgr::onCastSceneReturn( Entity::Player& player, const Event::SceneResult& result )
 {
   if( result.eventId != PrototypeEventId )
     return;
@@ -106,53 +106,16 @@ void FishingMgr::onStartSceneReturn( Entity::Player& player, const Event::SceneR
   if( sessionIt == m_sessions.end() )
     return;
 
-  if( !player.hasCondition( Common::PlayerCondition::Gathering ) )
-    player.setCondition( Common::PlayerCondition::Gathering );
-
-  if( !player.hasCondition( Common::PlayerCondition::Fishing ) )
-    player.setCondition( Common::PlayerCondition::Fishing );
-
+  player.setCondition( Common::PlayerCondition::Fishing );
   player.setStatus( Common::ActorStatus::Gathering );
 
-  Logger::debug( "[FishingMgr] Player {} cast scene returned, advancing to rest scene.", characterId );
+  Logger::debug( "[FishingMgr] Player {} cast scene returned; now fishing.", characterId );
 
-  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
-  eventMgr.playScene( player, PrototypeEventId, SceneRest, SceneFlags, { 2u, 283u },
-                      [this]( Entity::Player& cbPlayer, const Event::SceneResult& cbResult )
-                      {
-                        onRestSceneReturn( cbPlayer, cbResult );
-                      } );
-}
+  // keep the event alive without sending another scene
 
-void FishingMgr::onRestSceneReturn( Entity::Player& player, const Event::SceneResult& result )
-{
-  if( result.eventId != PrototypeEventId )
-    return;
-
-  const auto characterId = player.getCharacterId();
-  auto sessionIt = m_sessions.find( characterId );
-  if( sessionIt == m_sessions.end() )
-    return;
-
-  Logger::debug( "[FishingMgr] Player {} rest scene returned, advancing to pole ready.", characterId );
-
-  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
-  eventMgr.playScene( player, PrototypeEventId, ScenePoleReady, SceneFlags, { 3u, 271u, 0u, 0u },
-                      [this]( Entity::Player& cbPlayer, const Event::SceneResult& cbResult )
-                      {
-                        onPoleReadySceneReturn( cbPlayer, cbResult );
-                      } );
-}
-
-void FishingMgr::onPoleReadySceneReturn( Entity::Player& player, const Event::SceneResult& result )
-{
-  if( result.eventId != PrototypeEventId )
-    return;
-
-  Logger::debug( "[FishingMgr] Player {} pole ready scene returned unexpectedly, cleaning up.",
-                 player.getCharacterId() );
-
-  cleanupSession( player, true );
+  auto pEvent = player.getEvent( PrototypeEventId );
+  if( pEvent )
+    pEvent->setPlayedScene( true );
 }
 
 void FishingMgr::onQuitSceneReturn( Entity::Player& player, const Event::SceneResult& result )

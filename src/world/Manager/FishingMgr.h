@@ -12,13 +12,25 @@ namespace Sapphire::World::Manager
   {
   public:
     static constexpr uint32_t PrototypeEventId = 0x00150001;
-    static constexpr uint16_t SceneStart = 1;
-    static constexpr uint16_t SceneRest = 2;
-    static constexpr uint16_t SceneQuit = 3;
-    static constexpr uint16_t ScenePoleReady = 4;
-    static constexpr uint32_t SceneFlags = 0x00040001;
+    static constexpr uint32_t SceneFlags = 0x00010000;
     static constexpr uint8_t EventStartFlags = 0;
     static constexpr uint32_t EventStartArg = 0;
+
+    enum class FishingState : uint32_t
+    {
+      None = 0,
+      CastingOut = 1,
+      PullingPoleIn = 2,
+      Quitting = 3,
+      PoleReady = 4,
+      Bite = 5,
+      Hooking = 6,
+      ReleasingCatch = 7,
+      ConfirmingCollectable = 8,
+      AmbitiousLure = 9,
+      ModestLure = 10,
+      LineInWater = 12,
+    };
 
     enum class SessionState : uint8_t
     {
@@ -41,9 +53,7 @@ namespace Sapphire::World::Manager
       uint64_t startedAtMs{};
     };
 
-    void onStartSceneReturn( Entity::Player& player, const Event::SceneResult& result );
-    void onRestSceneReturn( Entity::Player& player, const Event::SceneResult& result );
-    void onPoleReadySceneReturn( Entity::Player& player, const Event::SceneResult& result );
+    void onCastSceneReturn( Entity::Player& player, const Event::SceneResult& result );
     void onQuitSceneReturn( Entity::Player& player, const Event::SceneResult& result );
 
     void cleanupSession( Entity::Player& player, bool setIdle );
