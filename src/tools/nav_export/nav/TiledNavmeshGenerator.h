@@ -166,10 +166,11 @@ public:
   bool buildNavmesh();
   bool buildTiledCache();
   int rasterizeTileLayers(
-          const int tx, const int ty,
+          const int tileX,
+          const int tileY,
           const rcConfig& cfg,
           TileCacheData* tiles,
-          const int maxTiles );
+          const int maxTiles ) const;
 
   void saveNavmesh( const std::string& name );
 
@@ -202,7 +203,7 @@ private:
 
   int m_tileTriCount = 0;
 
-  int m_partitionType = SamplePartitionType::SAMPLE_PARTITION_WATERSHED;
+  int m_partitionType = static_cast< int >( SamplePartitionType::WATERSHED );
 
   float m_meshBMin[ 3 ];
   float m_meshBMax[ 3 ];
