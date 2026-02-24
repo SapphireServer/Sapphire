@@ -34,28 +34,70 @@ using namespace Sapphire::World::Manager;
 
 bool MapMgr::loadQuests()
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
+  const auto startMs = Common::Util::getTimeMs();
+  m_questCacheMap.clear();
+  m_eNpcCacheMap.clear();
+  m_eObjCacheMap.clear();
 
-  auto questList = exdData.getRows< Excel::Quest >();
-  auto eNpcList = exdData.getRows< Excel::ENpcBase >();
-  auto eObjList = exdData.getRows< Excel::EObj >();
-
-  for( auto& [ id, questExdData ] : questList )
+  if( m_eagerENpcEObjCache )
   {
-    m_questCacheMap.emplace( id, std::move( questExdData ) );
+    auto& exdData = Common::Service< Data::ExdData >::ref();
+    m_eNpcCacheMap = exdData.getRows< Excel::ENpcBase >();
+    m_eObjCacheMap = exdData.getRows< Excel::EObj >();
+
+    Logger::info( "MapMgr: Hybrid preload enabled - cached {} ENpcBase rows and {} EObj rows, quests lazy ({}ms)",
+                  m_eNpcCacheMap.size(),
+                  m_eObjCacheMap.size(),
+                  Common::Util::getTimeMs() - startMs );
+    return true;
   }
 
-  for( auto& [ id, eNpcExdData ] : eNpcList )
-  {
-    m_eNpcCacheMap.emplace( id, std::move( eNpcExdData ) );
-  }
-
-  for( auto& [ id, eObjExdData ] : eObjList )
-  {
-    m_eObjCacheMap.emplace( id, std::move( eObjExdData ) );
-  }
+  Logger::info( "MapMgr: Deferred EXD preload enabled (quests/enpcs/eobjs cached on demand) in {}ms",
+                Common::Util::getTimeMs() - startMs );
 
   return true;
+}
+
+std::shared_ptr< Excel::ExcelStruct< Excel::Quest > > MapMgr::getQuestRow( uint32_t questId )
+{
+  auto it = m_questCacheMap.find( questId );
+  if( it != m_questCacheMap.end() )
+    return it->second;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto row = exdData.getRow< Excel::Quest >( questId );
+  if( row )
+    m_questCacheMap.emplace( questId, row );
+
+  return row;
+}
+
+std::shared_ptr< Excel::ExcelStruct< Excel::ENpcBase > > MapMgr::getENpcBaseRow( uint32_t eNpcBaseId )
+{
+  auto it = m_eNpcCacheMap.find( eNpcBaseId );
+  if( it != m_eNpcCacheMap.end() )
+    return it->second;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto row = exdData.getRow< Excel::ENpcBase >( eNpcBaseId );
+  if( row )
+    m_eNpcCacheMap.emplace( eNpcBaseId, row );
+
+  return row;
+}
+
+std::shared_ptr< Excel::ExcelStruct< Excel::EObj > > MapMgr::getEObjRow( uint32_t eObjBaseId )
+{
+  auto it = m_eObjCacheMap.find( eObjBaseId );
+  if( it != m_eObjCacheMap.end() )
+    return it->second;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto row = exdData.getRow< Excel::EObj >( eObjBaseId );
+  if( row )
+    m_eObjCacheMap.emplace( eObjBaseId, row );
+
+  return row;
 }
 
 void MapMgr::updateAll( Entity::Player& player )
@@ -71,11 +113,11 @@ void MapMgr::updateAll( Entity::Player& player )
   
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->header.BaseId );
-    if( eNpcIt == std::end( m_eNpcCacheMap ) )
+    auto eNpcRow = getENpcBaseRow( eventNpc.second->header.BaseId );
+    if( !eNpcRow )
       continue;
 
-    auto eNpcData = eNpcIt->second->data().EventHandler;
+    auto eNpcData = eNpcRow->data().EventHandler;
     for( auto npcEvent = 0; npcEvent < 32; ++npcEvent )
     {
       auto npcData = eNpcData[ npcEvent ].EventHandler;
@@ -93,7 +135,11 @@ void MapMgr::updateAll( Entity::Player& player )
       {
         case EventHandler::EventHandlerType::Quest:
         {
-          auto& quest = m_questCacheMap[ npcData ]->data();
+          auto questRow = getQuestRow( npcData );
+          if( !questRow )
+            break;
+
+          auto& quest = questRow->data();
 
           if( quest.Client == eventNpc.second->header.BaseId )
           {
@@ -175,11 +221,11 @@ void MapMgr::updateAll( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObjIt = m_eObjCacheMap.find( eventObj.second->header.BaseId );
-    if( eObjIt == std::end( m_eObjCacheMap ) )
+    auto eObjRow = getEObjRow( eventObj.second->header.BaseId );
+    if( !eObjRow )
       continue;
 
-    auto eObjData = eObjIt->second->data();
+    auto eObjData = eObjRow->data();
     EventData eventData;
     eventData.handlerId = eObjData.EventHandler;
     eventData.layoutId = eventObj.first;
@@ -188,7 +234,11 @@ void MapMgr::updateAll( Entity::Player& player )
 
     if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
+      auto questRow = getQuestRow( eObjData.EventHandler );
+      if( !questRow )
+        continue;
+
+      auto& quest = questRow->data();
 
       if( quest.Client == eventObj.second->header.BaseId )
       {
@@ -213,11 +263,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->header.BaseId );
-    if( eNpcIt == std::end( m_eNpcCacheMap ) )
+    auto eNpcRow = getENpcBaseRow( eventNpc.second->header.BaseId );
+    if( !eNpcRow )
       continue;
 
-    auto eNpcData = eNpcIt->second->data().EventHandler;
+    auto eNpcData = eNpcRow->data().EventHandler;
 
     for( auto npcEvent = 0; npcEvent < 32; ++npcEvent )
     {
@@ -234,7 +284,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
       if( eventHandlerType == EventHandler::EventHandlerType::Quest )
       {
-        auto& quest = m_questCacheMap[ npcData ]->data();
+        auto questRow = getQuestRow( npcData );
+        if( !questRow )
+          continue;
+
+        auto& quest = questRow->data();
 
         if( quest.Client == eventNpc.second->header.BaseId )
         {
@@ -250,11 +304,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObjIt = m_eObjCacheMap.find( eventObj.second->header.BaseId );
-    if( eObjIt == std::end( m_eObjCacheMap ) )
+    auto eObjRow = getEObjRow( eventObj.second->header.BaseId );
+    if( !eObjRow )
       continue;
 
-    auto eObjData = eObjIt->second->data();
+    auto eObjData = eObjRow->data();
     EventData eventData;
     eventData.handlerId = eObjData.EventHandler;
     eventData.layoutId = eventObj.first;
@@ -263,7 +317,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
     if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
+      auto questRow = getQuestRow( eObjData.EventHandler );
+      if( !questRow )
+        continue;
+
+      auto& quest = questRow->data();
 
       if( quest.Client == eventObj.second->header.BaseId )
       {
@@ -280,7 +338,11 @@ void MapMgr::insertQuest( Entity::Player& player, uint32_t questId, uint32_t lay
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  auto& quest = m_questCacheMap[ questId ]->data();
+  auto questRow = getQuestRow( questId );
+  if( !questRow )
+    return;
+
+  auto& quest = questRow->data();
 
   if( isQuestVisible( player, questId, quest ) )
   {

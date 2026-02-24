@@ -26,12 +26,32 @@
       }
     },
     {
+      "name": "vs2022-release",
+      "displayName": "VS2022 Release (MSVC)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
       "name": "clangd-debug",
       "displayName": "Ninja Debug for clangd (MSVC)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-clangd/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "clangd-release",
+      "displayName": "Ninja Release for clangd (MSVC)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-clangd/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
@@ -43,8 +63,19 @@
       "configuration": "Debug"
     },
     {
+      "name": "vs2022-release",
+      "configurePreset": "vs2022-release",
+      "configuration": "Release"
+    },
+    {
       "name": "clangd-debug",
       "configurePreset": "clangd-debug"
+    },
+    {
+      "name": "clangd-release",
+      "configurePreset": "clangd-release",
+      "configuration": "Release"
     }
+    
   ]
 }

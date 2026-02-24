@@ -31,6 +31,16 @@ namespace Sapphire
   public:
     ObjectPtr get( uint16_t zoneId, uint32_t id )
     {
+      auto zoneIt = m_objectCache.find( zoneId );
+      if( zoneIt != m_objectCache.end() )
+      {
+        auto rangeIt = zoneIt->second.find( id );
+        if( rangeIt != zoneIt->second.end() )
+        {
+          return rangeIt->second;
+        }
+      }
+
       for( auto& entry : m_objectCache )
       {
         auto rangeIt = entry.second.find( id );
@@ -54,17 +64,7 @@ namespace Sapphire
 
     void insert( uint16_t zoneId, std::shared_ptr< T > entry )
     {
-      if( m_objectCache.find( zoneId ) == m_objectCache.end() )
-      {
-        ObjectMap cache;
-        cache[ entry->header.InstanceID ] = std::move( entry );
-        m_objectCache[ zoneId ] = cache;
-      }
-      else
-      {
-        auto it = m_objectCache.find( zoneId );
-        it->second[ entry->header.InstanceID ] = std::move( entry );
-      }
+      m_objectCache[ zoneId ][ entry->header.InstanceID ] = std::move( entry );
     }
 
     size_t size() const

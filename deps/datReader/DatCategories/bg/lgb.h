@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <functional>
 
 #include "matrix4.h"
 #include "vec3.h"
@@ -78,6 +79,8 @@ public:
 
 struct LGB_GROUP
 {
+  using AssetTypeFilter = std::function< bool( eAssetType ) >;
+
   LGB_FILE* parent;
   Layer header;
   LayerSetReferencedList layerSetReferencedList;
@@ -85,7 +88,7 @@ struct LGB_GROUP
   std::vector< std::shared_ptr< InstanceObjectEntry > > entries;
   std::vector< LayerSetReferenced > refs;
 
-  LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset )
+  LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset, const AssetTypeFilter* pTypeFilter = nullptr )
   {
     parent = parentStruct;
     header = *reinterpret_cast< Layer* >( buf + offset );
@@ -112,6 +115,10 @@ struct LGB_GROUP
       try
       {
         const auto type = *reinterpret_cast< eAssetType* >( buf + entryOffset );
+
+        if( pTypeFilter && !( *pTypeFilter )( type ) )
+          continue;
+
         switch( type )
         {
           case eAssetType::BG:
@@ -194,16 +201,18 @@ struct LGB_FILE_HEADER
 
 struct LGB_FILE
 {
+  using AssetTypeFilter = std::function< bool( eAssetType ) >;
+
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
   std::string m_name;
 
-  LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
+  LGB_FILE( char* buf, const std::string& name, const AssetTypeFilter* pTypeFilter = nullptr ) : LGB_FILE( buf, pTypeFilter )
   {
     m_name = std::string( buf + 20 + header.nameOff );
   }
 
-  LGB_FILE( char* buf )
+  LGB_FILE( char* buf, const AssetTypeFilter* pTypeFilter = nullptr )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
     m_name = std::string( buf + 20 +  header.nameOff );
@@ -211,11 +220,11 @@ struct LGB_FILE
       throw std::runtime_error( "Invalid LGB file!" );
 
     constexpr auto baseOffset = sizeof( header );
+    groups.reserve( header.groupCount );
     for( size_t i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
-      const auto group = LGB_GROUP( buf, this, groupOffset );
-      groups.push_back( group );
+      groups.emplace_back( buf, this, groupOffset, pTypeFilter );
     }
   };
 };

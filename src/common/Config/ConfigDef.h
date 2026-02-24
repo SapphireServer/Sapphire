@@ -64,6 +64,11 @@ namespace Sapphire::Common::Config
       std::string meshPath;
     } navigation;
 
+    struct Map
+    {
+      bool eagerENpcEObjCache;
+    } map;
+
     std::string motd;
     bool skipOpening;
   };
