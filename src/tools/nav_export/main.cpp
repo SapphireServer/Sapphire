@@ -38,7 +38,7 @@ using namespace Sapphire;
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "H:\\Games\\ffxiv3.35\\game\\sqpack" );
+std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -334,10 +334,10 @@ int main( int argc, char *argv[ ] )
   auto entryStartTime = std::chrono::high_resolution_clock::now();
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
-  std::string zoneName = "s1b5";
+  std::string zoneName = "d2f1";
 
   bool generateNavmesh = true;
-  bool dumpAllZones = true;
+  bool dumpAllZones = false;
   int nJobs = std::thread::hardware_concurrency();
 
   int exportFileType = 0;

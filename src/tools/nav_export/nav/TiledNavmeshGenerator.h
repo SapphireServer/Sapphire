@@ -22,6 +22,24 @@
 #include <recastnavigation/RecastDemo/Include/Sample.h>
 #include <recastnavigation/RecastDemo/Include/InputGeom.h>
 
+// todo: this no worky
+struct PrintContext : rcContext {
+  explicit PrintContext( bool state = true ) : rcContext( state ) {}
+protected:
+  void doLog( const rcLogCategory category, const char* msg, const int /*len*/ ) override
+  {
+    const char* catStr = "";
+    switch( category )
+    {
+      case RC_LOG_PROGRESS: catStr = "PROGRESS"; break;
+      case RC_LOG_WARNING:  catStr = "WARNING";  break;
+      case RC_LOG_ERROR:    catStr = "ERROR";    break;
+    }
+    printf( "[Recast %s] %s\n", catStr, msg );
+    fflush( stdout );
+  }
+};
+
 struct FastLZCompressor : dtTileCacheCompressor {
   ~FastLZCompressor() override = default;
 
