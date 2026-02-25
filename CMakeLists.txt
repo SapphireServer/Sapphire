@@ -54,6 +54,15 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
 ##############################
 find_package( MySQL )
 
+if( WIN32 )
+  if( NOT EXISTS "${MYSQL_DLL}" )
+    message( FATAL_ERROR "Could not find MySQL runtime library: ${MYSQL_DLL}" )
+  endif()
+
+  file( COPY "${MYSQL_DLL}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "${MYSQL_DLL}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools" )
+endif()
+
 ##############################
 #        Dependencies        #
 ##############################
