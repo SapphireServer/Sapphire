@@ -21,22 +21,22 @@ set( CMAKE_MODULE_PATH
        ${CMAKE_MODULE_PATH}
        ${CMAKE_SOURCE_DIR}/cmake )
 
-#####################################
-# Copy needed files to build-folder #
-#####################################
-add_custom_target( copy_runtime_files ALL
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web
-                     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh )
-
-file( COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR}/bin )
-
 ######################################
 # Dependencies and compiler settings #
 ######################################
 include( "cmake/paths.cmake" )
 include( "cmake/compiler.cmake" )
+
+#####################################
+# Copy needed files to runtime dir  #
+#####################################
+add_custom_target( copy_runtime_files ALL
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sql
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/web
+                     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sql_import.sh )
+
+file( COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 
 option( SAPPHIRE_BUILD_TOOLKIT "Build the Sapphire Toolkit" ON )
 
@@ -53,6 +53,15 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
 #           Mysql            #
 ##############################
 find_package( MySQL )
+
+if( WIN32 )
+  if( NOT EXISTS "${MYSQL_DLL}" )
+    message( FATAL_ERROR "Could not find MySQL runtime library: ${MYSQL_DLL}" )
+  endif()
+
+  file( COPY "${MYSQL_DLL}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "${MYSQL_DLL}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools" )
+endif()
 
 ##############################
 #        Dependencies        #
