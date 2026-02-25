@@ -5,6 +5,7 @@
 
 #include "FishingMgr.h"
 #include "EventMgr.h"
+#include "PlayerMgr.h"
 
 #include "Actor/Player.h"
 #include "Event/EventDefs.h"
@@ -35,8 +36,9 @@ void FishingMgr::startFishing( Entity::Player& player )
   }
 
   Session session;
-  session.state = SessionState::Active;
+  session.state = FishingState::CastingOut; // todo: depends on whether player uses Cast or other fishing action
   session.startedAtMs = Common::Util::getTimeMs();
+  session.stateChangedAtMs = session.startedAtMs;
   m_sessions[ characterId ] = session;
 
   player.setStatus( Common::ActorStatus::Gathering );
@@ -48,6 +50,10 @@ void FishingMgr::startFishing( Entity::Player& player )
                        {
                          cleanupSession( cbPlayer, true );
                        } );
+
+  // eventStart unconditionally sets InNpcEvent which greys out the hotbar;
+  // fishing must allow the player to act (quit, hook, etc.) so remove it.
+  player.removeCondition( Common::PlayerCondition::InNpcEvent );
 
   Logger::debug( "[FishingMgr] Player {} start -> event {} scene {}", characterId, PrototypeEventId,
                  static_cast< uint32_t >( FishingState::CastingOut ) );
@@ -74,7 +80,7 @@ void FishingMgr::quitFishing( Entity::Player& player )
     return;
   }
 
-  sessionIt->second.state = SessionState::Quitting;
+  sessionIt->second.state = FishingState::Quitting;
 
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -89,7 +95,7 @@ void FishingMgr::quitFishing( Entity::Player& player )
   Logger::debug( "[FishingMgr] Player {} quit -> event {} scene {}", characterId, PrototypeEventId,
                  static_cast< uint32_t >( FishingState::Quitting ) );
 
-  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::Quitting ), SceneFlags, { 1u, 273u },
+  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::Quitting ), SceneFlags, { 1u, 273u, 0u, 0u },
                       [this]( Entity::Player& cbPlayer, const Event::SceneResult& result )
                       {
                         onQuitSceneReturn( cbPlayer, result );
@@ -106,13 +112,60 @@ void FishingMgr::onCastSceneReturn( Entity::Player& player, const Event::SceneRe
   if( sessionIt == m_sessions.end() )
     return;
 
+  Logger::debug( "[FishingMgr] Player {} cast scene returned, advancing to PullingPoleIn.", characterId );
+
+  // Client confirmed the cast – now trigger PullingPoleIn (scene 2) so the rod
+  // settles.  The client will return this scene to request the next transition.
+  sessionIt->second.state = FishingState::PullingPoleIn;
+  sessionIt->second.stateChangedAtMs = Common::Util::getTimeMs();
+
+  player.setCondition( Common::PlayerCondition::Fishing );
+
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::PullingPoleIn ), SceneFlags,
+                      { 2u, 283u, 271u, 0u },
+                      [this]( Entity::Player& cbPlayer, const Event::SceneResult& cbResult )
+                      {
+                        onRestSceneReturn( cbPlayer, cbResult );
+                      } );
+}
+
+void FishingMgr::onRestSceneReturn( Entity::Player& player, const Event::SceneResult& result )
+{
+  if( result.eventId != PrototypeEventId )
+    return;
+
+  const auto characterId = player.getCharacterId();
+  auto sessionIt = m_sessions.find( characterId );
+  if( sessionIt == m_sessions.end() )
+    return;
+
+  Logger::debug( "[FishingMgr] Player {} rest scene returned, advancing to pole ready.", characterId );
+
   player.setCondition( Common::PlayerCondition::Fishing );
   player.setStatus( Common::ActorStatus::Gathering );
 
-  Logger::debug( "[FishingMgr] Player {} cast scene returned; now fishing.", characterId );
+  sessionIt->second.state = FishingState::PoleReady;
+  sessionIt->second.stateChangedAtMs = Common::Util::getTimeMs();
 
-  // keep the event alive without sending another scene
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  eventMgr.playScene( player, PrototypeEventId, static_cast< uint32_t >( FishingState::PoleReady ), SceneFlags,
+                      { 3u, 271u, 0u, 0u },
+                      [this]( Entity::Player& cbPlayer, const Event::SceneResult& cbResult )
+                      {
+                        onPoleReadySceneReturn( cbPlayer, cbResult );
+                      } );
+}
 
+void FishingMgr::onPoleReadySceneReturn( Entity::Player& player, const Event::SceneResult& result )
+{
+  if( result.eventId != PrototypeEventId )
+    return;
+
+  Logger::debug( "[FishingMgr] Player {} pole ready scene returned, keeping event alive.",
+                 player.getCharacterId() );
+
+  // PoleReady is the idle fishing state; keep the event alive.
   auto pEvent = player.getEvent( PrototypeEventId );
   if( pEvent )
     pEvent->setPlayedScene( true );

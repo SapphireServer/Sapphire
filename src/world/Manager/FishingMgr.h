@@ -12,7 +12,7 @@ namespace Sapphire::World::Manager
   {
   public:
     static constexpr uint32_t PrototypeEventId = 0x00150001;
-    static constexpr uint32_t SceneFlags = 0x00010000;
+    static constexpr uint32_t SceneFlags = 0x00040001;
     static constexpr uint8_t EventStartFlags = 0;
     static constexpr uint32_t EventStartArg = 0;
 
@@ -32,13 +32,6 @@ namespace Sapphire::World::Manager
       LineInWater = 12,
     };
 
-    enum class SessionState : uint8_t
-    {
-      None,
-      Active,
-      Quitting
-    };
-
     void startFishing( Entity::Player& player );
     void quitFishing( Entity::Player& player );
     void onFishingActionRequest( Entity::Player& player, uint32_t actionId, uint16_t requestId, uint64_t targetId );
@@ -49,11 +42,14 @@ namespace Sapphire::World::Manager
   private:
     struct Session
     {
-      SessionState state{ SessionState::None };
+      FishingState state{ FishingState::None };
       uint64_t startedAtMs{};
+      uint64_t stateChangedAtMs{};
     };
 
     void onCastSceneReturn( Entity::Player& player, const Event::SceneResult& result );
+    void onRestSceneReturn( Entity::Player& player, const Event::SceneResult& result );
+    void onPoleReadySceneReturn( Entity::Player& player, const Event::SceneResult& result );
     void onQuitSceneReturn( Entity::Player& player, const Event::SceneResult& result );
 
     void cleanupSession( Entity::Player& player, bool setIdle );
