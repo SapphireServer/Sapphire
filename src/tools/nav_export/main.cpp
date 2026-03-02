@@ -328,7 +328,7 @@ void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, E
 int main( int argc, char *argv[ ] )
 {
   printf( "Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n"
-    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~3.5GB RAM using 16 jobs.\n" );
+    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~10GB RAM using 16 jobs.\n" );
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto entryStartTime = std::chrono::high_resolution_clock::now();
@@ -337,7 +337,7 @@ int main( int argc, char *argv[ ] )
   std::string zoneName = "d2f1";
 
   bool generateNavmesh = true;
-  bool dumpAllZones = false;
+  bool dumpAllZones = true;
   int nJobs = std::thread::hardware_concurrency();
 
   int exportFileType = 0;

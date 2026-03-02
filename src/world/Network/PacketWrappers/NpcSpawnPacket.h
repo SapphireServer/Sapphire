@@ -47,7 +47,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Pos[ 1 ] = bnpc.getPos().y;
       m_data.Pos[ 2 ] = bnpc.getPos().z;
       m_data.Dir = bnpc.getRotUInt16();
-      m_data.BindId = bnpc.getBoundEncounterId();
+      m_data.BindId = bnpc.getBoundInstanceId();
 
       m_data.Rank = bnpc.getRank();
       m_data.MainWeapon = bnpc.getWeaponMain();

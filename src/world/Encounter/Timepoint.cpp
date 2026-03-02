@@ -854,6 +854,11 @@ namespace Sapphire
           pBNpc->setInvincibilityType( static_cast< Common::InvincibilityType >( pSpawnData->m_invincibilityType ) );
           pBNpc->init();
 
+          pEncounter->addBNpc( pBNpc );
+          // make sure we bind this bnpc
+          if( pEncounter->getLockoutTime() > 0 )
+            pEncounter->bindActor( pBNpc );
+
           pTeri->pushActor( pBNpc );
         }
       }

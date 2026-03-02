@@ -20,7 +20,7 @@ namespace Sapphire::Common
     Vector3 operator+( const Vector3& v ) const { return { x + v.x, y + v.y, z + v.z }; }
     Vector3 operator-( const Vector3& v ) const { return { x - v.x, y - v.y, z - v.z }; }
     Vector3 operator*( float s ) const { return { x * s, y * s, z * s }; }
-
+    Vector3 operator/( float s ) const { return { x / s, y / s, z / s }; }
     // Vector Logic
     float lengthSq() const { return x * x + y * y + z * z; }
     float length() const { return std::sqrt( lengthSq() ); }

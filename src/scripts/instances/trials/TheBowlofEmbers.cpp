@@ -17,11 +17,10 @@ public:
   void setupEncounter( InstanceContent& instance, EncounterPtr pEncounter )
   {
     EncounterSetup setup;
-    setup.type = EncounterType::Trial;
     setup.timelineName = "IfritNormal";
     setup.encounterShape = EncounterShape::CYLINDER;
     setup.position = { 0, 0, 0 };   // centre
-    setup.position2 = { 40, 10, 0 };// radius, height, unused
+    setup.position2 = { 80, 10, 0 };// radius, height, unused
     setup.hasLockout = true;
     setup.bnpcSetupList = { { NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
 
