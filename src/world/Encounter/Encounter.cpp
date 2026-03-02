@@ -449,10 +449,12 @@ namespace Sapphire
         if( locked )
         {
           pEObj->setPermissionInvisibility( 0 );
+          pEObj->setCollisionEnabled( true );
         }
         else
         {
           pEObj->setPermissionInvisibility( 1 );
+          pEObj->setCollisionEnabled( false );
         }
       }
     }
@@ -470,10 +472,12 @@ namespace Sapphire
         if( locked )
         {
           pEObj->setPermissionInvisibility( 0 );
+          pEObj->setCollisionEnabled( true );
         }
         else
         {
           pEObj->setPermissionInvisibility( 1 );
+          pEObj->setCollisionEnabled( false );
         }
       }
     }

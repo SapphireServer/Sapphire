@@ -170,8 +170,6 @@ void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
   m_permissionInvisibility = permissionInvisibility;
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
-
-  setCollisionEnabled( permissionInvisibility == 0 );
 }
 
 uint32_t EventObject::getOwnerId() const
@@ -187,51 +185,67 @@ void EventObject::setCollisionEnabled( bool enabled )
   {
     if( auto pNavi = pTeri->getNaviProvider() )
     {
-      switch( m_collision.m_type )
+      for( auto& collision : m_collision )
       {
-        case EventObjectCollisionType::Box:
+        switch( collision.m_type )
         {
-          auto& box = m_collision.m_shape.box;
-          pNavi->toggleBox( getObstacleRef(), m_pos, { box.width, box.height, box.depth }, m_rot, enabled );
-        }
-        break;
-        case EventObjectCollisionType::Sphere:
-        {
-          // todo: actually make this a sphere
-          auto& sphere = m_collision.m_shape.sphere;
-          pNavi->toggleObstacle( getObstacleRef(), m_pos, sphere.radius, sphere.radius, enabled );
-        }
-        break;
-        case EventObjectCollisionType::Cylinder:
-        {
-          auto& cylinder = m_collision.m_shape.cylinder;
-          pNavi->toggleObstacle( getObstacleRef(), m_pos, cylinder.radius, cylinder.height, enabled );
-        }
-        break;
-        default:
+          case EventObjectCollisionType::Box:
+          {
+            auto& box = collision.m_shape.box;
+            pNavi->toggleBox( collision.m_obstacleRef, collision.m_pos, { box.width, box.height, box.depth }, collision.m_rot, enabled );
+          }
           break;
+          case EventObjectCollisionType::Sphere:
+          {
+            // todo: actually make this a sphere
+            auto& sphere = collision.m_shape.sphere;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, sphere.radius, sphere.radius, enabled );
+          }
+          break;
+          case EventObjectCollisionType::Cylinder:
+          {
+            auto& cylinder = collision.m_shape.cylinder;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, cylinder.radius, cylinder.height, enabled );
+          }
+          break;
+          default:
+            break;
+        }
       }
     }
   }
 }
 
-void EventObject::setCollisionBox( float width, float height, float depth )
+void EventObject::addCollisionBox( Common::Vector3 pos, float rot, float width, float height, float depth )
 {
-  m_collision.m_type = EventObjectCollisionType::Box;
-  m_collision.m_shape.box.width = width;
-  m_collision.m_shape.box.height = height;
-  m_collision.m_shape.box.depth = depth;
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Box;
+  collision.m_pos = pos;
+  collision.m_rot = rot;
+  collision.m_shape.box.width = width;
+  collision.m_shape.box.height = height;
+  collision.m_shape.box.depth = depth;
+
+  m_collision.push_back( collision );
 }
 
-void EventObject::setCollisionCylinder( float radius, float height )
+void EventObject::addCollisionCylinder( Common::Vector3 pos, float radius, float height )
 {
-  m_collision.m_type = EventObjectCollisionType::Cylinder;
-  m_collision.m_shape.cylinder.radius = radius;
-  m_collision.m_shape.cylinder.height = height;
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Cylinder;
+  collision.m_pos = pos;
+  collision.m_shape.cylinder.radius = radius;
+  collision.m_shape.cylinder.height = height;
+
+  m_collision.push_back( collision );
 }
 
-void EventObject::setCollisionSphere( float radius )
+void EventObject::addCollisionSphere( Common::Vector3 pos, float radius )
 {
-  m_collision.m_type = EventObjectCollisionType::Sphere;
-  m_collision.m_shape.sphere.radius = radius;
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Sphere;
+  collision.m_pos = pos;
+  collision.m_shape.sphere.radius = radius;
+
+  m_collision.push_back( collision );
 }

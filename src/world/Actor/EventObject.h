@@ -23,6 +23,9 @@ namespace Sapphire::Entity
   struct EventObjectCollision
   {
     EventObjectCollisionType m_type;
+    Common::Vector3 m_pos;
+    float m_rot;
+    uint32_t m_obstacleRef;
     union
     {
       struct
@@ -99,11 +102,11 @@ namespace Sapphire::Entity
 
     void setCollisionEnabled( bool enabled );
 
-    void setCollisionBox( float width, float height, float depth );
+    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
 
-    void setCollisionCylinder( float radius, float height );
+    void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
 
-    void setCollisionSphere( float radius );
+    void addCollisionSphere( Common::Vector3 pos, float radius );
 
 
 
@@ -119,7 +122,7 @@ namespace Sapphire::Entity
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
-    EventObjectCollision m_collision;
+    std::vector< EventObjectCollision > m_collision;
 
   };
 }

@@ -268,14 +268,14 @@ int main( int argc, char* argv[] )
 
   for( auto entry : contentList )
   {
-    std::string eobjects = "    Entity::EventObjectPtr pEObj;\n";
+    std::string eobjects = "    Entity::EventObjectPtr pEObj;\n\n";
     entryStartTime = std::chrono::system_clock::now();
     zoneName = entry.zoneName;
     try
     {
       std::unordered_map< uint32_t, SharedGroupEntry* > m_sharedGroupMap;
       std::unordered_map< uint32_t, EventObjectEntry* > m_eventObjectMap;
-      std::unordered_map< uint32_t, std::string > m_eventObjectStrings;
+      std::map< uint32_t, std::string > m_eventObjectStrings;
 
       const auto& zonePath = zoneNameToPath( zoneName );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
@@ -454,20 +454,30 @@ int main( int argc, char* argv[] )
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
+                      auto pos = collisionBox->header.Transformation.Translation;
+                      auto rot = collisionBox->header.Transformation.Rotation.y;
                       auto box = collisionBox->header.Transformation.Scale;
-                      eobjLine += "    pEObj->setCollisionBox( " + std::to_string( box.x ) + ", " +
-                                  std::to_string( box.y ) + ", " + std::to_string( box.z ) + " );\n";
+                      eobjLine += "    pEObj->addCollisionBox( { " +
+                                  // todo: this probably needs transforming by the parent eobj transformation
+                                  // todo: rot is probably also wrong
+                                  std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                                  std::to_string( rot * -1.f ) + ", " + // todo: is this rotation correct or should we use the eobj rotation?
+                                  std::to_string( box.x ) + ", " + std::to_string( box.y ) + ", " + std::to_string( box.z ) + " );\n";
                     }
                     break;
                     case TriggerBoxShapeSphere:
                       shapeStr = "Sphere";
                       // todo:
-                      // eobjLine += "    pEObj->setCollisionSphere( " + std::to_string( radius ) + " );\n";
+                      // eobjLine += "    pEObj->addCollisionSphere( { " +
+                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                      //             std::to_string( radius ) + " );\n";
                       break;
                     case TriggerBoxShapeCylinder:
                       shapeStr = "Cylinder";
                       // todo:
-                      // eobjLine += "    pEObj->setCollisionCylinder( " + std::to_string( radius ) + ", " + std::to_string( height ) + " );\n"
+                      // eobjLine += "    pEObj->addCollisionCylinder( { " +
+                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                      //             std::to_string( radius ) + ", " + std::to_string( height ) + " );\n"
                       break;
                     case TriggerBoxShapeBoard:
                       shapeStr = "Board";
@@ -517,7 +527,7 @@ int main( int argc, char* argv[] )
 
       // append all strings to the main eobj string
       for( auto [ id, str ] : m_eventObjectStrings )
-        eobjects += str;
+        eobjects += str + "\n";
 
       Logger::info( "Exported {} in {} seconds", zoneName, 
                 std::chrono::duration_cast< std::chrono::seconds >(
