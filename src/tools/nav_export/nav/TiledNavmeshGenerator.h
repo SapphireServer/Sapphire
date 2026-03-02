@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <memory>
 
 #include "ext/MeshLoaderObj.h"

@@ -171,22 +171,67 @@ void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
   m_permissionInvisibility = permissionInvisibility;
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
 
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+  setCollisionEnabled( permissionInvisibility == 0 );
+}
 
-  if( pTeri )
+uint32_t EventObject::getOwnerId() const
+{
+  return m_ownerId;
+}
+
+void EventObject::setCollisionEnabled( bool enabled )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  
+  if( auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() ) )
   {
     if( auto pNavi = pTeri->getNaviProvider() )
     {
-      if( m_eobjType == EventObjectType::Door )
-        pNavi->toggleDoor( getObstacleRef(), m_pos, { 50.f, 10.f, 2.f }, m_rot, permissionInvisibility == 0 );
-      else
-        pNavi->toggleObstacle( getObstacleRef(), m_pos, m_scale, m_scale, permissionInvisibility == 0 );
+      switch( m_collision.m_type )
+      {
+        case EventObjectCollisionType::Box:
+        {
+          auto& box = m_collision.m_shape.box;
+          pNavi->toggleBox( getObstacleRef(), m_pos, { box.width, box.height, box.depth }, m_rot, enabled );
+        }
+        break;
+        case EventObjectCollisionType::Sphere:
+        {
+          // todo: actually make this a sphere
+          auto& sphere = m_collision.m_shape.sphere;
+          pNavi->toggleObstacle( getObstacleRef(), m_pos, sphere.radius, sphere.radius, enabled );
+        }
+        break;
+        case EventObjectCollisionType::Cylinder:
+        {
+          auto& cylinder = m_collision.m_shape.cylinder;
+          pNavi->toggleObstacle( getObstacleRef(), m_pos, cylinder.radius, cylinder.height, enabled );
+        }
+        break;
+        default:
+          break;
+      }
     }
   }
 }
 
-uint32_t Sapphire::Entity::EventObject::getOwnerId() const
+void EventObject::setCollisionBox( float width, float height, float depth )
 {
-  return m_ownerId;
+  m_collision.m_type = EventObjectCollisionType::Box;
+  m_collision.m_shape.box.width = width;
+  m_collision.m_shape.box.height = height;
+  m_collision.m_shape.box.depth = depth;
+}
+
+void EventObject::setCollisionCylinder( float radius, float height )
+{
+  m_collision.m_type = EventObjectCollisionType::Cylinder;
+  m_collision.m_shape.cylinder.radius = radius;
+  m_collision.m_shape.cylinder.height = height;
+}
+
+void EventObject::setCollisionSphere( float radius )
+{
+  m_collision.m_type = EventObjectCollisionType::Sphere;
+  m_collision.m_shape.sphere.radius = radius;
 }
