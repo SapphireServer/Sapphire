@@ -249,3 +249,8 @@ void EventObject::addCollisionSphere( Common::Vector3 pos, float radius )
 
   m_collision.push_back( collision );
 }
+
+const std::vector< EventObjectCollision >& EventObject::getCollisionData() const
+{
+  return m_collision;
+}

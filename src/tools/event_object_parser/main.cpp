@@ -28,6 +28,9 @@
 
 #include <filesystem>
 
+#include "vec3.h"
+#include "matrix4.h"
+
 [[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 Sapphire::Data::ExdData g_exdData;
 
@@ -449,12 +452,29 @@ int main( int argc, char* argv[] )
 
                   auto collisionBox = static_cast< CollisionBoxEntry* >( instanceObject.get() );
                   const char* shapeStr = "Unknown";
+
+                  auto pos = collisionBox->header.Transformation.Translation;
+                  // transform by parent eobj
+                  {
+                    pos.x *= object->header.Transformation.Scale.x;
+                    pos.y *= object->header.Transformation.Scale.y;
+                    pos.z *= object->header.Transformation.Scale.z;
+
+                    pos = pos * matrix4::rotateX( object->header.Transformation.Rotation.x );
+                    pos = pos * matrix4::rotateY( object->header.Transformation.Rotation.y );
+                    pos = pos * matrix4::rotateZ( object->header.Transformation.Rotation.z );
+
+                    pos.x += object->header.Transformation.Translation.x;
+                    pos.y += object->header.Transformation.Translation.y;
+                    pos.z += object->header.Transformation.Translation.z;
+                  }
+
                   switch( collisionBox->header.triggerBoxShape )
                   {
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
-                      auto pos = collisionBox->header.Transformation.Translation;
+                      //auto pos = collisionBox->header.Transformation.Translation;
                       auto rot = collisionBox->header.Transformation.Rotation.y;
                       auto box = collisionBox->header.Transformation.Scale;
                       eobjLine += "    pEObj->addCollisionBox( { " +

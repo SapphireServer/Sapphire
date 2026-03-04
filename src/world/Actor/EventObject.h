@@ -108,6 +108,7 @@ namespace Sapphire::Entity
 
     void addCollisionSphere( Common::Vector3 pos, float radius );
 
+    const std::vector< EventObjectCollision >& getCollisionData() const;
 
 
   protected:

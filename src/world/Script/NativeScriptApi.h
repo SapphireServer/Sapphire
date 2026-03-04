@@ -429,6 +429,16 @@ namespace Sapphire::ScriptAPI
 
     virtual void onLeaveTerritory( InstanceContent& instance, Entity::Player& player );
 
+    virtual void onDirectorSeqChange( InstanceContent& instance );
+
+    virtual void onDirectorFlagChange( InstanceContent& instance );
+
+    virtual void onDirectorVarChange( InstanceContent& instance );
+
+    virtual void onCustomVarChange( InstanceContent& instance );
+
+    virtual void onActorDeath( InstanceContent& instance, Entity::Chara& chara );
+
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();

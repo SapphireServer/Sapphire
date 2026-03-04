@@ -61,6 +61,7 @@ namespace Sapphire
     Common::Vector3 position;
     Common::Vector3 position2;
     uint64_t duration{ 0 };
+    uint32_t placeName{ 0 };
     bool hasLockout{ false };
   };
 
@@ -115,6 +116,8 @@ namespace Sapphire
 
     uint64_t getLockoutTime() const;
 
+    bool isLocked() const;
+
     // todo:
     virtual void onEnterRange( Entity::GameObjectPtr pActor );
 
@@ -148,6 +151,7 @@ namespace Sapphire
     uint64_t m_lockoutTime{ 0 };
     uint64_t m_failTime{ 0 };
     uint64_t m_finishTime{ 0 };
+    uint32_t m_placeName{ 0 };
 
     Common::Vector3 m_position;
 

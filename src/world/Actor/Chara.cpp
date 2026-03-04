@@ -29,6 +29,8 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
+#include "Script/ScriptMgr.h"
+
 #include "Navi/NaviProvider.h"
 #include "Common.h"
 
@@ -297,6 +299,15 @@ void Chara::die()
 
   // fire onDeath event
   onDeath();
+
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( auto pInstance = pTeri->getAsInstanceContent() )
+  {
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    scriptMgr.onInstanceActorDeath( *pInstance, *this );
+  }
 
   removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnDeath );
 

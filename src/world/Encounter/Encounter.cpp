@@ -47,6 +47,7 @@ namespace Sapphire
     m_lockoutTime = 0;
     m_failTime = 0;
     m_finishTime = 0;
+    m_placeName = m_setup.placeName;
 
     // todo: probably add invisible untargetable BNpc for FATEs?
     for( const auto& actor : m_setup.bnpcSetupList )
@@ -55,6 +56,7 @@ namespace Sapphire
       if( !pBNpc )
         pBNpc = m_pTeri->createBNpcFromLayoutId( actor.layoutId, actor.hp, actor.type );
 
+      pBNpc->resetFlags( actor.flags );
       pBNpc->init();
       addBNpc( pBNpc );
 
@@ -206,24 +208,6 @@ namespace Sapphire
         m_lastRangeTick = currTime;
       }
     }
-
-    /*
-    if( m_duration && m_type == EncounterType::Fate && elapsed >= m_duration )
-    {
-      setStatus( EncounterStatus::FAIL );
-    }
-    */
-    if( m_status == EncounterStatus::FAIL && currTime - m_failTime >= 5000 )
-    {
-      //removeBNpcs( true );
-      //unbindActors();
-      reset();
-    }
-    else if( m_status == EncounterStatus::SUCCESS && m_finishTime == 0 )
-    {
-      unbindActors();
-      m_finishTime = currTime;
-    }
     
     m_pTimeline->update( currTime );
 
@@ -243,7 +227,7 @@ namespace Sapphire
     if( m_status == EncounterStatus::ACTIVE && ( m_playerList.empty() && m_playersInside.empty() ) )
       setStatus( EncounterStatus::IDLE );
 
-    if( m_setup.hasLockout && m_lockoutTime == 0 && elapsed >= 15000 )
+    if( m_setup.hasLockout && !isLocked() && elapsed >= 15000 )
     {
       // todo: send encounter sealed message
       m_playerList = m_playersInside;
@@ -261,7 +245,11 @@ namespace Sapphire
     removePlayers();
     m_actorsInside.clear();
     m_pTimeline->reset( shared_from_this() );
+
     init();
+
+    setEntranceEObjLocked( false );
+    setExitEObjLocked( true );
   }
 
   void Encounter::removeBNpcs( bool removeBoss )
@@ -272,6 +260,9 @@ namespace Sapphire
       if( auto bossIt = m_bossBnpcs.find( it->second->getId() ); bossIt != m_bossBnpcs.end() )
       {
         remove = removeBoss;
+
+        if( remove )
+          m_bossBnpcs.erase( bossIt );
       }
 
       if( remove )
@@ -379,6 +370,11 @@ namespace Sapphire
     return m_lockoutTime;
   }
 
+  bool Encounter::isLocked() const
+  {
+    return m_lockoutTime != 0;
+  }
+
   void Encounter::onEnterRange( Entity::GameObjectPtr pActor )
   {
     // todo: FATE
@@ -390,13 +386,13 @@ namespace Sapphire
 
     // todo: handle bnpcs from overworld that get converted to FATEs
 
-    if( pActor->isPlayer() )
+    if( pActor->isPlayer() && !isLocked() )
     {
       auto pPlayer = pActor->getAsPlayer();
       addPlayer( pPlayer, getLockoutTime() != 0 );
       m_playersInside.emplace( pPlayer );
     }
-    else
+    else if( !pActor->isPlayer() && canBindActors() )
     {
       bindActor( pActor );
     }
@@ -425,11 +421,14 @@ namespace Sapphire
   {
     if( newStatus == EncounterStatus::FAIL )
     {
+      // todo: reset(), init() will just clear the failTime anyway so should this be here?
       m_failTime = Common::Util::getTimeMs();
+      reset();
     }
     else if( newStatus == EncounterStatus::SUCCESS )
     {
       m_finishTime = Common::Util::getTimeMs();
+      unbindActors();
     }
     else if( newStatus == EncounterStatus::IDLE )
     {

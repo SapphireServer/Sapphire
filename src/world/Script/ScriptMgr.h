@@ -127,6 +127,16 @@ namespace Sapphire::Scripting
 
     bool onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player );
 
+    bool onInstanceDirectorSeqChange( InstanceContent& instance );
+
+    bool onInstanceDirectorFlagChange( InstanceContent& instance );
+
+    bool onInstanceDirectorVarChange( InstanceContent& instance );
+
+    bool onInstanceCustomVarChange( InstanceContent& instance );
+
+    bool onInstanceActorDeath( InstanceContent& instance, Entity::Chara& chara );
+
     bool onPlayerSetup( QuestBattle& instance, Entity::Player& player );
 
     bool onInstanceInit( QuestBattle& instance );
