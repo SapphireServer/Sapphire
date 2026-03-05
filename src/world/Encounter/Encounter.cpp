@@ -68,14 +68,14 @@ namespace Sapphire
 
     for( const auto& eobj : m_setup.eobjSetupList )
     {
-      auto pEObj = m_pTeri->getEObj( eobj.baseId );
+      auto pEObj = m_pTeri->getEObjByName( eobj.name );
 
       if( !pEObj )
       {
         pEObj = m_pTeri->addEObj( eobj.name, eobj.baseId, eobj.boundInstanceId, eobj.instanceId, eobj.state,
                                   eobj.pos, eobj.scale, eobj.rotation, eobj.permissionInvisibility );
       }
-      // todo:
+
       if( pEObj )
       {
         pEObj->setPos( eobj.pos );
@@ -91,8 +91,8 @@ namespace Sapphire
     // setup entrance eobjs
     for( const auto& entrance : m_setup.lockoutEntrances )
     {
+      auto pEObj = m_pTeri->getEObjByName( entrance.name );
 
-      auto pEObj = m_pTeri->getEObj( entrance.baseId );
       if( !pEObj )
       {
         pEObj = m_pTeri->addEObj( entrance.name, entrance.baseId, entrance.boundInstanceId, entrance.instanceId, entrance.state,
@@ -115,7 +115,8 @@ namespace Sapphire
     // setup exit eobjs
     for( const auto& exit : m_setup.lockoutExits )
     {
-      auto pEObj = m_pTeri->getEObj( exit.baseId );
+      auto pEObj = m_pTeri->getEObjByName( exit.name );
+
       if( !pEObj )
       {
         pEObj = m_pTeri->addEObj( exit.name, exit.baseId, exit.boundInstanceId, exit.instanceId, exit.state,
@@ -229,7 +230,7 @@ namespace Sapphire
     if( m_status == EncounterStatus::ACTIVE && ( m_playerList.empty() && m_playersInside.empty() ) )
       setStatus( EncounterStatus::IDLE );
 
-    if( m_setup.hasLockout && !isLocked() && canBindActors() )
+    if( m_status == EncounterStatus::ACTIVE && m_setup.hasLockout && !isLocked() && canBindActors() )
     {
       onLockout();
     }
@@ -440,32 +441,59 @@ namespace Sapphire
       // todo: reset(), init() will just clear the failTime anyway so should this be here?
       m_failTime = Common::Util::getTimeMs();
       // todo: FATEs should just despawn rather than reset
-      reset();
 
-      if( m_setup.placeName != 0 )
+      // send no longer sealed message
+      if( m_setup.placeName != 0 && isLocked() )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
 
-      // todo: change and send bgm
-      // todo: should this be set for overworld FATEs too?
+      // send bgm reset
+      if( m_setup.bgmInTeri != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          pInstance->setCurrentBGM( m_setup.bgmInTeri );
+
+      reset();
     }
     else if( newStatus == EncounterStatus::SUCCESS )
     {
       m_finishTime = Common::Util::getTimeMs();
+      m_lockoutTime = 0;
       unbindActors();
 
-      if( m_setup.placeName != 0 )
+      // send no longer sealed message
+      if( m_setup.placeName != 0 && isLocked() )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
 
-
-      // todo: change and send bgm
-      // todo: should this be set for overworld FATEs too?
+      // send bgm
+      if( m_setup.bgmOnFinish != 0 )
+      {
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          pInstance->setCurrentBGM( m_setup.bgmOnFinish );
+      }
+      else if( m_setup.bgmInTeri != 0 )
+      {
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          pInstance->setCurrentBGM( m_setup.bgmOnFinish );
+      }
+      setEntranceEObjLocked( false );
+      setExitEObjLocked( false );
     }
     else if( newStatus == EncounterStatus::IDLE )
     {
+      // send no longer sealed message
+      if( m_setup.placeName != 0 && isLocked() )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+
+      // send bgm reset
+      if( m_setup.bgmInTeri != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          pInstance->setCurrentBGM( m_setup.bgmInTeri );
+
       reset();
     }
     else if( newStatus == EncounterStatus::ACTIVE )
@@ -477,8 +505,9 @@ namespace Sapphire
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::WillBeSealed ), { m_setup.placeName } );
 
-      // todo: change and send bgm
-      // todo: should this be set for overworld FATEs too?
+      if( m_setup.bgmInCombat != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          pInstance->setCurrentBGM( m_setup.bgmInCombat );
     }
   }
 
@@ -599,7 +628,7 @@ namespace Sapphire
     for( auto& pEObj : m_eobjs )
     {
       unbindActor( pEObj );
-      m_pTeri->removeActor( pEObj );
+      // todo: should these be removed from the teri?
     }
 
     m_entranceEObjs.clear();

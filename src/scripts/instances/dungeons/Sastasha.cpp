@@ -129,8 +129,6 @@ public:
 
     pEObj = instance.addEObj( "Hiddendoor", 2000217, 3653517, 3280959, 4, { 59.000000f, 32.000000f, -35.000000f }, 1.000000f, -2.007129f, 0 );
     pEObj->addCollisionBox( { 59.048332, 39.016666, -35.022537 }, 0.000000, 8.800000, 7.718333, 0.738304 );
-    pEObj->setCollisionEnabled( true );
-    pEObj->setPermissionInvisibility( 1 );
 
     pEObj = instance.addEObj( "Giantclam", 2000222, 4208408, 3284776, 4, { 181.170303f, 32.104599f, -128.069000f }, 0.991789f, -0.862350f, 0 );
     // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8)
@@ -202,6 +200,7 @@ public:
 
     pEObj = instance.addEObj( "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 );
     pEObj->addCollisionBox( { -9.225822, 27.744892, 35.778111 }, 0.000000, 3.088758, 3.731382, 0.510000 );
+    pEObj->setPermissionInvisibility( 1 );
 
     pEObj = instance.addEObj( "sgvf_w_lvd_b0094", 2001507, 4035750, 4056798, 4, { -2.841087f, 23.114571f, 38.090420f }, 0.991760f, 0.000048f, 0 );
     // States -> vf_line_on (id: 12) vf_line_of (id: 13)
@@ -226,6 +225,8 @@ public:
     auto pEncounter = instance.getEncounter();
     if( pEncounter )
     {
+      pEncounter->update( tickCount );
+
       Entity::BNpcPtr pBNpc = nullptr;
 
       if( pEncounter->getId() == ENCOUNTER_CHOPPER )
@@ -246,6 +247,7 @@ public:
 
           // todo: hacky workaround for undefined arena coords
           pEncounter->onEnterRange( pBNpc->hateListGetHighest() );
+          pEncounter->onEnterRange( pBNpc );
         }
         // set the encounter as successful if boss is dead
         else if( !pBNpc->isAlive() && pEncounter->getStatus() == EncounterStatus::ACTIVE )
@@ -346,8 +348,8 @@ public:
         setup.timelineName = "dungeons/sastasha/Chopper";
         // todo: make this a box
         setup.encounterShape = EncounterShape::CYLINDER;
-        setup.position = {};
-        setup.position2 = {};
+        setup.position = { 74, 29, -46 };
+        setup.position2 = { 40, 10, 0 };
         //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
         setup.bnpcSetupList = { { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
         // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
@@ -370,13 +372,13 @@ public:
         setup.timelineName = "dungeons/sastasha/Madison";
         // todo: make this a box
         setup.encounterShape = EncounterShape::CYLINDER;
-        setup.position = {};
-        setup.position2 = {};
+        setup.position = { -17, 22, 48 };
+        setup.position2 = { 40, 10, 0 };
         //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
         setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
         // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
         setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 } };
-        setup.lockoutExits = { {} };
+        setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 } };
         setup.hasLockout = true;
         setup.placeName = PLACENAME_RAMBADE;
         setup.bgmInCombat = 37;

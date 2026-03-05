@@ -25,7 +25,7 @@ namespace Sapphire::Entity
     EventObjectCollisionType m_type;
     Common::Vector3 m_pos;
     float m_rot;
-    uint32_t m_obstacleRef;
+    uint32_t m_obstacleRef{ 0 };
     union
     {
       struct
