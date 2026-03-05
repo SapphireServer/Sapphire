@@ -26,6 +26,13 @@ namespace Sapphire
     CYLINDER
   };
 
+  enum class EncounterLogMessage : uint32_t
+  {
+    WillBeSealed = 2012,
+    IsSealed = 2013,
+    IsNoLongerSealed = 2014
+  };
+
   struct EncounterEObj
   {
     std::string name;
@@ -60,8 +67,12 @@ namespace Sapphire
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
     Common::Vector3 position;
     Common::Vector3 position2;
-    uint64_t duration{ 0 };
+    uint64_t duration{ 0 };    // todo: implement this
     uint32_t placeName{ 0 };
+    uint32_t bgmInCombat{ 0 }; // todo: implement this
+    uint32_t bgmInTeri{ 0 };   // todo: implement this
+    uint32_t bgmOnFinish{ 0 }; // todo: implement this
+
     bool hasLockout{ false };
   };
 
@@ -108,6 +119,10 @@ namespace Sapphire
 
     const std::set< Entity::PlayerPtr >& getPlayers() const;
 
+    const std::set< Entity::PlayerPtr >& getPlayersInside() const;
+
+    const std::set< Entity::GameObjectPtr >& getActorsInside() const;
+
     TerritoryPtr getTeriPtr();
 
     Event::DirectorPtr getDirector();
@@ -118,12 +133,13 @@ namespace Sapphire
 
     bool isLocked() const;
 
-    // todo:
     virtual void onEnterRange( Entity::GameObjectPtr pActor );
 
     virtual void onExitRange( Entity::GameObjectPtr pActor );
 
     virtual void onChangeStatus( EncounterStatus oldStatus, EncounterStatus newStatus );
+
+    virtual void onLockout();
 
     void setEntranceEObjLocked( bool locked );
 

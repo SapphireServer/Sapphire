@@ -279,20 +279,20 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onDirectorSeqChange( InstanceContent& instance )
+  void InstanceContentScript::onDirectorSeqChange( InstanceContent& instance, uint8_t seq )
   {
   }
 
-  void InstanceContentScript::onDirectorFlagChange( InstanceContent& instance )
+  void InstanceContentScript::onDirectorFlagChange( InstanceContent& instance, uint8_t flag )
   {
 
   }
 
-  void InstanceContentScript::onDirectorVarChange( InstanceContent& instance )
+  void InstanceContentScript::onDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val )
   {
   }
 
-  void InstanceContentScript::onCustomVarChange( InstanceContent& instance )
+  void InstanceContentScript::onCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val )
   {
 
   }

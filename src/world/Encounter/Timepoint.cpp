@@ -856,7 +856,7 @@ namespace Sapphire
 
           pEncounter->addBNpc( pBNpc );
           // make sure we bind this bnpc
-          if( pEncounter->getLockoutTime() > 0 )
+          if( pEncounter->isLocked() )
             pEncounter->bindActor( pBNpc );
 
           pTeri->pushActor( pBNpc );

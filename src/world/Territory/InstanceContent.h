@@ -151,6 +151,8 @@ namespace Sapphire
 
     void setFlags( uint8_t value );
 
+    void setCustomVar( uint32_t var, uint64_t value ) override;
+
     void startQte();
 
     void startEventCutscene();

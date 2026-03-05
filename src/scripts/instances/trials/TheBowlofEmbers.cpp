@@ -17,7 +17,7 @@ public:
   void setupEncounter( InstanceContent& instance, EncounterPtr pEncounter )
   {
     EncounterSetup setup;
-    setup.timelineName = "IfritNormal";
+    setup.timelineName = "trials/IfritNormal";
     setup.encounterShape = EncounterShape::CYLINDER;
     setup.position = { 0, 0, 0 };   // centre
     setup.position2 = { 80, 10, 0 };// radius, height, unused
@@ -34,7 +34,7 @@ public:
     auto director = std::static_pointer_cast< Event::Director >( instanceContent );
     instance.addEObj( "Entrance", 2000182, 4177874, 4177871, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0);
 
-    auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "IfritNormal" );
+    auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "trials/IfritNormal" );
     setupEncounter( instance, pEncounter );
 
     instance.setEncounter( pEncounter );

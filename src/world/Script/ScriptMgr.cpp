@@ -878,48 +878,48 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceLeaveTerritory( InstanceContent& 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorSeqChange( InstanceContent& instance )
+bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorSeqChange( InstanceContent& instance, uint8_t seq )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
-    script->onDirectorSeqChange( instance );
+    script->onDirectorSeqChange( instance, seq );
     return true;
   }
 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagChange( InstanceContent& instance )
+bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagChange( InstanceContent& instance, uint8_t flag )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
-    script->onDirectorFlagChange( instance );
+    script->onDirectorFlagChange( instance, flag );
     return true;
   }
 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarChange( InstanceContent& instance )
+bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
-    script->onDirectorVarChange( instance );
+    script->onDirectorVarChange( instance, var, val );
     return true;
   }
 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent& instance )
+bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
-    script->onCustomVarChange( instance );
+    script->onCustomVarChange( instance, var, val );
     return true;
   }
 

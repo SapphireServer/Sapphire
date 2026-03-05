@@ -6,6 +6,8 @@
 #include "Actor/GameObject.h"
 #include "Actor/Player.h"
 
+#include "Manager/PlayerMgr.h"
+
 #include "Util/UtilMath.h"
 #include "Util/Util.h"
 
@@ -227,11 +229,9 @@ namespace Sapphire
     if( m_status == EncounterStatus::ACTIVE && ( m_playerList.empty() && m_playersInside.empty() ) )
       setStatus( EncounterStatus::IDLE );
 
-    if( m_setup.hasLockout && !isLocked() && elapsed >= 15000 )
+    if( m_setup.hasLockout && !isLocked() && canBindActors() )
     {
-      // todo: send encounter sealed message
-      m_playerList = m_playersInside;
-      m_lockoutTime = currTime;
+      onLockout();
     }
 
     m_lastTick = currTime;
@@ -292,8 +292,8 @@ namespace Sapphire
 
   void Encounter::setStatus( EncounterStatus status )
   {
-    onChangeStatus( m_status, status );
     m_status = status;
+    onChangeStatus( m_status, status );
   }
 
   void Encounter::addBNpc( Entity::BNpcPtr pBNpc, bool bind )
@@ -350,6 +350,22 @@ namespace Sapphire
     m_playersInside.clear();
   }
 
+  const std::set< Entity::PlayerPtr >& Encounter::getPlayers() const
+  {
+    // todo: should this be playersInside?
+    return m_playerList;
+  }
+
+  const std::set< Entity::PlayerPtr >& Encounter::getPlayersInside() const
+  {
+    return m_playersInside;
+  }
+
+  const std::set< Entity::GameObjectPtr >& Encounter::getActorsInside() const
+  {
+    return m_actorsInside;
+  }
+
   TerritoryPtr Encounter::getTeriPtr()
   {
     return m_pTeri;
@@ -386,10 +402,10 @@ namespace Sapphire
 
     // todo: handle bnpcs from overworld that get converted to FATEs
 
-    if( pActor->isPlayer() && !isLocked() )
+    if( pActor->isPlayer() )
     {
       auto pPlayer = pActor->getAsPlayer();
-      addPlayer( pPlayer, getLockoutTime() != 0 );
+      addPlayer( pPlayer, isLocked() );
       m_playersInside.emplace( pPlayer );
     }
     else if( !pActor->isPlayer() && canBindActors() )
@@ -423,17 +439,64 @@ namespace Sapphire
     {
       // todo: reset(), init() will just clear the failTime anyway so should this be here?
       m_failTime = Common::Util::getTimeMs();
+      // todo: FATEs should just despawn rather than reset
       reset();
+
+      if( m_setup.placeName != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+
+      // todo: change and send bgm
+      // todo: should this be set for overworld FATEs too?
     }
     else if( newStatus == EncounterStatus::SUCCESS )
     {
       m_finishTime = Common::Util::getTimeMs();
       unbindActors();
+
+      if( m_setup.placeName != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+
+
+      // todo: change and send bgm
+      // todo: should this be set for overworld FATEs too?
     }
     else if( newStatus == EncounterStatus::IDLE )
     {
       reset();
     }
+    else if( newStatus == EncounterStatus::ACTIVE )
+    {
+      m_startTime = Common::Util::getTimeMs();
+
+      if( m_setup.placeName != 0 )
+        if( auto pInstance = m_pTeri->getAsInstanceContent() )
+          for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::WillBeSealed ), { m_setup.placeName } );
+
+      // todo: change and send bgm
+      // todo: should this be set for overworld FATEs too?
+    }
+  }
+
+  void Encounter::onLockout()
+  {
+    m_playerList = m_playersInside;
+
+    for( auto& pActor : m_actorsInside )
+      bindActor( pActor );
+
+    if( m_setup.placeName != 0 )
+      if( auto pInstance = m_pTeri->getAsInstanceContent() )
+       for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
+          pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsSealed ), { m_setup.placeName } );
+
+    setEntranceEObjLocked( true );
+    setExitEObjLocked( true );
+    m_lockoutTime = Common::Util::getTimeMs();
   }
 
   void Encounter::setEntranceEObjLocked( bool locked )
@@ -570,7 +633,9 @@ namespace Sapphire
 
   void Encounter::unbindActor( Entity::GameObjectPtr pActor )
   {
-    pActor->setBoundEncounterId( 0 );
+    if( pActor->getBoundEncounterId() == m_id )
+      pActor->setBoundEncounterId( 0 );
+
     m_boundActors.erase( pActor );
 
     /*
