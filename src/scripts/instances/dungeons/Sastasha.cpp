@@ -367,27 +367,6 @@ public:
       // chopper encounter is successful, set up the next encounter
       else if( pEncounter && pEncounter->getId() == ENCOUNTER_CHOPPER && pEncounter->getStatus() == EncounterStatus::SUCCESS )
       {
-        pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison" );
-        EncounterSetup setup;
-        setup.timelineName = "dungeons/sastasha/Madison";
-        // todo: make this a box
-        setup.encounterShape = EncounterShape::CYLINDER;
-        setup.position = { -17, 22, 48 };
-        setup.position2 = { 40, 10, 0 };
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
-        setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
-        setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 } };
-        setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 } };
-        setup.hasLockout = true;
-        setup.placeName = PLACENAME_RAMBADE;
-        setup.bgmInCombat = 37;
-        setup.bgmInTeri = 35;
-
-        pEncounter->setEncounterSetup( setup );
-        instance.setEncounter( pEncounter );
-        pEncounter->init();
-
         eventMgr().eventActionStart( player, getId(), EventActionTouch, [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                                       eobj.setPermissionInvisibility( 1 );
                                       instance.getEObjByName( "Hiddendoor" )->setPermissionInvisibility( 7 );
@@ -453,6 +432,37 @@ public:
                          uint16_t param2 ) override
   {
 
+  }
+
+  void onDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val ) override
+  {
+    // spawn madison
+    if( var == 0 && val == Seq2 )
+    {
+      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
+      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
+
+      auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison" );
+      EncounterSetup setup;
+      setup.timelineName = "dungeons/sastasha/Madison";
+      // todo: make this a box
+      setup.encounterShape = EncounterShape::CYLINDER;
+      setup.position = { -17, 22, 48 };
+      setup.position2 = { 40, 10, 0 };
+      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
+      setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
+      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
+      setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 } };
+      setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 } };
+      setup.hasLockout = true;
+      setup.placeName = PLACENAME_RAMBADE;
+      setup.bgmInCombat = 37;
+      setup.bgmInTeri = 35;
+
+      pEncounter->setEncounterSetup( setup );
+      instance.setEncounter( pEncounter );
+      pEncounter->init();
+    }
   }
 
   void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override

@@ -194,17 +194,21 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
-    int32_t posX;
-    int32_t posY;
-    int32_t posZ;
+    float posX;
+    float posY;
+    float posZ;
+    float rot = player.getRot();
 
-    sscanf( params.c_str(), "%d %d %d", &posX, &posY, &posZ );
+    sscanf( params.c_str(), "%f %f %f %f", &posX, &posY, &posZ, &rot );
 
     if( ( posX == 0xcccccccc ) || ( posY == 0xcccccccc ) || ( posZ == 0xcccccccc ) )
     {
       PlayerMgr::sendUrgent( player, "Syntaxerror." );
       return;
     }
+
+    if( rot == 0xcccccccc )
+      rot = player.getRot();
 
     if( subCommand == "pos" )
       player.setPos( static_cast< float >( posX ),
@@ -219,7 +223,9 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    server.queueForPlayer( player.getCharacterId(), setActorPosPacket );
+    setActorPosPacket->data().Dir = Common::Util::floatToUInt16Rot( rot );
+
+    server.queueForPlayers( player.getInRangePlayerIds( true ), setActorPosPacket );
   }
   else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {

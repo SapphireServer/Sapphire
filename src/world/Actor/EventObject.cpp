@@ -191,8 +191,13 @@ void EventObject::setCollisionEnabled( bool enabled )
         {
           case EventObjectCollisionType::Box:
           {
+            // todo: figure this out
             auto& box = collision.m_shape.box;
-            pNavi->toggleBox( collision.m_obstacleRef, collision.m_pos, { box.width, box.height, box.depth }, collision.m_rot, enabled );
+            Common::Vector3 pos = collision.m_pos;// Common::Util::getOffsettedPosition( collision.m_pos, collision.m_rot, 0.f, 0.f, box.width / 2.f );
+            float rot = collision.m_rot;
+            // rot = rot + ( PI / 2.0f );
+
+            pNavi->toggleBox( collision.m_obstacleRef, pos, { box.width, box.height, box.depth }, rot, enabled );
           }
           break;
           case EventObjectCollisionType::Sphere:

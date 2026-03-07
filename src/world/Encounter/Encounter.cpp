@@ -457,8 +457,6 @@ namespace Sapphire
     }
     else if( newStatus == EncounterStatus::SUCCESS )
     {
-      m_finishTime = Common::Util::getTimeMs();
-      m_lockoutTime = 0;
       unbindActors();
 
       // send no longer sealed message
@@ -478,6 +476,9 @@ namespace Sapphire
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           pInstance->setCurrentBGM( m_setup.bgmOnFinish );
       }
+
+      m_finishTime = Common::Util::getTimeMs();
+      m_lockoutTime = 0;
       setEntranceEObjLocked( false );
       setExitEObjLocked( false );
     }
@@ -640,7 +641,7 @@ namespace Sapphire
   {
     auto elapsed = Common::Util::getTimeMs() - m_startTime;
 
-    return ( m_startTime > 0 && m_setup.hasLockout && elapsed >= 15000 );
+    return ( m_status == EncounterStatus::ACTIVE && m_startTime > 0 && m_setup.hasLockout && elapsed >= 15000 );
   }
 
   void Encounter::bindActor( Entity::GameObjectPtr pActor )
