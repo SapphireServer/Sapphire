@@ -336,7 +336,7 @@ int main( int argc, char* argv[] )
     try
     {
       std::unordered_map< uint32_t, SharedGroupEntry* > m_sharedGroupMap;
-      std::unordered_map< uint32_t, EventObjectEntry* > m_eventObjectMap;
+      std::map< uint32_t, EventObjectEntry* > m_eventObjectMap;
       std::map< uint32_t, std::string > m_eventObjectStrings;
 
       const auto& zonePath = zoneNameToPath( zoneName );

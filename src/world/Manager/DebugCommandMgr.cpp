@@ -648,8 +648,10 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
   }
   else if( subCommand == "obstacle" )
   {
-    uint32_t radius;
-    sscanf( params.c_str(), "%u", &radius );
+    float radius{ 0.f };
+    float height{ 0.f };
+    float depth{ 0.f };
+    auto paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
 
     auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
     if( auto pNavi = pTeri->getNaviProvider() )
@@ -658,7 +660,10 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
       if( player.getObstacleRef() != 0 )
         pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, false );
 
-      pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, true );
+      if( paramCount == 3 )
+        pNavi->toggleBox( player.getObstacleRef(), { player.getPos().x, player.getPos().y + 2.f, player.getPos().z }, { radius, height, depth }, player.getRot(), true );
+      else
+        pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, true );
     }
   }
   else
