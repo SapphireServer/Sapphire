@@ -44,7 +44,7 @@ namespace fs = std::filesystem;
 bool ignoreModels = false;
 //std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 //std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
-std::string gamePath( "F:\\client3.0\\game\\sqpack" );
+std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 
 struct instanceContent
@@ -251,6 +251,18 @@ float wrapAngle( float angle )
 float toGameYaw( float yaw )
 {
   return wrapAngle( -yaw );
+}
+
+float directionFromForward( const vec3& forward )
+{
+  return wrapAngle( std::atan2( -forward.x, forward.z ) );
+}
+
+float composeCollisionRotation( const vec3& parentRotation, const vec3& localRotation )
+{
+  auto forward = applyRotation( vec3{ 0.0f, 0.0f, 1.0f }, localRotation );
+  forward = applyRotation( forward, parentRotation );
+  return directionFromForward( forward );
 }
 
 int main( int argc, char* argv[] )
@@ -518,8 +530,7 @@ int main( int argc, char* argv[] )
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
-                      // todo: parent rot wrong or is the game's inner quaternion showing wacky results for the same "angle"?
-                      const auto rot = toGameYaw( parentRotation.y + collisionBox->header.Transformation.Rotation.y );
+                      const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
                       const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
                       eobjLine += "    pEObj->addCollisionBox( { " +
                                   std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
