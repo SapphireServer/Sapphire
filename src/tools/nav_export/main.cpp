@@ -38,7 +38,7 @@ using namespace Sapphire;
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "H:\\Games\\ffxiv3.35\\game\\sqpack" );
+std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -328,13 +328,13 @@ void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, E
 int main( int argc, char *argv[ ] )
 {
   printf( "Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n"
-    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~3.5GB RAM using 16 jobs.\n" );
+    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~10GB RAM using 16 jobs.\n" );
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto entryStartTime = std::chrono::high_resolution_clock::now();
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
-  std::string zoneName = "s1b5";
+  std::string zoneName = "d2f1";
 
   bool generateNavmesh = true;
   bool dumpAllZones = true;

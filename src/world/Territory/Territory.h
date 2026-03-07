@@ -199,6 +199,10 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId );
+
+    Entity::EventObjectPtr getEObjByName( const std::string& name );
+
     Entity::PlayerPtr getPlayer( uint32_t playerId );
 
     const std::unordered_map< uint32_t, Entity::PlayerPtr >& getPlayers();

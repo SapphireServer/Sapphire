@@ -85,6 +85,7 @@ add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
+set(RECASTNAVIGATION_DT_POLYREF64 ON CACHE BOOL "Use 64bit polyrefs instead of 32bit for Detour" FORCE)
 add_subdirectory( "deps/recastnavigation" )
 
 if( SAPPHIRE_BUILD_TOOLKIT )

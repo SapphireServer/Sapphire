@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <memory>
 
 #include "ext/MeshLoaderObj.h"
@@ -21,6 +22,24 @@
 #include "FastLZ/fastlz.h"
 #include <recastnavigation/RecastDemo/Include/Sample.h>
 #include <recastnavigation/RecastDemo/Include/InputGeom.h>
+
+// todo: this no worky
+struct PrintContext : rcContext {
+  explicit PrintContext( bool state = true ) : rcContext( state ) {}
+protected:
+  void doLog( const rcLogCategory category, const char* msg, const int /*len*/ ) override
+  {
+    const char* catStr = "";
+    switch( category )
+    {
+      case RC_LOG_PROGRESS: catStr = "PROGRESS"; break;
+      case RC_LOG_WARNING:  catStr = "WARNING";  break;
+      case RC_LOG_ERROR:    catStr = "ERROR";    break;
+    }
+    printf( "[Recast %s] %s\n", catStr, msg );
+    fflush( stdout );
+  }
+};
 
 struct FastLZCompressor : dtTileCacheCompressor {
   ~FastLZCompressor() override = default;
@@ -166,10 +185,11 @@ public:
   bool buildNavmesh();
   bool buildTiledCache();
   int rasterizeTileLayers(
-          const int tx, const int ty,
+          const int tileX,
+          const int tileY,
           const rcConfig& cfg,
           TileCacheData* tiles,
-          const int maxTiles );
+          const int maxTiles ) const;
 
   void saveNavmesh( const std::string& name );
 
@@ -202,7 +222,7 @@ private:
 
   int m_tileTriCount = 0;
 
-  int m_partitionType = SamplePartitionType::SAMPLE_PARTITION_WATERSHED;
+  int m_partitionType = static_cast< int >( SamplePartitionType::WATERSHED );
 
   float m_meshBMin[ 3 ];
   float m_meshBMax[ 3 ];

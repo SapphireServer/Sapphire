@@ -390,6 +390,9 @@ void Sapphire::InstanceContent::setVar( uint8_t index, uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorVarChange( *this, index, value );
 }
 
 void Sapphire::InstanceContent::setSequence( uint8_t value )
@@ -400,6 +403,8 @@ void Sapphire::InstanceContent::setSequence( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorSeqChange( *this, value );
 }
 
 void Sapphire::InstanceContent::setFlags( uint8_t value )
@@ -410,6 +415,16 @@ void Sapphire::InstanceContent::setFlags( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorFlagChange( *this, value );
+}
+
+void Sapphire::InstanceContent::setCustomVar( uint32_t var, uint64_t value )
+{
+  Director::setCustomVar( var, value );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceCustomVarChange( *this, var, value );
 }
 
 void Sapphire::InstanceContent::startQte()

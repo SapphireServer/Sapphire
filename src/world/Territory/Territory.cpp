@@ -900,6 +900,23 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::EventObjectPtr Territory::getEObjByBaseId( uint32_t baseId )
+{
+  for( const auto& obj : m_eventObjects )
+    if( obj.second->getBaseId() == baseId )
+      return obj.second;
+  return nullptr;
+}
+
+Entity::EventObjectPtr Territory::getEObjByName(const std::string& name)
+{
+  for( const auto& obj : m_eventObjects )
+    if( obj.second->getName() == name )
+      return obj.second;
+
+  return nullptr;
+}
+
 Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
 {
   if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
@@ -980,7 +997,7 @@ uint32_t Territory::getNextActionResultId()
 
 uint32_t Territory::getNextEncounterId()
 {
-  return ++m_nextEncounterId;
+  return m_nextEncounterId++;
 }
 
 Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,

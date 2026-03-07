@@ -795,41 +795,41 @@ void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAg
   ag->params.updateFlags &= ~flags;
 }
 
-void Sapphire::Common::Navi::NaviProvider::toggleDoor( dtObstacleRef& doorRef, const Common::Vector3& pos,
-                                                       const Common::Vector3& halfExtents, float rot, bool closed )
+void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef, const Common::Vector3& pos,
+                                                       const Common::Vector3& halfExtents, float rot, bool enabled )
 {
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
   // Half-extents: Width, Height, Depth
   float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
 
-  if( doorRef != 0 && closed )
-    m_tileCache->removeObstacle( doorRef );
+  if( obstacleRef != 0 && enabled )
+    m_tileCache->removeObstacle( obstacleRef );
 
-  if( closed && doorRef == 0 )
+  if( enabled && obstacleRef == 0 )
   {
-    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &doorRef );
+    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef);
   }
-  else if( !closed && doorRef != 0 )
+  else if( !enabled && obstacleRef != 0 )
   {
     // REMOVE: Use the previously assigned doorRef to identify the obstacle
-    m_tileCache->removeObstacle( doorRef );
+    m_tileCache->removeObstacle( obstacleRef );
     // RESET: Clear the handle so the system knows the door is "free"
-    doorRef = 0;
+    obstacleRef = 0;
   }
 }
 
-void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool closed )
+void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled )
 {
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
 
-  if( obstacleRef != 0 && closed )
+  if( obstacleRef != 0 && enabled )
     m_tileCache->removeObstacle( obstacleRef );
 
-  if( closed && obstacleRef == 0 )
+  if( enabled && obstacleRef == 0 )
   {
     m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
   }
-  else if( !closed && obstacleRef != 0 )
+  else if( !enabled && obstacleRef != 0 )
   {
     // REMOVE: Use the previously assigned doorRef to identify the obstacle
     m_tileCache->removeObstacle( obstacleRef );

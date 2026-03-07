@@ -10,6 +10,46 @@ namespace Sapphire::Entity
     Door
   };
 
+  enum EventObjectCollisionType : uint32_t
+  {
+    None,
+    Box,
+    Sphere,
+    Cylinder,
+    Mesh,
+    Board
+  };
+
+  struct EventObjectCollision
+  {
+    EventObjectCollisionType m_type;
+    Common::Vector3 m_pos;
+    float m_rot;
+    uint32_t m_obstacleRef{ 0 };
+    union
+    {
+      struct
+      {
+        float width;
+        float height;
+        float depth;;
+      } box;
+
+      struct
+      {
+        float radius;
+      } sphere;
+
+      struct
+      {
+        float radius;
+        float height;
+      } cylinder;
+      // todo: mesh?
+
+    } m_shape;
+  };
+
   class EventObject : public GameObject
   {
   public:
@@ -60,6 +100,16 @@ namespace Sapphire::Entity
 
     uint32_t getOwnerId() const;
 
+    void setCollisionEnabled( bool enabled );
+
+    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
+
+    void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
+
+    void addCollisionSphere( Common::Vector3 pos, float radius );
+
+    const std::vector< EventObjectCollision >& getCollisionData() const;
+
 
   protected:
     EventObjectType m_eobjType;
@@ -73,7 +123,7 @@ namespace Sapphire::Entity
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
-
+    std::vector< EventObjectCollision > m_collision;
 
   };
 }

@@ -197,8 +197,10 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     float fPosX{ 0.f };
     float fPosY{ 0.f };
     float fPosZ{ 0.f };
+    float fRot{ 0.f };
 
-    if( sscanf( params.c_str(), "%f %f %f", &fPosX, &fPosY, &fPosZ ) != 3 )
+    const auto parsedCount = sscanf( params.c_str(), "%f %f %f %f", &fPosX, &fPosY, &fPosZ, &fRot );
+    if( ( parsedCount != 3 ) && ( parsedCount != 4 ) )
     {
       PlayerMgr::sendUrgent( player, "Syntaxerror." );
       return;
@@ -211,11 +213,16 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
                      player.getPos().y + fPosY,
                      player.getPos().z + fPosZ );
 
+    if( parsedCount == 4 )
+      player.setRot( fRot );
+
     auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    server.queueForPlayer( player.getCharacterId(), setActorPosPacket );
+    setActorPosPacket->data().Dir = player.getRotUInt16();
+
+    server.queueForPlayers( player.getInRangePlayerIds( true ), setActorPosPacket );
   }
   else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {

@@ -6,9 +6,142 @@
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 #include <recastnavigation/RecastDemo/Source/InputGeom.cpp>
 #include <recastnavigation/DebugUtils/Source/DebugDraw.cpp>
+#include <recastnavigation/RecastDemo/Source/PartitionedMesh.cpp>
+#include <recastnavigation/DebugUtils/Source/RecastDump.cpp>
 
+#ifdef WIN32
+#include <corecrt_io.h>
+#endif
 namespace fs = std::filesystem;
 
+
+FileIO::~FileIO()
+{
+  if( fp )
+  {
+    fclose( fp );
+  }
+}
+
+bool FileIO::openForWrite( const char* path )
+{
+  if( fp )
+  {
+    return false;
+  }
+  fp = fopen( path, "wb" );
+  if( !fp )
+  {
+    return false;
+  }
+  mode = Mode::writing;
+  return true;
+}
+
+bool FileIO::openForRead( const char* path )
+{
+  if( fp )
+  {
+    return false;
+  }
+  fp = fopen( path, "rb" );
+  if( !fp )
+  {
+    return false;
+  }
+  mode = Mode::reading;
+  return true;
+}
+
+bool FileIO::isWriting() const
+{
+  return mode == Mode::writing;
+}
+
+bool FileIO::isReading() const
+{
+  return mode == Mode::reading;
+}
+
+bool FileIO::write( const void* ptr, const size_t size )
+{
+  if( !fp || mode != Mode::writing )
+  {
+    return false;
+  }
+  fwrite( ptr, size, 1, fp );
+  return true;
+}
+
+bool FileIO::read( void* ptr, const size_t size )
+{
+  if( !fp || mode != Mode::reading )
+  {
+    return false;
+  }
+  size_t readLen = fread( ptr, size, 1, fp );
+  return readLen == 1;
+}
+
+size_t FileIO::getFileSize() const
+{
+  if( !fp || mode != Mode::reading )
+  {
+    return false;
+  }
+  const size_t currentPos = ftell( fp );
+  if( fseek( fp, 0, SEEK_END ) != 0 )
+  {
+    return 0;
+  }
+  const size_t size = ftell( fp );
+  if( fseek( fp, 0, static_cast< int >( currentPos ) ) != 0 )
+  {
+    return 0;
+  }
+  return size;
+}
+
+void FileIO::scanDirectory( const std::string& path, const std::string& ext, std::vector< std::string >& fileList )
+{
+#ifdef WIN32
+  const std::string pathWithExt = path + "/*" + ext;
+
+  _finddata_t dir;
+  const intptr_t findHandle = _findfirst( pathWithExt.c_str(), &dir );
+  if( findHandle == -1L )
+  {
+    return;
+  }
+
+  do
+  {
+    fileList.emplace_back( dir.name );
+  } while( _findnext( findHandle, &dir ) == 0 );
+  _findclose( findHandle );
+#else
+  dirent* current = 0;
+  DIR* dp = opendir( path.c_str() );
+  if( !dp )
+  {
+    return;
+  }
+
+  size_t extLen = strlen( ext.c_str() );
+  while( ( current = readdir( dp ) ) != 0 )
+  {
+    size_t len = strlen( current->d_name );
+    if( len > extLen && strncmp( current->d_name + len - extLen, ext.c_str(), extLen ) == 0 )
+    {
+      fileList.emplace_back( current->d_name );
+    }
+  }
+  closedir( dp );
+#endif
+
+  // Sort the list of files alphabetically.
+  std::sort( fileList.begin(), fileList.end() );
+}
 
 inline unsigned int nextPow2( uint32_t v )
 {
@@ -62,13 +195,13 @@ void MeshProcess::process( struct dtNavMeshCreateParams* params,
   // Pass in off-mesh connections.
   if( m_geom )
   {
-    params->offMeshConVerts = m_geom->getOffMeshConnectionVerts();
-    params->offMeshConRad = m_geom->getOffMeshConnectionRads();
-    params->offMeshConDir = m_geom->getOffMeshConnectionDirs();
-    params->offMeshConAreas = m_geom->getOffMeshConnectionAreas();
-    params->offMeshConFlags = m_geom->getOffMeshConnectionFlags();
-    params->offMeshConUserID = m_geom->getOffMeshConnectionId();
-    params->offMeshConCount = m_geom->getOffMeshConnectionCount();
+    params->offMeshConVerts = m_geom->offmeshConnVerts.data();//getOffMeshConnectionVerts();
+    params->offMeshConRad = m_geom->offmeshConnRadius.data(); //getOffMeshConnectionRads();
+    params->offMeshConDir = m_geom->offmeshConnBidirectional.data();//offmeshConnBidirectional();//getOffMeshConnectionDirs();
+    params->offMeshConAreas = m_geom->offmeshConnArea.data();       //getOffMeshConnectionAreas();
+    params->offMeshConFlags = m_geom->offmeshConnFlags.data();      //getOffMeshConnectionFlags();
+    params->offMeshConUserID = m_geom->offmeshConnId.data();        //getOffMeshConnectionId();
+    params->offMeshConCount = m_geom->offmeshConnArea.size();       //getOffMeshConnectionCount();
   }
 }
 
@@ -77,8 +210,7 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   if( !fs::exists( path ) )
     throw std::runtime_error( "what" );
 
-  // ignore logging/bullshit/etc
-  m_ctx = new rcContext( false );
+  m_ctx = new PrintContext( true );
 
   printf( "[Navmesh] loading obj: %s\n", path.substr( path.find( "navi" ) ).c_str() );
 
@@ -118,14 +250,19 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   const uint32_t tw = ( gw + ts - 1 ) / ts;
   const uint32_t th = ( gh + ts - 1 ) / ts;
 
- // printf( "[Navmesh]  - Tiles %d x %d\n", tw, th );
+  printf( "[Navmesh]  - Tiles %d x %d, total %d\n", tw, th, tw * th );
 
-  int tileBits = rcMin( ( int ) ilog2( nextPow2( tw * th ) ), 14 );
+#ifdef DT_POLYREF64
+  m_maxTiles = nextPow2( tw * th * EXPECTED_LAYERS_PER_TILE );
+  m_maxPolysPerTile = 1 << DT_POLY_BITS;
+#else
+  int tileBits = rcMin( ( int ) ilog2( nextPow2( tw * th * EXPECTED_LAYERS_PER_TILE ) ), 14 );
   if( tileBits > 14 )
     tileBits = 14;
   int polyBits = 22 - tileBits;
   m_maxTiles = 1 << tileBits;
   m_maxPolysPerTile = 1 << polyBits;
+#endif
 
   m_tAllocator = new LinearAllocator( 32000 );
   m_tCompressor = new FastLZCompressor();
@@ -294,154 +431,178 @@ bool TiledNavmeshGenerator::buildNavmesh()
 }
 
 int TiledNavmeshGenerator::rasterizeTileLayers(
-        const int tx, const int ty,
+        const int tileX,
+        const int tileY,
         const rcConfig& cfg,
         TileCacheData* tiles,
-        const int maxTiles )
+        const int maxTiles ) const
 {
-  if( !m_geom )
+  if( !m_geom || m_geom->mesh.getVertCount() == 0 || m_geom->partitionedMesh.tris.empty() )
   {
-    printf( "[Navmesh] buildTile: Input mesh is not specified." );
+    printf( "[Navmesh] buildTile: Input mesh is not specified.\n" );
     return 0;
   }
 
   FastLZCompressor comp;
-  RasterizationContext rc;
+  RasterizationContext rasterContext;
 
-  const float* verts = m_geom->getMesh()->getVerts();
-  const int nverts = m_geom->getMesh()->getVertCount();
-  const rcChunkyTriMesh* chunkyMesh = m_geom->getChunkyMesh();
-  
+  const float* verts = m_geom->mesh.verts.data();
+  const int nverts = m_geom->mesh.getVertCount();
+  const PartitionedMesh& partitionedMesh = m_geom->partitionedMesh;
+
   // Tile bounds.
   const float tcs = cfg.tileSize * cfg.cs;
 
   rcConfig tcfg;
   memcpy( &tcfg, &cfg, sizeof( tcfg ) );
 
-  tcfg.bmin[ 0 ] = cfg.bmin[ 0 ] + tx * tcs;
+  tcfg.bmin[ 0 ] = cfg.bmin[ 0 ] + tileX * tcs;
   tcfg.bmin[ 1 ] = cfg.bmin[ 1 ];
-  tcfg.bmin[ 2 ] = cfg.bmin[ 2 ] + ty * tcs;
-  tcfg.bmax[ 0 ] = cfg.bmin[ 0 ] + ( tx + 1 ) * tcs;
+  tcfg.bmin[ 2 ] = cfg.bmin[ 2 ] + tileY * tcs;
+  tcfg.bmax[ 0 ] = cfg.bmin[ 0 ] + ( tileX + 1 ) * tcs;
   tcfg.bmax[ 1 ] = cfg.bmax[ 1 ];
-  tcfg.bmax[ 2 ] = cfg.bmin[ 2 ] + ( ty + 1 ) * tcs;
-  tcfg.bmin[ 0 ] -= tcfg.borderSize * tcfg.cs;
-  tcfg.bmin[ 2 ] -= tcfg.borderSize * tcfg.cs;
-  tcfg.bmax[ 0 ] += tcfg.borderSize * tcfg.cs;
-  tcfg.bmax[ 2 ] += tcfg.borderSize * tcfg.cs;
+  tcfg.bmax[ 2 ] = cfg.bmin[ 2 ] + ( tileY + 1 ) * tcs;
+  tcfg.bmin[ 0 ] -= static_cast< float >( tcfg.borderSize ) * tcfg.cs;
+  tcfg.bmin[ 2 ] -= static_cast< float >( tcfg.borderSize ) * tcfg.cs;
+  tcfg.bmax[ 0 ] += static_cast< float >( tcfg.borderSize ) * tcfg.cs;
+  tcfg.bmax[ 2 ] += static_cast< float >( tcfg.borderSize ) * tcfg.cs;
 
   // Allocate voxel heightfield where we rasterize our input data to.
-  rc.solid = rcAllocHeightfield();
-  if( !rc.solid )
+  rasterContext.solid = rcAllocHeightfield();
+  if( !rasterContext.solid )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'solid'." );
+    printf( "[Navmesh] buildNavigation: Out of memory 'solid'.\n" );
     return 0;
   }
-  if( !rcCreateHeightfield( m_ctx, *rc.solid, tcfg.width, tcfg.height, tcfg.bmin, tcfg.bmax, tcfg.cs, tcfg.ch ) )
+  if( !rcCreateHeightfield(
+              m_ctx,
+              *rasterContext.solid,
+              tcfg.width,
+              tcfg.height,
+              tcfg.bmin,
+              tcfg.bmax,
+              tcfg.cs,
+              tcfg.ch ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not create solid heightfield." );
+    printf( "[Navmesh] buildNavigation: Could not create solid heightfield.\n" );
     return 0;
   }
 
   // Allocate array that can hold triangle flags.
   // If you have multiple meshes you need to process, allocate
   // and array which can hold the max number of triangles you need to process.
-  rc.triAreas = new unsigned char[ chunkyMesh->maxTrisPerChunk ];
-  if( !rc.triAreas )
+  rasterContext.triAreas = new unsigned char[ partitionedMesh.maxTrisPerChunk ];
+  if( !rasterContext.triAreas )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'm_triareas' (%d).", chunkyMesh->maxTrisPerChunk );
+    printf( "[Navmesh] buildNavigation: Out of memory 'rasterContext.triAreas' (%d).\n", partitionedMesh.maxTrisPerChunk );
     return 0;
   }
 
-  float tbmin[ 2 ], tbmax[ 2 ];
+  float tbmin[ 2 ];
+  float tbmax[ 2 ];
   tbmin[ 0 ] = tcfg.bmin[ 0 ];
   tbmin[ 1 ] = tcfg.bmin[ 2 ];
   tbmax[ 0 ] = tcfg.bmax[ 0 ];
   tbmax[ 1 ] = tcfg.bmax[ 2 ];
-  int cid[ 512 ];// TODO: Make grow when returning too many items.
-  const int ncid = rcGetChunksOverlappingRect( chunkyMesh, tbmin, tbmax, cid, 512 );
-  if( !ncid )
+  std::vector< int > overlappingNodes;
+  partitionedMesh.GetNodesOverlappingRect( tbmin, tbmax, overlappingNodes );
+  if( overlappingNodes.empty() )
   {
-    return 0;// empty
+    return 0;
   }
 
-  for( int i = 0; i < ncid; ++i )
+  for( int nodeIndex : overlappingNodes )
   {
-    const rcChunkyTriMeshNode& node = chunkyMesh->nodes[ cid[ i ] ];
-    const int* tris = &chunkyMesh->tris[ node.i * 3 ];
-    const int ntris = node.n;
+    const PartitionedMesh::Node& node = partitionedMesh.nodes[ nodeIndex ];
+    const int* tris = &partitionedMesh.tris[ node.triIndex * 3 ];
+    const int ntris = node.numTris;
 
-    memset( rc.triAreas, 0, ntris * sizeof( unsigned char ) );
-    rcMarkWalkableTriangles( m_ctx, tcfg.walkableSlopeAngle,
-                             verts, nverts, tris, ntris, rc.triAreas );
-
-    if( !rcRasterizeTriangles( m_ctx, verts, nverts, tris, rc.triAreas, ntris, *rc.solid, tcfg.walkableClimb ) )
+    memset( rasterContext.triAreas, 0, ntris * sizeof( unsigned char ) );
+    rcMarkWalkableTriangles( m_ctx, tcfg.walkableSlopeAngle, verts, nverts, tris, ntris, rasterContext.triAreas );
+    if( !rcRasterizeTriangles(
+                m_ctx,
+                verts,
+                nverts,
+                tris,
+                rasterContext.triAreas,
+                ntris,
+                *rasterContext.solid,
+                tcfg.walkableClimb ) )
+    {
       return 0;
+    }
   }
 
   // Once all geometry is rasterized, we do initial pass of filtering to
   // remove unwanted overhangs caused by the conservative rasterization
   // as well as filter spans where the character cannot possibly stand.
-  //if( m_filterLowHangingObstacles )
-    rcFilterLowHangingWalkableObstacles( m_ctx, tcfg.walkableClimb, *rc.solid );
-  //if( m_filterLedgeSpans )
-    rcFilterLedgeSpans( m_ctx, tcfg.walkableHeight, tcfg.walkableClimb, *rc.solid );
-  //if( m_filterWalkableLowHeightSpans )
-    rcFilterWalkableLowHeightSpans( m_ctx, tcfg.walkableHeight, *rc.solid );
+  //if( filterLowHangingObstacles )
+  {
+    rcFilterLowHangingWalkableObstacles( m_ctx, tcfg.walkableClimb, *rasterContext.solid );
+  }
+  //if( filterLedgeSpans )
+  {
+    rcFilterLedgeSpans( m_ctx, tcfg.walkableHeight, tcfg.walkableClimb, *rasterContext.solid );
+  }
+  //if( filterWalkableLowHeightSpans )
+  {
+    rcFilterWalkableLowHeightSpans( m_ctx, tcfg.walkableHeight, *rasterContext.solid );
+  }
 
-
-  rc.chf = rcAllocCompactHeightfield();
-  if( !rc.chf )
+  rasterContext.chf = rcAllocCompactHeightfield();
+  if( !rasterContext.chf )
   {
     printf( "[Navmesh] buildNavigation: Out of memory 'chf'.\n" );
     return 0;
   }
-  if( !rcBuildCompactHeightfield( m_ctx, tcfg.walkableHeight, tcfg.walkableClimb, *rc.solid, *rc.chf ) )
+  if( !rcBuildCompactHeightfield(
+              m_ctx,
+              tcfg.walkableHeight,
+              tcfg.walkableClimb,
+              *rasterContext.solid,
+              *rasterContext.chf ) )
   {
     printf( "[Navmesh] buildNavigation: Could not build compact data.\n" );
     return 0;
   }
 
   // Erode the walkable area by agent radius.
-  if( !rcErodeWalkableArea( m_ctx, tcfg.walkableRadius, *rc.chf ) )
+  if( !rcErodeWalkableArea( m_ctx, tcfg.walkableRadius, *rasterContext.chf ) )
   {
     printf( "[Navmesh] buildNavigation: Could not erode.\n" );
     return 0;
   }
 
   // (Optional) Mark areas.
-  const ConvexVolume* vols = m_geom->getConvexVolumes();
-  for( int i = 0; i < m_geom->getConvexVolumeCount(); ++i )
+  for( ConvexVolume& vol : m_geom->convexVolumes )
   {
-    rcMarkConvexPolyArea( m_ctx, vols[ i ].verts, vols[ i ].nverts,
-                          vols[ i ].hmin, vols[ i ].hmax,
-                          ( unsigned char ) vols[ i ].area, *rc.chf );
+    rcMarkConvexPolyArea(
+            m_ctx,
+            vol.verts,
+            vol.nverts,
+            vol.hmin,
+            vol.hmax,
+            static_cast< unsigned char >( vol.area ),
+            *rasterContext.chf );
   }
 
-  /*
-  if( !rcBuildRegionsMonotone( m_ctx, *rc.chf, cfg.borderSize, cfg.minRegionArea, cfg.mergeRegionArea ) )
-  {
-    printf( "[Navmesh] buildNavigation: Could not build monotone regions.\n" );
-    return 0;
-  }
-  //*/
-
-  rc.lset = rcAllocHeightfieldLayerSet();
-  if( !rc.lset )
+  rasterContext.lset = rcAllocHeightfieldLayerSet();
+  if( !rasterContext.lset )
   {
     printf( "[Navmesh] buildNavigation: Out of memory 'lset'.\n" );
     return 0;
   }
-  if( !rcBuildHeightfieldLayers( m_ctx, *rc.chf, tcfg.borderSize, tcfg.walkableHeight, *rc.lset ) )
+  if( !rcBuildHeightfieldLayers( m_ctx, *rasterContext.chf, tcfg.borderSize, tcfg.walkableHeight, *rasterContext.lset ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not build heightfield layers.\n" );
+    printf( "[Navmesh] buildNavigation: Could not build heightfield layers for tile (%d, %d).\n", tileX, tileY );
     return 0;
   }
 
-  rc.ntiles = 0;
-  for( int i = 0; i < rcMin( rc.lset->nlayers, MAX_LAYERS ); ++i )
+  rasterContext.ntiles = 0;
+  for( int i = 0; i < rcMin( rasterContext.lset->nlayers, MAX_LAYERS ); ++i )
   {
-    TileCacheData* tile = &rc.tiles[ rc.ntiles++ ];
-    const rcHeightfieldLayer* layer = &rc.lset->layers[ i ];
+    TileCacheData* tile = &rasterContext.tiles[ rasterContext.ntiles++ ];
+    const rcHeightfieldLayer* layer = &rasterContext.lset->layers[ i ];
 
     // Store header
     dtTileCacheLayerHeader header;
@@ -449,24 +610,24 @@ int TiledNavmeshGenerator::rasterizeTileLayers(
     header.version = DT_TILECACHE_VERSION;
 
     // Tile layer location in the navmesh.
-    header.tx = tx;
-    header.ty = ty;
+    header.tx = tileX;
+    header.ty = tileY;
     header.tlayer = i;
     dtVcopy( header.bmin, layer->bmin );
     dtVcopy( header.bmax, layer->bmax );
 
     // Tile info.
-    header.width = ( unsigned char ) layer->width;
-    header.height = ( unsigned char ) layer->height;
-    header.minx = ( unsigned char ) layer->minx;
-    header.maxx = ( unsigned char ) layer->maxx;
-    header.miny = ( unsigned char ) layer->miny;
-    header.maxy = ( unsigned char ) layer->maxy;
-    header.hmin = ( unsigned short ) layer->hmin;
-    header.hmax = ( unsigned short ) layer->hmax;
+    header.width = static_cast< unsigned char >( layer->width );
+    header.height = static_cast< unsigned char >( layer->height );
+    header.minx = static_cast< unsigned char >( layer->minx );
+    header.maxx = static_cast< unsigned char >( layer->maxx );
+    header.miny = static_cast< unsigned char >( layer->miny );
+    header.maxy = static_cast< unsigned char >( layer->maxy );
+    header.hmin = static_cast< unsigned short >( layer->hmin );
+    header.hmax = static_cast< unsigned short >( layer->hmax );
 
-    dtStatus status = dtBuildTileCacheLayer( &comp, &header, layer->heights, layer->areas, layer->cons,
-                                             &tile->data, &tile->dataSize );
+    dtStatus status =
+            dtBuildTileCacheLayer( &comp, &header, layer->heights, layer->areas, layer->cons, &tile->data, &tile->dataSize );
     if( dtStatusFailed( status ) )
     {
       return 0;
@@ -475,11 +636,11 @@ int TiledNavmeshGenerator::rasterizeTileLayers(
 
   // Transfer ownsership of tile data from build context to the caller.
   int n = 0;
-  for( int i = 0; i < rcMin( rc.ntiles, maxTiles ); ++i )
+  for( int i = 0; i < rcMin( rasterContext.ntiles, maxTiles ); ++i )
   {
-    tiles[ n++ ] = rc.tiles[ i ];
-    rc.tiles[ i ].data = 0;
-    rc.tiles[ i ].dataSize = 0;
+    tiles[ n++ ] = rasterContext.tiles[ i ];
+    rasterContext.tiles[ i ].data = 0;
+    rasterContext.tiles[ i ].dataSize = 0;
   }
 
   return n;
@@ -489,26 +650,25 @@ bool TiledNavmeshGenerator::buildTiledCache()
 {
   dtStatus status;
 
-  if( !m_geom || !m_geom->getMesh() )
+  if( !m_geom || m_geom->mesh.getVertCount() == 0 )
   {
-    printf( "[Navmesh] buildTiledNavigation: No vertices and triangles." );
+    printf( "[Navmesh] buildTiledNavigation: No vertices and triangles.\n" );
     return false;
   }
 
   m_tMeshProcess->init( m_geom );
 
   // Init cache
-  const float* bmin = m_geom->getNavMeshBoundsMin();
-  const float* bmax = m_geom->getNavMeshBoundsMax();
+  const float* minBounds = m_geom->getNavMeshBoundsMin();
+  const float* maxBounds = m_geom->getNavMeshBoundsMax();
   int gw = 0, gh = 0;
-  rcCalcGridSize( bmin, bmax, m_cellSize, &gw, &gh );
-  const int ts = ( int ) m_tileSize;
+  rcCalcGridSize( minBounds, maxBounds, m_cellSize, &gw, &gh );
+  const int ts = m_tileSize;
   const int tw = ( gw + ts - 1 ) / ts;
   const int th = ( gh + ts - 1 ) / ts;
 
   // Generation params.
-  rcConfig cfg;
-  memset( &cfg, 0, sizeof( cfg ) );
+  rcConfig cfg = {};
   cfg.cs = m_cellSize;
   cfg.ch = m_cellHeight;
   cfg.walkableSlopeAngle = m_agentMaxSlope;
@@ -520,23 +680,22 @@ bool TiledNavmeshGenerator::buildTiledCache()
   cfg.minRegionArea = ( int ) rcSqr( m_regionMinSize );    // Note: area = size*size
   cfg.mergeRegionArea = ( int ) rcSqr( m_regionMergeSize );// Note: area = size*size
   cfg.maxVertsPerPoly = ( int ) m_vertsPerPoly;
-  cfg.tileSize = ( int ) m_tileSize;
+  cfg.tileSize = m_tileSize;
   cfg.borderSize = cfg.walkableRadius + 3;// Reserve enough padding.
   cfg.width = cfg.tileSize + cfg.borderSize * 2;
   cfg.height = cfg.tileSize + cfg.borderSize * 2;
   cfg.detailSampleDist = m_detailSampleDist < 0.9f ? 0 : m_cellSize * m_detailSampleDist;
   cfg.detailSampleMaxError = m_cellHeight * m_detailSampleMaxError;
-  rcVcopy( cfg.bmin, bmin );
-  rcVcopy( cfg.bmax, bmax );
+  rcVcopy( cfg.bmin, minBounds );
+  rcVcopy( cfg.bmax, maxBounds );
 
   // Tile cache params.
-  dtTileCacheParams tcparams;
-  memset( &tcparams, 0, sizeof( tcparams ) );
-  rcVcopy( tcparams.orig, bmin );
+  dtTileCacheParams tcparams = {};
+  rcVcopy( tcparams.orig, minBounds );
   tcparams.cs = m_cellSize;
   tcparams.ch = m_cellHeight;
-  tcparams.width = ( int ) m_tileSize;
-  tcparams.height = ( int ) m_tileSize;
+  tcparams.width = m_tileSize;
+  tcparams.height = m_tileSize;
   tcparams.walkableHeight = m_agentHeight;
   tcparams.walkableRadius = m_agentRadius;
   tcparams.walkableClimb = m_agentMaxClimb;
@@ -549,13 +708,13 @@ bool TiledNavmeshGenerator::buildTiledCache()
   m_tileCache = dtAllocTileCache();
   if( !m_tileCache )
   {
-    printf( "[Navmesh] buildTiledNavigation: Could not allocate tile cache." );
+    printf( "[Navmesh] buildTiledNavigation: Could not allocate tile cache.\n" );
     return false;
   }
   status = m_tileCache->init( &tcparams, m_tAllocator, m_tCompressor, m_tMeshProcess );
   if( dtStatusFailed( status ) )
   {
-    printf( "[Navmesh] buildTiledNavigation: Could not init tile cache." );
+    printf( "[Navmesh] buildTiledNavigation: Could not init tile cache.\n" );
     return false;
   }
 
@@ -564,35 +723,39 @@ bool TiledNavmeshGenerator::buildTiledCache()
   m_navMesh = dtAllocNavMesh();
   if( !m_navMesh )
   {
-    printf( "[Navmesh] buildTiledNavigation: Could not allocate navmesh." );
+    printf( "[Navmesh] buildTiledNavigation: Could not allocate navmesh.\n" );
     return false;
   }
 
-  dtNavMeshParams params;
-  memset( &params, 0, sizeof( params ) );
-  rcVcopy( params.orig, bmin );
-  params.tileWidth = m_tileSize * m_cellSize;
-  params.tileHeight = m_tileSize * m_cellSize;
+  dtNavMeshParams params = {};
+  rcVcopy( params.orig, minBounds );
+  params.tileWidth = static_cast< float >( m_tileSize ) * m_cellSize;
+  params.tileHeight = static_cast< float >( m_tileSize ) * m_cellSize;
   params.maxTiles = m_maxTiles;
   params.maxPolys = m_maxPolysPerTile;
 
   status = m_navMesh->init( &params );
   if( dtStatusFailed( status ) )
   {
-    printf( "[Navmesh] buildTiledNavigation: Could not init navmesh." );
+    printf( "[Navmesh] buildTiledNavigation: Could not init navmesh.\n" );
     return false;
   }
 
+  /*
+  status = m_navMeshQuery->init( m_navMesh, 2048 );
+  if( dtStatusFailed( status ) )
+  {
+    printf( "[Navmesh] buildTiledNavigation: Could not init Detour navmesh query\n" );
+    return false;
+  }
+  */
   // Preprocess tiles.
-
-  m_ctx->resetTimers();
 
   for( int y = 0; y < th; ++y )
   {
     for( int x = 0; x < tw; ++x )
     {
-      TileCacheData tiles[ MAX_LAYERS ];
-      memset( tiles, 0, sizeof( tiles ) );
+      TileCacheData tiles[ MAX_LAYERS ] = {};
       int ntiles = rasterizeTileLayers( x, y, cfg, tiles, MAX_LAYERS );
 
       for( int i = 0; i < ntiles; ++i )
@@ -610,11 +773,13 @@ bool TiledNavmeshGenerator::buildTiledCache()
   }
 
   // Build initial meshes
-  m_ctx->startTimer( RC_TIMER_TOTAL );
   for( int y = 0; y < th; ++y )
+  {
     for( int x = 0; x < tw; ++x )
+    {
       m_tileCache->buildNavMeshTilesAt( x, y, m_navMesh );
-  m_ctx->stopTimer( RC_TIMER_TOTAL );
+    }
+  }
   return true;
 }
 
@@ -622,6 +787,13 @@ bool TiledNavmeshGenerator::buildTiledCache()
 unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty, const float* bmin, const float* bmax,
                                                      int& dataSize )
 {
+  if( m_solid ) { rcFreeHeightField( m_solid ); m_solid = nullptr; }
+  if( m_triareas ) { delete[] m_triareas; m_triareas = nullptr; }
+  if( m_chf ) { rcFreeCompactHeightfield( m_chf ); m_chf = nullptr; }
+  if( m_cset ) { rcFreeContourSet( m_cset ); m_cset = nullptr; }
+  if( m_pmesh ) { rcFreePolyMesh( m_pmesh ); m_pmesh = nullptr; }
+  if( m_dmesh ) { rcFreePolyMeshDetail( m_dmesh ); m_dmesh = nullptr; }
+
   const float* verts = m_mesh->getVerts();
   const int nverts = m_mesh->getVertCount();
   const int ntris = m_mesh->getTriCount();
@@ -703,8 +875,8 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   tbmax[ 0 ] = m_cfg.bmax[ 0 ];
   tbmax[ 1 ] = m_cfg.bmax[ 2 ];
 
-  int cid[512];// TODO: Make grow when returning too many items.
-  const int ncid = rcGetChunksOverlappingRect( m_chunkyMesh, tbmin, tbmax, cid, 512 );
+  std::vector<int> cid( m_chunkyMesh->nnodes );
+  const int ncid = rcGetChunksOverlappingRect( m_chunkyMesh, tbmin, tbmax, cid.data(), static_cast<int>(cid.size()) );
 
   if( !ncid )
   {
@@ -747,12 +919,12 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   m_chf = rcAllocCompactHeightfield();
   if( !m_chf )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'chf'." );
+    printf( "[Navmesh] buildNavigation: Out of memory 'chf'.\n" );
     return nullptr;
   }
   if( !rcBuildCompactHeightfield( m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid, *m_chf ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not build compact data." );
+    printf( "[Navmesh] buildNavigation: Could not build compact data.\n" );
     return nullptr;
   }
 
@@ -762,7 +934,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   // Erode the walkable area by agent radius.
   if( !rcErodeWalkableArea( m_ctx, m_cfg.walkableRadius, *m_chf ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not erode." );
+    printf( "[Navmesh] buildNavigation: Could not erode.\n" );
     return nullptr;
   }
 
@@ -797,29 +969,29 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   //     if you have large open areas with small obstacles (not a problem if you use tiles)
   //   * good choice to use for tiled navmesh with medium and small sized tiles
 
-  if( m_partitionType == SAMPLE_PARTITION_WATERSHED )
+  if( m_partitionType == static_cast< int >( SamplePartitionType::WATERSHED ) )
   {
     // Prepare for region partitioning, by calculating distance field along the walkable surface.
     if( !rcBuildDistanceField( m_ctx, *m_chf ) )
     {
-      printf( "[Navmesh] buildNavigation: Could not build distance field." );
+      printf( "[Navmesh] buildNavigation: Could not build distance field.\n" );
       return nullptr;
     }
 
     // Partition the walkable surface into simple regions without holes.
     if( !rcBuildRegions( m_ctx, *m_chf, m_cfg.borderSize, m_cfg.minRegionArea, m_cfg.mergeRegionArea ) )
     {
-      printf( "[Navmesh] buildNavigation: Could not build watershed regions." );
+      printf( "[Navmesh] buildNavigation: Could not build watershed regions.\n" );
       return nullptr;
     }
   }
-  else if( m_partitionType == SAMPLE_PARTITION_MONOTONE )
+  else if( m_partitionType == static_cast< int >( SamplePartitionType::MONOTONE ) )
   {
     // Partition the walkable surface into simple regions without holes.
     // Monotone partitioning does not need distancefield.
     if( !rcBuildRegionsMonotone( m_ctx, *m_chf, m_cfg.borderSize, m_cfg.minRegionArea, m_cfg.mergeRegionArea ) )
     {
-      printf( "[Navmesh] buildNavigation: Could not build monotone regions." );
+      printf( "[Navmesh] buildNavigation: Could not build monotone regions.\n" );
       return nullptr;
     }
   }
@@ -828,7 +1000,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
     // Partition the walkable surface into simple regions without holes.
     if( !rcBuildLayerRegions( m_ctx, *m_chf, m_cfg.borderSize, m_cfg.minRegionArea ) )
     {
-      printf( "[Navmesh] buildNavigation: Could not build layer regions." );
+      printf( "[Navmesh] buildNavigation: Could not build layer regions.\n" );
       return nullptr;
     }
   }
@@ -837,12 +1009,12 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   m_cset = rcAllocContourSet();
   if( !m_cset )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'cset'." );
+    printf( "[Navmesh] buildNavigation: Out of memory 'cset'.\n" );
     return nullptr;
   }
   if( !rcBuildContours( m_ctx, *m_chf, m_cfg.maxSimplificationError, m_cfg.maxEdgeLen, *m_cset ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not create contours." );
+    printf( "[Navmesh] buildNavigation: Could not create contours.\n" );
     return nullptr;
   }
 
@@ -859,12 +1031,12 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   m_pmesh = rcAllocPolyMesh();
   if( !m_pmesh )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'pmesh'." );
+    printf( "[Navmesh] buildNavigation: Out of memory 'pmesh'.\n" );
     return nullptr;
   }
   if( !rcBuildPolyMesh( m_ctx, *m_cset, m_cfg.maxVertsPerPoly, *m_pmesh ) )
   {
-    printf( "[Navmesh] buildNavigation: Could not triangulate contours." );
+    printf( "[Navmesh] buildNavigation: Could not triangulate contours.\n" );
     return nullptr;
   }
 
@@ -872,7 +1044,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   m_dmesh = rcAllocPolyMeshDetail();
   if( !m_dmesh )
   {
-    printf( "[Navmesh] buildNavigation: Out of memory 'dmesh'." );
+    printf( "[Navmesh] buildNavigation: Out of memory 'dmesh'.\n" );
     return nullptr;
   }
 
@@ -880,7 +1052,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
                               m_cfg.detailSampleDist, m_cfg.detailSampleMaxError,
                               *m_dmesh ) )
   {
-    printf( "[Navmesh] buildNavigation: Could build polymesh detail." );
+    printf( "[Navmesh] buildNavigation: Could build polymesh detail.\n" );
     return nullptr;
   }
 
@@ -959,7 +1131,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
 
     if( !dtCreateNavMeshData( &params, &navData, &navDataSize ) )
     {
-      printf( "[Navmesh] Could not build Detour navmesh." );
+      printf( "[Navmesh] Could not build Detour navmesh.\n" );
       return nullptr;
     }
   }

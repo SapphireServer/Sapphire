@@ -15,9 +15,8 @@ using namespace Sapphire;
 
 namespace Sapphire::ScriptAPI
 {
-  ScriptObject::ScriptObject( uint32_t id, std::size_t type ) :
-    m_id( id ),
-    m_type( type )
+  ScriptObject::ScriptObject( uint32_t id, std::size_t type ) : m_id( id ),
+                                                                m_type( type )
   {
   }
 
@@ -33,8 +32,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  StatusEffectScript::StatusEffectScript( uint32_t effectId ) :
-    ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
+  StatusEffectScript::StatusEffectScript( uint32_t effectId ) : ScriptObject( effectId, typeid( StatusEffectScript ).hash_code() )
   {
   }
 
@@ -72,8 +70,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  ActionScript::ActionScript( uint32_t actionId ) :
-    ScriptObject( actionId, typeid( ActionScript ).hash_code() )
+  ActionScript::ActionScript( uint32_t actionId ) : ScriptObject( actionId, typeid( ActionScript ).hash_code() )
   {
   }
 
@@ -132,7 +129,7 @@ namespace Sapphire::ScriptAPI
   //}
 
   void EventScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
-                                              uint32_t catalogId )
+                                               uint32_t catalogId )
   {
   }
 
@@ -220,15 +217,13 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  BattleNpcScript::BattleNpcScript( uint32_t npcId ) :
-    ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
+  BattleNpcScript::BattleNpcScript( uint32_t npcId ) : ScriptObject( npcId, typeid( BattleNpcScript ).hash_code() )
   {
   }
 
   ///////////////////////////////////////////////////////////////////
 
-  ZoneScript::ZoneScript( uint32_t zoneId ) :
-    ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
+  ZoneScript::ZoneScript( uint32_t zoneId ) : ScriptObject( zoneId, typeid( ZoneScript ).hash_code() )
   {
   }
 
@@ -243,8 +238,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  InstanceContentScript::InstanceContentScript( uint32_t instanceContentId ) :
-    ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceContentScript ).hash_code() )
+  InstanceContentScript::InstanceContentScript( uint32_t instanceContentId ) : ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceContentScript ).hash_code() )
   {
   }
 
@@ -256,12 +250,12 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, 
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj,
                                       uint32_t eventId )
   {
   }
 
-  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, 
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                       uint64_t actorId )
   {
   }
@@ -283,6 +277,29 @@ namespace Sapphire::ScriptAPI
 
   void InstanceContentScript::onLeaveTerritory( InstanceContent& instance, Entity::Player& player )
   {
+  }
+
+  void InstanceContentScript::onDirectorSeqChange( InstanceContent& instance, uint8_t seq )
+  {
+  }
+
+  void InstanceContentScript::onDirectorFlagChange( InstanceContent& instance, uint8_t flag )
+  {
+
+  }
+
+  void InstanceContentScript::onDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val )
+  {
+  }
+
+  void InstanceContentScript::onCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val )
+  {
+
+  }
+
+  void InstanceContentScript::onActorDeath( InstanceContent& instance, Entity::Chara& chara )
+  {
+
   }
 
   ///////////////////////////////////////////////////////////////////
