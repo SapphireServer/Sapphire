@@ -803,7 +803,10 @@ void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef
   float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
 
   if( obstacleRef != 0 && enabled )
+  {
     m_tileCache->removeObstacle( obstacleRef );
+    obstacleRef = 0;
+  }
 
   if( enabled && obstacleRef == 0 )
   {
@@ -823,7 +826,10 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
 
   if( obstacleRef != 0 && enabled )
+  {
     m_tileCache->removeObstacle( obstacleRef );
+    obstacleRef = 0;
+  }
 
   if( enabled && obstacleRef == 0 )
   {
