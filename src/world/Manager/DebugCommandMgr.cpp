@@ -194,26 +194,22 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
-    int32_t posX;
-    int32_t posY;
-    int32_t posZ;
+    float fPosX{ 0.f };
+    float fPosY{ 0.f };
+    float fPosZ{ 0.f };
 
-    sscanf( params.c_str(), "%d %d %d", &posX, &posY, &posZ );
-
-    if( ( posX == 0xcccccccc ) || ( posY == 0xcccccccc ) || ( posZ == 0xcccccccc ) )
+    if( sscanf( params.c_str(), "%f %f %f", &fPosX, &fPosY, &fPosZ ) != 3 )
     {
       PlayerMgr::sendUrgent( player, "Syntaxerror." );
       return;
     }
 
     if( subCommand == "pos" )
-      player.setPos( static_cast< float >( posX ),
-                     static_cast< float >( posY ),
-                     static_cast< float >( posZ ) );
+      player.setPos( fPosX, fPosY, fPosZ );
     else
-      player.setPos( player.getPos().x + static_cast< float >( posX ),
-                     player.getPos().y + static_cast< float >( posY ),
-                     player.getPos().z + static_cast< float >( posZ ) );
+      player.setPos( player.getPos().x + fPosX,
+                     player.getPos().y + fPosY,
+                     player.getPos().z + fPosZ );
 
     auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
