@@ -9,7 +9,9 @@
 #include <vector>
 #include <set>
 #include <variant>
+#include <cmath>
 #include <Util/Util.h>
+#include <Util/UtilMath.h>
 #include <Util/CrashHandler.h>
 
 #include <datReader/DatCategories/bg/pcb.h>
@@ -206,6 +208,51 @@ void stripUnicode(std::string & str)
   str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
 }
 
+// todo: i don't trust the overloads enough
+template< typename TVec >
+vec3 toVec3( const TVec& value )
+{
+  return { value.x, value.y, value.z };
+}
+
+vec3 applyRotation( vec3 value, const vec3& rotation )
+{
+  value = value * matrix4::rotateX( rotation.x );
+  value = value * matrix4::rotateY( rotation.y );
+  value = value * matrix4::rotateZ( rotation.z );
+  return value;
+}
+
+vec3 applyTransform( vec3 value, const vec3& scale, const vec3& rotation, const vec3& translation )
+{
+  value.x *= scale.x;
+  value.y *= scale.y;
+  value.z *= scale.z;
+
+  value = applyRotation( value, rotation );
+
+  value.x += translation.x;
+  value.y += translation.y;
+  value.z += translation.z;
+
+  return value;
+}
+
+vec3 scaleExtents( const vec3& extents, const vec3& scale )
+{
+  return { std::fabs( extents.x * scale.x ), std::fabs( extents.y * scale.y ), std::fabs( extents.z * scale.z ) };
+}
+
+float wrapAngle( float angle )
+{
+  return std::atan2( std::sin( angle ), std::cos( angle ) );
+}
+
+float toGameYaw( float yaw )
+{
+  return wrapAngle( -yaw );
+}
+
 int main( int argc, char* argv[] )
 {
   auto startTime = std::chrono::system_clock::now();
@@ -324,15 +371,14 @@ int main( int argc, char* argv[] )
             else if( pEntry->getType() == eAssetType::EventObject )
             {
               auto pObj = pEntry.get();
-              static std::string eobjStr( "\"EObj\", " );
               uint32_t id;
-              uint32_t unknown = 0, unknown2 = 0;
+              uint32_t instanceId;
               std::string name;
               uint32_t eobjlevelHierachyId = 0;
 
               auto pEobj = reinterpret_cast< EventObjectEntry* >( pObj );
               id = pEobj->header.BaseId;
-              unknown = pEobj->header.InstanceID;
+              instanceId = pEobj->header.InstanceID;
 
               eobjlevelHierachyId = pEobj->header.BoundInstanceID;
 
@@ -410,14 +456,14 @@ int main( int argc, char* argv[] )
               std::string eobjLine;
               eobjLine += "    pEObj = instance.addEObj( \"" + name + "\", " + std::to_string( id ) +
                           ", " + std::to_string( eobjlevelHierachyId ) +
-                          ", " + std::to_string( pObj->header.InstanceID ) + ", " + std::to_string( state ) +
+                          ", " + std::to_string( instanceId ) + ", " + std::to_string( state ) +
                           ", " + "{ " + std::to_string( pObj->header.Transformation.Translation.x ) + "f, " + std::to_string( pObj->header.Transformation.Translation.y ) + "f, " + std::to_string( pObj->header.Transformation.Translation.z ) + "f }, " + std::to_string( pObj->header.Transformation.Scale.x ) + "f, "
 
                           // the rotation inside the sgbs is the inverse of what the game uses
-                          + std::to_string( pObj->header.Transformation.Rotation.y * -1.f ) + "f" + ", " + std::to_string( permissionInv ) + " ); \n" + states;
+                          + std::to_string( toGameYaw( pObj->header.Transformation.Rotation.y ) ) + "f" + ", " + std::to_string( permissionInv ) + " ); \n" + states;
 
-              m_eventObjectStrings.emplace( id, eobjLine );
-              m_eventObjectMap.emplace( id, pEobj );
+              m_eventObjectStrings.emplace( instanceId, eobjLine );
+              m_eventObjectMap.emplace( instanceId, pEobj );
             }
           }
         }
@@ -425,7 +471,7 @@ int main( int argc, char* argv[] )
       }
      
       // gather dynamic collisions controlled by eobj
-      for( auto [ id, object ] : m_eventObjectMap )
+      for( auto [ instanceId, object ] : m_eventObjectMap )
       {
 
         if( object->header.BoundInstanceID != 0 )
@@ -448,40 +494,36 @@ int main( int argc, char* argv[] )
               {
                 if( instanceObject->getType() == CollisionBox )
                 {
-                  auto& eobjLine = m_eventObjectStrings[ id ];
+                  auto eobjLineIt = m_eventObjectStrings.find( instanceId );
+                  if( eobjLineIt == m_eventObjectStrings.end() )
+                    continue;
+
+                  auto& eobjLine = eobjLineIt->second;
 
                   auto collisionBox = static_cast< CollisionBoxEntry* >( instanceObject.get() );
                   const char* shapeStr = "Unknown";
 
-                  auto pos = collisionBox->header.Transformation.Translation;
-                  // transform by parent eobj
-                  {
-                    pos.x *= object->header.Transformation.Scale.x;
-                    pos.y *= object->header.Transformation.Scale.y;
-                    pos.z *= object->header.Transformation.Scale.z;
+                  const auto parentScale = toVec3( object->header.Transformation.Scale );
+                  const auto parentRotation = toVec3( object->header.Transformation.Rotation );
+                  const auto parentTranslation = toVec3( object->header.Transformation.Translation );
 
-                    pos = pos * matrix4::rotateX( object->header.Transformation.Rotation.x );
-                    pos = pos * matrix4::rotateY( object->header.Transformation.Rotation.y );
-                    pos = pos * matrix4::rotateZ( object->header.Transformation.Rotation.z );
-
-                    pos.x += object->header.Transformation.Translation.x;
-                    pos.y += object->header.Transformation.Translation.y;
-                    pos.z += object->header.Transformation.Translation.z;
-                  }
+                  const auto pos = applyTransform(
+                    toVec3( collisionBox->header.Transformation.Translation ),
+                    parentScale,
+                    parentRotation,
+                    parentTranslation );
 
                   switch( collisionBox->header.triggerBoxShape )
                   {
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
-                      //auto pos = collisionBox->header.Transformation.Translation;
-                      auto rot = collisionBox->header.Transformation.Rotation.y;
-                      auto box = collisionBox->header.Transformation.Scale;
+                      // todo: parent rot wrong or is the game's inner quaternion showing wacky results for the same "angle"?
+                      const auto rot = toGameYaw( parentRotation.y + collisionBox->header.Transformation.Rotation.y );
+                      const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
                       eobjLine += "    pEObj->addCollisionBox( { " +
-                                  // todo: this probably needs transforming by the parent eobj transformation
-                                  // todo: rot is probably also wrong
                                   std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                                  std::to_string( rot * -1.f ) + ", " + // todo: is this rotation correct or should we use the eobj rotation?
+                                  std::to_string( rot ) + ", " +
                                   std::to_string( box.x ) + ", " + std::to_string( box.y ) + ", " + std::to_string( box.z ) + " );\n";
                     }
                     break;
