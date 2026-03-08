@@ -198,14 +198,12 @@ void loadAllInstanceContentEntries()
   }
 }
 
-bool invalidChar (char c)
-{
-  return !isprint((unsigned)c);
+bool non_ascii(unsigned char c) {
+    return c > 127;
 }
 
-void stripUnicode(std::string & str)
-{
-  str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
+void stripUnicode(std::string& s) {
+    s.erase(std::remove_if(s.begin(), s.end(), non_ascii), s.end());
 }
 
 // todo: i don't trust the overloads enough
@@ -515,9 +513,9 @@ int main( int argc, char* argv[] )
                   auto collisionBox = static_cast< CollisionBoxEntry* >( instanceObject.get() );
                   const char* shapeStr = "Unknown";
 
-                  const auto parentScale = toVec3( object->header.Transformation.Scale );
-                  const auto parentRotation = toVec3( object->header.Transformation.Rotation );
-                  const auto parentTranslation = toVec3( object->header.Transformation.Translation );
+                  const auto parentScale = toVec3( pBoundGroup->header.Transformation.Scale );
+                  const auto parentRotation = toVec3( pBoundGroup->header.Transformation.Rotation );
+                  const auto parentTranslation = toVec3( pBoundGroup->header.Transformation.Translation );
 
                   const auto pos = applyTransform(
                     toVec3( collisionBox->header.Transformation.Translation ),
