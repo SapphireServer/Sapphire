@@ -810,7 +810,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef
 
   if( enabled && obstacleRef == 0 )
   {
-    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef);
+    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef );
   }
   else if( !enabled && obstacleRef != 0 )
   {

@@ -192,7 +192,10 @@ void EventObject::setCollisionEnabled( bool enabled )
           case EventObjectCollisionType::Box:
           {
             auto& box = collision.m_shape.box;
-            pNavi->toggleBox( collision.m_obstacleRef, collision.m_pos, { box.width / 2.f, box.height / 2.f, box.depth / 2.f }, collision.m_rot, enabled );
+            auto pos = collision.m_pos;
+            pos.y -= box.height / 2.f;
+
+            pNavi->toggleBox( collision.m_obstacleRef, pos, { box.width / 2.f, box.height / 2.f, box.depth / 2.f }, collision.m_rot, enabled );
           }
           break;
           case EventObjectCollisionType::Sphere:

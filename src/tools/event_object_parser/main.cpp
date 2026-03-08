@@ -532,7 +532,7 @@ int main( int argc, char* argv[] )
                       const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
                       eobjLine += "    pEObj->addCollisionBox( { " +
                                   std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                                  std::to_string( rot ) + ", " +
+                                  std::to_string( rot * -1.f ) + ", " +
                                   std::to_string( box.x ) + ", " + std::to_string( box.y ) + ", " + std::to_string( box.z ) + " );\n";
                     }
                     break;
