@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <set>
+#include <filesystem>
+#include <regex>
 #include "commonshader.h"
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
@@ -16,6 +18,25 @@
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 
+
+struct CachedEObjCollision
+{
+  std::string eobjName;
+  uint32_t baseId{ 0 };
+  uint32_t instanceId{ 0 };
+  // eobj world origin (for position marker)
+  glm::vec3 eobjPos{ 0.f, 0.f, 0.f };
+  float eobjRot{ 0.f };
+  // collision shape type (should just use Sapphire::Entity::EventObjectCollisionType tbh)
+  enum class ShapeType : uint32_t { Box = 1, Sphere = 3, Cylinder = 4 } type{ ShapeType::Box };
+  // collision shape world position / orientation
+  glm::vec3 collPos{ 0.f, 0.f, 0.f };
+  float collRot{ 0.f };
+  // box half-extents (already full w/h/d stored; halved in geometry parser)
+  float width{ 1.f }, height{ 1.f }, depth{ 1.f };
+  // cylinder / sphere
+  float radius{ 1.f }, cylinderH{ 1.f };
+};
 
 struct CachedServerPath
 {
@@ -234,6 +255,39 @@ private:
   GLuint m_serverPathShader = 0;
 
   void renderServerPaths();
+
+  // ---- EObj collision visualisation ----
+  std::vector< CachedEObjCollision > m_cachedEObjCollisions;
+
+  // VAO/VBO for collision shape wireframes (boxes/cylinders/spheres)
+  GLuint m_eobjCollisionVAO{ 0 };
+  GLuint m_eobjCollisionVBO{ 0 };
+  int    m_eobjCollisionVertexCount{ 0 };
+
+  // VAO/VBO for EObj origin marker crosses
+  GLuint m_eobjMarkerVAO{ 0 };
+  GLuint m_eobjMarkerVBO{ 0 };
+  int    m_eobjMarkerVertexCount{ 0 };
+
+  bool m_showEObjCollisions{ true };
+  bool m_showEObjMarkers{ true };
+
+  // Path of the last successfully parsed script
+  std::string m_loadedScriptPath;
+  char        m_scriptPathBuffer[ 512 ]{};
+
+  // One-time index: InstanceContentScript id  →  source file path
+  std::unordered_map< uint32_t, std::filesystem::path > m_scriptIndexCache;
+  bool m_scriptIndexBuilt{ false };
+
+  void buildScriptIndexCache();
+  void autoDetectInstanceScript();
+  void parseInstanceScript( const std::filesystem::path& path );
+  void buildEObjCollisionGeometry();
+  void buildEObjMarkerGeometry();
+  void renderEObjCollisions();
+  void renderEObjMarkers();
+  void cleanupEObjRendering();
 
 
   // Camera/view controls for navmesh

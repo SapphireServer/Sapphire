@@ -50,6 +50,11 @@
 
 #include "commonshader.h"
 
+#include <Util/Paths.h>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+
 extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
 
@@ -1408,6 +1413,7 @@ void ZoneEditor::cleanupNavmeshRendering()
   // Clean up geometry
   cleanupNavmeshGeometry();
   cleanupBnpcMarkerRendering();
+  cleanupEObjRendering();
 
   // Clean up shader
   if( m_navmeshShader )
@@ -1810,6 +1816,14 @@ void ZoneEditor::onSelectionChanged()
     loadServerPaths();
     if( !m_serverPathCache.empty() )
       buildServerPathGeometry();
+
+    // EObj collision visualisation
+    m_cachedEObjCollisions.clear();
+    cleanupEObjRendering();
+    if( !m_scriptIndexBuilt )
+      buildScriptIndexCache();
+    autoDetectInstanceScript();
+
     // Reset BNPC window state when zone changes
     m_selectedBnpcIndex = -1;
     m_filteredBnpcs.clear();
@@ -2863,6 +2877,556 @@ void ZoneEditor::initializeServerPathShader()
   glDeleteShader( fragmentShader );
 }
 
+// ============================================================
+//  eobj collision
+// ============================================================
+
+void ZoneEditor::buildScriptIndexCache()
+{
+  m_scriptIndexCache.clear();
+  m_scriptIndexBuilt = true;
+
+  // find scripts/instances directory
+  // <repo>/build/<preset>/bin/  ->  ../../../../src/scripts/instances
+  // we need source instead of compiled scripts, consider copying script source to build
+  namespace fs = std::filesystem;
+  fs::path scriptRoot;
+
+  auto exeDir = Sapphire::Common::Util::executableDir();
+  auto candidate = exeDir / "../../../../src/scripts/instances";
+  if( fs::exists( candidate ) )
+    scriptRoot = fs::canonical( candidate );
+  else
+  {
+    printf( "[EObj] Could not find scripts/instances directory (looked at: %s)\n",
+            candidate.string().c_str() );
+    return;
+  }
+
+  // regex to extract the InstanceContentScript ID from ctor
+  // match:  InstanceContentScript( 4 )   or  InstanceContentScript(20027)
+  std::regex idRe( R"(InstanceContentScript\s*\(\s*(\d+)\s*\))" );
+
+  for( auto& entry : fs::recursive_directory_iterator( scriptRoot ) )
+  {
+    if( !entry.is_regular_file() )
+      continue;
+    if( entry.path().extension() != ".cpp" )
+      continue;
+
+    std::ifstream f( entry.path() );
+    if( !f.is_open() )
+      continue;
+
+    std::string contents( ( std::istreambuf_iterator< char >( f ) ),
+                            std::istreambuf_iterator< char >() );
+
+    std::smatch m;
+    if( std::regex_search( contents, m, idRe ) )
+    {
+      uint32_t id = static_cast< uint32_t >( std::stoul( m[ 1 ] ) );
+      m_scriptIndexCache[ id ] = entry.path();
+    }
+  }
+
+  printf( "[EObj] Script index built: %zu entries\n", m_scriptIndexCache.size() );
+}
+
+void ZoneEditor::autoDetectInstanceScript()
+{
+  if( !m_selectedZone )
+    return;
+
+  auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+  auto cfcIds = exdD.getIdList< Excel::InstanceContent >();
+
+  for( auto cfcId : cfcIds )
+  {
+    auto cfc = exdD.getRow< Excel::InstanceContent >( cfcId );
+    if( !cfc )
+      continue;
+    if( cfc->data().TerritoryType != m_selectedZone->id )
+      continue;
+
+    // instancecontent is real, fetch from cache
+    auto it = m_scriptIndexCache.find( cfcId );
+    if( it != m_scriptIndexCache.end() )
+    {
+      printf( "[EObj] Auto-detected script for zone %u (InstanceContent %u): %s\n",
+              m_selectedZone->id, cfcId, it->second.string().c_str() );
+      parseInstanceScript( it->second );
+      return;
+    }
+  }
+
+  printf( "[EObj] No matching instance script found for zone %u\n", m_selectedZone->id );
+}
+
+// Helper: parse a "{x, y, z}" group out of a substring match
+static bool parseVec3( const std::string& s, glm::vec3& out )
+{
+  // Strip 'f'/'F' float-literal suffixes (e.g. "1.0f" -> "1.0 ") before parsing.
+  std::string clean = s;
+  for( auto& c : clean )
+    if( c == 'f' || c == 'F' ) c = ' ';
+
+  float x, y, z;
+  if( sscanf( clean.c_str(), "%f , %f , %f", &x, &y, &z ) == 3 ||
+      sscanf( clean.c_str(), "%f,%f,%f",     &x, &y, &z ) == 3 )
+  {
+    out = { x, y, z };
+    return true;
+  }
+  return false;
+}
+
+void ZoneEditor::parseInstanceScript( const std::filesystem::path& path )
+{
+  m_cachedEObjCollisions.clear();
+  m_loadedScriptPath.clear();
+
+  std::ifstream f( path );
+  if( !f.is_open() )
+  {
+    printf( "[EObj] Failed to open script: %s\n", path.string().c_str() );
+    return;
+  }
+  std::string src( ( std::istreambuf_iterator< char >( f ) ),
+                     std::istreambuf_iterator< char >() );
+
+  // Regex for addEObj(name, baseId, boundInstanceId, instanceId, state, {x,y,z}, scale, rotation, perm)
+  // We capture: name, baseId, instanceId, position group, rotation
+  // Note: the position is the 6th argument, preceded by state (arg5) and followed by scale (arg7)
+  // Float pattern: optional leading '-', digits/dot/exponent, optional 'f' suffix
+  // The 'f?' is outside every capture group so captured strings are pure numbers.
+  std::regex eobjRe(
+    R"~(addEObj\s*\(\s*"([^"]+)"\s*,\s*(\d+)\s*,\s*\d+\s*,\s*(\d+)\s*,\s*\d+\s*,\s*\{([^}]+)\}\s*,\s*[\d.eE+\-]+f?\s*,\s*([\d.eE+\-]+)f?\s*,)~" );
+
+  // Regex for addCollisionBox({x,y,z}, rot, w, h, d)
+  std::regex boxRe(
+    R"~(addCollisionBox\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  // Regex for addCollisionCylinder({x,y,z}, radius, height)
+  std::regex cylRe(
+    R"~(addCollisionCylinder\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  // Regex for addCollisionSphere({x,y,z}, radius)
+  std::regex sphereRe(
+    R"~(addCollisionSphere\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  auto srcBegin = std::sregex_iterator( src.begin(), src.end(), eobjRe );
+  auto srcEnd   = std::sregex_iterator{};
+
+  for( auto it = srcBegin; it != srcEnd; ++it )
+  {
+    const auto& eobjMatch = *it;
+    std::string eobjName   = eobjMatch[ 1 ].str();
+    uint32_t    baseId     = static_cast< uint32_t >( std::stoul( eobjMatch[ 2 ] ) );
+    uint32_t    instanceId = static_cast< uint32_t >( std::stoul( eobjMatch[ 3 ] ) );
+    glm::vec3   eobjPos{};
+    float       eobjRot    = std::stof( eobjMatch[ 5 ].str() );
+
+    if( !parseVec3( eobjMatch[ 4 ].str(), eobjPos ) )
+      continue;
+
+    // Search for collision calls following this addEObj (until the next one or end of string)
+    auto searchStart = static_cast< std::string::size_type >( eobjMatch.position() + eobjMatch.length() );
+    auto nextEObj    = ( std::next( it ) != srcEnd ) ?
+                       static_cast< std::string::size_type >( std::next( it )->position() ) :
+                       src.size();
+    std::string segment = src.substr( searchStart, nextEObj - searchStart );
+
+    // --- Boxes ---
+    auto boxIt = std::sregex_iterator( segment.begin(), segment.end(), boxRe );
+    for( auto b = boxIt; b != std::sregex_iterator{}; ++b )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*b)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision c;
+      c.eobjName   = eobjName;
+      c.baseId     = baseId;
+      c.instanceId = instanceId;
+      c.eobjPos    = eobjPos;
+      c.eobjRot    = eobjRot;
+      c.type       = CachedEObjCollision::ShapeType::Box;
+      c.collPos    = cpos;
+      c.collRot    = std::stof( (*b)[ 2 ].str() );
+      c.width      = std::stof( (*b)[ 3 ].str() );
+      c.height     = std::stof( (*b)[ 4 ].str() );
+      c.depth      = std::stof( (*b)[ 5 ].str() );
+      m_cachedEObjCollisions.push_back( c );
+    }
+
+    // --- Cylinders ---
+    auto cylIt = std::sregex_iterator( segment.begin(), segment.end(), cylRe );
+    for( auto c = cylIt; c != std::sregex_iterator{}; ++c )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*c)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision col;
+      col.eobjName   = eobjName;
+      col.baseId     = baseId;
+      col.instanceId = instanceId;
+      col.eobjPos    = eobjPos;
+      col.eobjRot    = eobjRot;
+      col.type       = CachedEObjCollision::ShapeType::Cylinder;
+      col.collPos    = cpos;
+      col.collRot    = 0.f;
+      col.radius     = std::stof( (*c)[ 2 ].str() );
+      col.cylinderH  = std::stof( (*c)[ 3 ].str() );
+      m_cachedEObjCollisions.push_back( col );
+    }
+
+    // --- Spheres ---
+    auto sphIt = std::sregex_iterator( segment.begin(), segment.end(), sphereRe );
+    for( auto s = sphIt; s != std::sregex_iterator{}; ++s )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*s)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision col;
+      col.eobjName   = eobjName;
+      col.baseId     = baseId;
+      col.instanceId = instanceId;
+      col.eobjPos    = eobjPos;
+      col.eobjRot    = eobjRot;
+      col.type       = CachedEObjCollision::ShapeType::Sphere;
+      col.collPos    = cpos;
+      col.collRot    = 0.f;
+      col.radius     = std::stof( (*s)[ 2 ].str() );
+      m_cachedEObjCollisions.push_back( col );
+    }
+
+    // Even if no collision was found, emit a marker-only entry so the EObj origin is shown
+    if( m_cachedEObjCollisions.empty() ||
+        m_cachedEObjCollisions.back().instanceId != instanceId )
+    {
+      CachedEObjCollision marker;
+      marker.eobjName   = eobjName;
+      marker.baseId     = baseId;
+      marker.instanceId = instanceId;
+      marker.eobjPos    = eobjPos;
+      marker.eobjRot    = eobjRot;
+      marker.type       = CachedEObjCollision::ShapeType::Box;
+      marker.collPos    = eobjPos;
+      marker.width = marker.height = marker.depth = 0.f; // zero-size -> no box drawn
+      m_cachedEObjCollisions.push_back( marker );
+    }
+  }
+
+  m_loadedScriptPath = path.filename().string();
+
+  // Build GL geometry
+  buildEObjCollisionGeometry();
+  buildEObjMarkerGeometry();
+
+  printf( "[EObj] Parsed %zu collision entries from %s\n",
+          m_cachedEObjCollisions.size(), path.string().c_str() );
+}
+
+// Rotate a point around Y axis
+static glm::vec3 rotY( const glm::vec3& p, float rad )
+{
+  float c = cosf( rad ), s = sinf( rad );
+  return { p.x * c + p.z * s, p.y, -p.x * s + p.z * c };
+}
+
+void ZoneEditor::buildEObjCollisionGeometry()
+{
+  // Clean up previous
+  if( m_eobjCollisionVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjCollisionVAO );
+    m_eobjCollisionVAO = 0;
+  }
+  if( m_eobjCollisionVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjCollisionVBO );
+    m_eobjCollisionVBO = 0;
+  }
+  m_eobjCollisionVertexCount = 0;
+
+  if( m_cachedEObjCollisions.empty() )
+    return;
+
+  std::vector< float > verts;
+  verts.reserve( m_cachedEObjCollisions.size() * 72 ); // ~24 verts * 3 floats per box
+
+  auto emit = [ & ]( const glm::vec3& v )
+  {
+    verts.push_back( v.x );
+    verts.push_back( v.y );
+    verts.push_back( v.z );
+  };
+
+  auto emitLine = [ & ]( const glm::vec3& a, const glm::vec3& b )
+  {
+    emit( a );
+    emit( b );
+  };
+
+  constexpr int CYL_SEGS   = 32;
+  constexpr int SPHERE_SEGS = 32;
+
+  for( const auto& col : m_cachedEObjCollisions )
+  {
+    const glm::vec3& p = col.collPos;
+    float r = col.collRot;
+
+    if( col.type == CachedEObjCollision::ShapeType::Box )
+    {
+      if( col.width == 0.f && col.height == 0.f && col.depth == 0.f )
+        continue; // marker-only entry
+
+      float hw = col.width  * 0.5f;
+      float hh = col.height * 0.5f;
+      float hd = col.depth  * 0.5f;
+
+      // 8 OBB corners in local space
+      // Game rotation convention: atan2(-forward.x, forward.z) — negation of standard right-handed Y rotation
+      glm::vec3 c0 = p + rotY( { -hw, -hh, -hd }, -r );
+      glm::vec3 c1 = p + rotY( {  hw, -hh, -hd }, -r );
+      glm::vec3 c2 = p + rotY( { -hw, -hh,  hd }, -r );
+      glm::vec3 c3 = p + rotY( {  hw, -hh,  hd }, -r );
+      glm::vec3 c4 = p + rotY( { -hw,  hh, -hd }, -r );
+      glm::vec3 c5 = p + rotY( {  hw,  hh, -hd }, -r );
+      glm::vec3 c6 = p + rotY( { -hw,  hh,  hd }, -r );
+      glm::vec3 c7 = p + rotY( {  hw,  hh,  hd }, -r );
+
+      // Bottom face
+      emitLine( c0, c1 ); emitLine( c1, c3 ); emitLine( c3, c2 ); emitLine( c2, c0 );
+      // Top face
+      emitLine( c4, c5 ); emitLine( c5, c7 ); emitLine( c7, c6 ); emitLine( c6, c4 );
+      // Vertical edges
+      emitLine( c0, c4 ); emitLine( c1, c5 ); emitLine( c2, c6 ); emitLine( c3, c7 );
+    }
+    else if( col.type == CachedEObjCollision::ShapeType::Cylinder )
+    {
+      float rad = col.radius;
+      float h   = col.cylinderH;
+      // Bottom + top circles, then 4 vertical lines
+      for( int i = 0; i < CYL_SEGS; ++i )
+      {
+        float a0 = ( float ) i       / CYL_SEGS * glm::two_pi< float >();
+        float a1 = ( float )( i + 1 ) / CYL_SEGS * glm::two_pi< float >();
+        glm::vec3 b0 = p + glm::vec3( rad * cosf( a0 ), 0.f,   rad * sinf( a0 ) );
+        glm::vec3 b1 = p + glm::vec3( rad * cosf( a1 ), 0.f,   rad * sinf( a1 ) );
+        glm::vec3 t0 = p + glm::vec3( rad * cosf( a0 ), h,     rad * sinf( a0 ) );
+        glm::vec3 t1 = p + glm::vec3( rad * cosf( a1 ), h,     rad * sinf( a1 ) );
+        emitLine( b0, b1 );
+        emitLine( t0, t1 );
+      }
+      for( int i = 0; i < 4; ++i )
+      {
+        float a  = ( float ) i / 4.f * glm::two_pi< float >();
+        glm::vec3 bot = p + glm::vec3( rad * cosf( a ), 0.f, rad * sinf( a ) );
+        glm::vec3 top = p + glm::vec3( rad * cosf( a ), h,   rad * sinf( a ) );
+        emitLine( bot, top );
+      }
+    }
+    else if( col.type == CachedEObjCollision::ShapeType::Sphere )
+    {
+      float rad = col.radius;
+      // Three great circles: XZ (equator), XY, YZ
+      for( int i = 0; i < SPHERE_SEGS; ++i )
+      {
+        float a0 = ( float ) i       / SPHERE_SEGS * glm::two_pi< float >();
+        float a1 = ( float )( i + 1 ) / SPHERE_SEGS * glm::two_pi< float >();
+        // XZ equator
+        emitLine( p + glm::vec3( rad * cosf( a0 ), 0.f,           rad * sinf( a0 ) ),
+                  p + glm::vec3( rad * cosf( a1 ), 0.f,           rad * sinf( a1 ) ) );
+        // XY circle
+        emitLine( p + glm::vec3( rad * cosf( a0 ), rad * sinf( a0 ), 0.f            ),
+                  p + glm::vec3( rad * cosf( a1 ), rad * sinf( a1 ), 0.f            ) );
+        // YZ circle
+        emitLine( p + glm::vec3( 0.f,              rad * cosf( a0 ), rad * sinf( a0 ) ),
+                  p + glm::vec3( 0.f,              rad * cosf( a1 ), rad * sinf( a1 ) ) );
+      }
+    }
+  }
+
+  if( verts.empty() )
+    return;
+
+  m_eobjCollisionVertexCount = static_cast< int >( verts.size() / 3 );
+
+  glGenVertexArrays( 1, &m_eobjCollisionVAO );
+  glGenBuffers( 1, &m_eobjCollisionVBO );
+
+  glBindVertexArray( m_eobjCollisionVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_eobjCollisionVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                static_cast< GLsizeiptr >( verts.size() * sizeof( float ) ),
+                verts.data(), GL_STATIC_DRAW );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), nullptr );
+  glEnableVertexAttribArray( 0 );
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::buildEObjMarkerGeometry()
+{
+  if( m_eobjMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjMarkerVAO );
+    m_eobjMarkerVAO = 0;
+  }
+  if( m_eobjMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjMarkerVBO );
+    m_eobjMarkerVBO = 0;
+  }
+  m_eobjMarkerVertexCount = 0;
+
+  if( m_cachedEObjCollisions.empty() )
+    return;
+
+  // Deduplicate by instanceId so we draw one cross per EObj, not one per shape
+  std::unordered_set< uint32_t > seen;
+  std::vector< float > verts;
+  verts.reserve( m_cachedEObjCollisions.size() * 18 );
+
+  constexpr float S = 1.5f; // arm length of the cross
+
+  for( const auto& col : m_cachedEObjCollisions )
+  {
+    if( !seen.insert( col.instanceId ).second )
+      continue;
+
+    const glm::vec3& p = col.eobjPos;
+    // X axis
+    verts.insert( verts.end(), { p.x - S, p.y, p.z,
+                                  p.x + S, p.y, p.z } );
+    // Y axis
+    verts.insert( verts.end(), { p.x, p.y - S, p.z,
+                                  p.x, p.y + S, p.z } );
+    // Z axis
+    verts.insert( verts.end(), { p.x, p.y, p.z - S,
+                                  p.x, p.y, p.z + S } );
+  }
+
+  if( verts.empty() )
+    return;
+
+  m_eobjMarkerVertexCount = static_cast< int >( verts.size() / 3 );
+
+  glGenVertexArrays( 1, &m_eobjMarkerVAO );
+  glGenBuffers( 1, &m_eobjMarkerVBO );
+
+  glBindVertexArray( m_eobjMarkerVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_eobjMarkerVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                static_cast< GLsizeiptr >( verts.size() * sizeof( float ) ),
+                verts.data(), GL_STATIC_DRAW );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), nullptr );
+  glEnableVertexAttribArray( 0 );
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::renderEObjCollisions()
+{
+  if( !m_showEObjCollisions || !m_serverPathShader || !m_eobjCollisionVAO ||
+      m_eobjCollisionVertexCount == 0 )
+    return;
+
+  glm::mat4 view       = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 mvp = projection * view * glm::mat4( 1.0f );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glDepthMask( GL_FALSE );
+  glDisable( GL_DEPTH_TEST );
+  glLineWidth( 2.0f );
+
+  glUseProgram( m_serverPathShader );
+
+  GLint mvpLoc   = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( mvpLoc != -1 )
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  if( colorLoc != -1 )
+    glUniform4f( colorLoc, 1.0f, 0.85f, 0.0f, 0.9f ); // amber/yellow — distinct from navmesh red/green
+
+  glBindVertexArray( m_eobjCollisionVAO );
+  glDrawArrays( GL_LINES, 0, m_eobjCollisionVertexCount );
+  glBindVertexArray( 0 );
+
+  glLineWidth( 1.0f );
+  glDepthMask( GL_TRUE );
+  glEnable( GL_DEPTH_TEST );
+  glUseProgram( 0 );
+}
+
+void ZoneEditor::renderEObjMarkers()
+{
+  if( !m_showEObjMarkers || !m_serverPathShader || !m_eobjMarkerVAO ||
+      m_eobjMarkerVertexCount == 0 )
+    return;
+
+  glm::mat4 view       = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 mvp = projection * view * glm::mat4( 1.0f );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glDepthMask( GL_FALSE );
+  glDisable( GL_DEPTH_TEST );
+  glLineWidth( 2.5f );
+
+  glUseProgram( m_serverPathShader );
+
+  GLint mvpLoc   = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( mvpLoc != -1 )
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  if( colorLoc != -1 )
+    glUniform4f( colorLoc, 0.0f, 0.85f, 1.0f, 1.0f ); // cyan
+
+  glBindVertexArray( m_eobjMarkerVAO );
+  glDrawArrays( GL_LINES, 0, m_eobjMarkerVertexCount );
+  glBindVertexArray( 0 );
+
+  glLineWidth( 1.0f );
+  glDepthMask( GL_TRUE );
+  glEnable( GL_DEPTH_TEST );
+  glUseProgram( 0 );
+}
+
+void ZoneEditor::cleanupEObjRendering()
+{
+  if( m_eobjCollisionVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjCollisionVAO );
+    m_eobjCollisionVAO = 0;
+  }
+  if( m_eobjCollisionVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjCollisionVBO );
+    m_eobjCollisionVBO = 0;
+  }
+  m_eobjCollisionVertexCount = 0;
+
+  if( m_eobjMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjMarkerVAO );
+    m_eobjMarkerVAO = 0;
+  }
+  if( m_eobjMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjMarkerVBO );
+    m_eobjMarkerVBO = 0;
+  }
+  m_eobjMarkerVertexCount = 0;
+}
+
+// ============================================================
+
 void ZoneEditor::initializeBnpcMarkerRendering()
 {
   // Enhanced billboard vertex shader with world-space rotation
@@ -3730,6 +4294,8 @@ void ZoneEditor::renderNavmeshToTexture()
   renderSenseRanges();
   renderBnpcMarkers();
   renderServerPaths();
+  renderEObjCollisions();
+  renderEObjMarkers();
   // Unbind framebuffer (back to default)
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
@@ -4302,6 +4868,50 @@ void ZoneEditor::showNavmeshWindow()
   //ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
   //ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
   ImGui::Text( "NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No" );
+
+  // eobj and collision control
+  ImGui::Separator();
+  ImGui::Text( "EObj Collisions:" );
+  ImGui::SameLine();
+  ImGui::Checkbox( "Shapes##eobj", &m_showEObjCollisions );
+  ImGui::SameLine();
+  ImGui::Checkbox( "Markers##eobj", &m_showEObjMarkers );
+
+  if( !m_loadedScriptPath.empty() )
+  {
+    int nShapes = static_cast< int >( m_cachedEObjCollisions.size() );
+    // count unique eobj id
+    std::unordered_set< uint32_t > uniqIds;
+    for( const auto& c : m_cachedEObjCollisions )
+      uniqIds.insert( c.instanceId );
+    ImGui::TextColored( ImVec4( 0.4f, 1.0f, 0.4f, 1.0f ),
+                        "Script: %s  (%zu EObjs, %d shapes)",
+                        m_loadedScriptPath.c_str(),
+                        uniqIds.size(), nShapes );
+  }
+  else
+  {
+    ImGui::TextColored( ImVec4( 1.0f, 0.6f, 0.2f, 1.0f ), "No instance script loaded" );
+  }
+
+  // pass script manually
+  ImGui::SetNextItemWidth( ImGui::GetContentRegionAvail().x - 60.f );
+  ImGui::InputText( "##scriptpath", m_scriptPathBuffer, sizeof( m_scriptPathBuffer ) );
+  ImGui::SameLine();
+  if( ImGui::Button( "Load##script" ) )
+  {
+    std::filesystem::path p( m_scriptPathBuffer );
+    if( std::filesystem::exists( p ) )
+    {
+      m_cachedEObjCollisions.clear();
+      cleanupEObjRendering();
+      parseInstanceScript( p );
+    }
+    else
+    {
+      printf( "[EObj] Script path does not exist: %s\n", m_scriptPathBuffer );
+    }
+  }
 
   // Add OBJ model info with more detailed status
   if( m_objLoaded )
