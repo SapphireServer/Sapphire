@@ -493,8 +493,11 @@ public:
   float m_mapScale = 100.0f; // You'll need to get this from the map data
   ImVec2 m_mapOffset = ImVec2( 1024.0f, 1024.0f ); // Default offset
 
+  bool m_showNavCameraOnMap = true;
+
   // Helper methods
   void drawBnpcIcons();
+  void drawNavCameraOnMap( const ImVec2& imagePos, const ImVec2& imageSize );
 
   ImVec2 worldToScreenPos( float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize );
 

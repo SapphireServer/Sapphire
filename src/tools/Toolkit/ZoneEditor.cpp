@@ -3185,15 +3185,14 @@ void ZoneEditor::buildEObjCollisionGeometry()
       float hd = col.depth  * 0.5f;
 
       // 8 OBB corners in local space
-      // Game rotation convention: atan2(-forward.x, forward.z) — negation of standard right-handed Y rotation
-      glm::vec3 c0 = p + rotY( { -hw, -hh, -hd }, -r );
-      glm::vec3 c1 = p + rotY( {  hw, -hh, -hd }, -r );
-      glm::vec3 c2 = p + rotY( { -hw, -hh,  hd }, -r );
-      glm::vec3 c3 = p + rotY( {  hw, -hh,  hd }, -r );
-      glm::vec3 c4 = p + rotY( { -hw,  hh, -hd }, -r );
-      glm::vec3 c5 = p + rotY( {  hw,  hh, -hd }, -r );
-      glm::vec3 c6 = p + rotY( { -hw,  hh,  hd }, -r );
-      glm::vec3 c7 = p + rotY( {  hw,  hh,  hd }, -r );
+      glm::vec3 c0 = p + rotY( { -hw, -hh, -hd }, r );
+      glm::vec3 c1 = p + rotY( {  hw, -hh, -hd }, r );
+      glm::vec3 c2 = p + rotY( { -hw, -hh,  hd }, r );
+      glm::vec3 c3 = p + rotY( {  hw, -hh,  hd }, r );
+      glm::vec3 c4 = p + rotY( { -hw,  hh, -hd }, r );
+      glm::vec3 c5 = p + rotY( {  hw,  hh, -hd }, r );
+      glm::vec3 c6 = p + rotY( { -hw,  hh,  hd }, r );
+      glm::vec3 c7 = p + rotY( {  hw,  hh,  hd }, r );
 
       // Bottom face
       emitLine( c0, c1 ); emitLine( c1, c3 ); emitLine( c3, c2 ); emitLine( c2, c0 );
@@ -5316,6 +5315,9 @@ void ZoneEditor::showMapWindow()
       ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 2.0f, 10.0f );
     }
 
+    ImGui::Separator();
+    ImGui::Checkbox( "Camera##map", &m_showNavCameraOnMap );
+
     if( ImGui::Button( "Reset Zoom" ) )
     {
       m_zoomLevel = 1.0f;
@@ -5440,6 +5442,12 @@ void ZoneEditor::showMapWindow()
     if( m_showBnpcIcons && !m_bnpcs.empty() )
     {
       drawBnpcIcons();
+    }
+
+    // Draw camera position and FOV cone overlay
+    if( m_showNavCameraOnMap )
+    {
+      drawNavCameraOnMap( imagePos, imageSize );
     }
 
     // Handle panning (drag to move when zoomed in)
@@ -5718,6 +5726,68 @@ ImVec2 ZoneEditor::worldToScreenPos( float worldX, float worldZ, const ImVec2& i
   screenPos.y = imagePos.y + ( normalizedY * imageSize.y );
 
   return screenPos;
+}
+
+void ZoneEditor::drawNavCameraOnMap( const ImVec2& imagePos, const ImVec2& imageSize )
+{
+  if( !m_selectedZone )
+    return;
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  // camera target: the point the 3D camera orbits around
+  ImVec2 targetScreenPos = worldToScreenPos( m_navCameraTarget.x, m_navCameraTarget.z, imagePos, imageSize );
+
+  // camera position projected onto xz plane
+  ImVec2 camScreenPos = worldToScreenPos( m_navCameraPos.x, m_navCameraPos.z, imagePos, imageSize );
+
+  // view direction: from camera toward target, in screen space (x=right, z=down)
+  float yawRad = glm::radians( m_navCameraYaw );
+  // viewDir on screen: +X world -> right, +Z world -> down
+  // cam offset from target = (cos(yaw), sin(yaw)), so viewDir toward target = (-cos(yaw), -sin(yaw))
+  float vdx = -cosf( yawRad );
+  float vdz = -sinf( yawRad );
+
+  // cone length in screen pixels, use fixed size
+  const float coneLen = 36.0f;
+  const float halfFovRad = glm::radians( 22.5f ); // half of 45deg vertical FOV
+
+  // rotate viewDir by mod of halfFov to get cone edges
+  auto rot2d = []( float dx, float dy, float angle ) -> ImVec2 {
+    float c = cosf( angle ), s = sinf( angle );
+    return { dx * c - dy * s, dx * s + dy * c };
+  };
+
+  ImVec2 leftDir  = rot2d( vdx, vdz, -halfFovRad );
+  ImVec2 rightDir = rot2d( vdx, vdz,  halfFovRad );
+
+  ImVec2 coneLeft  = { camScreenPos.x + leftDir.x  * coneLen, camScreenPos.y + leftDir.y  * coneLen };
+  ImVec2 coneRight = { camScreenPos.x + rightDir.x * coneLen, camScreenPos.y + rightDir.y * coneLen };
+
+  // draw cone
+  drawList->AddTriangleFilled( camScreenPos, coneLeft, coneRight, IM_COL32( 255, 255, 255, 45 ) );
+
+  // draw cone outline
+  drawList->AddLine( camScreenPos, coneLeft,  IM_COL32( 255, 255, 255, 200 ), 1.5f );
+  drawList->AddLine( camScreenPos, coneRight, IM_COL32( 255, 255, 255, 200 ), 1.5f );
+  drawList->AddLine( coneLeft, coneRight,     IM_COL32( 255, 255, 255, 120 ), 1.0f );
+
+  // camera position dot
+  drawList->AddCircleFilled( camScreenPos, 4.0f, IM_COL32( 255, 255, 255, 230 ) );
+  drawList->AddCircle( camScreenPos, 4.0f, IM_COL32( 0, 0, 0, 180 ), 0, 1.5f );
+
+  // crosshair
+  const float crossR = 4.0f;
+  drawList->AddLine( { targetScreenPos.x - crossR, targetScreenPos.y },
+                     { targetScreenPos.x + crossR, targetScreenPos.y },
+                     IM_COL32( 255, 220, 100, 200 ), 1.5f );
+  drawList->AddLine( { targetScreenPos.x, targetScreenPos.y - crossR },
+                     { targetScreenPos.x, targetScreenPos.y + crossR },
+                     IM_COL32( 255, 220, 100, 200 ), 1.5f );
+  drawList->AddCircle( targetScreenPos, crossR + 1.0f, IM_COL32( 255, 220, 100, 160 ), 0, 1.0f );
+
+  // line cam -> target
+  drawList->AddLine( camScreenPos, targetScreenPos, IM_COL32( 255, 220, 100, 80 ), 1.0f );
 }
 
 void ZoneEditor::drawBnpcIcons()
