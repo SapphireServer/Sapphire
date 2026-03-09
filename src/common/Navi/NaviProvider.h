@@ -35,6 +35,7 @@ namespace Sapphire::Common::Navi
 
   /** 2. FastLZ Compressor for Tiles **/
   struct FastLZCompressor : public dtTileCacheCompressor {
+    ~FastLZCompressor() {}
     int maxCompressedSize( const int bufferSize ) override { return ( int ) ( bufferSize * 1.05f ); }
     dtStatus compress( const unsigned char* buffer, const int bufferSize,
                        unsigned char* compressed, const int, int* compressedSize ) override
@@ -52,6 +53,7 @@ namespace Sapphire::Common::Navi
 
   /** 3. Mesh Processor (Assigns Area IDs and Flags) **/
   struct MeshProcess : public dtTileCacheMeshProcess {
+    ~MeshProcess() {}
     void process( struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags ) override
     {
       for( int i = 0; i < params->polyCount; ++i )
