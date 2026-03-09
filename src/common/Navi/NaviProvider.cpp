@@ -810,7 +810,10 @@ void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef
 
   if( enabled && obstacleRef == 0 )
   {
-    m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef );
+    auto status = m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef );
+    if( dtStatusFailed( status ) )
+      Logger::error( "[Navmesh] addBoxObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
+                     pos.x, pos.y, pos.z );
   }
   else if( !enabled && obstacleRef != 0 )
   {
@@ -833,7 +836,10 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
 
   if( enabled && obstacleRef == 0 )
   {
-    m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
+    auto status = m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
+    if( dtStatusFailed( status ) )
+      Logger::error( "[Navmesh] addObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
+                     pos.x, pos.y, pos.z );
   }
   else if( !enabled && obstacleRef != 0 )
   {
