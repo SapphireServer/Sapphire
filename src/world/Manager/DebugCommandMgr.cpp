@@ -648,29 +648,32 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
   }
   else if( subCommand == "obstacle" )
   {
-    float radius{ 0.f };
-    float height{ 0.f };
-    float depth{ 0.f };
-    auto paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
+      float radius{ 0.f };
+      float height{ 0.f };
+      float depth{ 0.f };
 
-    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
-    if( auto pNavi = pTeri->getNaviProvider() )
-    {
-      uint32_t obstacleRef = 0;
-      if( player.getObstacleRef() != 0 )
-        pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, false );
+      int paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
+      if( paramCount <= 0 )
+      {
+          PlayerMgr::sendUrgent(player, "Invalid parameter count.");
+          return;
+      }
 
-      if( paramCount == 3 )
-        pNavi->toggleBox( player.getObstacleRef(), { player.getPos().x, player.getPos().y + 2.f, player.getPos().z }, { radius, height, depth }, player.getRot(), true );
-      else
-        pNavi->toggleObstacle( player.getObstacleRef(), player.getPos(), radius, radius, true );
-    }
+      auto pTeri = terriMgr.getTerritoryByGuId(player.getTerritoryId());
+
+      if( auto pNavi = pTeri->getNaviProvider() )
+      {
+          auto obstacleRef = player.getObstacleRef();
+
+          if( obstacleRef != 0 )
+              pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );
+
+          if( paramCount == 3 )
+              pNavi->toggleBox( obstacleRef, {player.getPos().x, player.getPos().y + 2.f, player.getPos().z}, {radius, height, depth}, player.getRot(), true );
+          else
+              pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, true );
+      }
   }
-  else
-  {
-    PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );
-  }
-
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
