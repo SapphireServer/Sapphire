@@ -60,7 +60,7 @@ class ClsWvr021 : public Sapphire::ScriptAPI::QuestScript
   {
   }
 
-  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override
+  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::Vector3 pos ) override
   {
   }
 
