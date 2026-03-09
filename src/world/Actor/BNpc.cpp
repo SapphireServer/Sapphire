@@ -847,6 +847,8 @@ void BNpc::onDeath()
       // todo: get this outta here!
       taskMgr.queueTask( makeLootBNpcTask( *pPlayer, "testTable", 2000 ) );
 
+      playerMgr.sendDebug( *pPlayer, ( "Killed Layout ID: " + std::to_string( getLayoutId() ) ) );
+
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }

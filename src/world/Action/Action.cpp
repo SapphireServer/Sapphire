@@ -500,6 +500,8 @@ void Action::Action::execute()
     else // clear last combo action if the combo breaks
       m_pSource->setLastComboActionId( 0 );
   }
+
+  m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnActionUse );
 }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )

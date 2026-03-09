@@ -950,7 +950,8 @@ namespace Sapphire::Common
     RemoveOnSuccessfulHit = 0x1000,
     ReplaceSameCaster = 0x2000,
     GroundTarget = 0x4000,
-    RemoveOnDeath = 0x8000
+    RemoveOnDeath = 0x8000,
+    RemoveOnActionUse = 0x10000
   };
 
   enum class StatusRefreshPolicy : uint8_t

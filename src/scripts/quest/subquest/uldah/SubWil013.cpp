@@ -63,12 +63,16 @@ public:
   {
     if( bnpc.getBNpcBaseId() != Enemy0 )
       return;
-    if( quest.getUI8AL() < 4 )
+
+    auto currentKC49 = quest.getUI8AL() + 1;
+
+    if( currentKC49 <= 4 )
     {
-      quest.setUI8AL( quest.getUI8AL() + 1 );
-      if( quest.getUI8AL() == 4 )
+      eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC49, 4 );
+      quest.setUI8AL( currentKC49 );
+      if( currentKC49 == 4 )
       {
-        eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 );
+        quest.setUI8AL( 0 );
         quest.setSeq( SeqFinish );
       }
     }

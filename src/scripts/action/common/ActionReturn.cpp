@@ -4,11 +4,15 @@
 #include <Action/Action.h>
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
+#include <Action/CommonAction.h>
 
-class ActionReturn6 : public Sapphire::ScriptAPI::ActionScript
+using namespace Sapphire;
+using namespace Sapphire::World::Action;
+
+class ActionReturn : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionReturn6() : Sapphire::ScriptAPI::ActionScript( 6 )
+  ActionReturn() : Sapphire::ScriptAPI::ActionScript( Return )
   {
   }
 
@@ -23,4 +27,4 @@ public:
   }
 };
 
-EXPOSE_SCRIPT( ActionReturn6 );
+EXPOSE_SCRIPT( ActionReturn );

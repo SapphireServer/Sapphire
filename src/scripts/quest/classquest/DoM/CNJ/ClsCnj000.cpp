@@ -195,6 +195,7 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId() );
+      player.setRewardFlag( Sapphire::Common::UnlockEntry::HuntingLog );
     }
   }
 };

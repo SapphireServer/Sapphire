@@ -6,16 +6,17 @@
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
+#include <Actor/BNpc.h>
 
-// Quest Script: ClsGla021_00286
-// Quest Name: My First Gladius
-// Quest ID: 65822
-// Start NPC: 1001739 (Mylla)
-// End NPC: 1001739 (Mylla)
+// Quest Script: ClsAcn021_00454
+// Quest Name: My First Grimoire
+// Quest ID: 65990
+// Start NPC: 1000909 (Thubyrgeim)
+// End NPC: 1000909 (Thubyrgeim)
 
 using namespace Sapphire;
 
-class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
+class ClsAcn021 : public Sapphire::ScriptAPI::QuestScript
 {
   private:
     // Basic quest information 
@@ -24,10 +25,10 @@ class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
     // UI8BH
     // UI8BL
 
-    /// Countable Num: 3 Seq: 1 Event: 5 Listener: 351
-    /// Countable Num: 3 Seq: 1 Event: 5 Listener: 385
-    /// Countable Num: 3 Seq: 1 Event: 5 Listener: 205
-    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1001739
+    /// Countable Num: 0 Seq: 1 Event: 5 Listener: 347
+    /// Countable Num: 0 Seq: 1 Event: 5 Listener: 324
+    /// Countable Num: 0 Seq: 1 Event: 5 Listener: 49
+    /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1000909
     // Steps in this quest ( 0 is before accepting, 
     // 1 is first, 255 means ready for turning it in
     enum Sequence : uint8_t
@@ -38,14 +39,14 @@ class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
     };
 
     // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1001739; // Mylla ( Pos: -94.529701 6.499970 39.810699  Teri: 131 )
-    static constexpr auto Enemy0 = 351; // Qiqirn Gullroaster
-    static constexpr auto Enemy1 = 385; // Trenchclaw Sahagin ( Pos: 80.837502 68.925400 -218.042999  Teri: 134 )
-    static constexpr auto Enemy2 = 205; // Mottled Eft ( Pos: 15.554700 0.648601 -59.534698  Teri: 141 )
+    static constexpr auto Actor0 = 1000909; // Thubyrgeim ( Pos: -326.360992 12.893700 10.001000  Teri: 129 )
+    static constexpr auto Enemy0 = 347; // Shelfscale Reaver
+    static constexpr auto Enemy1 = 324; // Fallen Wizard
+    static constexpr auto Enemy2 = 49; // Little Ladybug ( Pos: 230.500000 52.037998 138.003998  Teri: 140 )
 
   public:
-    ClsGla021() : Sapphire::ScriptAPI::QuestScript( 65822 ){}; 
-    ~ClsGla021() = default; 
+    ClsAcn021() : Sapphire::ScriptAPI::QuestScript( 65990 ){}; 
+    ~ClsAcn021() = default; 
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -59,7 +60,7 @@ class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
           Scene00000( quest, player );
           break;
         case SeqFinish:
-          Scene00001( quest, player );
+          Scene00005( quest, player );
           break;
       }
     }
@@ -71,41 +72,41 @@ class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
       return;
 
 
-    auto currentKC351 = quest.getUI8AL() + 1;
-    auto currentKC385 = quest.getUI8BH() + 1;
-    auto currentKC205 = quest.getUI8BL() + 1;
+    auto currentKC347 = quest.getUI8AL() + 1;
+    auto currentKC324 = quest.getUI8BH() + 1;
+    auto currentKC49 = quest.getUI8BL() + 1;
 
     switch( bnpc.getBNpcBaseId() )
     {
       case Enemy0:
       {
-        if( currentKC351 <= 3 )
+        if( currentKC347 <= 3 )
         {
-          quest.setUI8AL( currentKC351 );
-          eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC351, 3 );
-          if( currentKC351 == 3 )
+          quest.setUI8AL( currentKC347 );
+          eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC347, 3 );
+          if( currentKC347 == 3 )
             checkQuestCompletion( quest, player );
         }
         break;
       }
       case Enemy1:
       {
-        if( currentKC385 <= 3 )
+        if( currentKC324 <= 3 )
         {
-          quest.setUI8BH( currentKC385 );
-          eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC385, 3 );
-          if( currentKC385 == 3 )
+          quest.setUI8BH( currentKC324 );
+          eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC324, 3 );
+          if( currentKC324 == 3 )
             checkQuestCompletion( quest, player );
         }
         break;
       }
       case Enemy2:
       {
-        if( currentKC205 <= 3 )
+        if( currentKC49 <= 3 )
         {
-          quest.setUI8BL( currentKC205 );
-          eventMgr().sendEventNotice( player, getId(), 3, 2, currentKC205, 3 );
-          if( currentKC205 == 3 )
+          quest.setUI8BL( currentKC49 );
+          eventMgr().sendEventNotice( player, getId(), 3, 2, currentKC49, 3 );
+          if( currentKC49 == 3 )
             checkQuestCompletion( quest, player );
         }
         break;
@@ -116,11 +117,11 @@ class ClsGla021 : public Sapphire::ScriptAPI::QuestScript
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentKC351 = quest.getUI8AL();
-    auto currentKC385 = quest.getUI8BH();
-    auto currentKC205 = quest.getUI8BL();
+    auto currentKC347 = quest.getUI8AL();
+    auto currentKC324 = quest.getUI8BH();
+    auto currentKC49 = quest.getUI8BL();
 
-    if( currentKC351 == 3 && currentKC385 == 3 && currentKC205 == 3 )
+    if( currentKC347 == 3 && currentKC324 == 3 && currentKC49 == 3 )
     {
       quest.setUI8AL( 0 );
       quest.setUI8BH( 0 );
@@ -134,14 +135,14 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ClsGla021::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ClsAcn021::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq( Seq1 );
+      Scene00001( quest, player );
     }
 
 
@@ -151,10 +152,22 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ClsGla021::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ClsAcn021::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    quest.setSeq( Seq1 );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &ClsAcn021::Scene00005Return ) );
+  }
+
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
     if( result.getResult( 0 ) == 1 )
@@ -166,4 +179,4 @@ private:
 
 };
 
-EXPOSE_SCRIPT( ClsGla021 );
+EXPOSE_SCRIPT( ClsAcn021 );

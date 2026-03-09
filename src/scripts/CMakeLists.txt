@@ -1,19 +1,12 @@
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-message("exec: ${EXECUTABLE_OUTPUT_PATH}")
+set( SCRIPT_RUNTIME_ROOT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+set( SCRIPT_POSTBUILD_DIR "${SCRIPT_RUNTIME_ROOT}/compiledscripts/" )
+set( SCRIPT_STAGING_DIR "${SCRIPT_RUNTIME_ROOT}/tmp/compiledscripts/" )
 
-set(SCRIPT_POSTBUILD_DIR "${EXECUTABLE_OUTPUT_PATH}/compiledscripts/")
-set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_PATH}/tmp/compiledscripts/" )
-set(EXECUTABLE_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
-set(LIBRARY_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
-set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
-
-if( WIN32 )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${SCRIPT_LIB_DIR}" )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${SCRIPT_LIB_DIR}" )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${SCRIPT_LIB_DIR}" )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${SCRIPT_LIB_DIR}" )
-endif()
+sapphire_set_output_directories(
+    "${SCRIPT_STAGING_DIR}"
+)
 
 # Enable unity builds if not explicitly enabled/disabled
 if( "${CMAKE_UNITY_BUILD}" STREQUAL "" )
@@ -72,11 +65,11 @@ foreach(_scriptDir ${children})
         # Copy the modules over once they're built. Prevent watchdog from trying to reload partially written files.
         if(WIN32)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
-                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"
-                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.ilk"
-                COMMAND ${CMAKE_COMMAND} -E copy "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_STAGING_DIR}/script_${_name}.exp"
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_STAGING_DIR}/script_${_name}.lib"
+                COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_STAGING_DIR}/script_${_name}.ilk"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SCRIPT_STAGING_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_STAGING_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll
                 COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
             )
         else()

@@ -236,7 +236,6 @@ elseif( WIN32 )
   endif()
 
   STRING( REGEX REPLACE "(.lib)$" ".dll" MYSQL_DLL ${MYSQL_LIBRARY} )
-  file( COPY ${MYSQL_DLL} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 else()
   message( FATAL_ERROR "Unsupported platform!" )
 endif()

@@ -2,11 +2,15 @@
 #include <Actor/Player.h>
 #include <Action/Action.h>
 #include <Inventory/Item.h>
+#include <Action/CommonAction.h>
 
-class ActionDye2472 : public Sapphire::ScriptAPI::ActionScript
+using namespace Sapphire;
+using namespace Sapphire::World::Action;
+
+class ActionGlamour : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionDye2472() : Sapphire::ScriptAPI::ActionScript( 2472 )
+  ActionGlamour() : Sapphire::ScriptAPI::ActionScript( Glamour )
   {
   }
 
@@ -18,8 +22,8 @@ public:
       return;
 
     //TODO: Effect
-    sourceChara->getAsPlayer()->dyeItemFromDyeingInfo();
+    sourceChara->getAsPlayer()->glamourItemFromGlamouringInfo();
   }
 };
 
-EXPOSE_SCRIPT(ActionDye2472);
+EXPOSE_SCRIPT( ActionGlamour );

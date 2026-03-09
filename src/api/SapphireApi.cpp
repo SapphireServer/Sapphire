@@ -201,6 +201,9 @@ void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
   g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId = " + std::to_string( id ) + ";" );
   g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId = " + std::to_string( id ) + ";" );
   g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfoachievement WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaitemcurrency WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charamonsternote WHERE CharacterId = " + std::to_string( id ) + ";" );
 }
 
 std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
