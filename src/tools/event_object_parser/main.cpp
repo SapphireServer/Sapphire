@@ -529,11 +529,12 @@ int main( int argc, char* argv[] )
                     {
                       shapeStr = "Box";
                       const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
+                      // SGB stores Transformation.Scale as half-extents; addCollisionBox expects full extents, so multiply by 2
                       const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
                       eobjLine += "    pEObj->addCollisionBox( { " +
                                   std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
                                   std::to_string( rot * -1.f ) + ", " +
-                                  std::to_string( box.x ) + ", " + std::to_string( box.y ) + ", " + std::to_string( box.z ) + " );\n";
+                                  std::to_string( box.x * 2.f ) + ", " + std::to_string( box.y * 2.f ) + ", " + std::to_string( box.z * 2.f ) + " );\n";
                     }
                     break;
                     case TriggerBoxShapeSphere:
