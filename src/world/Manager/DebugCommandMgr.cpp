@@ -663,7 +663,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
       if( auto pNavi = pTeri->getNaviProvider() )
       {
-          auto obstacleRef = player.getObstacleRef();
+          auto& obstacleRef = player.getObstacleRef();
 
           if( obstacleRef != 0 )
               pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );

@@ -13,7 +13,7 @@
           "timepoints": [
             {
               "data": {
-                "actionId": 6116,
+                "actionId": 351,
                 "selectorIndex": 0,
                 "selectorName": "<unset>",
                 "snapshot": false,
@@ -23,7 +23,7 @@
               },
               "description": "",
               "id": 1,
-              "startTime": 8000,
+              "startTime": 16000,
               "type": "castAction"
             }
           ]

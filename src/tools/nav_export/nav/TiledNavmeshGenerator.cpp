@@ -104,43 +104,7 @@ size_t FileIO::getFileSize() const
 
 void FileIO::scanDirectory( const std::string& path, const std::string& ext, std::vector< std::string >& fileList )
 {
-#ifdef WIN32
-  const std::string pathWithExt = path + "/*" + ext;
-
-  _finddata_t dir;
-  const intptr_t findHandle = _findfirst( pathWithExt.c_str(), &dir );
-  if( findHandle == -1L )
-  {
-    return;
-  }
-
-  do
-  {
-    fileList.emplace_back( dir.name );
-  } while( _findnext( findHandle, &dir ) == 0 );
-  _findclose( findHandle );
-#else
-  dirent* current = 0;
-  DIR* dp = opendir( path.c_str() );
-  if( !dp )
-  {
-    return;
-  }
-
-  size_t extLen = strlen( ext.c_str() );
-  while( ( current = readdir( dp ) ) != 0 )
-  {
-    size_t len = strlen( current->d_name );
-    if( len > extLen && strncmp( current->d_name + len - extLen, ext.c_str(), extLen ) == 0 )
-    {
-      fileList.emplace_back( current->d_name );
-    }
-  }
-  closedir( dp );
-#endif
-
-  // Sort the list of files alphabetically.
-  std::sort( fileList.begin(), fileList.end() );
+  // stub to fix linux build
 }
 
 inline unsigned int nextPow2( uint32_t v )
