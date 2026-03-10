@@ -151,9 +151,15 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
       return nullptr;
   }
 
-  uint32_t index = stmt->getIndex();
+  const uint32_t index = stmt->getIndex();
+  const auto it = m_queries.find( index );
 
-  auto pStmt = getPreparedStatement( index );
+  if( it == m_queries.end() )
+    return nullptr;
+
+  // Use a fresh prepared statement object for synchronous queries.
+  // Reusing the same MYSQL_STMT across overlapping reads can leave the connection/state out of sync.
+  auto pStmt = m_pConnection->prepareStatement( it->second.first );
 
   if( !pStmt )
     return nullptr;
@@ -169,7 +175,6 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
     Logger::error( e.what() );
     return nullptr;
   }
-
 }
 
 bool Sapphire::Db::DbConnection::execute( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )

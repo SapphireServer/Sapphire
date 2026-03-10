@@ -18,6 +18,7 @@
 
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
 
 #include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
@@ -139,7 +140,10 @@ Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( uint64_t characterId )
 Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( const std::string& playerName )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_BY_NAME );
+  stmt->setString( 1, playerName );
+
+  auto res = db.query( stmt );
   if( !res || !res->next() )
     return nullptr;
 
