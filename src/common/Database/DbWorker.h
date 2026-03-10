@@ -2,8 +2,9 @@
 
 #include <atomic>
 #include <thread>
-#include "Util/LockedWaitQueue.h"
 #include <memory>
+
+#include "Util/LockedWaitQueue.h"
 
 namespace Sapphire::Db
 {

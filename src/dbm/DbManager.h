@@ -1,10 +1,10 @@
-#ifndef SAPPHIRE_DBMANAGER
-#define SAPPHIRE_DBMANAGER
+#pragma once
+
 #include <string>
 #include <stdint.h>
 #include <memory>
 
-namespace Mysql 
+namespace Mysql
 {
   class Connection;
 }
@@ -21,59 +21,55 @@ enum class Mode
 
 class DbManager
 {
-  public:
-    DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port );
-    
-    void setMode( Mode mode );
-    Mode getMode() const;
+public:
+  DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port );
 
-    bool connect();
-    bool selectSchema();
+  void setMode( Mode mode );
+  Mode getMode() const;
 
-    bool execute( const std::string& sql );
+  bool connect();
+  bool selectSchema();
 
-    bool performAction();
+  bool execute( const std::string& sql );
 
-    bool modeInit();
+  bool performAction();
 
-    bool modeLiquidate();
+  bool modeInit();
 
-    bool modeCheck();
+  bool modeLiquidate();
 
-    bool modeMigrate();
+  bool modeCheck();
 
-    bool modeAddMigration();
+  bool modeMigrate();
 
-    virtual ~DbManager();
+  bool modeAddMigration();
 
-    const std::string& getLastError();
+  virtual ~DbManager();
 
-    const std::string& getSchemaFile() const;
-    const std::string& getInsertFile() const;
-    
-    void setSchemaFile( const std::string& schemaFile );
-    void setInsertFile( const std::string& insertFile );
+  const std::string& getLastError();
 
-    void setForceMode( bool mode );
+  const std::string& getSchemaFile() const;
+  const std::string& getInsertFile() const;
 
-    void setMigratioName( const std::string& name );
+  void setSchemaFile( const std::string& schemaFile );
+  void setInsertFile( const std::string& insertFile );
 
-  private:
-    std::string m_host;
-    std::string m_database;
-    std::string m_user;
-    std::string m_password;
-    uint16_t m_port;
-    std::shared_ptr< Mysql::Connection > m_pConnection;
-    std::string m_lastError;
-    Mode m_mode;
-    std::string m_iFile;
-    std::string m_sFile;
-    bool m_force;
+  void setForceMode( bool mode );
 
-    std::string m_migrationName;
+  void setMigratioName( const std::string& name );
+
+private:
+  std::string m_host;
+  std::string m_database;
+  std::string m_user;
+  std::string m_password;
+  uint16_t m_port;
+  std::shared_ptr< Mysql::Connection > m_pConnection;
+  std::string m_lastError;
+  Mode m_mode;
+  std::string m_iFile;
+  std::string m_sFile;
+  bool m_force;
+
+  std::string m_migrationName;
 };
-
-
-
-#endif

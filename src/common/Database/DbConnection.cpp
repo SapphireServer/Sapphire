@@ -1,6 +1,5 @@
 #include "DbConnection.h"
 #include "DbWorker.h"
-#include <MySqlConnector.h>
 #include "Logging/Logger.h"
 #include <cassert>
 
@@ -51,9 +50,9 @@ void Sapphire::Db::DbConnection::close()
 uint32_t Sapphire::Db::DbConnection::open()
 {
   std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
-  Mysql::optionMap options;
-  options[ Mysql::mysqlOption::MYSQL_OPT_RECONNECT ] = "1";
-  options[ Mysql::mysqlOption::MYSQL_SET_CHARSET_NAME ] = "utf8";
+  Mysql::OptionMap options;
+  options[ Mysql::Option::OptReconnect ] = "1";
+  options[ Mysql::Option::SetCharsetName ] = "utf8";
 
   try
   {
@@ -64,7 +63,7 @@ uint32_t Sapphire::Db::DbConnection::open()
   }
   catch( std::runtime_error& e )
   {
-   Logger::error( e.what() );
+    Logger::error( e.what() );
     return 1;
   }
 
@@ -147,7 +146,7 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
   if( !ping() ) //this does not work right and results in too many connections
   {
     // naivly reconnect and hope for the best
-    //open(); 
+    //open();
     lockIfReady();
     if( !prepareStatements() )
       return nullptr;

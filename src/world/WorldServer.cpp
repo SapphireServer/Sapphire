@@ -1,4 +1,3 @@
-#include <Connection.h>
 #include <Network/Connection.h>
 #include <Network/Hive.h>
 #include <Network/PacketContainer.h>

@@ -1,5 +1,4 @@
 #include "ZoneDbConnection.h"
-#include <MySqlConnector.h>
 
 Sapphire::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
   DbConnection( connInfo )

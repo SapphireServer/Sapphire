@@ -1,10 +1,5 @@
 #pragma once
 
-namespace Mysql
-{
-  class Connection;
-}
-
 namespace Sapphire::Db
 {
   class DbConnection;

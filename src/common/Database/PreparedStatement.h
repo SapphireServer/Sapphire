@@ -4,12 +4,9 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "Operation.h"
 
-namespace Mysql
-{
-  class PreparedStatement;
-}
+#include "Operation.h"
+#include "MySqlPreparedStatement.h"
 
 namespace Sapphire::Db
 {

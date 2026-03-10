@@ -15,7 +15,7 @@ using namespace Sapphire::Api;
 bool SapphireApi::login( const std::string& username, const std::string& pass, std::string& sId )
 {
   std::string query =
-    "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
+          "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
 
   // check if a user with that name / password exists
   auto pQR = g_charaDb.query( query );
@@ -33,13 +33,13 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
   for( int32_t i = 0; i < 64 / 4; ++i )
   {
     short number = 0x1111 + rand() % 0xFFFF;
-    char part[5];
+    char part[ 5 ];
     sprintf( part, "%04hx", number );
 
     if( i == 15 )
     {
-      part[2] = 0;
-      part[3] = 0;
+      part[ 2 ] = 0;
+      part[ 3 ] = 0;
     }
     sessionId += std::string( part );
   }
@@ -53,7 +53,6 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
   sId = sessionId;
 
   return true;
-
 }
 
 
@@ -67,7 +66,6 @@ bool SapphireApi::insertSession( const uint32_t accountId, std::string& sId )
   m_sessionMap[ sId ] = pSession;
 
   return true;
-
 }
 
 bool SapphireApi::createAccount( const std::string& username, const std::string& pass, std::string& sId )
@@ -97,7 +95,6 @@ bool SapphireApi::createAccount( const std::string& username, const std::string&
     return false;
 
   return true;
-
 }
 
 int SapphireApi::createCharacter( const uint32_t accountId, const std::string& name,
@@ -125,7 +122,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   std::vector< int32_t > tmpVector;
   std::vector< int32_t > tmpVector2;
 
-  for( auto& v : json["content"] )
+  for( auto& v : json[ "content" ] )
   {
     if( v.is_array() )
     {
@@ -152,7 +149,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   //         if( !v.second.data().empty() )
   //           tmpVector2.push_back( std::stoi( v.second.data() ) );
   //       }
-  
+
   std::vector< int32_t >::iterator it = tmpVector.begin();
   for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
   {
@@ -212,7 +209,7 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
   std::vector< Api::PlayerMinimal > charList;
 
   auto pQR = g_charaDb.query(
-    "SELECT CharacterId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
+          "SELECT CharacterId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
 
   while( pQR->next() )
   {
@@ -227,11 +224,9 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
   return charList;
 }
 
-bool SapphireApi::checkNameTaken( std::string name )
+bool SapphireApi::checkNameTaken( std::string_view name )
 {
-
-  g_charaDb.escapeString( name );
-  std::string query = "SELECT * FROM charainfo WHERE Name = '" + name + "';";
+  std::string query = "SELECT * FROM charainfo WHERE Name = '" + g_charaDb.escapeString( name ) + "';";
 
   auto pQR = g_charaDb.query( query );
 

@@ -1,8 +1,6 @@
 #include "PreparedStatement.h"
 #include "DbConnection.h"
 
-#include <MySqlConnector.h>
-
 #include <string.h>
 #include <sstream>
 #include <cassert>

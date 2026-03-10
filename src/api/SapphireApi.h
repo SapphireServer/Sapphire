@@ -31,7 +31,7 @@ namespace Sapphire::Api
 
     std::vector< Api::PlayerMinimal > getCharList( uint32_t accountId );
 
-    bool checkNameTaken( std::string name );
+    bool checkNameTaken( std::string_view name );
 
     uint32_t getNextEntityId();
 

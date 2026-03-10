@@ -28,7 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <iostream>
 #include <sstream>
 #include <cstdint>
-#include <mysql.h>
+#include "MySqlNative.h"
 
 //using  MYSQL_FIELD = st_mysql_field;
 #ifndef UL64

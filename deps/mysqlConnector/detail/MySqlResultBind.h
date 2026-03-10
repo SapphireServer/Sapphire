@@ -2,17 +2,17 @@
 #define SAPPHIRE_RESULTBIND_H
 
 #include <memory>
-#include "mysql_util.h"
-#include "mysql.h"
-#include "PreparedStatement.h"
+#include "MySqlUtil.h"
+#include "MySqlNative.h"
+#include "MySqlPreparedStatement.h"
 
 namespace Mysql
 {
    class ResultBind
    {
       uint32_t m_numFields;
-      std::unique_ptr< char[] > m_isNull;
-      std::unique_ptr< char[] > m_err;
+      std::unique_ptr< BindBool[] > m_isNull;
+      std::unique_ptr< BindBool[] > m_err;
       std::unique_ptr< unsigned long[] > m_len;
       MYSQL_STMT* m_pStmt;
 
