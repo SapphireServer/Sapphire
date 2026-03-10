@@ -144,7 +144,12 @@ bool Player::loadFromDb( uint64_t characterId )
   auto gcRank = res->getBlobVector( "GrandCompanyRank" );
   memcpy( m_gcRank.data(), gcRank.data(), gcRank.size() );
 
-  res->free();
+  // Stats
+  m_hp = res->getUInt( "Hp" );
+  m_mp = res->getUInt( "Mp" );
+  m_tp = res->getUInt( "Tp" );
+  m_mount = res->getUInt8( "Mount" );
+  res.reset();
 
   if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() || !loadFriendList() || !loadBlacklist() || !loadAchievements() )
   {
@@ -153,14 +158,8 @@ bool Player::loadFromDb( uint64_t characterId )
 
   initInventory();
 
-  // Stats
-  m_hp = res->getUInt( "Hp" );
-  m_mp = res->getUInt( "Mp" );
-  m_tp = res->getUInt( "Tp" );
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();
-
-  m_mount = res->getUInt8( "Mount" );
 
   m_modelSubWeapon = 0;
   m_lastTickTime = 0;
