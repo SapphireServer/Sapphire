@@ -377,6 +377,8 @@ void ZoneEditor::loadBnpcs()
   auto res = db.query( stmt );
 
   m_bnpcs.clear();
+  if( !res )
+    return;
 
   while( res->next() )
   {

@@ -31,7 +31,7 @@ void PlayerMinimal::load( uint64_t charId )
   stmt->setUInt64( 1, charId );
   auto res = g_charaDb.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return;
 
   m_characterId = charId;
@@ -68,6 +68,8 @@ void PlayerMinimal::load( uint64_t charId )
   stmtClass->setUInt64( 1, m_characterId );
 
   auto resClass = g_charaDb.query( stmtClass );
+  if( !resClass )
+    return;
 
   while( resClass->next() )
   {
@@ -480,7 +482,7 @@ uint64_t PlayerMinimal::getNextUId64() const
   g_charaDb.directExecute( std::string( "INSERT INTO uniqueiddata( IdName ) VALUES( 'NOT_SET' );" ) );
   auto res = g_charaDb.query( "SELECT LAST_INSERT_ID();" );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return 0;
 
   return res->getUInt64( 1 );

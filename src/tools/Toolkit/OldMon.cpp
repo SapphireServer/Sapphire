@@ -489,6 +489,8 @@ void OldMon::loadCaptures( uint32_t versionId )
 {
   std::string query = fmt::format( "SELECT * FROM captures WHERE version_id = {};", versionId );
   auto res = m_dbConnection->query( query );
+  if( !res )
+    return;
 
   while( res->next() )
   {
@@ -510,6 +512,8 @@ void OldMon::loadCapture( uint32_t captureId )
 
   std::string query = fmt::format( "SELECT * FROM packet_set WHERE capture_id = {} ORDER BY id ASC;", captureId );
   auto res = m_dbConnection->query( query );
+  if( !res )
+    return;
 
   while( res->next() )
   {
@@ -528,6 +532,9 @@ void OldMon::loadCapture( uint32_t captureId )
   {
     std::string query = fmt::format( "SELECT * FROM packet WHERE packet_set_id = {} ORDER BY id ASC;", set.id );
     auto res = m_dbConnection->query( query );
+    if( !res )
+      continue;
+
     Packet pack;
     while( res->next() )
     {

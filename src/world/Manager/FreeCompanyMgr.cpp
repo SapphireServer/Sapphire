@@ -411,6 +411,8 @@ std::vector< FreeCompanyPtr > FreeCompanyMgr::dbSelectFcsAll()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto query = db.getPreparedStatement( Db::FC_SEL_ALL );
   auto res = db.query( query );
+  if( !res )
+    return fcList;
 
   /* FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
                     "       ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList */
@@ -457,6 +459,9 @@ std::vector< FreeCompany::FcMember > FreeCompanyMgr::dbSelectMembersByFc( uint64
   auto queryMember = db.getPreparedStatement( Db::FC_MEMBERS_SEL_FC );
   queryMember->setUInt64( 1, fcId );
   auto resMember = db.query( queryMember );
+  if( !resMember )
+    return memberList;
+
   while( resMember->next() )
   {
     struct FreeCompany::FcMember member;

@@ -33,7 +33,7 @@ bool Player::loadFromDb( uint64_t characterId )
   stmt->set( 1, characterId );
   auto res = db.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return false;
 
   m_id = res->getUInt( "EntityId" );
@@ -190,6 +190,8 @@ bool Player::loadActiveQuests()
 
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
+  if( !res )
+    return false;
 
   for( size_t idx = 0; idx < 30; ++ idx )
     m_quests[ idx ] = World::Quest();
@@ -219,6 +221,8 @@ bool Player::loadAchievements()
 
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
+  if( !res )
+    return false;
 
   while( res->next() )
   {
@@ -262,6 +266,8 @@ bool Player::loadClassData()
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
+  if( !res )
+    return false;
 
   while( res->next() )
   {
@@ -285,7 +291,7 @@ bool Player::loadSearchInfo()
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
   {
     Logger::error( "Failed to load search info for character#{}", m_characterId );
     return false;
@@ -310,7 +316,7 @@ bool Player::loadHuntingLog()
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
   {
     Logger::error( "Failed to load hunting log data for character#{}", m_characterId );
     return false;
@@ -732,6 +738,8 @@ bool Player::loadInventory()
                          "FROM charaitemgearset " \
                                "WHERE CharacterId =  " + std::to_string( m_characterId ) + " " \
                                "ORDER BY storageId ASC;" );
+  if( !res )
+    return false;
 
   while( res->next() )
   {
@@ -766,6 +774,8 @@ bool Player::loadInventory()
                             "FROM charaiteminventory " \
                                   "WHERE CharacterId =  " + std::to_string( m_characterId ) + " " \
                                   "ORDER BY storageId ASC;" );
+  if( !bagRes )
+    return false;
 
   while( bagRes->next() )
   {
@@ -792,6 +802,8 @@ bool Player::loadInventory()
     "FROM charaitemcurrency " \
     "WHERE CharacterId = {0} " \
     "ORDER BY storageId ASC;", std::to_string(m_characterId)));
+  if( !currencyRes )
+    return false;
 
   while ( currencyRes->next() )
   {
@@ -825,7 +837,7 @@ bool Player::loadFriendList()
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
   {
     Logger::error( "Failed to load friendlist data for character#{}", m_characterId );
     return false;
@@ -850,7 +862,7 @@ bool Player::loadBlacklist()
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
 
-  if( !res->next() )
+  if( !res || !res->next() )
   {
     Logger::error( "Failed to load blacklist data for character#{}", m_characterId );
     return false;
@@ -870,7 +882,7 @@ bool Player::syncLastDBWrite()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT UNIX_TIMESTAMP(UPDATE_DATE) FROM charainfo WHERE characterid = " + std::to_string( m_characterId ) );
 
-  if( !res->next() )
+  if( !res || !res->next() )
   {
     Logger::error( "Failed to load update date for character#{}", m_characterId );
     return false;

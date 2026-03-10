@@ -120,6 +120,8 @@ bool HousingMgr::loadEstateInventories()
 
   auto stmt = db.getPreparedStatement( Db::LAND_INV_SEL_ALL );
   auto res = db.query( stmt );
+  if( !res )
+    return false;
 
   uint32_t itemCount = 0;
   while( res->next() )
@@ -178,6 +180,8 @@ void HousingMgr::initLandCache()
 
   auto stmt = db.getPreparedStatement( Db::LAND_SEL_ALL );
   auto res = db.query( stmt );
+  if( !res )
+    return;
 
   while( res->next() )
   {
@@ -278,7 +282,7 @@ uint64_t HousingMgr::getNextHouseId()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto pQR = db.query( "SELECT MAX( HouseId ) FROM house" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0;
 
   return pQR->getUInt64( 1 ) + 1;
@@ -295,7 +299,7 @@ LandPtr HousingMgr::getLandByOwnerId( uint64_t id )
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT LandSetId, LandId FROM land WHERE OwnerId = " + std::to_string( id ) );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return nullptr;
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();

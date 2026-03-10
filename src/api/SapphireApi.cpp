@@ -20,7 +20,7 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
   // check if a user with that name / password exists
   auto pQR = g_charaDb.query( query );
   // found?
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return false;
 
   // user found, proceed
@@ -73,13 +73,13 @@ bool SapphireApi::createAccount( const std::string& username, const std::string&
   // get account from login name
   auto pQR = g_charaDb.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
   // found?
-  if( pQR->next() )
+  if( pQR && pQR->next() )
     return false;
 
   // we are clear and can create a new account
   // get the next free account id
   pQR = g_charaDb.query( "SELECT MAX(account_id) FROM accounts;" );
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return false;
   uint32_t accountId = pQR->getUInt( 1 ) + 1;
 
@@ -210,6 +210,8 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
 
   auto pQR = g_charaDb.query(
           "SELECT CharacterId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
+  if( !pQR )
+    return charList;
 
   while( pQR->next() )
   {
@@ -230,7 +232,7 @@ bool SapphireApi::checkNameTaken( std::string_view name )
 
   auto pQR = g_charaDb.query( query );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return false;
   else
     return true;
@@ -242,7 +244,7 @@ uint32_t SapphireApi::getNextEntityId()
 
   auto pQR = g_charaDb.query( "SELECT MAX(EntityId) FROM charainfo" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0x00200001;
 
   charId = pQR->getUInt( 1 ) + 1;
@@ -258,7 +260,7 @@ uint64_t SapphireApi::getNextCharaId()
 
   auto pQR = g_charaDb.query( "SELECT MAX(CharacterId) FROM charainfo" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0x0040000001000001;
 
   contentId = pQR->getUInt64( 1 ) + 1;

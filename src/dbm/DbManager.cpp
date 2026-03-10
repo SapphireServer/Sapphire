@@ -163,7 +163,7 @@ bool DbManager::modeInit()
       auto stmt = m_pConnection->createStatement();
       auto resultSet = stmt->executeQuery( query );
 
-      if( !resultSet->next() )
+      if( !resultSet || !resultSet->next() )
         return false;
 
       auto count = resultSet->getUInt( 1 );
@@ -295,6 +295,8 @@ bool DbManager::modeLiquidate()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {
@@ -340,6 +342,8 @@ bool DbManager::modeCheck()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {
@@ -393,6 +397,8 @@ bool DbManager::modeMigrate()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {

@@ -127,7 +127,7 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
   query->setUInt64( 1, uId );
 
   auto itemRes = db.query( query );
-  if( !itemRes->next() )
+  if( !itemRes || !itemRes->next() )
     return nullptr;
 
   try
@@ -185,7 +185,7 @@ uint32_t ItemMgr::getNextUId()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto pQR = db.query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0x00500001;
 
   charId = pQR->getUInt( 1 ) + 1;

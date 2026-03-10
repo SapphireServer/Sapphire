@@ -97,7 +97,7 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return "Obtaining Signature";
 
   std::string playerName = res->getString( 1 );
@@ -152,6 +152,8 @@ bool PlayerMgr::loadPlayers()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo" );
+  if( !res )
+    return false;
 
   // no players or failed
   while( res->next() )

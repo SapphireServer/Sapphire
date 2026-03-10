@@ -36,6 +36,8 @@ bool LinkshellMgr::loadLinkshells()
 
   auto query = db.getPreparedStatement( Db::LINKSHELL_SEL_ALL );
   auto res = db.query( query );
+  if( !res )
+    return false;
 
   while( res->next() )
   {
