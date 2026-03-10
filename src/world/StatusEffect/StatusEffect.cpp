@@ -116,10 +116,10 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   if( !hasScript && getFlag() & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && m_groundAOE.vfxId > 0 )
   {
     // filter by allies
-    static auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
-    static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
-    static auto pDeadFilter = std::make_shared< World::AI::IsDeadFilter >();
-    static auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
+    auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
+    auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+    auto pDeadFilter = std::make_shared< World::AI::IsDeadFilter >();
+    auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
 
     if( m_targetActor->getAreaObject() == nullptr )
       return;

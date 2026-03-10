@@ -1082,7 +1082,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
     return false;
 
   // todo: is this correct?
-  static auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
+  auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
   if( !pEncounterFilter->isApplicable( pSrc, pChara ) )
     return false;
 

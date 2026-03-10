@@ -272,7 +272,7 @@ public:
       */
 
       // all players dead probably, fail
-      if( pEncounter->getStatus() == EncounterStatus::ACTIVE )
+      if( pBNpc && pEncounter->getStatus() == EncounterStatus::ACTIVE )
       {
         if( pBNpc->hateListGetHighest() == nullptr )
           pEncounter->setStatus( EncounterStatus::FAIL );
@@ -355,7 +355,7 @@ public:
         setup.encounterShape = EncounterShape::CYLINDER;
         setup.position = { 74, 29, -46 };
         setup.position2 = { 40, 10, 0 };
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
+        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
         setup.bnpcSetupList = { { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
         // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
         setup.lockoutEntrances = { { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1 } };
@@ -363,7 +363,7 @@ public:
         setup.hasLockout = true;
         setup.placeName = PLACENAME_CATTERY;
         setup.bgmInCombat = 37;
-        setup.bgmInTeri = 35;
+        setup.bgmToRestore = 35;
 
         pEncounter->setEncounterSetup( setup );
         instance.setEncounter( pEncounter );
@@ -458,7 +458,7 @@ public:
       setup.encounterShape = EncounterShape::CYLINDER;
       setup.position = { -17, 22, 48 };
       setup.position2 = { 40, 10, 0 };
-      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, bool isBoss } }
+      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
       setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
       // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
       setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1 } };
@@ -466,7 +466,7 @@ public:
       setup.hasLockout = true;
       setup.placeName = PLACENAME_RAMBADE;
       setup.bgmInCombat = 37;
-      setup.bgmInTeri = 35;
+      setup.bgmToRestore = 35;
 
       pEncounter->setEncounterSetup( setup );
       instance.setEncounter( pEncounter );

@@ -32,7 +32,7 @@ namespace Sapphire::Entity
       {
         float width;
         float height;
-        float depth;;
+        float depth;
       } box;
 
       struct

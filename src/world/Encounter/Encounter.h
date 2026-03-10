@@ -69,9 +69,19 @@ namespace Sapphire
     Common::Vector3 position2;
     uint64_t duration{ 0 };    // todo: implement this
     uint32_t placeName{ 0 };
-    uint32_t bgmInCombat{ 0 }; // todo: implement this
-    uint32_t bgmInTeri{ 0 };   // todo: implement this
-    uint32_t bgmOnFinish{ 0 }; // todo: implement this
+
+    // todo: all FATEs need bgm handling too, currently only instances are handled
+    uint16_t bgmOnEnterRange{ 0 };          // todo: (FATE) implement this in onEnterRange, FATEs change bgm for player on entering
+    uint16_t bgmOnExitRangeTeri{ 0 };       // todo: (FATE) implement this in onExitRange
+    uint16_t bgmOnExitRangeTeriCombat{ 0 }; // todo: (FATE) implement this in onExitRange
+
+    uint16_t bgmInCombat{ 0 };              // bgm when encounter is active
+
+    uint16_t bgmToRestore{ 0 };             // default teri bgm, set when encounter has failed
+    uint16_t bgmToRestoreCombat{ 0 };       // default teri combat bgm, set when encounter has failed
+
+    uint16_t bgmOnFinishTeri{ 0 };          // new teri bgm after encounter success
+    uint16_t bgmOnFinishTeriCombat{ 0 };    // new teri bgm in combat after encounter success // todo: implement this, sastasha uses different combat bgm for trash after first boss
 
     bool hasLockout{ false };
   };
@@ -148,7 +158,8 @@ namespace Sapphire
     bool isPositionInside( const Common::Vector3& pos ) const;
 
     //void addEObj( Entity::EventObjectPtr pEObj );
-    Entity::EventObjectPtr getEObj( uint32_t baseId ) const;
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId ) const;
+    Entity::EventObjectPtr getEObjByName( const std::string& name ) const;
     void removeEObj( Entity::EventObjectPtr pEObj );
     void removeEObjs();
 

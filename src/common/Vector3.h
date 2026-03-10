@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cassert>
 
 namespace Sapphire::Common
 {
@@ -9,7 +10,7 @@ namespace Sapphire::Common
     float x{ 0 }, y{ 0 }, z{ 0 };
 
     // Constructors
-    constexpr Vector3() : x( 0.0f ), y( 0.0f ), z( 0.0f ) {}
+    constexpr Vector3() = default;
     constexpr Vector3( float x, float y, float z ) : x( x ), y( y ), z( z ) {}
 
     // Pointer access for Detour API (e.g., &pos.x or pos.f())
@@ -19,8 +20,13 @@ namespace Sapphire::Common
     // Basic arithmetic
     Vector3 operator+( const Vector3& v ) const { return { x + v.x, y + v.y, z + v.z }; }
     Vector3 operator-( const Vector3& v ) const { return { x - v.x, y - v.y, z - v.z }; }
-    Vector3 operator*( float s ) const { return { x * s, y * s, z * s }; }
-    Vector3 operator/( float s ) const { return { x / s, y / s, z / s }; }
+    Vector3 operator*( float scalar ) const { return { x * scalar, y * scalar, z * scalar }; }
+    Vector3 operator/( float scalar ) const
+    {
+      assert( scalar != 0.0f );
+      return { x / scalar, y / scalar, z / scalar };
+    }
+
     // Vector Logic
     float lengthSq() const { return x * x + y * y + z * z; }
     float length() const { return std::sqrt( lengthSq() ); }

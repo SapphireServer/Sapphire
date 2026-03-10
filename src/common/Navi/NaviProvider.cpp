@@ -581,6 +581,9 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   status = m_tileCache->init( &header.cacheParams, m_talloc, m_tcomp, m_tmproc );
   if( dtStatusFailed( status ) )
   {
+    Logger::error( "dtTileCache::init failed with status {:#x} for zone {}", status, path );
+    dtFreeTileCache( m_tileCache );
+    m_tileCache = nullptr;
     fclose( fp );
     return false;
   }
@@ -852,6 +855,12 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
 
 bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos )
 {
+  if( m_naviMeshQuery == nullptr )
+  {
+    Logger::error( "[Navmesh] hasLineOfSight: m_naviMeshQuery is null" );
+    return true;
+  }
+
   dtQueryFilter filter;
   // 1. DETOUR CHECK: Is the path clear on the NavMesh?
   dtPolyRef startRef{ 0 };

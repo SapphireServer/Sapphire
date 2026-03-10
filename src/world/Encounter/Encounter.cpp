@@ -199,11 +199,11 @@ namespace Sapphire
 
         for( auto& pActor : inRange )
         {
-          if( pActor->getBoundEncounterId() != m_id && isPositionInside( pActor->getPos() ) )
+          if( pActor->getBoundEncounterId() != m_id && isPositionInside( pActor->getPos() ) && m_actorsInside.count( pActor ) == 0 )
           {
             onEnterRange( pActor );
           }
-          else if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
+          else if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) && m_actorsInside.count( pActor ) > 0 )
           {
             onExitRange( pActor );
           }
@@ -293,8 +293,11 @@ namespace Sapphire
 
   void Encounter::setStatus( EncounterStatus status )
   {
+    const auto oldStatus = m_status;
     m_status = status;
-    onChangeStatus( m_status, status );
+
+    if( oldStatus != status )
+      onChangeStatus( oldStatus, status );
   }
 
   void Encounter::addBNpc( Entity::BNpcPtr pBNpc, bool bind )
@@ -408,6 +411,12 @@ namespace Sapphire
       auto pPlayer = pActor->getAsPlayer();
       addPlayer( pPlayer, isLocked() );
       m_playersInside.emplace( pPlayer );
+
+      // todo: (FATE) some FATEs change the bgm for the player on entering, handle this
+      if( m_setup.bgmOnEnterRange != 0 )
+      {
+
+      }
     }
     else if( !pActor->isPlayer() && canBindActors() )
     {
@@ -423,6 +432,8 @@ namespace Sapphire
       auto pPlayer = pActor->getAsPlayer();
       removePlayer( pPlayer );
       m_playersInside.erase( pPlayer );
+
+      // todo: (FATE) restore teri idle/combat music
     }
     else if( pActor->isBattleNpc() )
     {
@@ -449,9 +460,9 @@ namespace Sapphire
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
 
       // send bgm reset
-      if( m_setup.bgmInTeri != 0 )
+      if( m_setup.bgmToRestore != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmInTeri );
+          pInstance->setCurrentBGM( m_setup.bgmToRestore );
 
       reset();
     }
@@ -465,20 +476,19 @@ namespace Sapphire
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
 
+
+      auto bgmToRestore = m_setup.bgmOnFinishTeri != 0 ? m_setup.bgmOnFinishTeri : m_setup.bgmToRestore;
       // send bgm
-      if( m_setup.bgmOnFinish != 0 )
+      if( bgmToRestore != 0 )
       {
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmOnFinish );
-      }
-      else if( m_setup.bgmInTeri != 0 )
-      {
-        if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmOnFinish );
+          pInstance->setCurrentBGM( bgmToRestore );
       }
 
       m_finishTime = Common::Util::getTimeMs();
       m_lockoutTime = 0;
+
+      // todo: despawn entrance eobjs?
       setEntranceEObjLocked( false );
       setExitEObjLocked( false );
     }
@@ -491,9 +501,9 @@ namespace Sapphire
             pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
 
       // send bgm reset
-      if( m_setup.bgmInTeri != 0 )
+      if( m_setup.bgmToRestore != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmInTeri );
+          pInstance->setCurrentBGM( m_setup.bgmToRestore );
 
       reset();
     }
@@ -535,9 +545,6 @@ namespace Sapphire
     {
       if( pEObj )
       {
-        // todo: map eobj states to vfx
-        // todo: map eobj to lgb collisionbox
-        // todo: pNaviProvider->toggleDoor
         if( locked )
         {
           pEObj->setPermissionInvisibility( 0 );
@@ -558,9 +565,6 @@ namespace Sapphire
     {
       if( pEObj )
       {
-        // todo: map eobj states to vfx
-        // todo: map eobj to lgb collisionbox
-        // todo: pNaviProvider->toggleDoor
         if( locked )
         {
           pEObj->setPermissionInvisibility( 0 );
@@ -585,7 +589,7 @@ namespace Sapphire
         auto height = m_setup.position2.y;
 
         auto distance = Common::Util::distance2D( m_position.x, m_position.z, pos.x, pos.z );
-        volatile auto dY = std::fabs( m_position.y - pos.y );
+        auto dY = std::fabs( m_position.y - pos.y );
 
         return distance <= radius && dY <= height;
       }
@@ -596,7 +600,7 @@ namespace Sapphire
         auto max = m_setup.position2;
 
         return ( pos.x >= min.x && pos.x <= max.x ) &&
-               ( pos.y >= min.x && pos.y <= max.y ) &&
+               ( pos.y >= min.y && pos.y <= max.y ) &&
                ( pos.z >= min.z && pos.z <= max.z );
       }
       break;
@@ -606,11 +610,21 @@ namespace Sapphire
     return false;
   }
 
-  Entity::EventObjectPtr Encounter::getEObj( uint32_t baseId ) const
+  Entity::EventObjectPtr Encounter::getEObjByBaseId( uint32_t baseId ) const
   {
     for( const auto& pEObj : m_eobjs )
       if( pEObj->getBaseId() == baseId )
         return pEObj;
+
+    return nullptr;
+  }
+
+  Entity::EventObjectPtr Encounter::getEObjByName( const std::string& name ) const
+  {
+    for( const auto& pEObj : m_eobjs )
+      if( pEObj->getName() == name )
+        return pEObj;
+
     return nullptr;
   }
 
@@ -626,10 +640,12 @@ namespace Sapphire
 
   void Encounter::removeEObjs()
   {
-    for( auto& pEObj : m_eobjs )
+    std::set< Entity::EventObjectPtr > toRemove = m_eobjs;
+    for( auto& pEObj : toRemove )
     {
-      unbindActor( pEObj );
       // todo: should these be removed from the teri?
+      unbindActor( pEObj );
+      //removeEObj( pEObj );
     }
 
     m_entranceEObjs.clear();
