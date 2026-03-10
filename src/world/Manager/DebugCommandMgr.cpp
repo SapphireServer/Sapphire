@@ -648,31 +648,31 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
   }
   else if( subCommand == "obstacle" )
   {
-      float radius{ 0.f };
-      float height{ 0.f };
-      float depth{ 0.f };
+    float radius{ 0.f };
+    float height{ 0.f };
+    float depth{ 0.f };
 
-      int paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
-      if( paramCount <= 0 )
-      {
-          PlayerMgr::sendUrgent(player, "Invalid parameter count.");
-          return;
-      }
+    int paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
+    if( paramCount < 2 )
+    {
+      PlayerMgr::sendUrgent( player, "Usage: <radius> <height> or <width> <height> <depth>." );
+      return;
+    }
 
-      auto pTeri = terriMgr.getTerritoryByGuId(player.getTerritoryId());
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
-      if( auto pNavi = pTeri->getNaviProvider() )
-      {
-          auto& obstacleRef = player.getObstacleRef();
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      auto& obstacleRef = player.getObstacleRef();
 
-          if( obstacleRef != 0 )
-              pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );
+      if( obstacleRef != 0 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );
 
-          if( paramCount == 3 )
-              pNavi->toggleBox( obstacleRef, {player.getPos().x, player.getPos().y + 2.f, player.getPos().z}, {radius, height, depth}, player.getRot(), true );
-          else
-              pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, true );
-      }
+      if( paramCount == 3 )
+        pNavi->toggleBox( obstacleRef, player.getPos(), { radius, height, depth }, player.getRot(), true );
+      else if( paramCount == 2 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, height, true );
+    }
   }
 }
 
