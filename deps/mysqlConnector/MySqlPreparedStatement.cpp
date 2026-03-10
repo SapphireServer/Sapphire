@@ -393,7 +393,7 @@ void Mysql::PreparedStatement::clearParameters()
 bool Mysql::PreparedStatement::execute()
 {
   doQuery();
-  return mysql_stmt_field_count( nativeStatement( m_pStmt ) ) > 0;
+  return mysql_stmt_field_count( nativeStatement( m_pStmt ) ) == 0;
 }
 
 bool Mysql::PreparedStatement::execute( const std::string& sql )

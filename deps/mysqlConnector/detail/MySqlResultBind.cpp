@@ -16,9 +16,23 @@ namespace Mysql
     }
   };
 
-  using BufferSizePair = std::pair< char*, size_t >;
+  static size_t get_variable_field_size( const MYSQL_FIELD* const field, bool useMaxLength, size_t fallback, bool nullTerminate = false )
+  {
+    size_t size = fallback;
+
+    if( useMaxLength && field->max_length > 0 )
+      size = static_cast< size_t >( field->max_length );
+    else if( field->length > 0 && field->length < fallback )
+      size = static_cast< size_t >( field->length );
+
+    if( nullTerminate )
+      ++size;
+
+    return std::max< size_t >( size, 1 );
+  }
+
   static struct st_buffer_size_type
-  allocate_buffer_for_field( const MYSQL_FIELD* const field )
+  allocate_buffer_for_field( const MYSQL_FIELD* const field, bool useMaxLength )
   {
     switch( field->type )
     {
@@ -43,18 +57,24 @@ namespace Mysql
       case MYSQL_TYPE_DATETIME:
         return st_buffer_size_type( new char[ sizeof( MYSQL_TIME ) ], sizeof( MYSQL_TIME ), field->type );
       case MYSQL_TYPE_TINY_BLOB:
-        return st_buffer_size_type( new char[ 256 ], 256, field->type );
+        return st_buffer_size_type( new char[ get_variable_field_size( field, useMaxLength, 256 ) ],
+                                    get_variable_field_size( field, useMaxLength, 256 ), field->type );
       case MYSQL_TYPE_LONG_BLOB:
-        return st_buffer_size_type( new char[ 16777215 ], 16777215, field->type );
+        return st_buffer_size_type( new char[ get_variable_field_size( field, useMaxLength, 64 * 1024 ) ],
+                                    get_variable_field_size( field, useMaxLength, 64 * 1024 ), field->type );
       case MYSQL_TYPE_MEDIUM_BLOB:
       case MYSQL_TYPE_BLOB:
+        return st_buffer_size_type( new char[ get_variable_field_size( field, useMaxLength, 64 * 1024 ) ],
+                                    get_variable_field_size( field, useMaxLength, 64 * 1024 ), field->type );
       case MYSQL_TYPE_VAR_STRING:
       case MYSQL_TYPE_STRING:
-        return st_buffer_size_type( new char[ 65535 ], 65535, field->type );
+        return st_buffer_size_type( new char[ get_variable_field_size( field, useMaxLength, 4096, true ) ],
+                                    get_variable_field_size( field, useMaxLength, 4096, true ), field->type );
 
       case MYSQL_TYPE_DECIMAL:
       case MYSQL_TYPE_NEWDECIMAL:
-        return st_buffer_size_type( new char[ 64 ], 64, field->type );
+        return st_buffer_size_type( new char[ get_variable_field_size( field, useMaxLength, 64, true ) ],
+                                    get_variable_field_size( field, useMaxLength, 64, true ), field->type );
 #if A1
       case MYSQL_TYPE_TIMESTAMP:
       case MYSQL_TYPE_YEAR:
@@ -92,7 +112,7 @@ namespace Mysql
     }
   }
 
-  void ResultBind::bindResult()
+  void ResultBind::bindResult( bool useMaxLength )
   {
     for( uint32_t i = 0; i < m_numFields; ++i )
       delete[]( char* ) m_pBind[ i ].buffer;
@@ -120,12 +140,15 @@ namespace Mysql
 
 
     MYSQL_RES* info = mysql_stmt_result_metadata( m_pStmt );
+    if( !info )
+      throw std::runtime_error( "Couldn't obtain result metadata : " + std::to_string( mysql_stmt_errno( m_pStmt ) ) );
+
     for( uint32_t i = 0; i < m_numFields; ++i )
     {
       //            MYSQL_FIELD * field = resultMeta->fetch_field();
 
       MYSQL_FIELD* field = mysql_fetch_field_direct( info, i );
-      struct st_buffer_size_type p = allocate_buffer_for_field( field );
+      struct st_buffer_size_type p = allocate_buffer_for_field( field, useMaxLength );
       m_pBind[ i ].buffer_type = p.type;
       m_pBind[ i ].buffer = p.buffer;
       m_pBind[ i ].buffer_length = static_cast< unsigned long >( p.size );
@@ -134,6 +157,9 @@ namespace Mysql
       m_pBind[ i ].error = &m_err[ i ];
       m_pBind[ i ].is_unsigned = field->flags & UNSIGNED_FLAG;
     }
+
+    mysql_free_result( info );
+
     if( mysql_stmt_bind_result( m_pStmt, m_pBind.get() ) )
       throw std::runtime_error( "Couldn't bind : " + std::to_string( mysql_stmt_errno( m_pStmt ) ) );
   }

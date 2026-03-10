@@ -11,11 +11,11 @@ namespace Mysql
   class PreparedResultSet : public ResultSet
   {
   private:
-    mutable uint32_t m_lastQueriedColumn;// this is updated by calls to getInt(int), getString(int), etc...
+    mutable uint32_t m_lastQueriedColumn{};// this is updated by calls to getInt(int), getString(int), etc...
 
-    uint32_t m_numFields;
-    uint64_t m_numRows;
-    uint64_t m_rowPosition;
+    uint32_t m_numFields{};
+    uint64_t m_numRows{};
+    uint64_t m_rowPosition{};
 
     typedef std::map< std::string, uint32_t > FieldNameIndexMap;
 
@@ -23,9 +23,10 @@ namespace Mysql
 
     std::shared_ptr< PreparedStatement > m_pStmt;
 
-    bool is_valid;
+    bool is_valid{};
 
     std::shared_ptr< ResultBind > m_pResultBind;
+    NativeResultHandle m_pMetaRes{};
 
   protected:
     void checkValid() const;

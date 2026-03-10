@@ -25,7 +25,7 @@ namespace Mysql
 
       ~ResultBind();
 
-      void bindResult();
+      void bindResult( bool useMaxLength = false );
 
    };
 }

@@ -248,6 +248,9 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
                                                  m_bConnected( false )
 {
   m_pRawCon = static_cast< Mysql::NativeConnectionHandle >( mysql_init( nullptr ) );
+  if( !m_pRawCon )
+    throw std::runtime_error( "mysql_init failed" );
+
   if( mysql_real_connect( nativeConnection( m_pRawCon ), hostName.c_str(), userName.c_str(), password.c_str(),
                           nullptr, port, nullptr, 0 ) == nullptr )
     throw std::runtime_error( mysql_error( nativeConnection( m_pRawCon ) ) );
@@ -259,9 +262,13 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
                                const std::string& userName,
                                const std::string& password,
                                const OptionMap& options,
-                               uint16_t port ) : m_pBase( std::move( pBase ) )
+                               uint16_t port ) : m_pBase( std::move( pBase ) ),
+                                                 m_bConnected( false )
 {
   m_pRawCon = static_cast< Mysql::NativeConnectionHandle >( mysql_init( nullptr ) );
+  if( !m_pRawCon )
+    throw std::runtime_error( "mysql_init failed" );
+
   for( const auto& entry : options )
     setOption( entry.first, entry.second );
 
@@ -269,6 +276,8 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
   if( mysql_real_connect( nativeConnection( m_pRawCon ), hostName.c_str(), userName.c_str(), password.c_str(),
                           nullptr, port, nullptr, 0 ) == nullptr )
     throw std::runtime_error( mysql_error( nativeConnection( m_pRawCon ) ) );
+
+  m_bConnected = true;
 }
 
 
@@ -355,7 +364,12 @@ void Mysql::Connection::setOption( Option option, const std::string& arg )
 
 void Mysql::Connection::close()
 {
-  mysql_close( nativeConnection( m_pRawCon ) );
+  if( m_pRawCon )
+  {
+    mysql_close( nativeConnection( m_pRawCon ) );
+    m_pRawCon = nullptr;
+  }
+
   m_bConnected = false;
 }
 
@@ -386,9 +400,12 @@ bool Mysql::Connection::getAutoCommit()
     throw std::runtime_error( "Query failed!" );
 
   auto pRes = mysql_store_result( nativeConnection( m_pRawCon ) );
-  auto row = mysql_fetch_row( pRes );
+  if( !pRes )
+    throw std::runtime_error( "Query failed!" );
 
-  uint32_t ac = atoi( row[ 0 ] );
+  auto row = mysql_fetch_row( pRes );
+  uint32_t ac = row && row[ 0 ] ? atoi( row[ 0 ] ) : 0;
+  mysql_free_result( pRes );
 
   return ac != 0;
 }
@@ -452,7 +469,11 @@ std::shared_ptr< Mysql::PreparedStatement > Mysql::Connection::prepareStatement(
     throw std::runtime_error( "Could not init prepared statement: " + getError() );
 
   if( mysql_stmt_prepare( stmt, sql.c_str(), static_cast< unsigned long >( sql.size() ) ) )
-    throw std::runtime_error( "Could not prepare statement: " + sql + "\n" + getError() );
+  {
+    const auto error = std::string( mysql_stmt_error( stmt ) );
+    mysql_stmt_close( stmt );
+    throw std::runtime_error( "Could not prepare statement: " + sql + "\n" + error );
+  }
 
   return std::make_shared< PreparedStatement >( stmt, shared_from_this() );
 }
@@ -464,5 +485,5 @@ uint32_t Mysql::Connection::getErrorNo()
 
 bool Mysql::Connection::ping()
 {
-  return mysql_ping( nativeConnection( m_pRawCon ) ) != 0;
+  return mysql_ping( nativeConnection( m_pRawCon ) ) == 0;
 }
