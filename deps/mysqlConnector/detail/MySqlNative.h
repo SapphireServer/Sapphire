@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_MYSQL_NATIVE_H
-#define SAPPHIRE_MYSQL_NATIVE_H
+#pragma once
 
 #include <mysql.h>
 #include <type_traits>
@@ -7,7 +6,5 @@
 
 namespace Mysql
 {
-   using BindBool = std::remove_pointer_t< decltype( std::declval< MYSQL_BIND >().is_null ) >;
+  using BindBool = std::remove_pointer_t< decltype( std::declval< MYSQL_BIND >().is_null ) >;
 }
-
-#endif // SAPPHIRE_MYSQL_NATIVE_H
