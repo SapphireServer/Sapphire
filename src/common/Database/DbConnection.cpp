@@ -139,7 +139,6 @@ std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std
 std::shared_ptr< Mysql::ResultSet >
 Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
 {
-  std::shared_ptr< Mysql::ResultSet > res( nullptr );
   if( !stmt )
     return nullptr;
 

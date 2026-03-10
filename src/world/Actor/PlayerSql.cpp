@@ -760,6 +760,8 @@ bool Player::loadInventory()
     }
   }
 
+  res.reset();
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   // Load everything
   auto bagRes = db.query( "SELECT storageId, "
@@ -793,6 +795,8 @@ bool Player::loadInventory()
       m_storageMap[ storageId ]->getItemMap()[ i - 1 ] = pItem;
     }
   }
+
+  bagRes.reset();
 
   auto currencyRes = db.query(fmt::format("SELECT storageId, "
     "container_0, container_1, container_2, container_3, container_4, "

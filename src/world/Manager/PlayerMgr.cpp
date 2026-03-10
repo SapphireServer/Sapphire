@@ -144,6 +144,7 @@ Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( const std::string& playerName
     return nullptr;
 
   uint64_t characterId = res->getUInt64( 1 );
+  res.reset();
 
   return addPlayer( characterId );
 }
