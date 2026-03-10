@@ -12,6 +12,9 @@ namespace Sapphire::World::Manager
     PlayerMgr() = default;
 
     std::string getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad = false );
+    Entity::PlayerPtr findPlayer( uint32_t entityId ) const;
+    Entity::PlayerPtr findPlayer( uint64_t characterId ) const;
+    Entity::PlayerPtr findPlayer( const std::string& playerName ) const;
     Entity::PlayerPtr getPlayer( uint32_t entityId );
     Entity::PlayerPtr getPlayer( uint64_t characterId );
     Entity::PlayerPtr getPlayer( const std::string& playerName );

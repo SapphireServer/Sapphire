@@ -37,13 +37,43 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 
-Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( uint32_t entityId ) const
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapById.find( entityId );
 
   if( it != m_playerMapById.end() )
-    return ( it->second );
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( uint64_t characterId ) const
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByCharacterId.find( characterId );
+
+  if( it != m_playerMapByCharacterId.end() )
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( const std::string& playerName ) const
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByName.find( playerName );
+
+  if( it != m_playerMapByName.end() )
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
+{
+  if( auto pPlayer = findPlayer( entityId ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( entityId );
@@ -51,11 +81,8 @@ Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
 
 Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint64_t characterId )
 {
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByCharacterId.find( characterId );
-
-  if( it != m_playerMapByCharacterId.end() )
-    return ( it->second );
+  if( auto pPlayer = findPlayer( characterId ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( characterId );
@@ -63,11 +90,8 @@ Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint64_t characterId )
 
 Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( const std::string& playerName )
 {
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByName.find( playerName );
-
-  if( it != m_playerMapByName.end() )
-    return ( it->second );
+  if( auto pPlayer = findPlayer( playerName ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( playerName );
@@ -89,10 +113,8 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
 {
   if( !forceDbLoad )
   {
-    auto it = m_playerMapByCharacterId.find( characterId );
-
-    if( it != m_playerMapByCharacterId.end() )
-      return ( it->second->getName() );
+    if( auto pPlayer = findPlayer( characterId ) )
+      return pPlayer->getName();
   }
 
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
