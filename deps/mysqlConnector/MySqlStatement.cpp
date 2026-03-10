@@ -53,19 +53,19 @@ uint32_t Mysql::Statement::errNo()
   return mysql_errno( nativeConnection( m_pConnection->m_pRawCon ) );
 }
 
-std::shared_ptr< Mysql::ResultSet > Mysql::Statement::executeQuery( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Mysql::Statement::executeQuery( const std::string& sql, bool streaming )
 {
   m_lastUpdateCount = UL64( ~0 );
   doQuery( sql );
 
-  return std::make_shared< ResultSet >( mysql_store_result( nativeConnection( m_pConnection->m_pRawCon ) ), shared_from_this() );
-}
+  auto result = streaming
+    ? mysql_use_result( nativeConnection( m_pConnection->m_pRawCon ) )
+    : mysql_store_result( nativeConnection( m_pConnection->m_pRawCon ) );
 
-std::shared_ptr< Mysql::ResultSet > Mysql::Statement::getResultSet()
-{
-  if( errNo() != 0 )
-    throw std::runtime_error( "Error during getResultSet() : " + std::to_string( errNo() ) + ": " +
+  if( !result && errNo() != 0 )
+    throw std::runtime_error( "Error during executeQuery() : " + std::to_string( errNo() ) + ": " +
                               m_pConnection->getError() );
 
-  return std::make_shared< ResultSet >( mysql_store_result( nativeConnection( m_pConnection->m_pRawCon ) ), shared_from_this() );
+  return std::make_shared< ResultSet >( result, shared_from_this() );
 }
+

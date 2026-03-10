@@ -20,14 +20,15 @@ namespace
   }
 }// namespace
 
-Mysql::ResultSet::ResultSet( NativeResultHandle res, std::shared_ptr< Mysql::Statement > par )
+Mysql::ResultSet::ResultSet( NativeResultHandle res, std::shared_ptr< Mysql::Statement > par ) :
+  m_pStmt( std::move( par ) ),
+  m_pRes( res )
 {
   if( !res )
     return;
-  m_pRes = res;
+
   m_numRows = mysql_num_rows( nativeResult( res ) );
   m_numFields = mysql_num_fields( nativeResult( res ) );
-  m_pStmt = par;
   m_rowPosition = 0;
 
   for( uint32_t i = 0; i < m_numFields; ++i )
@@ -49,6 +50,8 @@ Mysql::ResultSet::~ResultSet()
     mysql_free_result( nativeResult( m_pRes ) );
     m_pRes = nullptr;
   }
+
+  m_lifetimeGuard.reset();
 }
 
 uint32_t Mysql::ResultSet::findColumn( const std::string& columnLabel ) const
@@ -104,6 +107,11 @@ bool Mysql::ResultSet::next()
 size_t Mysql::ResultSet::rowsCount() const
 {
   return static_cast< uint32_t >( m_numRows );
+}
+
+void Mysql::ResultSet::setLifetimeGuard( std::shared_ptr< void > lifetimeGuard )
+{
+  m_lifetimeGuard = std::move( lifetimeGuard );
 }
 
 const std::shared_ptr< Mysql::Statement > Mysql::ResultSet::getStatement() const

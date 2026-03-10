@@ -93,15 +93,12 @@ bool Sapphire::Db::DbWorkerPool< T >::prepareStatements()
 
 template< class T >
 std::shared_ptr< Mysql::ResultSet >
-Sapphire::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection )
+Sapphire::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection, bool streaming )
 {
   if( !connection )
     connection = getFreeConnection();
 
-  std::shared_ptr< Mysql::ResultSet > result = connection->query( sql );
-  connection->unlock();
-
-  return result;
+  return connection->query( sql, streaming );
 }
 
 template< class T >
@@ -109,10 +106,7 @@ std::shared_ptr< Mysql::PreparedResultSet >
 Sapphire::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
-  auto ret = std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
-  connection->unlock();
-
-  return ret;
+  return std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
 }
 
 template< class T >

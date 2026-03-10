@@ -49,11 +49,9 @@ namespace Mysql
     bool execute( const std::string& sql ) override;
 
     std::shared_ptr< ResultSet > executeQuery();
-    std::shared_ptr< ResultSet > executeQuery( const std::string& sql ) override;
+    std::shared_ptr< ResultSet > executeQuery( const std::string& sql, bool streaming = false ) override;
 
     bool getMoreResults();
-
-    std::shared_ptr< ResultSet > getResultSet() override;
 
     void setBlob( uint32_t parameterIndex, std::istream* blob );
 

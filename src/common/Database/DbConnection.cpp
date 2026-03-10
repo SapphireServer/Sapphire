@@ -5,6 +5,33 @@
 
 #include "PreparedStatement.h"
 
+namespace
+{
+  struct ConnectionLease
+  {
+    explicit ConnectionLease( std::shared_ptr< Sapphire::Db::DbConnection > connection ) :
+      m_connection( std::move( connection ) )
+    {
+    }
+
+    ~ConnectionLease()
+    {
+      if( m_connection )
+        m_connection->unlock();
+    }
+
+    std::shared_ptr< Sapphire::Db::DbConnection > m_connection;
+  };
+
+  std::shared_ptr< void > makeConnectionLease( const std::shared_ptr< Sapphire::Db::DbConnection >& connection )
+  {
+    if( !connection )
+      return nullptr;
+
+    return std::static_pointer_cast< void >( std::make_shared< ConnectionLease >( connection ) );
+  }
+}
+
 Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
@@ -120,16 +147,31 @@ bool Sapphire::Db::DbConnection::execute( const std::string& sql )
   }
 }
 
-std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std::string& sql, bool streaming )
 {
+  auto self = shared_from_this();
+
   try
   {
     auto stmt = m_pConnection->createStatement();
-    auto result = stmt->executeQuery( sql );
+    auto result = stmt->executeQuery( sql, streaming );
+
+    if( !result )
+    {
+      unlock();
+      return nullptr;
+    }
+
+    if( streaming )
+      result->setLifetimeGuard( makeConnectionLease( self ) );
+    else
+      unlock();
+
     return result;
   }
   catch( std::runtime_error& e )
   {
+    unlock();
     Logger::error( e.what() );
     return nullptr;
   }
@@ -139,39 +181,56 @@ std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std
 std::shared_ptr< Mysql::ResultSet >
 Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
 {
-  if( !stmt )
-    return nullptr;
+  auto self = shared_from_this();
 
-  if( !ping() ) //this does not work right and results in too many connections
+  if( !stmt )
+  {
+    unlock();
+    return nullptr;
+  }
+
+  if( !ping() )
   {
     // naivly reconnect and hope for the best
-    //open();
+    open();
     lockIfReady();
     if( !prepareStatements() )
+    {
+      unlock();
       return nullptr;
+    }
   }
 
   const uint32_t index = stmt->getIndex();
-  const auto it = m_queries.find( index );
-
-  if( it == m_queries.end() )
-    return nullptr;
-
-  // Use a fresh prepared statement object for synchronous queries.
-  // Reusing the same MYSQL_STMT across overlapping reads can leave the connection/state out of sync.
-  auto pStmt = m_pConnection->prepareStatement( it->second.first );
+  auto pStmt = getPreparedStatement( index );
 
   if( !pStmt )
+  {
+    unlock();
     return nullptr;
+  }
 
   stmt->setMysqlPS( pStmt );
   try
   {
     stmt->bindParameters();
-    return pStmt->executeQuery();
+    auto result = pStmt->executeQuery();
+
+    if( !result )
+    {
+      unlock();
+      return nullptr;
+    }
+
+    // Prepared results keep using the MYSQL_STMT while fetching, so keep the
+    // connection leased until the result is destroyed, even when buffered.
+    result->setLifetimeGuard( makeConnectionLease( self ) );
+
+    return result;
   }
   catch( std::runtime_error& e )
   {
+    unlock();
     Logger::error( e.what() );
     return nullptr;
   }

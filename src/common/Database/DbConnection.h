@@ -31,6 +31,8 @@ namespace Sapphire::Db
     public std::enable_shared_from_this< DbConnection >
   {
   public:
+    constexpr static bool DEFAULT_STREAMING = false;
+
     // Constructor for synchronous connections.
     DbConnection( ConnectionInfo& connInfo );
 
@@ -49,7 +51,7 @@ namespace Sapphire::Db
 
     bool execute( std::shared_ptr< PreparedStatement > stmt );
 
-    std::shared_ptr< Mysql::ResultSet > query( const std::string& sql );
+    std::shared_ptr< Mysql::ResultSet > query( const std::string& sql, bool streaming = DEFAULT_STREAMING );
 
     std::shared_ptr< Mysql::ResultSet > query( std::shared_ptr< PreparedStatement > stmt );
 
