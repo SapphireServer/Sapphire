@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
     - name: install deps
@@ -46,14 +46,11 @@ jobs:
     runs-on: windows-2025
       
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
     - name: Enable Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
-    - name: install deps
-      run: |
-        choco install --no-progress mariadb
     - name: build
       run: |
         cmake -B build -G Ninja ${{ matrix.cmakeArgs }}

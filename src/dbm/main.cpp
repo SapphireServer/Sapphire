@@ -3,7 +3,6 @@
 #include <cctype>
 #include <set>
 #include <Logging/Logger.h>
-#include <MySqlConnector.h>
 #include <Util/CrashHandler.h>
 #include <Config/ConfigMgr.h>
 

@@ -7,9 +7,6 @@
 #include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
 
-#include <MySqlBase.h>
-#include <Connection.h>
-
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Service.h>

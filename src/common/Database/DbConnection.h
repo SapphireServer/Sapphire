@@ -5,16 +5,10 @@
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include "Util/LockedWaitQueue.h"
 #include "DbCommon.h"
-
-namespace Mysql
-{
-  class Connection;
-  class ResultSet;
-  class PreparedResultSet;
-  class PreparedStatement;
-}
+#include "MySqlConnection.h"
 
 namespace Sapphire::Db
 {

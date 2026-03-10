@@ -41,7 +41,6 @@
 #include <cctype>
 
 #include "Common.h"
-#include "PreparedResultSet.h"
 
 #include <Navi/NaviProvider.h>
 #include "glm/gtc/matrix_transform.hpp"

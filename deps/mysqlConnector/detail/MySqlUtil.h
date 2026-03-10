@@ -22,13 +22,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#ifndef SAPPHIRE_MYSQL_UTIL_H
-#define SAPPHIRE_MYSQL_UTIL_H
+#pragma once
 
 #include <iostream>
 #include <sstream>
 #include <cstdint>
-#include <mysql.h>
+#include "MySqlNative.h"
 
 //using  MYSQL_FIELD = st_mysql_field;
 #ifndef UL64
@@ -116,4 +115,3 @@ namespace Util
 
 }
 }
-#endif //SAPPHIRE_MYSQL_UTIL_H

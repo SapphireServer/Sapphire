@@ -3,9 +3,10 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <ResultSet.h>
+
 #include "Util/LockedWaitQueue.h"
 #include "DbConnection.h"
+#include "MySqlPreparedResultSet.h"
 
 namespace Sapphire::Db
 {
@@ -67,14 +68,12 @@ namespace Sapphire::Db
 
     std::shared_ptr< PreparedStatement > getPreparedStatement( PreparedStatementIndex index );
 
-    void escapeString( std::string& str );
+    [[nodiscard]] std::string escapeString( std::string_view str );
 
     void keepAlive();
 
   private:
     uint32_t openConnections( InternalIndex type, uint8_t numConnections );
-
-    unsigned long escapeString( char* to, const char* from, size_t length );
 
     void enqueue( std::shared_ptr< Operation > op );
 
@@ -89,5 +88,4 @@ namespace Sapphire::Db
     uint8_t m_synchThreads;
   };
 
-}
-
+}// namespace Sapphire::Db

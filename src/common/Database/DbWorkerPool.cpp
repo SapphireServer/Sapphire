@@ -1,13 +1,11 @@
 #include "DbWorkerPool.h"
 #include "DbConnection.h"
 #include "PreparedStatement.h"
-#include <MySqlConnector.h>
 #include "StatementTask.h"
 #include "Operation.h"
 #include "ZoneDbConnection.h"
 
 #include "Logging/Logger.h"
-#include <mysql.h>
 
 class PingOperation : public Sapphire::Db::Operation
 {
@@ -125,15 +123,9 @@ Sapphire::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex in
 }
 
 template< class T >
-void Sapphire::Db::DbWorkerPool< T >::escapeString( std::string& str )
+std::string Sapphire::Db::DbWorkerPool< T >::escapeString( std::string_view str )
 {
-  if( str.empty() )
-    return;
-
-  char* buf = new char[str.size() * 2 + 1];
-  escapeString( buf, str.c_str(), str.size() );
-  str = buf;
-  delete[] buf;
+  return m_connections[ IDX_SYNCH ].front()->getConnection()->escapeString( str );
 }
 
 template< class T >
@@ -159,8 +151,7 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, u
   for( uint8_t i = 0; i < numConnections; ++i )
   {
     // Create the connection
-    auto connection = [ & ]
-    {
+    auto connection = [ & ] {
       switch( type )
       {
         case IDX_ASYNC:
@@ -182,16 +173,6 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, u
   }
 
   return 0;
-}
-
-template< class T >
-unsigned long Sapphire::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, size_t length )
-{
-  if( !to || !from || !length )
-    return 0;
-
-  return mysql_real_escape_string(
-    m_connections[ IDX_SYNCH ].front()->getConnection()->getRawCon(), to, from, static_cast< unsigned long >( length ) );
 }
 
 template< class T >
@@ -254,5 +235,4 @@ void Sapphire::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedSt
   connection->unlock();
 }
 
-template
-class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;
+template class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;
