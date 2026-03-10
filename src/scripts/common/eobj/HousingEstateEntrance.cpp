@@ -54,7 +54,7 @@ public:
 
       eventMgr().eventFinish( player, result.eventId, 1 );
 
-      Common::FFXIVARR_POSITION3 pos;
+      Common::Vector3 pos;
 
       auto land = zone->getLand( eobj.getHousingLink() );
       if( !land )

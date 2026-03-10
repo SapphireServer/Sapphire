@@ -334,12 +334,12 @@ void BNpc::setNaviIsPathing( bool pathing )
   m_naviIsPathing = true;
 }
 
-Common::FFXIVARR_POSITION3 BNpc::getNaviLastMoveTarget() const
+Common::Vector3 BNpc::getNaviLastMoveTarget() const
 {
   return m_naviLastTarget;
 }
 
-Common::FFXIVARR_POSITION3 BNpc::getNaviMoveTarget() const
+Common::Vector3 BNpc::getNaviMoveTarget() const
 {
   return m_naviTarget;
 }
@@ -415,7 +415,7 @@ float BNpc::getCurrentSpeed() const
   return isRunning ? getRunSpeed() : getWalkSpeed();
 }
 
-bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
+bool BNpc::moveTo( const Vector3& pos )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -1412,17 +1412,17 @@ bool BNpc::isRoamTargetReached() const
   return m_roamTargetReached;
 }
 
-void BNpc::setRoamTargetPos( const FFXIVARR_POSITION3& targetPos )
+void BNpc::setRoamTargetPos( const Vector3& targetPos )
 {
   m_roamPos = targetPos;
 }
 
-const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
+const Common::Vector3& BNpc::getRoamTargetPos() const
 {
   return m_roamPos;
 }
 
-const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
+const Common::Vector3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
 }
@@ -1452,7 +1452,7 @@ void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
   Chara::setPos( x, y, z, broadcastUpdate );
 }
 
-void BNpc::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void BNpc::setPos( const Vector3& pos, bool broadcastUpdate )
 {
   setPos( pos.x, pos.y, pos.z, broadcastUpdate );
 }

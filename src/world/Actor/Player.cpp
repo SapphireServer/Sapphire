@@ -1594,7 +1594,7 @@ Player::FriendListIDVec& Player::getBlacklistId()
   return m_blacklist;
 }
 
-void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool ignoreDamage )
+void Player::setFalling( bool state, const Common::Vector3& pos, bool ignoreDamage )
 {
   bool isFalling = m_falling;
   auto initialPos = m_initialFallPos;
@@ -1675,7 +1675,7 @@ std::vector< uint32_t >& Player::getLastPcSearchResult()
   return m_lastPcSearch;
 }
 
-const FFXIVARR_POSITION3& Player::getPrevPos() const
+const Vector3& Player::getPrevPos() const
 {
   return m_prevPos;
 }

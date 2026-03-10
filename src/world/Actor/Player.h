@@ -783,14 +783,14 @@ namespace Sapphire::Entity
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
 
-    void setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool ignoreDamage = false );
+    void setFalling( bool state, const Common::Vector3& pos, bool ignoreDamage = false );
     bool isFalling() const;
 
     // todo: sort this requestkey pcsearch mess
     void setLastPcSearchResult( std::vector< uint32_t > result );
     std::vector< uint32_t >& getLastPcSearchResult();
 
-    const Common::FFXIVARR_POSITION3& getPrevPos() const;
+    const Common::Vector3& getPrevPos() const;
     float getPrevRot() const;
 
     bool isConnected() const;
@@ -814,7 +814,7 @@ namespace Sapphire::Entity
 
     // keep track of movement state of player
     bool m_running{false};
-    Common::FFXIVARR_POSITION3 m_initialFallPos{};
+    Common::Vector3 m_initialFallPos{};
 
     bool m_markedForRemoval;
 
@@ -831,7 +831,7 @@ namespace Sapphire::Entity
 
     InventoryMap m_storageMap;
 
-    Common::FFXIVARR_POSITION3 m_prevPos{};
+    Common::Vector3 m_prevPos{};
     uint32_t m_prevTerritoryTypeId{};
     uint32_t m_prevTerritoryId{};
     float m_prevRot{};

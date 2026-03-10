@@ -53,7 +53,7 @@ namespace Sapphire::World::Manager
     void eventItemActionStart( Entity::Player& player, uint32_t eventId, uint32_t action, uint32_t sequence,
                                uint64_t targetId );
 
-    bool checkHitEobject( Entity::Player& player, Common::FFXIVARR_POSITION3 targetPos, Common::QuestEobject Eobject );
+    bool checkHitEobject( Entity::Player& player, Common::Vector3 targetPos, Common::QuestEobject Eobject );
 
     void playGilShop( Entity::Player& player, uint32_t eventId, uint32_t flags, uint32_t param1,
                       Event::EventHandler::SceneReturnCallback eventCallback );

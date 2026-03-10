@@ -441,7 +441,7 @@ namespace Sapphire
       {
         auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
         auto pBNpc = pack.getBNpcByRef( pActionData->m_sourceRef, pEncounter );
-        Common::FFXIVARR_POSITION3 pos = pBNpc->getPos();
+        Common::Vector3 pos = pBNpc->getPos();
         // todo: filter the correct target
         // todo: tie to mechanic script?
         // todo: mechanic should probably just be an Action::onTick, with instance/director passed to it
@@ -853,6 +853,11 @@ namespace Sapphire
           pBNpc->resetFlags( flags );
           pBNpc->setInvincibilityType( static_cast< Common::InvincibilityType >( pSpawnData->m_invincibilityType ) );
           pBNpc->init();
+
+          pEncounter->addBNpc( pBNpc );
+          // make sure we bind this bnpc
+          if( pEncounter->isLocked() )
+            pEncounter->bindActor( pBNpc );
 
           pTeri->pushActor( pBNpc );
         }

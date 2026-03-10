@@ -8,4 +8,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_link_libraries( nav_export PRIVATE common Recast DetourTileCache )
 
 # NOTE: This is for #include <datReader/xxx>
-target_include_directories( nav_export PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../deps" )
+target_include_directories( nav_export PUBLIC 
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../deps"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../../deps/recastnavigation/DebugUtils/Include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../../deps/recastnavigation/RecastDemo/Include"
+)

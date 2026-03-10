@@ -49,12 +49,12 @@ ObjKind GameObject::getObjKind() const
   return m_objKind;
 }
 
-FFXIVARR_POSITION3& GameObject::getPos()
+Vector3& GameObject::getPos()
 {
   return m_pos;
 }
 
-const FFXIVARR_POSITION3& GameObject::getPos() const
+const Vector3& GameObject::getPos() const
 {
   return m_pos;
 }
@@ -74,7 +74,7 @@ void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
 
 }
 
-void GameObject::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void GameObject::setPos( const Vector3& pos, bool broadcastUpdate )
 {
   m_pos = pos;
 
@@ -371,6 +371,21 @@ uint8_t GameObject::getPermissionInvisibility() const
 void GameObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
   m_permissionInvisibility = permissionInvisibility;
+}
+
+uint32_t GameObject::getBoundEncounterId() const
+{
+  return m_boundEncounterId;
+}
+
+void GameObject::setBoundEncounterId( uint32_t id )
+{
+  m_boundEncounterId = id;
+}
+
+uint32_t& GameObject::getObstacleRef()
+{
+  return m_obstacleRef;
 }
 
 /*!

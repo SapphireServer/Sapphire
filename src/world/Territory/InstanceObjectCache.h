@@ -92,7 +92,7 @@ namespace Sapphire
 
     struct PopRangeInfo
     {
-      Common::FFXIVARR_POSITION3 m_pos;
+      Common::Vector3 m_pos;
       float m_rotation;
       uint16_t m_territoryTypeId;
     };

@@ -385,6 +385,8 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
     else
       m_bNpcAreaObjects[ pArea->getOwnerId() ] = pArea;
   }
+  pActor->setTerritoryId( getGuId() );
+  pActor->setTerritoryTypeId( getTerritoryTypeId() );
 }
 
 void Territory::removeActor( const Entity::GameObjectPtr& pActor )
@@ -595,7 +597,7 @@ bool Territory::update( uint64_t tickCount )
   auto dt = static_cast< float >( std::difftime( tickCount, m_lastUpdate ) / 1000.f );
 
   if( m_pNaviProvider )
-    m_pNaviProvider->updateCrowd( dt );
+    m_pNaviProvider->update( dt );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
@@ -898,6 +900,23 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::EventObjectPtr Territory::getEObjByBaseId( uint32_t baseId )
+{
+  for( const auto& obj : m_eventObjects )
+    if( obj.second->getBaseId() == baseId )
+      return obj.second;
+  return nullptr;
+}
+
+Entity::EventObjectPtr Territory::getEObjByName(const std::string& name)
+{
+  for( const auto& obj : m_eventObjects )
+    if( obj.second->getName() == name )
+      return obj.second;
+
+  return nullptr;
+}
+
 Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
 {
   if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
@@ -932,7 +951,7 @@ uint32_t Territory::getNextActorId()
 
 Entity::EventObjectPtr Territory::addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId,
                                            uint32_t instanceId,
-                                           uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                           uint8_t state, Common::Vector3 pos, float scale,
                                            float rotation, uint8_t permissionInv )
 {
   auto eObj = Entity::make_EventObject( getNextEObjId(), baseId, boundInstanceId, instanceId, state, pos, rotation, name,
@@ -974,6 +993,11 @@ void Territory::updateSpawnPoints()
 uint32_t Territory::getNextActionResultId()
 {
   return m_effectCounter++;
+}
+
+uint32_t Territory::getNextEncounterId()
+{
+  return m_nextEncounterId++;
 }
 
 Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,

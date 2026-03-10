@@ -175,11 +175,11 @@ PathfindingResponse PathFinder::findPath( const PathfindingRequest& request )
   return response;
 }
 
-std::vector< Common::FFXIVARR_POSITION3 > PathFinder::findStraightPath(
-  const Common::FFXIVARR_POSITION3& start,
-  const Common::FFXIVARR_POSITION3& end )
+std::vector< Common::Vector3 > PathFinder::findStraightPath(
+  const Common::Vector3& start,
+  const Common::Vector3& end )
 {
-  std::vector< Common::FFXIVARR_POSITION3 > waypoints;
+  std::vector< Common::Vector3 > waypoints;
 
   if( !m_naviMesh || !m_naviMeshQuery )
     return waypoints;
@@ -327,7 +327,7 @@ std::vector< Common::FFXIVARR_POSITION3 > PathFinder::findStraightPath(
   return waypoints;
 }
 
-Common::FFXIVARR_POSITION3 PathFinder::findNearestWalkablePosition( const Common::FFXIVARR_POSITION3& position,
+Common::Vector3 PathFinder::findNearestWalkablePosition( const Common::Vector3& position,
                                                                     float searchRadius )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
@@ -352,7 +352,7 @@ Common::FFXIVARR_POSITION3 PathFinder::findNearestWalkablePosition( const Common
   return fromDetourCoords( nearest );
 }
 
-Common::FFXIVARR_POSITION3 PathFinder::findRandomPositionInRadius( const Common::FFXIVARR_POSITION3& center,
+Common::Vector3 PathFinder::findRandomPositionInRadius( const Common::Vector3& center,
                                                                    float radius )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
@@ -388,12 +388,12 @@ Common::FFXIVARR_POSITION3 PathFinder::findRandomPositionInRadius( const Common:
   return fromDetourCoords( randomPoint );
 }
 
-bool PathFinder::isPositionWalkable( const Common::FFXIVARR_POSITION3& position, float tolerance )
+bool PathFinder::isPositionWalkable( const Common::Vector3& position, float tolerance )
 {
   return findNearestPoly( position ).has_value();
 }
 
-float PathFinder::calculateDistance( const Common::FFXIVARR_POSITION3& start, const Common::FFXIVARR_POSITION3& end ) const
+float PathFinder::calculateDistance( const Common::Vector3& start, const Common::Vector3& end ) const
 {
   float dx = end.x - start.x;
   float dy = end.y - start.y;
@@ -401,7 +401,7 @@ float PathFinder::calculateDistance( const Common::FFXIVARR_POSITION3& start, co
   return std::sqrt( dx * dx + dy * dy + dz * dz );
 }
 
-int32_t PathFinder::createAgent( const Common::FFXIVARR_POSITION3& position, const AgentParameters& params )
+int32_t PathFinder::createAgent( const Common::Vector3& position, const AgentParameters& params )
 {
   if( !m_crowd )
     return -1;
@@ -441,7 +441,7 @@ bool PathFinder::removeAgent( int32_t agentId )
   return true;
 }
 
-bool PathFinder::setAgentDestination( int32_t agentId, const Common::FFXIVARR_POSITION3& destination )
+bool PathFinder::setAgentDestination( int32_t agentId, const Common::Vector3& destination )
 {
   if( !m_crowd || !isValidAgentId( agentId ) )
     return false;
@@ -480,7 +480,7 @@ bool PathFinder::resetAgentDestination( int32_t agentId )
   return true;
 }
 
-Common::FFXIVARR_POSITION3 PathFinder::getAgentPosition( int32_t agentId )
+Common::Vector3 PathFinder::getAgentPosition( int32_t agentId )
 {
   if( !m_crowd || !isValidAgentId( agentId ) )
     return {};
@@ -543,7 +543,7 @@ void PathFinder::updateCrowdSimulation( float deltaTime )
   m_crowd->update( deltaTime, &info );
 }
 
-void PathFinder::registerDoor( uint32_t doorId, const Common::FFXIVARR_POSITION3& position,
+void PathFinder::registerDoor( uint32_t doorId, const Common::Vector3& position,
                                const std::vector< dtPolyRef >& connectedPolys )
 {
   DoorInfo& door = m_doors[ doorId ];
@@ -568,7 +568,7 @@ DoorState PathFinder::getDoorState( uint32_t doorId ) const
   return it != m_doors.end() ? it->second.state : DoorState::Locked;
 }
 
-std::vector< uint32_t > PathFinder::getDoorsNearPosition( const Common::FFXIVARR_POSITION3& position,
+std::vector< uint32_t > PathFinder::getDoorsNearPosition( const Common::Vector3& position,
                                                           float radius ) const
 {
   std::vector< uint32_t > nearbyDoors;
@@ -745,7 +745,7 @@ void PathFinder::setupObstacleAvoidanceParams()
   m_crowd->setObstacleAvoidanceParams( 3, &params );
 }
 
-std::optional< dtPolyRef > PathFinder::findNearestPoly( const Common::FFXIVARR_POSITION3& position,
+std::optional< dtPolyRef > PathFinder::findNearestPoly( const Common::Vector3& position,
                                                         const float *extents )
 {
   if( !m_naviMeshQuery )
@@ -948,14 +948,14 @@ std::vector< uint32_t > PathFinder::findRequiredDoorsForPath( const dtPolyRef *p
   return requiredDoors;
 }
 
-void PathFinder::toDetourCoords( const Common::FFXIVARR_POSITION3& position, float *out ) const
+void PathFinder::toDetourCoords( const Common::Vector3& position, float *out ) const
 {
   out[ 0 ] = position.x;
   out[ 1 ] = position.y;
   out[ 2 ] = position.z;
 }
 
-Common::FFXIVARR_POSITION3 PathFinder::fromDetourCoords( const float *coords ) const
+Common::Vector3 PathFinder::fromDetourCoords( const float *coords ) const
 {
   return { coords[ 0 ], coords[ 1 ], coords[ 2 ] };
 }

@@ -107,7 +107,7 @@ namespace Sapphire::Event
      * @param index of var to set 
      * @param value to set
      */
-    void setCustomVar( uint32_t index, uint64_t value );
+    virtual void setCustomVar( uint32_t index, uint64_t value );
 
     /*!
      * @brief Gets a value of a director var

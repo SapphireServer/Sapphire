@@ -194,32 +194,35 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
-    int32_t posX;
-    int32_t posY;
-    int32_t posZ;
+    float fPosX{ 0.f };
+    float fPosY{ 0.f };
+    float fPosZ{ 0.f };
+    float fRot{ 0.f };
 
-    sscanf( params.c_str(), "%d %d %d", &posX, &posY, &posZ );
-
-    if( ( posX == 0xcccccccc ) || ( posY == 0xcccccccc ) || ( posZ == 0xcccccccc ) )
+    const auto parsedCount = sscanf( params.c_str(), "%f %f %f %f", &fPosX, &fPosY, &fPosZ, &fRot );
+    if( ( parsedCount != 3 ) && ( parsedCount != 4 ) )
     {
       PlayerMgr::sendUrgent( player, "Syntaxerror." );
       return;
     }
 
     if( subCommand == "pos" )
-      player.setPos( static_cast< float >( posX ),
-                     static_cast< float >( posY ),
-                     static_cast< float >( posZ ) );
+      player.setPos( fPosX, fPosY, fPosZ );
     else
-      player.setPos( player.getPos().x + static_cast< float >( posX ),
-                     player.getPos().y + static_cast< float >( posY ),
-                     player.getPos().z + static_cast< float >( posZ ) );
+      player.setPos( player.getPos().x + fPosX,
+                     player.getPos().y + fPosY,
+                     player.getPos().z + fPosZ );
+
+    if( parsedCount == 4 )
+      player.setRot( fRot );
 
     auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    server.queueForPlayer( player.getCharacterId(), setActorPosPacket );
+    setActorPosPacket->data().Dir = player.getRotUInt16();
+
+    server.queueForPlayers( player.getInRangePlayerIds( true ), setActorPosPacket );
   }
   else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {
@@ -643,11 +646,34 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     achvMgr.progressAchievementByType< Common::Achievement::Type::General >( player, achvSubtype, progress );
   }
-  else
+  else if( subCommand == "obstacle" )
   {
-    PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );
-  }
+    float radius{ 0.f };
+    float height{ 0.f };
+    float depth{ 0.f };
 
+    int paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
+    if( paramCount < 2 )
+    {
+      PlayerMgr::sendUrgent( player, "Usage: <radius> <height> or <width> <height> <depth>." );
+      return;
+    }
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      auto& obstacleRef = player.getObstacleRef();
+
+      if( obstacleRef != 0 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );
+
+      if( paramCount == 3 )
+        pNavi->toggleBox( obstacleRef, player.getPos(), { radius, height, depth }, player.getRot(), true );
+      else if( paramCount == 2 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, height, true );
+    }
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
@@ -681,6 +707,29 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
     PlayerMgr::sendServerNotice( player, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                                  player.getPos().x, player.getPos().y, player.getPos().z,
                                  player.getRot(), map_id, player.getTerritoryTypeId() );
+  }
+  else if( subCommand == "los" )
+  {
+    auto targetId = player.getTargetId();
+    bool los = false;
+    bool naviLos = false;
+    auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+    auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    for( auto pActor : player.getInRangeActors() )
+    {
+      if( auto pChara = pActor->getAsChara(); pChara && pChara->getId() == targetId )
+      {
+        if( auto pNavi = pTeri->getNaviProvider() )
+        {
+          los = player.isFacingTarget( *pChara );
+          naviLos = pNavi->hasLineOfSight( player.getPos(), pChara->getPos() );
+        }
+        break;
+      }
+    }
+
+    PlayerMgr::sendServerNotice( player, "Facing: {0} NaviLos: {1}\n", los ? "true" : "false", naviLos ? "true" : "false" );
   }
   else
   {

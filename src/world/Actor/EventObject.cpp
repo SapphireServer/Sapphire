@@ -15,6 +15,7 @@
 #include "WorldServer.h"
 #include "Session.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/TerritoryMgr.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -26,7 +27,7 @@ using namespace Sapphire::Network::ActorControl;
 
 EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
                           uint8_t initialState,
-                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName,
+                          Vector3 pos, float rotation, const std::string& givenName,
                           uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
   m_boundInstanceId( boundInstanceId ),
@@ -43,6 +44,11 @@ EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInsta
   m_pos.z = pos.z;
   m_rot = rotation;
   m_permissionInvisibility = permissionInv;
+}
+
+void EventObject::setEventObjectType( EventObjectType type )
+{
+  m_eobjType = type;
 }
 
 uint32_t EventObject::getBoundInstanceId() const
@@ -166,7 +172,88 @@ void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
 }
 
-uint32_t Sapphire::Entity::EventObject::getOwnerId() const
+uint32_t EventObject::getOwnerId() const
 {
   return m_ownerId;
+}
+
+void EventObject::setCollisionEnabled( bool enabled )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  
+  if( auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() ) )
+  {
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      for( auto& collision : m_collision )
+      {
+        switch( collision.m_type )
+        {
+          case EventObjectCollisionType::Box:
+          {
+            auto& box = collision.m_shape.box;
+            auto pos = collision.m_pos;
+            pos.y -= box.height / 2.f;
+
+            pNavi->toggleBox( collision.m_obstacleRef, pos, { box.width / 2.f, box.height / 2.f, box.depth / 2.f }, collision.m_rot, enabled );
+          }
+          break;
+          case EventObjectCollisionType::Sphere:
+          {
+            // todo: actually make this a sphere
+            auto& sphere = collision.m_shape.sphere;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, sphere.radius, sphere.radius, enabled );
+          }
+          break;
+          case EventObjectCollisionType::Cylinder:
+          {
+            auto& cylinder = collision.m_shape.cylinder;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, cylinder.radius, cylinder.height, enabled );
+          }
+          break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+}
+
+void EventObject::addCollisionBox( Common::Vector3 pos, float rot, float width, float height, float depth )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Box;
+  collision.m_pos = pos;
+  collision.m_rot = rot;
+  collision.m_shape.box.width = width;
+  collision.m_shape.box.height = height;
+  collision.m_shape.box.depth = depth;
+
+  m_collision.push_back( collision );
+}
+
+void EventObject::addCollisionCylinder( Common::Vector3 pos, float radius, float height )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Cylinder;
+  collision.m_pos = pos;
+  collision.m_shape.cylinder.radius = radius;
+  collision.m_shape.cylinder.height = height;
+
+  m_collision.push_back( collision );
+}
+
+void EventObject::addCollisionSphere( Common::Vector3 pos, float radius )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Sphere;
+  collision.m_pos = pos;
+  collision.m_shape.sphere.radius = radius;
+
+  m_collision.push_back( collision );
+}
+
+const std::vector< EventObjectCollision >& EventObject::getCollisionData() const
+{
+  return m_collision;
 }

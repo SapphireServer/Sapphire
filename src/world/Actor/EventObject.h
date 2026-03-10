@@ -4,14 +4,61 @@
 
 namespace Sapphire::Entity
 {
+  enum EventObjectType : uint32_t
+  {
+    Obstacle,
+    Door
+  };
+
+  enum EventObjectCollisionType : uint32_t
+  {
+    None,
+    Box,
+    Sphere,
+    Cylinder,
+    Mesh,
+    Board
+  };
+
+  struct EventObjectCollision
+  {
+    EventObjectCollisionType m_type;
+    Common::Vector3 m_pos;
+    float m_rot;
+    uint32_t m_obstacleRef{ 0 };
+    union
+    {
+      struct
+      {
+        float width;
+        float height;
+        float depth;
+      } box;
+
+      struct
+      {
+        float radius;
+      } sphere;
+
+      struct
+      {
+        float radius;
+        float height;
+      } cylinder;
+      // todo: mesh?
+
+    } m_shape;
+  };
 
   class EventObject : public GameObject
   {
   public:
     EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
-                 Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
+                 Common::Vector3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
+
+    void setEventObjectType( EventObjectType type );
 
     uint32_t getBoundInstanceId() const;
 
@@ -53,7 +100,19 @@ namespace Sapphire::Entity
 
     uint32_t getOwnerId() const;
 
+    void setCollisionEnabled( bool enabled );
+
+    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
+
+    void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
+
+    void addCollisionSphere( Common::Vector3 pos, float radius );
+
+    const std::vector< EventObjectCollision >& getCollisionData() const;
+
+
   protected:
+    EventObjectType m_eobjType;
     uint32_t m_instanceId;
     uint32_t m_housingLink;
     uint32_t m_boundInstanceId;
@@ -64,7 +123,7 @@ namespace Sapphire::Entity
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
-
+    std::vector< EventObjectCollision > m_collision;
 
   };
 }

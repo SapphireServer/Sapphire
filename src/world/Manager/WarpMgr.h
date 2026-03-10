@@ -13,7 +13,7 @@ namespace Sapphire::World::Manager
   {
     uint32_t m_targetTerritoryId;
     Common::WarpType m_warpType;
-    Common::FFXIVARR_POSITION3 m_targetPos;
+    Common::Vector3 m_targetPos;
     float m_targetRot;
   };
 
@@ -30,7 +30,7 @@ namespace Sapphire::World::Manager
     /// <param name="targetTerritoryId"></param>
     /// <param name="targetPos"></param>
     /// <param name="targetRot"></param>
-    void requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot );
+    void requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId, Common::Vector3 targetPos, float targetRot );
 
     /// <summary>
     /// request to move a player to specified territory type and position, with given WarpType
@@ -40,7 +40,7 @@ namespace Sapphire::World::Manager
     /// <param name="targetTerritoryTypeId"></param>
     /// <param name="targetPos"></param>
     /// <param name="targetRot"></param>
-    void requestMoveTerritoryType( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot );
+    void requestMoveTerritoryType( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId, Common::Vector3 targetPos, float targetRot );
 
 
 
@@ -67,7 +67,7 @@ namespace Sapphire::World::Manager
     /// <param name="warpType"></param>
     /// <param name="targetPos"></param>
     /// <param name="targetRot"></param>
-    void requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot );
+    void requestWarp( Entity::Player& player, Common::WarpType warpType, Common::Vector3 targetPos, float targetRot );
 
     /// <summary>
     /// handle player state post-warp after client is done loading

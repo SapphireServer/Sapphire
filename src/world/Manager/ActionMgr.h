@@ -25,7 +25,7 @@ namespace Sapphire::World::Manager
 
     void handleItemManipulationAction( Entity::Player& player, uint32_t actionId, uint16_t requestId );
     void handleTargetedAction( Entity::Chara& chara, uint32_t actionId, uint64_t targetId, uint16_t requestId );
-    void handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::FFXIVARR_POSITION3 pos, uint16_t requestId, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 );
+    void handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::Vector3 pos, uint16_t requestId, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
@@ -34,7 +34,7 @@ namespace Sapphire::World::Manager
                                 std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > itemActionData, uint32_t sequence, uint64_t targetId );
 
     void handlePlacedEventItemAction( Entity::Player& player, uint32_t itemId,
-                                      std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > itemActionData, uint32_t sequence, Common::FFXIVARR_POSITION3 targetPos );
+                                      std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > itemActionData, uint32_t sequence, Common::Vector3 targetPos );
 
     void handleMountAction( Entity::Player& player, uint16_t mountId,
                             std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );

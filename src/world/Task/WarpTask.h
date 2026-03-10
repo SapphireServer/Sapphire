@@ -13,7 +13,7 @@ class WarpTask : public Task
 {
 public:
   WarpTask( Entity::Player& player, Common::WarpType warpType,
-            Common::FFXIVARR_POSITION3 targetPos, float targetRot, uint64_t delayTime );
+            Common::Vector3 targetPos, float targetRot, uint64_t delayTime );
 
   void onQueue() override;
   void execute() override;

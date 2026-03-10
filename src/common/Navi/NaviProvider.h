@@ -3,31 +3,97 @@
 #include <Common.h>
 #include "recastnavigation/Detour/Include/DetourNavMesh.h"
 #include "recastnavigation/Detour/Include/DetourNavMeshQuery.h"
+#include "recastnavigation/Detour/Include/DetourNavMeshBuilder.h"
 #include "recastnavigation/DetourCrowd/Include/DetourCrowd.h"
+#include "recastnavigation/DetourTileCache/Include/DetourTileCache.h"
+#include "recastnavigation/DetourTileCache/Include/DetourTileCacheBuilder.h"
+#include "recastnavigation/Recast/Include/Recast.h"
+
+#include "FastLZ/fastlz.h"
 
 namespace Sapphire::Common::Navi
 {
   const int32_t MAX_POLYS = 32;
   const int32_t MAX_SMOOTH = 2048;
 
-  const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET'
-  const int32_t NAVMESHSET_VERSION = 1;
+  /** 1. Memory Allocator for Tile Cache **/
+  struct LinearAllocator : public dtTileCacheAlloc {
+    unsigned char* buffer;
+    size_t capacity, top;
+    LinearAllocator( size_t cap ) : capacity( cap ), top( 0 ) { buffer = new unsigned char[ cap ]; }
+    ~LinearAllocator() { delete[] buffer; }
+    void reset() override { top = 0; }
+    void* alloc( const size_t size ) override
+    {
+      if( top + size > capacity ) return nullptr;
+      unsigned char* mem = &buffer[ top ];
+      top += size;
+      return mem;
+    }
+    void free( void* ) override {}
+  };
+
+  /** 2. FastLZ Compressor for Tiles **/
+  struct FastLZCompressor : public dtTileCacheCompressor {
+    ~FastLZCompressor() {}
+    int maxCompressedSize( const int bufferSize ) override { return ( int ) ( bufferSize * 1.05f ); }
+    dtStatus compress( const unsigned char* buffer, const int bufferSize,
+                       unsigned char* compressed, const int, int* compressedSize ) override
+    {
+      *compressedSize = fastlz_compress( buffer, bufferSize, compressed );
+      return DT_SUCCESS;
+    }
+    dtStatus decompress( const unsigned char* compressed, const int compressedSize,
+                         unsigned char* buffer, const int maxBufferSize, int* bufferSize ) override
+    {
+      *bufferSize = fastlz_decompress( compressed, compressedSize, buffer, maxBufferSize );
+      return *bufferSize < 0 ? DT_FAILURE : DT_SUCCESS;
+    }
+  };
+
+  /** 3. Mesh Processor (Assigns Area IDs and Flags) **/
+  struct MeshProcess : public dtTileCacheMeshProcess {
+    ~MeshProcess() {}
+    void process( struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags ) override
+    {
+      for( int i = 0; i < params->polyCount; ++i )
+      {
+        if( polyAreas[ i ] == RC_WALKABLE_AREA )
+        {
+          polyAreas[ i ] = 0;   // Default Ground Area
+          polyFlags[ i ] = 0x01;// Walkable Flag
+        }
+      }
+    }
+  };
 
   class NaviProvider
   {
-    struct NavMeshSetHeader
+
+    struct TileCacheSetHeader
     {
-      int32_t magic;
-      int32_t version;
-      int32_t numTiles;
-      dtNavMeshParams params;
+      int magic;
+      int version;
+      int numTiles;
+      dtNavMeshParams meshParams;
+      dtTileCacheParams cacheParams;
     };
 
-    struct NavMeshTileHeader
-    {
-      dtTileRef tileRef;
-      int32_t dataSize;
+    struct TileCacheData {
+      unsigned char* data;
+      int dataSize;
     };
+
+    struct TileCacheTileHeader {
+      dtCompressedTileRef tileRef;
+      int dataSize;
+    };
+
+    static const int EXPECTED_LAYERS_PER_TILE = 4;
+    static const int MAX_LAYERS = 32;
+
+    static const int TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T';//'TSET';
+    static const int TILECACHESET_VERSION = 1;
 
   public:
     explicit NaviProvider( const std::string& internalName );
@@ -36,52 +102,63 @@ namespace Sapphire::Common::Navi
     bool loadMesh( const std::string& path );
     void initQuery();
 
-    void toDetourPos( const Common::FFXIVARR_POSITION3& position, float* out );
-    Common::FFXIVARR_POSITION3 toGamePos( float* pos );
+    void toDetourPos( const Common::Vector3& position, float* out );
+    Common::Vector3 toGamePos( float* pos );
 
-    std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
-                                                              const Common::FFXIVARR_POSITION3& endPos );
-    Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Common::FFXIVARR_POSITION3& startPos,
+    std::vector< Common::Vector3 > findFollowPath( const Common::Vector3& startPos,
+                                                              const Common::Vector3& endPos );
+    Common::Vector3 findRandomPositionInCircle( const Common::Vector3& startPos,
                                                            float maxRadius );
 
-    Common::FFXIVARR_POSITION3 findNearestPosition( float x, float z );
+    Common::Vector3 findNearestPosition( float x, float z );
 
     bool hasNaviMesh() const;
 
-    int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius, float speed = 1.0f );
+    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f );
 
     void removeAgent( int32_t naviAgentId );
 
-    void updateCrowd( float timeInSeconds );
+    void update( float timeInSeconds );
 
     static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
 
-    void setMoveTarget( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& endPos );
+    void setMoveTarget( int32_t naviAgentId, const Common::Vector3& endPos );
     void resetMoveTarget( int32_t naviAgentId );
 
-    Common::FFXIVARR_POSITION3 getAgentPos( int32_t naviAgentId );
+    Common::Vector3 getAgentPos( int32_t naviAgentId );
     float getAgentSpeed( int32_t naviAgentId );
 
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;
 
-    int32_t updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius, float speed );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed );
 
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
     void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
+    const dtTileCache* getTileCache() const { return m_tileCache; }
 
     std::string getNaviPath() const { return m_naviPath; }
+
+    // halfExtents: { width, height, depth } 
+    void toggleBox( dtObstacleRef& doorRef, const Common::Vector3& pos, const Common::Vector3& halfExtents, float rot, bool enabled );
+    void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
+    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
 
   protected:
     std::string m_internalName;
     std::string m_naviPath;
 
-    dtNavMesh* m_naviMesh;
-    dtNavMeshQuery* m_naviMeshQuery;
-    dtObstacleAvoidanceDebugData* m_vod;
+    dtNavMesh* m_naviMesh{ nullptr };
+    dtTileCache* m_tileCache{ nullptr };
+    LinearAllocator* m_talloc{ nullptr };
+    FastLZCompressor* m_tcomp{ nullptr };
+    MeshProcess* m_tmproc{ nullptr };
+
+    dtNavMeshQuery* m_naviMeshQuery{ nullptr };
+    dtObstacleAvoidanceDebugData* m_vod{ nullptr };
     std::unique_ptr< dtCrowd > m_pCrowd;
 
     float m_polyFindRange[ 3 ];

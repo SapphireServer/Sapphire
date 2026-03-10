@@ -18,12 +18,12 @@ void Sapphire::Inventory::HousingItem::setRot( float rot )
   m_rotation = rot;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Inventory::HousingItem::getPos() const
+Sapphire::Common::Vector3 Sapphire::Inventory::HousingItem::getPos() const
 {
   return m_position;
 }
 
-void Sapphire::Inventory::HousingItem::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Sapphire::Inventory::HousingItem::setPos( Sapphire::Common::Vector3 pos )
 {
   m_position = pos;
 }

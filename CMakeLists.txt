@@ -66,12 +66,35 @@ endif()
 ##############################
 #        Dependencies        #
 ##############################
+if( NOT EXISTS "${CMAKE_SOURCE_DIR}/deps/FastLZ/fastlz.c" )
+  find_package( Git QUIET )
+  if( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git" )
+    message( STATUS "FastLZ not found. Initializing deps/FastLZ submodule..." )
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive -- deps/FastLZ
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      RESULT_VARIABLE FASTLZ_SUBMODULE_RESULT
+    )
+
+    if( NOT FASTLZ_SUBMODULE_RESULT EQUAL 0 )
+      message( WARNING "Failed to initialize deps/FastLZ submodule automatically." )
+    endif()
+  endif()
+endif()
+
+if( NOT EXISTS "${CMAKE_SOURCE_DIR}/deps/FastLZ/fastlz.c" )
+  message( FATAL_ERROR "FastLZ source is missing. Run: git submodule update --init --recursive -- deps/FastLZ" )
+endif()
+
 set( CMAKE_FOLDER "deps" )
+add_library( fastlz STATIC "deps/FastLZ/fastlz.c" )
+target_include_directories( fastlz PUBLIC "${CMAKE_SOURCE_DIR}/deps" )
 add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
+set(RECASTNAVIGATION_DT_POLYREF64 ON CACHE BOOL "Use 64bit polyrefs instead of 32bit for Detour" FORCE)
 add_subdirectory( "deps/recastnavigation" )
 
 if( SAPPHIRE_BUILD_TOOLKIT )

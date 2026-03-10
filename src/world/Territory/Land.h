@@ -34,7 +34,7 @@ namespace Sapphire
     Common::LandType getLandType() const;
     void setHouse( Sapphire::HousePtr );
     Sapphire::HousePtr getHouse() const;
-    Common::FFXIVARR_POSITION3 getMapMarkerPosition();
+    Common::Vector3 getMapMarkerPosition();
     Common::LandIdent getLandIdent() const;
 
     //Free Comapny
@@ -74,7 +74,7 @@ namespace Sapphire
     uint32_t m_fcIcon;
     uint32_t m_fcIconColor;
 
-    Common::FFXIVARR_POSITION3 m_mapMarkerPosition;
+    Common::Vector3 m_mapMarkerPosition;
 
     uint64_t m_ownerId;
     std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > m_landInfo;

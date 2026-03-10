@@ -274,8 +274,8 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   auto pExitRange = instanceObjectCache.getExitRange( player.getTerritoryTypeId(), exitBoxId );
 
-  Common::FFXIVARR_POSITION3 targetPos{};
-  Common::FFXIVARR_POSITION3 targetRot{};
+  Common::Vector3 targetPos{};
+  Common::Vector3 targetRot{};
   uint32_t targetZone{128};
   float rotation = 0.0f;
 

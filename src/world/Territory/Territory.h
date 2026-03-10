@@ -71,6 +71,7 @@ namespace Sapphire
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
+    uint32_t m_nextEncounterId{ 1 };
 
     std::vector< SpawnInfo > m_spawnInfo;
 
@@ -180,7 +181,7 @@ namespace Sapphire
     void updateSessions( uint64_t tickCount, bool changedWeather );
 
     Entity::EventObjectPtr addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
-                                    uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                    uint8_t state, Common::Vector3 pos, float scale,
                                     float rotation, uint8_t permissionInv );
 
     void addEObj( Entity::EventObjectPtr object );
@@ -198,6 +199,10 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId );
+
+    Entity::EventObjectPtr getEObjByName( const std::string& name );
+
     Entity::PlayerPtr getPlayer( uint32_t playerId );
 
     const std::unordered_map< uint32_t, Entity::PlayerPtr >& getPlayers();
@@ -209,6 +214,8 @@ namespace Sapphire
     void updateSpawnPoints();
 
     uint32_t getNextActionResultId();
+
+    uint32_t getNextEncounterId();
 
     std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };

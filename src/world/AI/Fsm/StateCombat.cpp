@@ -65,6 +65,10 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
       bnpc.deaggro( pHatedActor );
     }
   }
+  if( bnpc.getBoundEncounterId() != pHatedActor->getBoundEncounterId() )
+  {
+    bnpc.deaggro( pHatedActor );
+  }
 
   auto dtMove = tickCount - m_lastMoveTime;
   auto dtRot = tickCount - m_lastRotTime;
@@ -115,7 +119,7 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   {
     if( dtRot >= 300 )
     {
-      Common::FFXIVARR_POSITION3 lookAtPos = pHatedActor->getPos();
+      Common::Vector3 lookAtPos = pHatedActor->getPos();
 
       // If moving and outside combat range, face the movement direction (Navi Agent)
       if( isPathing && distance > stopDistance && bnpc.getAgentId() != -1 )
