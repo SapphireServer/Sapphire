@@ -264,7 +264,11 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   if( auto instance = zone ? zone->getAsInstanceContent() : nullptr )
   {
     auto instanceScript = m_nativeScriptMgr->getScript< ... >( instance->getDirectorId() );
-    if( instanceScript ) { instanceScript->onTalk( *instance, player, eventId, actorId ); return true; }
+    if( instanceScript )
+    {
+      instanceScript->onTalk( *instance, player, eventId, actorId );
+      return true;
+    }
   }
 
   return false;

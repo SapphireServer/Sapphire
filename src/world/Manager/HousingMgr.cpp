@@ -384,7 +384,6 @@ LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone
 
   auto plotPrice = pLand->getCurrentPrice();
   auto gilAvailable = player.getCurrency( Common::CurrencyType::Gil );
-  auto pLand = zone.getLand( plot );
 
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;

@@ -259,7 +259,7 @@ uint64_t Player::getOnlineStatusCustomMask() const
 void Player::addOnlineStatus( OnlineStatus status )
 {
   uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
-  uint64_t newFlags = getOnlineStatusMask() | statusValue;
+  uint64_t newFlags = ( getOnlineStatusMask() | getOnlineStatusCustomMask() ) | statusValue;
 
   setOnlineStatusMask( newFlags );
 

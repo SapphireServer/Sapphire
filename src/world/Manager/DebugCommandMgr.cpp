@@ -980,14 +980,14 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
-      subCommand = tmpCommand.substr( 0, pos );
+    subCommand = tmpCommand.substr( 0, pos );
   else
-      subCommand = tmpCommand;
+    subCommand = tmpCommand;
 
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-      params = tmpCommand.substr( pos + 1 );
+    params = tmpCommand.substr( pos + 1 );
   else
-      params.clear();
+    params.clear();
 
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1259,14 +1259,14 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
-      subCommand = tmpCommand.substr( 0, pos );
+    subCommand = tmpCommand.substr( 0, pos );
   else
-      subCommand = tmpCommand;
+    subCommand = tmpCommand;
 
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-      params = tmpCommand.substr( pos + 1 );
+    params = tmpCommand.substr( pos + 1 );
   else
-      params.clear();
+    params.clear();
   
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1455,14 +1455,14 @@ void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_p
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
-      subCommand = tmpCommand.substr( 0, pos );
+    subCommand = tmpCommand.substr( 0, pos );
   else
-      subCommand = tmpCommand;
+    subCommand = tmpCommand;
 
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-      params = tmpCommand.substr( pos + 1 );
+    params = tmpCommand.substr( pos + 1 );
   else
-      params.clear();
+    params.clear();
 
 //  if( subCommand == "permission" || subCommand == "perm" )
 //  {
@@ -1575,6 +1575,11 @@ void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::sh
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
+  if( pos != std::string::npos )
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    subCommand = tmpCommand;
+
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
     params = tmpCommand.substr( pos + 1 );
   else
@@ -1622,6 +1627,11 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
+  if( pos != std::string::npos )
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    subCommand = tmpCommand;
+
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
     params = tmpCommand.substr( pos + 1 );
   else
@@ -1664,6 +1674,11 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
+  if( pos != std::string::npos )
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    subCommand = tmpCommand;
+
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
     params = tmpCommand.substr( pos + 1 );
   else
@@ -1705,6 +1720,11 @@ void DebugCommandMgr::facing( char* data, Sapphire::Entity::Player& player, std:
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
+
+  if( pos != std::string::npos )
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    subCommand = tmpCommand;
 
   if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
     params = tmpCommand.substr( pos + 1 );
