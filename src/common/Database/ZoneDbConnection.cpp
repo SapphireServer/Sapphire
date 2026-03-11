@@ -421,4 +421,28 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "DELETE FROM fcmember WHERE FcMemberId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( ACCOUNT_SEL_BY_NAME_PASS,
+                    "SELECT account_id FROM accounts WHERE account_name = ? AND account_pass = ?;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( ACCOUNT_SEL_BY_NAME,
+                    "SELECT account_id FROM accounts WHERE account_name = ?;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( ACCOUNT_SEL_MAX_ID,
+                    "SELECT MAX(account_id) FROM accounts;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( ACCOUNT_INS,
+                    "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( ?, ?, ?, ? );",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_SEL_BY_ACCOUNT_ID,
+                    "SELECT CharacterId FROM charainfo WHERE AccountId = ?;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_SEL_BY_NAME,
+                    "SELECT CharacterId FROM charainfo WHERE Name = ?;",
+                    CONNECTION_SYNC );
+
 }

@@ -13,6 +13,11 @@ namespace
     return static_cast< MYSQL_STMT* >( handle );
   }
 
+  MYSQL_RES* nativeResult( Mysql::NativeResultHandle handle )
+  {
+    return static_cast< MYSQL_RES* >( handle );
+  }
+
   static inline char* my_l_to_a( char* buf, size_t buf_size, int64_t a )
   {
     snprintf( buf, buf_size, "%lld", ( long long ) a );
@@ -48,18 +53,22 @@ uint32_t Mysql::PreparedResultSet::findColumn( const std::string& columnLabel ) 
 
 Mysql::PreparedResultSet::PreparedResultSet( std::shared_ptr< ResultBind >& pBind,
                                              std::shared_ptr< Mysql::PreparedStatement > par ) : ResultSet( nullptr, par ),
-                                                                                                 m_pResultBind( pBind ),
-                                                                                                 m_pStmt( par )
+                                                                                                 m_pStmt( par ),
+                                                                                                 m_pResultBind( pBind )
 {
-  pBind->bindResult();
-
   m_numRows = mysql_stmt_num_rows( nativeStatement( par->m_pStmt ) );
   m_numFields = mysql_stmt_field_count( nativeStatement( par->m_pStmt ) );
-  auto resMeta = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
+  m_rowPosition = 0;
+  m_truncatedColumnData.resize( m_numFields );
+  m_hasFetchedTruncatedColumn.resize( m_numFields, false );
+  m_pMetaRes = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
+
+  auto resMeta = nativeResult( m_pMetaRes );
+  if( !resMeta )
+    return;
 
   for( uint32_t i = 0; i < m_numFields; ++i )
   {
-
     auto field = resMeta->fields[ i ];
     std::string fieldName( field.name );
 
@@ -75,9 +84,72 @@ bool Mysql::PreparedResultSet::isBeforeFirstOrAfterLast() const
   return ( m_rowPosition == 0 );
 }
 
+void Mysql::PreparedResultSet::clearTruncatedColumnCache() const
+{
+  for( uint32_t i = 0; i < m_numFields; ++i )
+  {
+    m_truncatedColumnData[ i ].clear();
+    m_hasFetchedTruncatedColumn[ i ] = false;
+  }
+}
+
+const std::vector< char >& Mysql::PreparedResultSet::getColumnData( uint32_t columnIndex ) const
+{
+  if( columnIndex == 0 || columnIndex > m_numFields )
+    throw std::runtime_error( "PreparedResultSet::getColumnData: invalid 'columnIndex'" );
+
+  const uint32_t index = columnIndex - 1;
+  if( !m_pResultBind->isTruncated( index ) )
+  {
+    const auto* begin = static_cast< const char* >( m_pResultBind->m_pBind[ index ].buffer );
+    const auto length = static_cast< size_t >( m_pResultBind->getLength( index ) );
+    m_truncatedColumnData[ index ].assign( begin, begin + length );
+    m_hasFetchedTruncatedColumn[ index ] = true;
+    return m_truncatedColumnData[ index ];
+  }
+
+  if( m_hasFetchedTruncatedColumn[ index ] )
+    return m_truncatedColumnData[ index ];
+
+  const auto length = static_cast< size_t >( m_pResultBind->getLength( index ) );
+  m_truncatedColumnData[ index ].assign( length + 1, '\0' );
+
+  MYSQL_BIND bind{};
+  bind.buffer_type = m_pResultBind->m_pBind[ index ].buffer_type;
+  bind.buffer = m_truncatedColumnData[ index ].data();
+  bind.buffer_length = static_cast< unsigned long >( length );
+  bind.is_unsigned = m_pResultBind->m_pBind[ index ].is_unsigned;
+
+  unsigned long fetchedLength = 0;
+  BindBool isNull = 0;
+  BindBool error = 0;
+  bind.length = &fetchedLength;
+  bind.is_null = &isNull;
+  bind.error = &error;
+
+  const int result = mysql_stmt_fetch_column( nativeStatement( m_pStmt->m_pStmt ), &bind, index, 0 );
+  if( result == 1 )
+    throw std::runtime_error( "PreparedResultSet::getColumnData: error fetching oversized column: " +
+                              std::to_string( mysql_stmt_errno( nativeStatement( m_pStmt->m_pStmt ) ) ) +
+                              ": " + std::string( mysql_stmt_error( nativeStatement( m_pStmt->m_pStmt ) ) ) );
+
+  if( result == MYSQL_DATA_TRUNCATED )
+    throw std::runtime_error( "PreparedResultSet::getColumnData: oversized column fetch was still truncated" );
+
+  m_truncatedColumnData[ index ].resize( fetchedLength );
+  m_hasFetchedTruncatedColumn[ index ] = true;
+  return m_truncatedColumnData[ index ];
+}
+
 Mysql::PreparedResultSet::~PreparedResultSet()
 {
   free();
+
+  if( m_pMetaRes )
+  {
+    mysql_free_result( nativeResult( m_pMetaRes ) );
+    m_pMetaRes = nullptr;
+  }
 }
 
 uint32_t Mysql::PreparedResultSet::getUInt( const uint32_t columnIndex ) const
@@ -168,8 +240,7 @@ int64_t Mysql::PreparedResultSet::getInt64( const std::string& columnLabel ) con
 uint64_t Mysql::PreparedResultSet::getUInt64_intern( const uint32_t columnIndex, bool ) const
 {
 
-  MYSQL_RES* res = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
-  MYSQL_FIELD* field = mysql_fetch_field_direct( res, columnIndex - 1 );
+  MYSQL_FIELD* field = mysql_fetch_field_direct( nativeResult( m_pMetaRes ), columnIndex - 1 );
 
   switch( Mysql::Util::mysql_type_to_datatype( field ) )
   {
@@ -277,8 +348,7 @@ uint64_t Mysql::PreparedResultSet::getUInt64_intern( const uint32_t columnIndex,
 int64_t Mysql::PreparedResultSet::getInt64_intern( const uint32_t columnIndex, bool ) const
 {
 
-  MYSQL_RES* res = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
-  MYSQL_FIELD* field = mysql_fetch_field_direct( res, columnIndex - 1 );
+  MYSQL_FIELD* field = mysql_fetch_field_direct( nativeResult( m_pMetaRes ), columnIndex - 1 );
 
   switch( Mysql::Util::mysql_type_to_datatype( field ) )
   {
@@ -414,8 +484,7 @@ std::string Mysql::PreparedResultSet::getString( const uint32_t columnIndex ) co
   if( *m_pResultBind->m_pBind[ columnIndex - 1 ].is_null )
     return std::string( "" );
 
-  MYSQL_RES* res = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
-  MYSQL_FIELD* field = mysql_fetch_field_direct( res, columnIndex - 1 );
+  MYSQL_FIELD* field = mysql_fetch_field_direct( nativeResult( m_pMetaRes ), columnIndex - 1 );
 
   switch( Mysql::Util::mysql_type_to_datatype( field ) )
   {
@@ -486,8 +555,10 @@ std::string Mysql::PreparedResultSet::getString( const uint32_t columnIndex ) co
     case DataType::SET:
     case DataType::ENUM:
     case DataType::JSON:
-      return std::string( static_cast< char* >( m_pResultBind->m_pBind[ columnIndex - 1 ].buffer ),
-                          *m_pResultBind->m_pBind[ columnIndex - 1 ].length );
+    {
+      const auto& data = getColumnData( columnIndex );
+      return std::string( data.data(), data.size() );
+    }
     default:
       break;
   }
@@ -536,8 +607,7 @@ long double Mysql::PreparedResultSet::getDouble( const uint32_t columnIndex ) co
   if( *m_pResultBind->m_pBind[ columnIndex - 1 ].is_null )
     return 0.0;
 
-  MYSQL_RES* res = mysql_stmt_result_metadata( nativeStatement( m_pStmt->m_pStmt ) );
-  MYSQL_FIELD* field = mysql_fetch_field_direct( res, columnIndex - 1 );
+  MYSQL_FIELD* field = mysql_fetch_field_direct( nativeResult( m_pMetaRes ), columnIndex - 1 );
 
   switch( Mysql::Util::mysql_type_to_datatype( field ) )
   {
@@ -649,12 +719,19 @@ std::vector< char > Mysql::PreparedResultSet::getBlobVector( uint32_t columnInde
   std::unique_ptr< std::istream > inStr( getBlob( columnIndex ) );
   char buff[ 4196 ];
   std::vector< char > data;
-  inStr->read( buff, sizeof( buff ) );
-  if( inStr->gcount() )
+
+  while( inStr->good() )
   {
-    data.resize( static_cast< uint32_t >( inStr->gcount() ) );
-    memcpy( data.data(), buff, static_cast< size_t >( inStr->gcount() ) );
+    inStr->read( buff, sizeof( buff ) );
+    const auto count = inStr->gcount();
+    if( count <= 0 )
+      break;
+
+    const auto oldSize = data.size();
+    data.resize( oldSize + static_cast< size_t >( count ) );
+    memcpy( data.data() + oldSize, buff, static_cast< size_t >( count ) );
   }
+
   return data;
 }
 
@@ -707,21 +784,28 @@ bool Mysql::PreparedResultSet::isNull( const std::string& columnLabel ) const
 
 bool Mysql::PreparedResultSet::next()
 {
-  bool ret = false;
-
-  // reset last_queried_column
-  // m_lastQueriedColumn = std::numeric_limits< uint32_t >::max();
+  clearTruncatedColumnCache();
 
   int result = mysql_stmt_fetch( nativeStatement( m_pStmt->m_pStmt ) );
-  if( !result || result == MYSQL_DATA_TRUNCATED )
-    ret = true;
-  if( result == MYSQL_NO_DATA )
-    ret = false;
-  if( result == 1 )
-    throw std::runtime_error( "PreparedResultSet:next: error getting next result" );
-  ++m_rowPosition;
+  if( result == 0 || result == MYSQL_DATA_TRUNCATED )
+  {
+    ++m_rowPosition;
+    return true;
+  }
 
-  return ret;
+  if( result == MYSQL_NO_DATA )
+  {
+    m_rowPosition = 0;
+    return false;
+  }
+
+  if( result == 1 )
+    throw std::runtime_error( "PreparedResultSet::next: error getting next result: " +
+                              std::to_string( mysql_stmt_errno( nativeStatement( m_pStmt->m_pStmt ) ) ) +
+                              ": " + std::string( mysql_stmt_error( nativeStatement( m_pStmt->m_pStmt ) ) ) );
+
+  m_rowPosition = 0;
+  return false;
 }
 
 void Mysql::PreparedResultSet::clearWarnings()

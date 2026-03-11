@@ -29,9 +29,7 @@ namespace Mysql
 
     virtual bool execute( const std::string& sql );
 
-    virtual std::shared_ptr< ResultSet > executeQuery( const std::string& sql );
-
-    virtual std::shared_ptr< ResultSet > getResultSet();
+    virtual std::shared_ptr< ResultSet > executeQuery( const std::string& sql, bool streaming = false );
 
     virtual uint64_t getUpdateCount();
 

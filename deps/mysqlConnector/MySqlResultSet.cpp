@@ -20,15 +20,16 @@ namespace
   }
 }// namespace
 
-Mysql::ResultSet::ResultSet( NativeResultHandle res, std::shared_ptr< Mysql::Statement > par )
+Mysql::ResultSet::ResultSet( NativeResultHandle res, std::shared_ptr< Mysql::Statement > par ) :
+  m_pStmt( std::move( par ) ),
+  m_pRes( res )
 {
   if( !res )
     return;
-  m_pRes = res;
+
   m_numRows = mysql_num_rows( nativeResult( res ) );
   m_numFields = mysql_num_fields( nativeResult( res ) );
-  m_pStmt = par;
-  m_rowPosition = 1;
+  m_rowPosition = 0;
 
   for( uint32_t i = 0; i < m_numFields; ++i )
   {
@@ -44,6 +45,13 @@ Mysql::ResultSet::ResultSet( NativeResultHandle res, std::shared_ptr< Mysql::Sta
 
 Mysql::ResultSet::~ResultSet()
 {
+  if( m_pRes )
+  {
+    mysql_free_result( nativeResult( m_pRes ) );
+    m_pRes = nullptr;
+  }
+
+  m_lifetimeGuard.reset();
 }
 
 uint32_t Mysql::ResultSet::findColumn( const std::string& columnLabel ) const
@@ -86,18 +94,24 @@ bool Mysql::ResultSet::next()
     if( m_pStmt->errNo() == 2013 || m_pStmt->errNo() == 2000 )
       throw std::runtime_error( "Error fetching next row " + std::to_string( m_pStmt->errNo() ) +
                                 ": " + m_pStmt->getConnection()->getError() );
-  }
-  if( ( ret = ( m_row != nullptr ) ) )
-    ++m_rowPosition;
-  else
-    m_rowPosition = 0;
 
+    m_rowPosition = 0;
+    return false;
+  }
+
+  ++m_rowPosition;
+  ret = true;
   return ret;
 }
 
 size_t Mysql::ResultSet::rowsCount() const
 {
   return static_cast< uint32_t >( m_numRows );
+}
+
+void Mysql::ResultSet::setLifetimeGuard( std::shared_ptr< void > lifetimeGuard )
+{
+  m_lifetimeGuard = std::move( lifetimeGuard );
 }
 
 const std::shared_ptr< Mysql::Statement > Mysql::ResultSet::getStatement() const
@@ -169,7 +183,25 @@ int64_t Mysql::ResultSet::getInt64( const std::string& columnLabel ) const
 
 uint64_t Mysql::ResultSet::getUInt64( uint32_t columnIndex ) const
 {
-  return static_cast< uint64_t >( getInt64( columnIndex ) );
+  if( columnIndex == 0 || columnIndex > m_numFields )
+    throw std::runtime_error( "ResultSet::getUInt64: invalid value of 'columnIndex'" );
+
+  m_lastQueriedColumn = columnIndex;
+
+  if( m_row[ columnIndex - 1 ] == nullptr )
+  {
+    m_wasNull = true;
+    return 0;
+  }
+
+  m_wasNull = false;
+  if( getFieldMeta( m_pRes, columnIndex )->type == MYSQL_TYPE_BIT &&
+      getFieldMeta( m_pRes, columnIndex )->flags != ( BINARY_FLAG | UNSIGNED_FLAG ) )
+  {
+    return static_cast< uint64_t >( getInt64( columnIndex ) );
+  }
+
+  return std::stoull( m_row[ columnIndex - 1 ] );
 }
 
 uint64_t Mysql::ResultSet::getUInt64( const std::string& columnLabel ) const
@@ -194,7 +226,7 @@ int16_t Mysql::ResultSet::getInt16( uint32_t columnIndex ) const
 
 int16_t Mysql::ResultSet::getInt16( const std::string& columnLabel ) const
 {
-  return getUInt16( findColumn( columnLabel ) );
+  return getInt16( findColumn( columnLabel ) );
 }
 
 int32_t Mysql::ResultSet::getInt( uint32_t columnIndex ) const
@@ -335,12 +367,19 @@ std::vector< char > Mysql::ResultSet::getBlobVector( uint32_t columnIndex ) cons
   std::unique_ptr< std::istream > inStr( getBlob( columnIndex ) );
   char buff[ 4196 ];
   std::vector< char > data;
-  inStr->read( buff, sizeof( buff ) );
-  if( inStr->gcount() )
+
+  while( inStr->good() )
   {
-    data.resize( static_cast< const uint32_t >( inStr->gcount() ) );
-    memcpy( data.data(), buff, static_cast< size_t >( inStr->gcount() ) );
+    inStr->read( buff, sizeof( buff ) );
+    const auto count = inStr->gcount();
+    if( count <= 0 )
+      break;
+
+    const auto oldSize = data.size();
+    data.resize( oldSize + static_cast< size_t >( count ) );
+    memcpy( data.data() + oldSize, buff, static_cast< size_t >( count ) );
   }
+
   return data;
 }
 

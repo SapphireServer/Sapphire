@@ -5,6 +5,33 @@
 
 #include "PreparedStatement.h"
 
+namespace
+{
+  struct ConnectionLease
+  {
+    explicit ConnectionLease( std::shared_ptr< Sapphire::Db::DbConnection > connection ) :
+      m_connection( std::move( connection ) )
+    {
+    }
+
+    ~ConnectionLease()
+    {
+      if( m_connection )
+        m_connection->unlock();
+    }
+
+    std::shared_ptr< Sapphire::Db::DbConnection > m_connection;
+  };
+
+  std::shared_ptr< void > makeConnectionLease( const std::shared_ptr< Sapphire::Db::DbConnection >& connection )
+  {
+    if( !connection )
+      return nullptr;
+
+    return std::static_pointer_cast< void >( std::make_shared< ConnectionLease >( connection ) );
+  }
+}
+
 Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
@@ -82,12 +109,13 @@ bool Sapphire::Db::DbConnection::ping()
 
 bool Sapphire::Db::DbConnection::lockIfReady()
 {
-  return m_mutex.try_lock();
+  bool expected = false;
+  return m_inUse.compare_exchange_strong( expected, true, std::memory_order_acquire );
 }
 
 void Sapphire::Db::DbConnection::unlock()
 {
-  m_mutex.unlock();
+  m_inUse.store( false, std::memory_order_release );
 }
 
 void Sapphire::Db::DbConnection::beginTransaction()
@@ -120,16 +148,31 @@ bool Sapphire::Db::DbConnection::execute( const std::string& sql )
   }
 }
 
-std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std::string& sql, bool streaming )
 {
+  auto self = shared_from_this();
+
   try
   {
     auto stmt = m_pConnection->createStatement();
-    auto result = stmt->executeQuery( sql );
+    auto result = stmt->executeQuery( sql, streaming );
+
+    if( !result )
+    {
+      unlock();
+      return nullptr;
+    }
+
+    if( streaming )
+      result->setLifetimeGuard( makeConnectionLease( self ) );
+    else
+      unlock();
+
     return result;
   }
   catch( std::runtime_error& e )
   {
+    unlock();
     Logger::error( e.what() );
     return nullptr;
   }
@@ -139,38 +182,63 @@ std::shared_ptr< Mysql::ResultSet > Sapphire::Db::DbConnection::query( const std
 std::shared_ptr< Mysql::ResultSet >
 Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
 {
-  std::shared_ptr< Mysql::ResultSet > res( nullptr );
-  if( !stmt )
-    return nullptr;
+  auto self = shared_from_this();
 
-  if( !ping() ) //this does not work right and results in too many connections
+  if( !stmt )
   {
-    // naivly reconnect and hope for the best
-    //open();
-    lockIfReady();
-    if( !prepareStatements() )
-      return nullptr;
+    unlock();
+    return nullptr;
   }
 
-  uint32_t index = stmt->getIndex();
+  if( !ping() )
+  {
+    // getFreeConnection() already holds this connection mutex
+    if( open() != 0 )
+    {
+      unlock();
+      return nullptr;
+    }
 
+    if( !prepareStatements() )
+    {
+      unlock();
+      return nullptr;
+    }
+  }
+
+  const uint32_t index = stmt->getIndex();
   auto pStmt = getPreparedStatement( index );
 
   if( !pStmt )
+  {
+    unlock();
     return nullptr;
+  }
 
   stmt->setMysqlPS( pStmt );
   try
   {
     stmt->bindParameters();
-    return pStmt->executeQuery();
+    auto result = pStmt->executeQuery();
+
+    if( !result )
+    {
+      unlock();
+      return nullptr;
+    }
+
+    // Prepared results keep using the MYSQL_STMT while fetching, so keep the
+    // connection leased until the result is destroyed.
+    result->setLifetimeGuard( makeConnectionLease( self ) );
+
+    return result;
   }
   catch( std::runtime_error& e )
   {
+    unlock();
     Logger::error( e.what() );
     return nullptr;
   }
-
 }
 
 bool Sapphire::Db::DbConnection::execute( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt )
@@ -241,6 +309,7 @@ void Sapphire::Db::DbConnection::prepareStatement( uint32_t index,
 
 bool Sapphire::Db::DbConnection::prepareStatements()
 {
+  m_prepareError = false;
   doPrepareStatements();
   return !m_prepareError;
 }

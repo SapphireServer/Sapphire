@@ -393,7 +393,7 @@ void Mysql::PreparedStatement::clearParameters()
 bool Mysql::PreparedStatement::execute()
 {
   doQuery();
-  return mysql_stmt_field_count( nativeStatement( m_pStmt ) ) > 0;
+  return mysql_stmt_field_count( nativeStatement( m_pStmt ) ) == 0;
 }
 
 bool Mysql::PreparedStatement::execute( const std::string& sql )
@@ -402,8 +402,10 @@ bool Mysql::PreparedStatement::execute( const std::string& sql )
   return false;
 }
 
-std::shared_ptr< Mysql::ResultSet > Mysql::PreparedStatement::executeQuery( const std::string& sql )
+std::shared_ptr< Mysql::ResultSet > Mysql::PreparedStatement::executeQuery( const std::string& sql, bool streaming )
 {
+  ( void ) sql;
+  ( void ) streaming;
   // not to be implemented for prepared statements
   return nullptr;
 }
@@ -411,25 +413,13 @@ std::shared_ptr< Mysql::ResultSet > Mysql::PreparedStatement::executeQuery( cons
 std::shared_ptr< Mysql::ResultSet > Mysql::PreparedStatement::executeQuery()
 {
   doQuery();
+  m_pResultBind->bindResult( false );
 
-  BindBool bool_tmp = 1;
-  mysql_stmt_attr_set( nativeStatement( m_pStmt ), STMT_ATTR_UPDATE_MAX_LENGTH, &bool_tmp );
-
-  std::shared_ptr< ResultSet > tmp( new PreparedResultSet( m_pResultBind, std::static_pointer_cast< PreparedStatement >( shared_from_this() ) ) );
-
-  return tmp;
-}
-
-std::shared_ptr< Mysql::ResultSet > Mysql::PreparedStatement::getResultSet()
-{
-  BindBool bool_tmp = 1;
-  mysql_stmt_attr_set( nativeStatement( m_pStmt ), STMT_ATTR_UPDATE_MAX_LENGTH, &bool_tmp );
-
-  std::shared_ptr< ResultSet > tmp( new PreparedResultSet( m_pResultBind, std::static_pointer_cast< PreparedStatement >( shared_from_this() ) ) );
+  std::shared_ptr< ResultSet > tmp( new PreparedResultSet( m_pResultBind,
+                                                           std::static_pointer_cast< PreparedStatement >( shared_from_this() ) ) );
 
   return tmp;
 }
-
 
 typedef std::pair< char*, size_t > BufferSizePair;
 

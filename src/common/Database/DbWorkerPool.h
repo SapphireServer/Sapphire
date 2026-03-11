@@ -60,7 +60,7 @@ namespace Sapphire::Db
     void directExecute( std::shared_ptr< PreparedStatement > stmt );
 
     std::shared_ptr< Mysql::ResultSet >
-    query( const std::string& sql, std::shared_ptr< T > connection = nullptr );
+    query( const std::string& sql, std::shared_ptr< T > connection = nullptr, bool streaming = DbConnection::DEFAULT_STREAMING );
 
     std::shared_ptr< Mysql::PreparedResultSet > query( std::shared_ptr< PreparedStatement > stmt );
 

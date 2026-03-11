@@ -30,6 +30,7 @@ namespace Mysql
     std::shared_ptr< Statement > m_pStmt;
 
     NativeResultHandle m_pRes{};
+    std::shared_ptr< void > m_lifetimeGuard;
 
   public:
     ResultSet( NativeResultHandle res, std::shared_ptr< Statement > par );
@@ -89,6 +90,7 @@ namespace Mysql
     virtual bool next();
 
     size_t rowsCount() const;
+    void setLifetimeGuard( std::shared_ptr< void > lifetimeGuard );
 
   private:
     ResultSet( const ResultSet& );

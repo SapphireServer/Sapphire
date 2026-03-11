@@ -25,7 +25,10 @@ namespace Mysql
 
       ~ResultBind();
 
-      void bindResult();
+      void bindResult( bool useMaxLength = false );
+
+      bool isTruncated( uint32_t index ) const;
+      unsigned long getLength( uint32_t index ) const;
 
    };
 }

@@ -11,11 +11,11 @@ namespace Mysql
   class PreparedResultSet : public ResultSet
   {
   private:
-    mutable uint32_t m_lastQueriedColumn;// this is updated by calls to getInt(int), getString(int), etc...
+    mutable uint32_t m_lastQueriedColumn{};// this is updated by calls to getInt(int), getString(int), etc...
 
-    uint32_t m_numFields;
-    uint64_t m_numRows;
-    uint64_t m_rowPosition;
+    uint32_t m_numFields{};
+    uint64_t m_numRows{};
+    uint64_t m_rowPosition{};
 
     typedef std::map< std::string, uint32_t > FieldNameIndexMap;
 
@@ -23,9 +23,12 @@ namespace Mysql
 
     std::shared_ptr< PreparedStatement > m_pStmt;
 
-    bool is_valid;
+    bool is_valid{};
 
     std::shared_ptr< ResultBind > m_pResultBind;
+    NativeResultHandle m_pMetaRes{};
+    mutable std::vector< std::vector< char > > m_truncatedColumnData;
+    mutable std::vector< bool > m_hasFetchedTruncatedColumn;
 
   protected:
     void checkValid() const;
@@ -35,6 +38,8 @@ namespace Mysql
 
     int64_t getInt64_intern( const uint32_t columnIndex, bool cutTooBig ) const;
     uint64_t getUInt64_intern( const uint32_t columnIndex, bool cutTooBig ) const;
+    void clearTruncatedColumnCache() const;
+    const std::vector< char >& getColumnData( uint32_t columnIndex ) const;
 
   public:
     PreparedResultSet( std::shared_ptr< ResultBind >& pBind, std::shared_ptr< PreparedStatement > par );

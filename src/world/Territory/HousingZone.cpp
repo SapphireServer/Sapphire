@@ -44,7 +44,7 @@ bool Sapphire::HousingZone::init()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   {
     auto res = db.query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
-    if( !res->next() )
+    if( !res || !res->next() )
     {
       db.directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
     }
