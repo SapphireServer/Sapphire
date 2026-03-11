@@ -799,13 +799,13 @@ void Action::Action::handleJobAction()
     {
       case ClassJob::Warrior:
       {
-        Warrior::onAction( pPlayer, *this );
+        Warrior::onAction( *pPlayer, *this );
         break;
       }
       case ClassJob::Archer:
       case ClassJob::Bard:
       {
-        Bard::onAction( pPlayer, *this );
+        Bard::onAction( *pPlayer, *this );
         break;
       }
     }

@@ -1450,7 +1450,6 @@ void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_p
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
-  std::string subCommand, params;
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
@@ -1492,10 +1491,8 @@ void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_p
 //    else
 //      PlayerMgr::sendDebug( player, "PermissionSet out of range." );
 //  }
-  else
-  {
-    PlayerMgr::sendDebug( player, "Unknown sub command." );
-  }
+
+  PlayerMgr::sendDebug( player, "Unknown sub command." );
 }
 
 void DebugCommandMgr::linkshell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )

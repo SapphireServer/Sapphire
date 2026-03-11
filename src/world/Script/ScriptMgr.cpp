@@ -261,12 +261,13 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     return true;
   }
   // fallthrough to instance content check
+  // todo: this zone check might fumbling it. need testing
   if( auto instance = zone ? zone->getAsInstanceContent() : nullptr )
   {
-    auto instanceScript = m_nativeScriptMgr->getScript< ... >( instance->getDirectorId() );
+    auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( instance->getDirectorId() );
     if( instanceScript )
     {
-      instanceScript->onTalk( *instance, player, eventId, actorId );
+      instanceScript->onTalk( eventId, player, actorId );
       return true;
     }
   }
