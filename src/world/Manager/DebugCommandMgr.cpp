@@ -187,10 +187,12 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     // no subcommand given
     subCommand = tmpCommand;
 
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
+  else
+    params.clear();
 
-  Logger::debug( "[{0}] subCommand: {1} params: {1}", player.getId(), subCommand, params );
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
@@ -370,9 +372,12 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
     for( auto actor : inRange )
     {
-      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
+      if( actor->getId() == player.getTargetId() )
       {
-        actor->getAsBNpc()->onActionHostile( player.getAsChara(), 1 );
+        auto pChara = actor->getAsChara();
+        auto pBNpc = actor->getAsBNpc();
+        if( pChara && pBNpc && pChara->isAlive() )
+          pBNpc->onActionHostile( player.getAsChara(), 1 );
       }
     }
   }
@@ -425,8 +430,10 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     // no subcommand given
     subCommand = tmpCommand;
 
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
+  else
+    params.clear();
 
   Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                  "subCommand " + subCommand + " params: " + params );
@@ -660,6 +667,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     }
 
     auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    if( !pTeri )
+        return;
 
     if( auto pNavi = pTeri->getNaviProvider() )
     {
@@ -694,8 +703,10 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
     // no subcommand given
     subCommand = tmpCommand;
 
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
+  else
+    params.clear();
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -776,8 +787,10 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
     // no subcommand given
     subCommand = tmpCommand;
 
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
+  else
+    params.clear();
 
   Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                  "subCommand " + subCommand + " params: " + params );
@@ -821,10 +834,12 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
   auto& pos = player.getPos();
 
   int32_t offset = 0;
-  char direction[20];
-  memset( direction, 0, 20 );
-
-  sscanf( tmpCommand.c_str(), "%d %s", &offset, direction );
+  char direction[20]{};
+  if( sscanf( tmpCommand.c_str(), "%d %19s", &offset, direction ) != 2 )
+  {
+    PlayerMgr::sendUrgent( player, "Usage: nudge <distance> <u|d|r|f>" );
+    return;
+  }
 
   if( direction[ 0 ] == 'u' || direction[ 0 ] == '+' )
   {
@@ -887,9 +902,10 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
     // no subcommand given
     subCommand = tmpCommand;
 
-  // todo: fix params so it's empty if there's no params
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
+  else
+    params.clear();
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -959,23 +975,19 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
-  std::string cmd( data ), params, subCommand;
-  auto cmdPos = cmd.find_first_of( ' ' );
+  std::string subCommand, params;
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( cmdPos != std::string::npos )
-  {
-    params = cmd.substr( cmdPos + 1 );
+  if( pos != std::string::npos )
+      subCommand = tmpCommand.substr( 0, pos );
+  else
+      subCommand = tmpCommand;
 
-    auto p = params.find_first_of( ' ' );
-
-    if( p != std::string::npos )
-    {
-      subCommand = params.substr( 0, p );
-      params = params.substr( subCommand.length() + 1 );
-    }
-    else
-      subCommand = params;
-  }
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+      params = tmpCommand.substr( pos + 1 );
+  else
+      params.clear();
 
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1024,6 +1036,11 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
     }
 
     auto pInstanceContent = instance->getAsInstanceContent();
+    if( !pInstanceContent )
+    {
+      PlayerMgr::sendDebug( player, "Territory id#{0} is not an InstanceContent territory.", instanceId );
+      return;
+    }
     if( pInstanceContent->isPlayerBound( player.getId() ) )
     {
       pInstanceContent->unbindPlayer( player.getId() );
@@ -1108,15 +1125,17 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   }
   else if( subCommand == "set" )
   {
-    uint32_t index;
-    uint32_t value;
-    sscanf( params.c_str(), "%d %d", &index, &value );
-
-
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
+    uint32_t index{};
+    uint32_t value{};
+    if( sscanf( params.c_str(), "%u %u", &index, &value ) != 2 || index > UINT8_MAX || value > UINT8_MAX )
+    {
+      PlayerMgr::sendDebug( player, "Usage: set <index 0-255> <value 0-255>" );
+      return;
+    }
     instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
   }
   else if( subCommand == "objstate" )
@@ -1124,7 +1143,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
     char objName[128];
     uint8_t state;
 
-    sscanf( params.c_str(), "%s %hhu", objName, &state );
+    sscanf( params.c_str(), "%127s %hhu", objName, &state );
 
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
@@ -1142,7 +1161,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
     uint32_t state1;
     uint32_t state2;
 
-    sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+    sscanf( params.c_str(), "%255s %i %i", objName, &state1, &state2 );
 
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
@@ -1234,24 +1253,21 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
-  std::string cmd( data ), params, subCommand;
-  auto cmdPos = cmd.find_first_of( ' ' );
 
-  if( cmdPos != std::string::npos )
-  {
-    params = cmd.substr( cmdPos + 1 );
+  std::string subCommand, params;
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-    auto p = params.find_first_of( ' ' );
+  if( pos != std::string::npos )
+      subCommand = tmpCommand.substr( 0, pos );
+  else
+      subCommand = tmpCommand;
 
-    if( p != std::string::npos )
-    {
-      subCommand = params.substr( 0, p );
-      params = params.substr( subCommand.length() + 1 );
-    }
-    else
-      subCommand = params;
-  }
-
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+      params = tmpCommand.substr( pos + 1 );
+  else
+      params.clear();
+  
   if( subCommand == "create" || subCommand == "cr" )
   {
     uint32_t questId;
@@ -1312,15 +1328,17 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   }
   else if( subCommand == "set" )
   {
-    uint32_t index;
-    uint32_t value;
-    sscanf( params.c_str(), "%d %d", &index, &value );
-
-
     auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
-      return;
-
+        return;
+    
+    uint32_t index{};
+    uint32_t value{};
+    if( sscanf( params.c_str(), "%u %u", &index, &value ) != 2 || index > UINT8_MAX || value > UINT8_MAX )
+    {
+        PlayerMgr::sendDebug( player, "Usage: set <index 0-255> <value 0-255>" );
+        return;
+    }
     instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
   }
   else if( subCommand == "objstate" )
@@ -1432,20 +1450,19 @@ void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_p
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
-  if( cmdPos != std::string::npos )
-  {
-    params = cmd.substr( cmdPos + 1 );
+  std::string subCommand, params;
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-    auto p = params.find_first_of( ' ' );
+  if( pos != std::string::npos )
+      subCommand = tmpCommand.substr( 0, pos );
+  else
+      subCommand = tmpCommand;
 
-    if( p != std::string::npos )
-    {
-      subCommand = params.substr( 0, p );
-      params = params.substr( subCommand.length() + 1 );
-    }
-    else
-      subCommand = params;
-  }
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+      params = tmpCommand.substr( pos + 1 );
+  else
+      params.clear();
 
 //  if( subCommand == "permission" || subCommand == "perm" )
 //  {
@@ -1483,32 +1500,32 @@ void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_p
 
 void DebugCommandMgr::linkshell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
-  std::string cmd( data ), params, subCommand;
-  auto cmdPos = cmd.find_first_of( ' ' );
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  std::string subCommand, params;
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( cmdPos != std::string::npos )
-  {
-    params = cmd.substr( cmdPos + 1 );
+  if( pos != std::string::npos )
+      subCommand = tmpCommand.substr( 0, pos );
+  else
+      subCommand = tmpCommand;
 
-    auto p = params.find_first_of( ' ' );
-
-    if( p != std::string::npos )
-    {
-      subCommand = params.substr( 0, p );
-      params = params.substr( subCommand.length() + 1 );
-    }
-    else
-      subCommand = params;
-  }
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+      params = tmpCommand.substr( pos + 1 );
+  else
+      params.clear();
+    
 
   if( subCommand != "" )
   {
     auto lsName = subCommand;
-
     auto& lsMgr = Common::Service< Manager::LinkshellMgr >::ref();
-
     auto lsPtr = lsMgr.createLinkshell( lsName, player );
+    if( !lsPtr )
+    {
+        PlayerMgr::sendDebug( player, "Failed to create linkshell '{0}'", lsName );
+        return;
+    }
 
     PlayerMgr::sendDebug( player, "Created LS name " + lsPtr->getName() + " ID: " + std::to_string( lsPtr->getId() ) );
   }
@@ -1518,23 +1535,19 @@ void DebugCommandMgr::contentFinder( char *data, Sapphire::Entity::Player &playe
 {
   auto& cf = Common::Service< ContentFinder >::ref();
 
-  std::string cmd( data ), params, subCommand;
-  auto cmdPos = cmd.find_first_of( ' ' );
+  std::string subCommand, params;
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( cmdPos != std::string::npos )
-  {
-    params = cmd.substr( cmdPos + 1 );
+  if( pos != std::string::npos )
+      subCommand = tmpCommand.substr( 0, pos );
+  else
+      subCommand = tmpCommand;
 
-    auto p = params.find_first_of( ' ' );
-
-    if( p != std::string::npos )
-    {
-      subCommand = params.substr( 0, p );
-      params = params.substr( subCommand.length() + 1 );
-    }
-    else
-      subCommand = params;
-  }
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+      params = tmpCommand.substr( pos + 1 );
+  else
+      params.clear();
 
   if( subCommand == "pop" )
   {
@@ -1562,15 +1575,10 @@ void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::sh
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
   else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+    params.clear();
 
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& warpMgr = Common::Service< WarpMgr >::ref();
@@ -1585,13 +1593,13 @@ void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::sh
     return PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", contentFinderConditionId );
 
 
-  auto terri = terriMgr.getTerritoryByGuId( instance->getGuId() );
-  if( terri )
+  auto teri = terriMgr.getTerritoryByGuId( instance->getGuId() );
+  if( teri )
   {
-    auto pInstanceContent = terri->getAsInstanceContent();
+    auto pInstanceContent = teri->getAsInstanceContent();
     if( !pInstanceContent )
     {
-      PlayerMgr::sendDebug( player, "Instance id#{} is not an InstanceContent territory.", pInstanceContent->getGuId() );
+      PlayerMgr::sendDebug( player, "Instance id#{} is not an InstanceContent territory." );
       return;
     }
 
@@ -1614,15 +1622,10 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
   else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+    params.clear();
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -1645,7 +1648,7 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
     warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getTerritoryByTypeId( 132 )->getGuId(), { 43.729f, -7.96559f, 103.965f }, -1.59436f );
   else if( subCommand == "observatorium" )
     warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getTerritoryByTypeId( 155 )->getGuId(), { 224.965f, 221.958f, 301.33f }, -0.0316129f );
-  else if( subCommand == "rising_stones" )
+  else if( subCommand == "rising_stones_2" )
     warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getTerritoryByTypeId( 156 )->getGuId(), { 22.7204f, 21.2639f, -635.704f }, -0.360031f );
   else
     PlayerMgr::sendUrgent( player, "{0} is not a valid easyWarp location.", subCommand );
@@ -1661,15 +1664,10 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
   else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+    params.clear();
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -1708,15 +1706,10 @@ void DebugCommandMgr::facing( char* data, Sapphire::Entity::Player& player, std:
 
   std::size_t pos = tmpCommand.find_first_of( ' ' );
 
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
+  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
+    params = tmpCommand.substr( pos + 1 );
   else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
-    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+    params.clear();
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
