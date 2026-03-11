@@ -309,6 +309,7 @@ void Sapphire::Db::DbConnection::prepareStatement( uint32_t index,
 
 bool Sapphire::Db::DbConnection::prepareStatements()
 {
+  m_prepareError = false;
   doPrepareStatements();
   return !m_prepareError;
 }
