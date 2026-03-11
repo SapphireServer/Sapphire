@@ -163,4 +163,20 @@ namespace Mysql
     if( mysql_stmt_bind_result( m_pStmt, m_pBind.get() ) )
       throw std::runtime_error( "Couldn't bind : " + std::to_string( mysql_stmt_errno( m_pStmt ) ) );
   }
+
+  bool ResultBind::isTruncated( uint32_t index ) const
+  {
+    if( index >= m_numFields )
+      throw std::runtime_error( "ResultBind::isTruncated: invalid column index" );
+
+    return m_err && m_err[ index ] != 0;
+  }
+
+  unsigned long ResultBind::getLength( uint32_t index ) const
+  {
+    if( index >= m_numFields )
+      throw std::runtime_error( "ResultBind::getLength: invalid column index" );
+
+    return m_len ? m_len[ index ] : 0;
+  }
 }// namespace Mysql

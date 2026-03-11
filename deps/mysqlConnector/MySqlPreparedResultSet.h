@@ -27,6 +27,8 @@ namespace Mysql
 
     std::shared_ptr< ResultBind > m_pResultBind;
     NativeResultHandle m_pMetaRes{};
+    mutable std::vector< std::vector< char > > m_truncatedColumnData;
+    mutable std::vector< bool > m_hasFetchedTruncatedColumn;
 
   protected:
     void checkValid() const;
@@ -36,6 +38,8 @@ namespace Mysql
 
     int64_t getInt64_intern( const uint32_t columnIndex, bool cutTooBig ) const;
     uint64_t getUInt64_intern( const uint32_t columnIndex, bool cutTooBig ) const;
+    void clearTruncatedColumnCache() const;
+    const std::vector< char >& getColumnData( uint32_t columnIndex ) const;
 
   public:
     PreparedResultSet( std::shared_ptr< ResultBind >& pBind, std::shared_ptr< PreparedStatement > par );
