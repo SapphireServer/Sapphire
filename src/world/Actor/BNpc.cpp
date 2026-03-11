@@ -331,7 +331,7 @@ bool BNpc::getNaviIsPathing() const
 
 void BNpc::setNaviIsPathing( bool pathing )
 {
-  m_naviIsPathing = true;
+  m_naviIsPathing = pathing;
 }
 
 Common::Vector3 BNpc::getNaviLastMoveTarget() const

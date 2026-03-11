@@ -702,7 +702,8 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
   if( ( subCommand == "pos" ) )
   {
 
-    int16_t map_id = exdData.getRow< Excel::TerritoryType >( player.getTerritoryTypeId() )->data().Map;
+    auto pTeriInfo = exdData.getRow< Excel::TerritoryType >( player.getTerritoryTypeId() );
+    int16_t map_id = pTeriInfo ? pTeriInfo->data().Map : 0;
 
     PlayerMgr::sendServerNotice( player, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                                  player.getPos().x, player.getPos().y, player.getPos().z,

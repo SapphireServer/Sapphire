@@ -259,7 +259,7 @@ uint64_t Player::getOnlineStatusCustomMask() const
 void Player::addOnlineStatus( OnlineStatus status )
 {
   uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
-  uint64_t newFlags = ( getOnlineStatusMask() & getOnlineStatusCustomMask() ) | statusValue;
+  uint64_t newFlags = getOnlineStatusMask() | statusValue;
 
   setOnlineStatusMask( newFlags );
 
@@ -925,7 +925,7 @@ void Player::setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const cha
 {
   m_searchSelectRegion = selectRegion;
   m_searchSelectClass = selectClass;
-  memset( &m_searchMessage[ 0 ], 0, sizeof( searchMessage ) );
+  memset( &m_searchMessage[ 0 ], 0, sizeof( m_searchMessage ) );
   strcpy( &m_searchMessage[ 0 ], searchMessage );
 }
 
@@ -1139,7 +1139,8 @@ uint8_t Player::getMaxGearSets() const
 
 void Player::setConfigFlags( uint16_t state )
 {
-  m_configFlags = static_cast< uint8_t >( state );
+  // todo: FFXIVIpcConfig flag is 16bits, are upper bytes ignored?
+  m_configFlags = static_cast< uint8_t >( state & 0xFF );
   Network::Util::Packet::sendConfigFlags( *this );
 }
 
@@ -1291,8 +1292,11 @@ void Player::teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket )
   if( !targetAetheryte )
    return;
 
-  auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
+  auto fromTeri = exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() );
+  if( !fromTeri )
+    return; // teleport failed msg to player?
 
+  auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( fromTeri->data().Aetheryte );
   // calculate cost - does not apply for favorite points or homepoints
   // if using aetheryte ticket, cost is 0
   auto cost = useAetheryteTicket ? 0 : static_cast< uint16_t > (

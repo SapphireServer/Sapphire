@@ -335,9 +335,11 @@ TerritoryPtr TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto pTeri = getTerritoryDetail( territoryTypeId );
+  if( !pTeri )
+    return nullptr;
+  
   auto pPlaceName = exdData.getRow< Excel::PlaceName >( pTeri->data().Area );
-
-  if( !pTeri || !pPlaceName )
+  if( !pPlaceName )
     return nullptr;
 
   auto placeName = pPlaceName->getString( pPlaceName->data().Text.SGL );

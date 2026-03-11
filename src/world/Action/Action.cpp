@@ -481,8 +481,8 @@ void Action::Action::execute()
 
   if( isCorrectCombo() )
   {
-    auto player = m_pSource->getAsPlayer();
-    Manager::PlayerMgr::sendDebug( *player, "action combo success from action#{0}", player->getLastComboActionId() );
+    if( auto player = m_pSource->getAsPlayer() )
+      Manager::PlayerMgr::sendDebug( *player, "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
   if( !hasClientsideTarget()  )
@@ -792,18 +792,22 @@ void Action::Action::handleStatusEffects()
 
 void Action::Action::handleJobAction()
 {
-  switch( m_pSource->getClass() )
+  // todo: this really shouldn't use getAsPlayer and treat as any actor. leaving explicit isPlayer check
+  if( auto pPlayer = m_pSource->getAsPlayer() )
   {
-    case ClassJob::Warrior:
+    switch( m_pSource->getClass() )
     {
-      Warrior::onAction( *m_pSource->getAsPlayer(), *this );
-      break;
-    }
-    case ClassJob::Archer:
-    case ClassJob::Bard:
-    {
-      Bard::onAction( *m_pSource->getAsPlayer(), *this );
-      break;
+      case ClassJob::Warrior:
+      {
+        Warrior::onAction( pPlayer, *this );
+        break;
+      }
+      case ClassJob::Archer:
+      case ClassJob::Bard:
+      {
+        Bard::onAction( pPlayer, *this );
+        break;
+      }
     }
   }
 }
