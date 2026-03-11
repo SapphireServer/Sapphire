@@ -109,12 +109,13 @@ bool Sapphire::Db::DbConnection::ping()
 
 bool Sapphire::Db::DbConnection::lockIfReady()
 {
-  return m_mutex.try_lock();
+  bool expected = false;
+  return m_inUse.compare_exchange_strong( expected, true, std::memory_order_acquire );
 }
 
 void Sapphire::Db::DbConnection::unlock()
 {
-  m_mutex.unlock();
+  m_inUse.store( false, std::memory_order_release );
 }
 
 void Sapphire::Db::DbConnection::beginTransaction()
@@ -191,9 +192,13 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
 
   if( !ping() )
   {
-    // naivly reconnect and hope for the best
-    open();
-    lockIfReady();
+    // getFreeConnection() already holds this connection mutex
+    if( open() != 0 )
+    {
+      unlock();
+      return nullptr;
+    }
+
     if( !prepareStatements() )
     {
       unlock();
@@ -223,7 +228,7 @@ Sapphire::Db::DbConnection::query( std::shared_ptr< Sapphire::Db::PreparedStatem
     }
 
     // Prepared results keep using the MYSQL_STMT while fetching, so keep the
-    // connection leased until the result is destroyed, even when buffered.
+    // connection leased until the result is destroyed.
     result->setLifetimeGuard( makeConnectionLease( self ) );
 
     return result;

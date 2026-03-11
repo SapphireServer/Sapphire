@@ -7,6 +7,9 @@
 
 #include "Logging/Logger.h"
 
+#include <stdexcept>
+#include <thread>
+
 class PingOperation : public Sapphire::Db::Operation
 {
   bool execute() override
@@ -77,15 +80,17 @@ bool Sapphire::Db::DbWorkerPool< T >::prepareStatements()
   for( auto& connections : m_connections )
     for( auto& connection : connections )
     {
-      connection->lockIfReady();
+      while( !connection->lockIfReady() )
+        std::this_thread::yield();
+
       if( !connection->prepareStatements() )
       {
         connection->unlock();
         close();
         return false;
       }
-      else
-        connection->unlock();
+
+      connection->unlock();
     }
 
   return true;
@@ -119,7 +124,19 @@ Sapphire::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex in
 template< class T >
 std::string Sapphire::Db::DbWorkerPool< T >::escapeString( std::string_view str )
 {
-  return m_connections[ IDX_SYNCH ].front()->getConnection()->escapeString( str );
+  auto connection = getFreeConnection();
+
+  try
+  {
+    auto escaped = connection->getConnection()->escapeString( str );
+    connection->unlock();
+    return escaped;
+  }
+  catch( ... )
+  {
+    connection->unlock();
+    throw;
+  }
 }
 
 template< class T >
@@ -182,12 +199,17 @@ std::shared_ptr< T > Sapphire::Db::DbWorkerPool< T >::getFreeConnection()
   const auto numCons = m_connections[ IDX_SYNCH ].size();
   std::shared_ptr< T > connection = nullptr;
 
+  if( numCons == 0 )
+    throw std::runtime_error( "DbWorkerPool::getFreeConnection requires at least one synchronous connection" );
+
   while( true )
   {
     connection = m_connections[ IDX_SYNCH ][ i++ % numCons ];
 
     if( connection->lockIfReady() )
       break;
+
+    std::this_thread::yield();
   }
 
   return connection;

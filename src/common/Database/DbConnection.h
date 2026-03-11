@@ -1,8 +1,8 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
 
@@ -92,7 +92,7 @@ namespace Sapphire::Db
     std::shared_ptr< Mysql::Connection > m_pConnection;
     ConnectionInfo& m_connectionInfo;
     ConnectionFlags m_connectionFlags;
-    std::mutex m_mutex;
+    std::atomic_bool m_inUse{ false };
 
     DbConnection( DbConnection const& right ) = delete;
 

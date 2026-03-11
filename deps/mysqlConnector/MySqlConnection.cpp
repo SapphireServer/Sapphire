@@ -253,7 +253,13 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
 
   if( mysql_real_connect( nativeConnection( m_pRawCon ), hostName.c_str(), userName.c_str(), password.c_str(),
                           nullptr, port, nullptr, 0 ) == nullptr )
-    throw std::runtime_error( mysql_error( nativeConnection( m_pRawCon ) ) );
+  {
+    const auto error = std::string( mysql_error( nativeConnection( m_pRawCon ) ) );
+    mysql_close( nativeConnection( m_pRawCon ) );
+    m_pRawCon = nullptr;
+    throw std::runtime_error( error );
+  }
+
   m_bConnected = true;
 }
 
@@ -275,13 +281,21 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
 
   if( mysql_real_connect( nativeConnection( m_pRawCon ), hostName.c_str(), userName.c_str(), password.c_str(),
                           nullptr, port, nullptr, 0 ) == nullptr )
-    throw std::runtime_error( mysql_error( nativeConnection( m_pRawCon ) ) );
+  {
+    const auto error = std::string( mysql_error( nativeConnection( m_pRawCon ) ) );
+    mysql_close( nativeConnection( m_pRawCon ) );
+    m_pRawCon = nullptr;
+    throw std::runtime_error( error );
+  }
 
   m_bConnected = true;
 }
 
 
-Mysql::Connection::~Connection() = default;
+Mysql::Connection::~Connection()
+{
+  close();
+}
 
 void Mysql::Connection::setOption( Option option, const void* arg )
 {
@@ -430,13 +444,19 @@ void Mysql::Connection::rollbackTransaction()
 
 std::string Mysql::Connection::escapeString( std::string_view inData )
 {
+  if( !m_pRawCon || isClosed() )
+    throw std::runtime_error( "Connection::escapeString requires an open connection" );
+
   std::string out( inData.length() * 2 + 1, '\0' );
 
-  auto length = mysql_real_escape_string(
-          nativeConnection( m_pRawCon ),
-          out.data(),
-          inData.data(),
-          static_cast< unsigned long >( inData.length() ) );
+  const auto length = mysql_real_escape_string(
+    nativeConnection( m_pRawCon ),
+    out.data(),
+    inData.data(),
+    static_cast< unsigned long >( inData.length() ) );
+
+  if( length == static_cast< unsigned long >( -1 ) )
+    throw std::runtime_error( "Connection::escapeString failed: " + getError() );
 
   out.resize( length );
   return out;
