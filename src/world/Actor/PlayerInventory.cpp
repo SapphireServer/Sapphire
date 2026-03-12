@@ -857,7 +857,7 @@ bool Player::updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem
         equipItem( static_cast< GearSetSlot >( slotId ), *pItem, true );
       }
       else if( pOldItem )
-        unequipItem( static_cast< GearSetSlot >( slotId ), *pItem, true );
+        unequipItem( static_cast< GearSetSlot >( slotId ), *pOldItem, true );
 
       writeInventory( static_cast< InventoryType >( storageId ) );
       break;

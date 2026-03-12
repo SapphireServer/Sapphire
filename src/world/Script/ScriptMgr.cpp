@@ -264,10 +264,10 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   // todo: this zone check might fumbling it. need testing
   if( auto instance = zone ? zone->getAsInstanceContent() : nullptr )
   {
-    auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( instance->getDirectorId() );
+    auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
     if( instanceScript )
     {
-      instanceScript->onTalk( eventId, player, actorId );
+      instanceScript->onTalk( *instance, player, eventId, actorId );
       return true;
     }
   }

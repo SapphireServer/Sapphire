@@ -692,8 +692,8 @@ bool Territory::isCellActive( uint32_t x, uint32_t y )
 
 void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
-  uint32_t endX = ( x + 1 < _sizeX ) ? x + 1 : ( _sizeX - 1 );
-  uint32_t endY = ( y + 1 < _sizeY ) ? y + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( x + radius < _sizeX ) ? x + radius : ( _sizeX - 1 );
+  uint32_t endY = ( y + radius < _sizeY ) ? y + radius : ( _sizeY - 1 );
     
   uint32_t startX = x - radius > 0 ? x - radius : 0;
   uint32_t startY = y - radius > 0 ? y - radius : 0;
