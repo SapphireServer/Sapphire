@@ -133,7 +133,7 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
   try
   {
     auto itemInfo = exdData.getRow< Excel::Item >( itemRes->getUInt( 1 ) );
-    bool isHq = itemRes->getUInt( 3 ) == 1;
+    bool isHq = ( itemRes->getUInt( 5 ) & HQ_FLAG_BIT ) != 0;
 
     ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
@@ -180,6 +180,7 @@ Common::ContainerType ItemMgr::getContainerType( uint32_t containerId )
 
 uint64_t ItemMgr::getNextUId()
 {
+  // todo: fix crosstalk bug here, we're possibly creating two items of the same id
   uint64_t charId;
 
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();

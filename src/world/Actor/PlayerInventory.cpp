@@ -802,8 +802,10 @@ Player::moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInve
   if( tmpItem == nullptr )
     return;
 
-  itemMap[ fromSlotId ].reset();
+  if( m_storageMap[ toInventoryId ]->getItem( toSlot ) )
+    return;
 
+  itemMap[ fromSlotId ].reset();
   m_storageMap[ toInventoryId ]->setItem( toSlot, tmpItem );
 
   writeInventory( static_cast< InventoryType >( toInventoryId ) );
@@ -847,7 +849,7 @@ bool Player::updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem
           unequipItem( static_cast< GearSetSlot >( slotId ), *pOldItem, false );
         equipItem( static_cast< GearSetSlot >( slotId ), *pItem, true );
       }
-      else
+      else if( pOldItem )
         unequipItem( static_cast< GearSetSlot >( slotId ), *pItem, true );
 
       writeInventory( static_cast< InventoryType >( storageId ) );
@@ -900,8 +902,9 @@ void Player::mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
   if( !fromItem || !toItem )
     return;
 
-  if( fromItem->getId() != toItem->getId() )
-    return;
+  if( fromItem->getId() != toItem->getId() ||
+    fromItem->isHq() != toItem->isHq() )
+  return;
 
   uint32_t stackSize = fromItem->getStackSize() + toItem->getStackSize();
   uint32_t stackOverflow = stackSize - std::min< uint32_t >( fromItem->getMaxStackSize(), stackSize );
@@ -911,18 +914,18 @@ void Player::mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
   {
     m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
     deleteItemDb( fromItem );
+    updateContainer( fromInventoryId, fromSlotId, nullptr );
   }
   else
   {
     fromItem->setStackSize( stackOverflow );
     writeItem( fromItem );
+    updateContainer( fromInventoryId, fromSlotId, fromItem );
   }
-
 
   toItem->setStackSize( stackSize );
   writeItem( toItem );
 
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
   updateContainer( toInventoryId, toSlot, toItem );
 }
 
@@ -945,7 +948,11 @@ void Player::swapItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t t
     auto& exdData = Common::Service< Data::ExdData >::ref();
     auto itemInfo = exdData.getRow< Excel::Item >( toItem->getId() );
     fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->data().Slot ) );
-    fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
+    auto freeSlot = m_storageMap[ fromInventoryId ]->getFreeSlot();
+    if( freeSlot < 0 )
+      return;
+
+    fromSlotId = static_cast< uint8_t >( freeSlot );
   }
 
   auto containerTypeFrom = World::Manager::ItemMgr::getContainerType( fromInventoryId );
@@ -965,6 +972,8 @@ void Player::discardItem( uint16_t fromInventoryId, uint16_t fromSlotId )
   uint32_t sequence = getNextInventorySequence();
 
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
+  if( !fromItem )
+    return;
 
   deleteItemDb( fromItem );
 

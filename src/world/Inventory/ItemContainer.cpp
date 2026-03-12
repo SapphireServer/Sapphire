@@ -79,7 +79,7 @@ int16_t Sapphire::ItemContainer::getFreeSlot()
 Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 {
 
-  if( ( slotId > m_size ) )
+  if( slotId >= m_size )
   {
     Logger::error( "Slot out of range {0}", slotId );
     return nullptr;

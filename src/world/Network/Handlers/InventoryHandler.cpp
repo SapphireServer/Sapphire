@@ -54,6 +54,10 @@ void Sapphire::Network::GameConnection::itemOperation( const Packets::FFXIVARR_P
 
     case Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_MOVEITEM: // move item action
     {
+      if( !player.isValidInventoryContainer( fromContainer ) ||
+          !player.isValidInventoryContainer( toContainer ) )
+        return;
+
       player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
     }
       break;

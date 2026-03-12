@@ -5,6 +5,7 @@
 #include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
+#include <type_traits>
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
@@ -708,9 +709,9 @@ ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity )
   if( !itemInfo )
     return nullptr;
 
-  uint8_t flags = 0;
+  uint8_t flags = isHq ? HQ_FLAG_BIT : 0;
 
-  ItemPtr pItem = make_Item( itemMgr.getNextUId(), catalogId );
+  ItemPtr pItem = make_Item( itemMgr.getNextUId(), catalogId, isHq );
 
   pItem->setStackSize( quantity );
 
