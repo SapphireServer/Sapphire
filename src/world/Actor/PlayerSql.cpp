@@ -698,7 +698,7 @@ void Player::insertDbQuest( const World::Quest& quest, uint8_t index ) const
   db.execute( stmt );
 }
 
-ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity )
+ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity, bool isHq )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();

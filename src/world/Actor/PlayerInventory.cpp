@@ -710,7 +710,8 @@ ItemPtr Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool 
   if( !foundFreeSlot )
     return nullptr;
 
-  auto item = createItem( catalogId, quantity );
+  auto item = createItem( catalogId, quantity, isHq );
+  // todo: this is erroneous and i will come back to it shortly
   item->setHq( isHq );
 
   auto storage = m_storageMap[ freeBagSlot.first ];

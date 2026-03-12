@@ -702,7 +702,7 @@ namespace Sapphire::Entity
     using InvSlotPair = std::pair< uint16_t, int8_t >;
     using InvSlotPairVec = std::vector< InvSlotPair >;
 
-    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
+    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false );
 
     bool loadInventory();
 
