@@ -1169,7 +1169,6 @@ void BNpc::resetFlags( uint32_t flags )
 void BNpc::setFlag( uint32_t flag )
 {
   uint32_t oldFlags = m_flags;
-  uint32_t oldFlags = m_flags;
   m_flags |= flag;
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
