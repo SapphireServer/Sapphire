@@ -93,7 +93,7 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 
 void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
 {
-  if( slotId > m_size )
+  if( slotId >= m_size )
   {
     Logger::error( "Unable to place item {}, {} exceeds max size of {}", pItem->getId(), slotId, m_size );
     return;
@@ -104,7 +104,7 @@ void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
 
 uint16_t Sapphire::ItemContainer::getMaxSize() const
 {
-  return m_size > 65536 ? 65536 : m_size;
+  return m_size;
 }
 
 std::string Sapphire::ItemContainer::getTableName() const
