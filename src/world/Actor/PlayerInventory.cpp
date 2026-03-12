@@ -552,7 +552,7 @@ void Player::writeInventory( InventoryType type )
 
   std::string query = "UPDATE " + storage->getTableName() + " SET ";
 
-  for( int32_t i = 0; i <= storage->getMaxSize(); i++ )
+  for( int32_t i = 0; i < storage->getMaxSize(); i++ )
   {
     auto currItem = storage->getItem( i );
 
