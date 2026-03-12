@@ -385,9 +385,6 @@ LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone
   auto plotPrice = pLand->getCurrentPrice();
   auto gilAvailable = player.getCurrency( Common::CurrencyType::Gil );
 
-  if( !pLand )
-    return LandPurchaseResult::ERR_INTERNAL;
-
   if( pLand->getStatus() != Common::HouseStatus::ForSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
 
@@ -937,9 +934,9 @@ void HousingMgr::updateHouseModels( HousePtr house )
       // but the models array starts from the 2nd entry of the enum
       // so we skip the first one, and then any subsequent entries is slotid - 1
 
-      auto slotId = item.first - 1;
-      if( slotId < 0 )
+      if( item.first == 0 )
         continue;
+      auto slotId = static_cast< uint16_t >( item.first - 1 );
 
       house->setExteriorModel( static_cast< Common::HouseExteriorSlot >( slotId ),
                                getItemAdditionalData( item.second->getId() ), item.second->getStain() );

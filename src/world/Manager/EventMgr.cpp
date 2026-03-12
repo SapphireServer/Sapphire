@@ -857,6 +857,12 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
   else if( paramCount < 255 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
+  
+  if( !pPacket )
+  {
+      Logger::error( "EventMgr: failed to allocate event packet for paramCount={}", paramCount );
+      return false;
+  }
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );

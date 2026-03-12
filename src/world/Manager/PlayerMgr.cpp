@@ -424,7 +424,7 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
       onLevelChanged( player, level );
     }
 
-    uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
+    neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
   }
 
   player.setCurrentExp( exp );
@@ -556,6 +556,9 @@ void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint32_t id )
     for( auto x = 0; x < 4; ++x )
     {
       auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
+      if( !note1 )
+        continue;
+
       if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;

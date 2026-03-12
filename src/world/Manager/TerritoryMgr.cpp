@@ -585,7 +585,10 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
     {
       auto zone = std::dynamic_pointer_cast< QuestBattle >( inIt->second );
       if( !zone )
+      {
+        ++inIt;
         continue;
+      }
 
       auto diff = std::difftime( tickCount, zone->getLastActivityTime() );
 
@@ -611,8 +614,11 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
     {
       auto zone = std::dynamic_pointer_cast< InstanceContent >( inIt->second );
       if( !zone )
+      {
+        ++inIt;
         continue;
-
+      }
+      
       if( zone->isTerminationReady() )
       {
         Logger::info( "Removing InstanceContent#{0} - marked for terminate", zone->getGuId() );
