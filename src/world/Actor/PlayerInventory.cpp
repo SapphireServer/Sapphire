@@ -510,6 +510,12 @@ ItemPtr Player::getItemAt( uint16_t containerId, uint16_t slotId )
   return m_storageMap[ containerId ]->getItem( slotId );
 }
 
+bool Player::isValidInventoryContainer( uint16_t containerId ) const
+{
+  const auto it = m_storageMap.find( containerId );
+  return it != m_storageMap.end() && it->second != nullptr;
+}
+
 
 uint32_t Player::getCurrency( CurrencyType type )
 {
