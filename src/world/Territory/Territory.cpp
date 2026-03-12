@@ -665,8 +665,8 @@ void Territory::updateSessions( uint64_t tickCount, bool changedWeather )
 
 bool Territory::isCellActive( uint32_t x, uint32_t y )
 {
-  uint32_t endX = ( cellX + 1 < _sizeX ) ? cellX + 1 : ( _sizeX - 1 );
-  uint32_t endY = ( cellY + 1 < _sizeY ) ? cellY + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( x + 1 < _sizeX ) ? x + 1 : ( _sizeX - 1 );
+  uint32_t endY = ( y + 1 < _sizeY ) ? y + 1 : ( _sizeY - 1 );
 
   uint32_t startX = x > 0 ? x - 1 : 0;
   uint32_t startY = y > 0 ? y - 1 : 0;
@@ -692,8 +692,8 @@ bool Territory::isCellActive( uint32_t x, uint32_t y )
 
 void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
-  uint32_t endX = ( cellX + 1 < _sizeX ) ? cellX + 1 : ( _sizeX - 1 );
-  uint32_t endY = ( cellY + 1 < _sizeY ) ? cellY + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( x + 1 < _sizeX ) ? x + 1 : ( _sizeX - 1 );
+  uint32_t endY = ( y + 1 < _sizeY ) ? y + 1 : ( _sizeY - 1 );
     
   uint32_t startX = x - radius > 0 ? x - radius : 0;
   uint32_t startY = y - radius > 0 ? y - radius : 0;
