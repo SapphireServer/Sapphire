@@ -72,24 +72,19 @@ void Sapphire::Cell::setActivity( bool state )
 
 void Sapphire::Cell::removeActors()
 {
-  //uint32_t ltime = getMSTime();
-
-  m_actors.clear();
-
-  //This time it's simpler! We just remove everything
-  Entity::GameObjectPtr pAct; //do this outside the loop!
+  /*
   for( auto itr = m_actors.begin(); itr != m_actors.end(); )
   {
-    pAct = ( *itr );
-    itr++;
+    auto pAct = ( *itr );
+    ++itr;
 
     if( !pAct )
-    {
       continue;
-    }
 
-  }
+    // todo: actor clean up goes here
+  }*/
 
+  m_actors.clear();
   m_playerCount = 0;
 }
 
