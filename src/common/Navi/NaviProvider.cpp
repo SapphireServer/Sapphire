@@ -3,6 +3,7 @@
 
 #include <Random/RNGMgr.h>
 
+#include "NavMeshCacheIO.h"
 #include "NaviProvider.h"
 
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
@@ -10,6 +11,7 @@
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <filesystem>
+#include <fstream>
 #include <Service.h>
 
 Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
@@ -519,52 +521,36 @@ std::vector< Sapphire::Common::Vector3 >
 
 bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
 {
-  FILE* fp = fopen( path.c_str(), "rb" );
-  if( !fp )
+  std::ifstream fp( path, std::ios::binary );
+  if( !fp.is_open() )
   {
     Logger::error( "Couldn't open navimesh file: {0}", path );
     return false;
   }
 
-  if( !fp ) return false;
-
   // Read header.
   TileCacheSetHeader header;
-  size_t headerReadReturnCode = fread( &header, sizeof( TileCacheSetHeader ), 1, fp );
-  if( headerReadReturnCode != 1 )
+  fp.read( reinterpret_cast<char*>( &header ), sizeof( TileCacheSetHeader ) );
+  if( !fp || header.magic != TILECACHESET_MAGIC || header.version != TILECACHESET_VERSION )
   {
-    // Error or early EOF
-    fclose( fp );
-    return false;
-  }
-  if( header.magic != TILECACHESET_MAGIC )
-  {
-    fclose( fp );
-    return false;
-  }
-  if( header.version != TILECACHESET_VERSION )
-  {
-    fclose( fp );
     return false;
   }
 
   m_naviMesh = dtAllocNavMesh();
   if( !m_naviMesh )
   {
-    fclose( fp );
     return false;
   }
+  
   dtStatus status = m_naviMesh->init( &header.meshParams );
   if( dtStatusFailed( status ) )
   {
-    fclose( fp );
     return false;
   }
 
   m_tileCache = dtAllocTileCache();
   if( !m_tileCache )
   {
-    fclose( fp );
     return false;
   }
   if( m_talloc )
@@ -584,33 +570,78 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
     Logger::error( "dtTileCache::init failed with status {:#x} for zone {}", status, path );
     dtFreeTileCache( m_tileCache );
     m_tileCache = nullptr;
-    fclose( fp );
     return false;
   }
+
+  auto resetNavMesh = [ this, &header, &path ]() -> bool
+  {
+    if( m_naviMesh )
+    {
+      dtFreeNavMesh( m_naviMesh );
+      m_naviMesh = nullptr;
+    }
+
+    m_naviMesh = dtAllocNavMesh();
+    if( !m_naviMesh )
+    {
+      Logger::error( "Unable to allocate navmesh while resetting cache load for {0}", path );
+      return false;
+    }
+
+    dtStatus resetStatus = m_naviMesh->init( &header.meshParams );
+    if( dtStatusFailed( resetStatus ) )
+    {
+      Logger::error( "Unable to reinitialize navmesh while resetting cache load for {0}", path );
+      return false;
+    }
+
+    return true;
+  };
+
+  bool loadedFromCache = false;
+  // todo: allow nav cache to be optional from config.ini??? unsure
+  const std::filesystem::path navPath( path );
+  const std::filesystem::path cachePath = getNavMeshCachePath( navPath );
+
+  if( isNavMeshCacheFresh( navPath, cachePath ) )
+  {
+    std::string cacheError;
+    if( loadNavMeshCache( cachePath, m_naviMesh, &cacheError ) )
+    {
+      loadedFromCache = true;
+      Logger::info( "Loaded navmesh from fast-cache for {}", path );
+    }
+    else
+    {
+      Logger::warn( "Rejected navmesh cache {}: {}", cachePath.string(), cacheError );
+      if( !resetNavMesh() )
+      {
+        return false;
+      }
+    }
+  }
+
+  const bool rebuildNavMesh = !loadedFromCache;
 
   // Read tiles.
   for( int i = 0; i < header.numTiles; ++i )
   {
     TileCacheTileHeader tileHeader;
-    size_t tileHeaderReadReturnCode = fread( &tileHeader, sizeof( tileHeader ), 1, fp );
-    if( tileHeaderReadReturnCode != 1 )
+    fp.read( reinterpret_cast<char*>( &tileHeader ), sizeof( tileHeader ) );
+    if( !fp )
     {
-      // Error or early EOF
-      fclose( fp );
-      return false;
+      return false; // eof or navmesh is porked as hell
     }
     if( !tileHeader.tileRef || !tileHeader.dataSize )
       break;
 
-    unsigned char* data = ( unsigned char* ) dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM );
+    auto* data = static_cast< unsigned char* >( dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM ) );
     if( !data ) break;
     memset( data, 0, tileHeader.dataSize );
-    size_t tileDataReadReturnCode = fread( data, tileHeader.dataSize, 1, fp );
-    if( tileDataReadReturnCode != 1 )
+    fp.read( reinterpret_cast< char* >( data ), tileHeader.dataSize );
+    if( !fp )
     {
-      // Error or early EOF
       dtFree( data );
-      fclose( fp );
       return false;
     }
 
@@ -622,11 +653,24 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
       dtFree( data );
     }
 
-    if( tile )
+    if( tile && rebuildNavMesh )
       m_tileCache->buildNavMeshTile( tile, m_naviMesh );
   }
 
-  fclose( fp );
+  fp.close();
+
+  if( rebuildNavMesh )
+  {
+    std::string cacheError;
+    if( writeNavMeshCache( cachePath, m_naviMesh, &cacheError ) )
+    {
+      Logger::info( "Created fast-cache navmesh for {}", path );
+    }
+    else
+    {
+      Logger::warn( "Unable to write fast-cache navmesh for {}: {}", path, cacheError );
+    }
+  }
 
   return true;
 }

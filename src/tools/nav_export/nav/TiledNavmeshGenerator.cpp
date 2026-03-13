@@ -1,7 +1,9 @@
 #include "TiledNavmeshGenerator.h"
+#include "Navi/NavMeshCacheIO.h"
 
 #include <filesystem>
 #include <cstring>
+#include <fstream>
 
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 #include <recastnavigation/RecastDemo/Source/InputGeom.cpp>
@@ -14,7 +16,7 @@
 #endif
 namespace fs = std::filesystem;
 
-
+// todo: change all this to use c++ streams tbh
 FileIO::~FileIO()
 {
   if( fp )
@@ -279,7 +281,6 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
 {
   assert( m_navMesh );
 
-  // fuck this gay earth
   auto mesh = const_cast< const dtNavMesh* >( m_navMesh );
   auto tileCache = const_cast< const dtTileCache* >( m_tileCache );
 
@@ -288,11 +289,11 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
 
   fs::create_directories( dir );
 
-  FILE* fp = fopen( fileName.string().c_str(), "wb" );
-  if( !fp )
+  std::ofstream out( fileName, std::ios::binary );
+  if( !out.is_open() )
     return;
 
-	// Store header.
+  // Store header.
   TileCacheSetHeader header;
   header.magic = TILECACHESET_MAGIC;
   header.version = TILECACHESET_VERSION;
@@ -300,29 +301,51 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
   for( int i = 0; i < m_tileCache->getTileCount(); ++i )
   {
     const dtCompressedTile* tile = m_tileCache->getTile( i );
-    if( !tile || !tile->header || !tile->dataSize ) continue;
+    if( !tile || !tile->header || !tile->dataSize )
+      continue;
     header.numTiles++;
   }
 
   memcpy( &header.cacheParams, m_tileCache->getParams(), sizeof( dtTileCacheParams ) );
   memcpy( &header.meshParams, m_navMesh->getParams(), sizeof( dtNavMeshParams ) );
-  fwrite( &header, sizeof( TileCacheSetHeader ), 1, fp );
+  out.write( reinterpret_cast< const char* >( &header ), sizeof( TileCacheSetHeader ) );
+  if( !out )
+    return;
 
   // Store tiles.
   for( int i = 0; i < m_tileCache->getTileCount(); ++i )
   {
     const dtCompressedTile* tile = m_tileCache->getTile( i );
-    if( !tile || !tile->header || !tile->dataSize ) continue;
+    if( !tile || !tile->header || !tile->dataSize )
+      continue;
 
     TileCacheTileHeader tileHeader;
     tileHeader.tileRef = m_tileCache->getTileRef( tile );
     tileHeader.dataSize = tile->dataSize;
-    fwrite( &tileHeader, sizeof( tileHeader ), 1, fp );
+    out.write( reinterpret_cast< const char* >( &tileHeader ), sizeof( tileHeader ) );
+    if( !out )
+      return;
 
-    fwrite( tile->data, tile->dataSize, 1, fp );
+    out.write( reinterpret_cast< const char* >( tile->data ), tile->dataSize );
+    if( !out )
+      return;
   }
 
-  fclose( fp );
+  out.flush();
+  if( !out )
+    return;
+
+  out.close();
+  if( out.fail() )
+    return;
+
+  // export navmesh_cache file so server inits faster
+  const auto cacheFileName = Sapphire::Common::Navi::getNavMeshCachePath( fileName );
+  std::string cacheError;
+  if( !Sapphire::Common::Navi::writeNavMeshCache( cacheFileName, mesh, &cacheError ) )
+  {
+    printf( "[Navmesh] Failed to export navmesh_cache to %s (%s)\n", cacheFileName.string().c_str(), cacheError.c_str() );
+  }
 }
 
 bool TiledNavmeshGenerator::buildNavmesh()
