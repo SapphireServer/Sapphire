@@ -516,7 +516,7 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     return std::make_pair( static_cast< uint32_t >( dmg.first ), dmg.second );
   };
 
-  Common::BaseParam calcStat;
+  Common::BaseParam calcStat = Common::BaseParam::Strength;;
   switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
   {
     case Common::ClassJob::Conjurer:
@@ -543,13 +543,14 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     calcStat = Common::BaseParam::Dexterity;
 
   auto wepDmg = m_pSource->getPhysicalWeaponDamage();
+  // We assume that the attack scales with magical weapon damage if the main stat of the attack is INT (probably for MND too but there shouldn't be any attacks that scale with MNDs)
+  if( calcStat == Common::BaseParam::Intelligence )
+    wepDmg = m_pSource->getMagicalWeaponDamage();
 
+
+  // todo: do we still need that player check for auto attacks?
   if( auto player = m_pSource->getAsPlayer() )
   {
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-      wepDmg = player->getMagicalWeaponDamage();
-
     // is auto attack
     if( getId() == 7 || getId() == 8 )
       return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg ) );
