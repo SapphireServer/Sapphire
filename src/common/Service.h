@@ -3,110 +3,90 @@
 #include <memory>
 #include <utility>
 #include <cassert>
+#include <typeindex>
+#include <string>
+
+#include "ServiceRegistry.h"
 
 // stolen from: https://github.com/skypjack/entt/blob/master/src/entt/locator/locator.hpp
 
 namespace Sapphire::Common
 {
   /**
-   * @brief Service locator, nothing more.
+   * @brief Service locator with cross-module registry.
    *
-   * A service locator can be used to do what it promises: locate services.<br/>
-   * Usually service locators are tightly bound to the services they expose and
-   * thus it's hard to define a general purpose class to do that. This template
-   * based implementation tries to fill the gap and to get rid of the burden of
-   * defining a different specific locator for each application.
+   * Backed by a process-wide registry implemented in the 'common' shared library,
+   * so all DLLs and the main executable see the same services.
    *
    * @tparam SvcType Type of service managed by the locator.
    */
   template< typename SvcType >
   struct Service
   {
-    /*! @brief Type of service offered. */
     using ServiceType = SvcType;
 
-    /*! @brief Default constructor, deleted on purpose. */
     Service() = delete;
 
-    /*! @brief Default destructor, deleted on purpose. */
     ~Service() = delete;
 
-    /**
-     * @brief Tests if a valid service implementation is set.
-     * @return True if the service is set, false otherwise.
-     */
     static bool empty() noexcept
     {
-      return !static_cast< bool >( service );
+      return !static_cast< bool >( slot() );
     }
 
-    /**
-     * @brief Returns a weak pointer to a service implementation, if any.
-     *
-     * Clients of a service shouldn't retain references to it. The recommended
-     * way is to retrieve the service implementation currently set each and
-     * every time the need of using it arises. Otherwise users can incur in
-     * unexpected behaviors.
-     *
-     * @return A reference to the service implementation currently set, if any.
-     */
     static std::weak_ptr< SvcType > get() noexcept
     {
-      return service;
+      return std::reinterpret_pointer_cast< SvcType >( slot() );
     }
 
-    /**
-     * @brief Returns a weak reference to a service implementation, if any.
-     *
-     * Clients of a service shouldn't retain references to it. The recommended
-     * way is to retrieve the service implementation currently set each and
-     * every time the need of using it arises. Otherwise users can incur in
-     * unexpected behaviors.
-     *
-     * @warning
-     * In case no service implementation has been set, a call to this function
-     * results in undefined behavior.
-     *
-     * @return A reference to the service implementation currently set, if any.
-     */
     static SvcType& ref() noexcept
     {
-      return *service;
+      return *std::reinterpret_pointer_cast< SvcType >( slot() );
     }
 
-    /**
-     * @brief Sets or replaces a service.
-     * @tparam Impl Type of the new service to use.
-     * @tparam Args Types of arguments to use to construct the service.
-     * @param args Parameters to use to construct the service.
-     */
     template< typename Impl = SvcType, typename... Args >
-    static void set( Args&& ... args )
+    static void set( Args&&... args )
     {
-      service = std::make_shared< Impl >( std::forward< Args >( args )... );
+      // Construct the implementation, cast to the service base first to preserve pointer adjustment,
+      // then erase to void. This avoids losing the correct base subobject address in MI/VI cases.
+      auto impl = std::make_shared< Impl >( std::forward< Args >( args )... );
+      std::shared_ptr< SvcType > base = std::static_pointer_cast< SvcType >( impl );
+      std::shared_ptr< void > erased = base; // upcast keeps adjusted base pointer
+      slot() = std::move( erased );
     }
 
-    /**
-     * @brief Sets or replaces a service.
-     * @param ptr Service to use to replace the current one.
-     */
     static void set( std::shared_ptr< SvcType > ptr )
     {
-      assert( static_cast< bool >( ptr ) );
-      service = std::move( ptr );
+      assert( static_cast<bool>(ptr) );
+      std::shared_ptr< void > erased = std::move( ptr );
+      slot() = std::move( erased );
     }
 
-    /**
-     * @brief Resets a service.
-     *
-     * The service is no longer valid after a reset.
-     */
     static void reset()
     {
-      service.reset();
+      slot().reset();
     }
 
   private:
-    inline static std::shared_ptr< SvcType > service = nullptr;
+    static std::shared_ptr< void >& slot() noexcept
+    {
+      // Build a normalized key from RTTI name of pointer-to-type (avoids requiring complete type)
+      // Strip MSVC-specific "class " / "struct " prefixes to ensure the same key across TUs/libraries.
+      static const std::string key = []
+      {
+        std::string s = typeid( SvcType * ).name();
+        auto erase_all = [&]( const char *token )
+        {
+          const size_t n = std::char_traits< char >::length( token );
+          size_t pos = 0;
+          while( ( pos = s.find( token, pos ) ) != std::string::npos )
+            s.erase( pos, n );
+        };
+        erase_all( "class " );
+        erase_all( "struct " );
+        return s;
+      }();
+      return Sapphire::Common::detail::service_slot_by_name( key );
+    }
   };
 }

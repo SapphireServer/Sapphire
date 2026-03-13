@@ -19,6 +19,11 @@ SkipOpening = true
 [Navigation]
 MeshPath = navi
 
+[Map]
+; true = eager preload ENpcBase/EObj sheets at startup (quests stay lazy)
+; false = fully lazy map data loading
+EagerENpcEObjCache = true
+
 [Housing]
 ; Set the default estate name. {0} will be replaced with the plot number
 DefaultEstateName = Estate ${0}

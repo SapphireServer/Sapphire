@@ -24,7 +24,7 @@ ActionIntegrityTask::ActionIntegrityTask( uint32_t resultId, Entity::CharaPtr pT
 
 void ActionIntegrityTask::onQueue()
 {
-  Logger::debug( { __FUNCTION__ } );
+//  Logger::debug( { __FUNCTION__ } );
 }
 
 void ActionIntegrityTask::execute()

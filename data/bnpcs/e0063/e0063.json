@@ -1,0 +1,594 @@
+{
+  "QB_ClsLnc004_002": {
+    "bnpcs": {
+      "4248895": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 8,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            0
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1745,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 128,
+          "equipmentId": 470,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248895,
+          "level": 20,
+          "nameId": 614,
+          "position": [
+            -218.6511993408203,
+            11.595230102539063,
+            40.506160736083984
+          ],
+          "rotation": -1.0432544946670532
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248927": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1741,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248927,
+          "level": 21,
+          "nameId": 1942,
+          "position": [
+            -229.8061981201172,
+            11.862910270690918,
+            22.80419921875
+          ],
+          "rotation": 0.7692350745201111
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248928": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1742,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248928,
+          "level": 20,
+          "nameId": 15,
+          "position": [
+            -233.2469024658203,
+            11.904970169067383,
+            25.52239990234375
+          ],
+          "rotation": 0.7692031264305115
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248929": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1742,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248929,
+          "level": 20,
+          "nameId": 15,
+          "position": [
+            -236.40550231933594,
+            11.724650382995605,
+            29.198999404907227
+          ],
+          "rotation": 0.9082847237586975
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248938": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1742,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248938,
+          "level": 20,
+          "nameId": 15,
+          "position": [
+            -248.614501953125,
+            11.659270286560059,
+            10.712470054626465
+          ],
+          "rotation": 0.4479893743991852
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248939": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1742,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248939,
+          "level": 20,
+          "nameId": 15,
+          "position": [
+            -245.9145965576172,
+            11.546480178833008,
+            9.172157287597656
+          ],
+          "rotation": 0.519738495349884
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248944": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1744,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248944,
+          "level": 20,
+          "nameId": 116,
+          "position": [
+            -250.84530639648438,
+            11.604100227355957,
+            2.7169649600982666
+          ],
+          "rotation": -0.0
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248945": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1744,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248945,
+          "level": 20,
+          "nameId": 116,
+          "position": [
+            -248.75439453125,
+            11.455169677734375,
+            1.6894869804382324
+          ],
+          "rotation": -0.0
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      },
+      "4248948": {
+        "Behaviour": {
+          "dropItem": 0,
+          "moveAI": 1,
+          "normalAI": 0,
+          "routeId": 0,
+          "serverPathId": 0,
+          "territoryRange": 0,
+          "wanderingRange": 6
+        },
+        "SenseInfo": {
+          "Sense": [
+            3,
+            0
+          ],
+          "SenseRange": [
+            80,
+            10
+          ],
+          "senseRangeRate": 0.0,
+          "territoryRange": 0
+        },
+        "baseInfo": {
+          "activeType": 0,
+          "baseId": 1743,
+          "bnpcRankId": 0,
+          "boundInstanceId": 0,
+          "customizeId": 0,
+          "equipmentId": 0,
+          "fateLayoutLabelId": 0,
+          "groupId": 92103,
+          "instanceId": 4248948,
+          "level": 20,
+          "nameId": 56,
+          "position": [
+            -250.8748016357422,
+            11.476019859313965,
+            -0.09466428309679031
+          ],
+          "rotation": -0.0
+        },
+        "linkData": {
+          "linkCountLimit": 0,
+          "linkFamily": 0,
+          "linkGroup": 0,
+          "linkOverride": 0,
+          "linkParent": 0,
+          "linkRange": 0,
+          "linkReply": 0
+        },
+        "popInfo": {
+          "horizontalPopRange": 0.0,
+          "invalidRepop": 0,
+          "nonpop": 1,
+          "nonpopInitZone": 0,
+          "popEvent": 0,
+          "popInterval": 120,
+          "popRate": 1,
+          "popTimeEnd": 0,
+          "popTimeStart": 0,
+          "popWeather": 0,
+          "repopId": 1,
+          "verticalPopRange": 1.0
+        }
+      }
+    },
+    "groupId": 92103,
+    "groupName": "QB_ClsLnc004_002",
+    "layerSetId": 92080
+  }
+}

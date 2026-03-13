@@ -82,7 +82,7 @@ void PartyMgr::onJoin( Entity::Player& joiner, Entity::Player& inviter )
   }
 }
 
-void PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
+void PartyMgr::onLeave( Sapphire::Entity::Player& leavingPlayer )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -109,12 +109,16 @@ void PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
     {
       if( member->getId() == leavingPlayer.getId() )
       {
-        member->removeOnlineStatus( { Common::OnlineStatus::PartyMember,
-                                      Common::OnlineStatus::PartyLeader } );
+        member->removeOnlineStatus( {
+          Common::OnlineStatus::PartyMember,
+          Common::OnlineStatus::PartyLeader
+        } );
 
-        server.queueForPlayer( leavingPlayer.getCharacterId() , makeZonePacket< FFXIVIpcUpdateParty >( leavingPlayer.getId() ) );
+        server.queueForPlayer( leavingPlayer.getCharacterId(),
+                               makeZonePacket< FFXIVIpcUpdateParty >( leavingPlayer.getId() ) );
         server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leadingPlayer, nullptr,
-                                                                               UpdateStatus::KICK_SELF, party->PartyCount ) );
+                                                                            UpdateStatus::KICK_SELF,
+                                                                            party->PartyCount ) );
       }
       else
       {
@@ -125,14 +129,15 @@ void PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
           if( !pPlayer || !pPlayer->isConnected() )
             continue;
           pPlayer->addOnlineStatus( Common::OnlineStatus::PartyLeader );
-          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), pPlayer,
-                                                                              UpdateStatus::LEAVELEADER_LEAVED_MEMBER, party->PartyCount ) );
+          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer, *pPlayer,
+                                                                              UpdateStatus::LEAVELEADER_LEAVED_MEMBER,
+                                                                              party->PartyCount ) );
         }
         else
         {
-          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), nullptr,
-                                                                              UpdateStatus::LEAVE_MEMBER, party->PartyCount ) );
-
+          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer,
+                                                                              UpdateStatus::LEAVE_MEMBER,
+                                                                              party->PartyCount ) );
         }
       }
     }
@@ -154,14 +159,17 @@ void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
   {
     removeMember( *party, member );
     member->removeOnlineStatus( { Common::OnlineStatus::PartyMember, Common::OnlineStatus::PartyLeader } );
-    server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( disbandingPlayer, disbandingPlayer, UpdateStatus::DISBAND, party->PartyCount ),
-                                                          makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+    server.queueForPlayer( member->getCharacterId(), {
+                             makePcPartyUpdate( disbandingPlayer, disbandingPlayer, UpdateStatus::DISBAND,
+                                                party->PartyCount ),
+                             makeZonePacket< FFXIVIpcUpdateParty >( member->getId() )
+                           } );
   }
 
   removeParty( party->PartyID );
 }
 
-void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
+void PartyMgr::onMoveZone( Sapphire::Entity::Player& movingPlayer )
 {
   if( movingPlayer.getPartyId() == 0 )
     return;
@@ -199,8 +207,10 @@ void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
   for( const auto& member : members )
   {
     // TODO: 2nd argument here makes it automatically send passing leadership message
-    server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( disconnectingPlayer, UpdateStatus::OFFLINE_MEMBER, party->PartyCount ),
-                                                       makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+    server.queueForPlayer( member->getCharacterId(), {
+                             makePcPartyUpdate( disconnectingPlayer, UpdateStatus::OFFLINE_MEMBER, party->PartyCount ),
+                             makeZonePacket< FFXIVIpcUpdateParty >( member->getId() )
+                           } );
   }
 
   sendPartyUpdate( *party );
@@ -214,20 +224,13 @@ void PartyMgr::onMemberRejoin( Entity::Player& joiningPlayer )
   // TODO: do we need a party update here? move zone handler already handles it
 }
 
-void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader )
+void PartyMgr::onKick( const Entity::Player& kickedPlayer, const Entity::Player& leader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto party = getParty( leader.getPartyId() );
   assert( party );
   auto pLeader = getPartyLeader( *party );
   auto members = getPartyMembers( *party );
-  auto pKickedPlayer = playerMgr.getPlayer( kickPlayerName );
-  if( !pKickedPlayer )
-  {
-    Logger::error( "Target player for kicking not found (\"{t}\")", kickPlayerName );
-    return;
-  }
 
   if( party->PartyCount == 2 )
   {
@@ -235,19 +238,22 @@ void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader
   }
   else
   {
-    for( const auto &member: members )
+    for( const auto& member : members )
     {
-      if( kickPlayerName == member->getName() )
+      if( kickedPlayer.getId() == member->getId() )
       {
         removeMember( *party, member );
         member->removeOnlineStatus( Common::OnlineStatus::PartyMember );
 
-        server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( *pLeader, *member, UpdateStatus::KICK_SELF, party->PartyCount ),
-                                                           makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+        server.queueForPlayer( member->getCharacterId(), {
+                                 makePcPartyUpdate( *pLeader, *member, UpdateStatus::KICK_SELF, party->PartyCount ),
+                                 makeZonePacket< FFXIVIpcUpdateParty >( member->getId() )
+                               } );
       }
       else
       {
-        server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( *pKickedPlayer, UpdateStatus::KICK_MEMBER, party->PartyCount ) );
+        server.queueForPlayer( member->getCharacterId(),
+                               makePcPartyUpdate( kickedPlayer, UpdateStatus::KICK_MEMBER, party->PartyCount ) );
       }
     }
     party->PartyCount--;
@@ -255,31 +261,22 @@ void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader
   }
 }
 
-void PartyMgr::onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader )
+void PartyMgr::onChangeLeader( Entity::Player& newLeader, Entity::Player& oldLeader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto party = getParty( oldLeader.getPartyId() );
-
-  auto pNewLeader = playerMgr.getPlayer( newLeaderName );
-
-  if( !pNewLeader )
-  {
-    Logger::error( "Target player for new leader not found (\"{t}\")", newLeaderName );
-    return;
-  }
 
   for( auto memberId : party->MemberId )
   {
-    if( memberId == pNewLeader->getId() )
+    if( memberId == newLeader.getId() )
     {
-      pNewLeader->addOnlineStatus( Common::OnlineStatus::PartyLeader );
+      newLeader.addOnlineStatus( Common::OnlineStatus::PartyLeader );
       // this is not ideal, probably better to have a function which can add
       // and remove at the same time so packets are only triggered once
       oldLeader.addOnlineStatus( Common::OnlineStatus::PartyMember );
       oldLeader.removeOnlineStatus( Common::OnlineStatus::PartyLeader );
 
-      party->LeaderId = pNewLeader->getId();
+      party->LeaderId = newLeader.getId();
       break;
     }
   }
@@ -287,7 +284,7 @@ void PartyMgr::onChangeLeader( const std::string& newLeaderName, Entity::Player&
   auto members = getPartyMembers( *party );
   for( auto& member : members )
   {
-    auto pcUpdateParty = makePcPartyUpdate( oldLeader.getAsPlayer(), pNewLeader, UpdateStatus::CHANGELEADER, party->PartyCount );
+    auto pcUpdateParty = makePcPartyUpdate( oldLeader, newLeader, UpdateStatus::CHANGELEADER, party->PartyCount );
     server.queueForPlayer( member->getCharacterId(), pcUpdateParty );
   }
 
@@ -423,7 +420,7 @@ void PartyMgr::removeParty( uint64_t partyId )
   m_partyIdMap.erase( partyId );
 }
 
-int8_t PartyMgr::getPartyLeaderIndex( const Party &party )
+int8_t PartyMgr::getPartyLeaderIndex( const Party& party )
 {
   size_t idx = 0;
   for( const auto& memberId : party.MemberId )
@@ -435,10 +432,11 @@ int8_t PartyMgr::getPartyLeaderIndex( const Party &party )
   return -1;
 }
 
-void PartyMgr::removeMember( Party &party, const Entity::PlayerPtr& pMember )
+void PartyMgr::removeMember( Party& party, const Entity::PlayerPtr& pMember )
 {
   auto& ccMgr = Common::Service< World::Manager::ChatChannelMgr >::ref();
   pMember->setPartyId( 0 );
   ccMgr.removeFromChannel( party.ChatChannel, *pMember );
-  party.MemberId.erase( std::remove( party.MemberId.begin(), party.MemberId.end(), pMember->getId() ), party.MemberId.end() );
+  party.MemberId.erase( std::remove( party.MemberId.begin(), party.MemberId.end(), pMember->getId() ),
+                        party.MemberId.end() );
 }

@@ -18,6 +18,7 @@
 
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
 
 #include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
@@ -36,13 +37,43 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 
-Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( uint32_t entityId ) const
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapById.find( entityId );
 
   if( it != m_playerMapById.end() )
-    return ( it->second );
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( uint64_t characterId ) const
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByCharacterId.find( characterId );
+
+  if( it != m_playerMapByCharacterId.end() )
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::findPlayer( const std::string& playerName ) const
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByName.find( playerName );
+
+  if( it != m_playerMapByName.end() )
+    return it->second;
+
+  return nullptr;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
+{
+  if( auto pPlayer = findPlayer( entityId ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( entityId );
@@ -50,11 +81,8 @@ Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
 
 Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint64_t characterId )
 {
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByCharacterId.find( characterId );
-
-  if( it != m_playerMapByCharacterId.end() )
-    return ( it->second );
+  if( auto pPlayer = findPlayer( characterId ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( characterId );
@@ -62,11 +90,8 @@ Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint64_t characterId )
 
 Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( const std::string& playerName )
 {
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByName.find( playerName );
-
-  if( it != m_playerMapByName.end() )
-    return ( it->second );
+  if( auto pPlayer = findPlayer( playerName ) )
+    return pPlayer;
 
   // not found (new character?) - we'll load from DB and hope it's there
   return loadPlayer( playerName );
@@ -88,16 +113,14 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
 {
   if( !forceDbLoad )
   {
-    auto it = m_playerMapByCharacterId.find( characterId );
-
-    if( it != m_playerMapByCharacterId.end() )
-      return ( it->second->getName() );
+    if( auto pPlayer = findPlayer( characterId ) )
+      return pPlayer->getName();
   }
 
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
 
-  if( !res->next() )
+  if( !res || !res->next() )
     return "Obtaining Signature";
 
   std::string playerName = res->getString( 1 );
@@ -139,11 +162,15 @@ Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( uint64_t characterId )
 Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( const std::string& playerName )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_BY_NAME );
+  stmt->setString( 1, playerName );
+
+  auto res = db.query( stmt );
   if( !res || !res->next() )
     return nullptr;
 
   uint64_t characterId = res->getUInt64( 1 );
+  res.reset();
 
   return addPlayer( characterId );
 }
@@ -152,6 +179,8 @@ bool PlayerMgr::loadPlayers()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo" );
+  if( !res )
+    return false;
 
   // no players or failed
   while( res->next() )
@@ -305,6 +334,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
 void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 {
+  // todo: shouldnt all this be in Player::update()?
   if( player.getHp() <= 0 && player.getStatus() != Common::ActorStatus::Dead )
   {
     player.die();
@@ -315,12 +345,24 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
     return;
 
   checkAutoAttack( player, tickCount );
+
+  /*
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( pTeri )
+  {
+    auto pNaviProvider = pTeri->getNaviProvider();
+    // update with speed 0 to essentially have them as an obstacle
+    if( pNaviProvider )
+      pNaviProvider->updateAgentPosition( player.getAgentId(), player.getPos(), 1.0f, 0.0f );
+  }
+  //*/
 }
 
 void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
 {
   auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
-  if( !mainWeap || player.checkAction() || !player.isAutoattackOn() || !player.getTargetId() || player.getStance() != Common::Active )
+  if( !mainWeap || player.hasAction() || !player.isAutoattackOn() || !player.getTargetId() || player.getStance() != Common::Active )
     return;
 
   for( const auto& actor : player.getInRangeActors() )
@@ -480,7 +522,7 @@ void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battl
                                          param1, param2, param3, param4, param5, param6, param7, param8 );
 }
 
-void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
+void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint32_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
   const auto maxRank = 4;

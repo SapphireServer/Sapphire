@@ -1,13 +1,14 @@
 #include "DbWorkerPool.h"
 #include "DbConnection.h"
 #include "PreparedStatement.h"
-#include <MySqlConnector.h>
 #include "StatementTask.h"
 #include "Operation.h"
 #include "ZoneDbConnection.h"
 
 #include "Logging/Logger.h"
-#include <mysql.h>
+
+#include <stdexcept>
+#include <thread>
 
 class PingOperation : public Sapphire::Db::Operation
 {
@@ -79,15 +80,17 @@ bool Sapphire::Db::DbWorkerPool< T >::prepareStatements()
   for( auto& connections : m_connections )
     for( auto& connection : connections )
     {
-      connection->lockIfReady();
+      while( !connection->lockIfReady() )
+        std::this_thread::yield();
+
       if( !connection->prepareStatements() )
       {
         connection->unlock();
         close();
         return false;
       }
-      else
-        connection->unlock();
+
+      connection->unlock();
     }
 
   return true;
@@ -95,15 +98,12 @@ bool Sapphire::Db::DbWorkerPool< T >::prepareStatements()
 
 template< class T >
 std::shared_ptr< Mysql::ResultSet >
-Sapphire::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection )
+Sapphire::Db::DbWorkerPool< T >::query( const std::string& sql, std::shared_ptr< T > connection, bool streaming )
 {
   if( !connection )
     connection = getFreeConnection();
 
-  std::shared_ptr< Mysql::ResultSet > result = connection->query( sql );
-  connection->unlock();
-
-  return result;
+  return connection->query( sql, streaming );
 }
 
 template< class T >
@@ -111,10 +111,7 @@ std::shared_ptr< Mysql::PreparedResultSet >
 Sapphire::Db::DbWorkerPool< T >::query( std::shared_ptr< PreparedStatement > stmt )
 {
   auto connection = getFreeConnection();
-  auto ret = std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
-  connection->unlock();
-
-  return ret;
+  return std::static_pointer_cast< Mysql::PreparedResultSet >( connection->query( stmt ) );
 }
 
 template< class T >
@@ -125,15 +122,21 @@ Sapphire::Db::DbWorkerPool< T >::getPreparedStatement( PreparedStatementIndex in
 }
 
 template< class T >
-void Sapphire::Db::DbWorkerPool< T >::escapeString( std::string& str )
+std::string Sapphire::Db::DbWorkerPool< T >::escapeString( std::string_view str )
 {
-  if( str.empty() )
-    return;
+  auto connection = getFreeConnection();
 
-  char* buf = new char[str.size() * 2 + 1];
-  escapeString( buf, str.c_str(), str.size() );
-  str = buf;
-  delete[] buf;
+  try
+  {
+    auto escaped = connection->getConnection()->escapeString( str );
+    connection->unlock();
+    return escaped;
+  }
+  catch( ... )
+  {
+    connection->unlock();
+    throw;
+  }
 }
 
 template< class T >
@@ -159,8 +162,7 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, u
   for( uint8_t i = 0; i < numConnections; ++i )
   {
     // Create the connection
-    auto connection = [ & ]
-    {
+    auto connection = [ & ] {
       switch( type )
       {
         case IDX_ASYNC:
@@ -185,16 +187,6 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, u
 }
 
 template< class T >
-unsigned long Sapphire::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, size_t length )
-{
-  if( !to || !from || !length )
-    return 0;
-
-  return mysql_real_escape_string(
-    m_connections[ IDX_SYNCH ].front()->getConnection()->getRawCon(), to, from, static_cast< unsigned long >( length ) );
-}
-
-template< class T >
 void Sapphire::Db::DbWorkerPool< T >::enqueue( std::shared_ptr< Operation > op )
 {
   m_queue->push( op );
@@ -207,12 +199,17 @@ std::shared_ptr< T > Sapphire::Db::DbWorkerPool< T >::getFreeConnection()
   const auto numCons = m_connections[ IDX_SYNCH ].size();
   std::shared_ptr< T > connection = nullptr;
 
+  if( numCons == 0 )
+    throw std::runtime_error( "DbWorkerPool::getFreeConnection requires at least one synchronous connection" );
+
   while( true )
   {
     connection = m_connections[ IDX_SYNCH ][ i++ % numCons ];
 
     if( connection->lockIfReady() )
       break;
+
+    std::this_thread::yield();
   }
 
   return connection;
@@ -254,5 +251,4 @@ void Sapphire::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedSt
   connection->unlock();
 }
 
-template
-class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;
+template class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;

@@ -1,14 +1,26 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
 class UldahsMostWanted : public Sapphire::ScriptAPI::QuestBattleScript
 {
 private:
+  static constexpr auto INIT_POP_BOSS = 3983981; // Duskwight freelancer captain ( Pos: 7.250590 12.328980 31.341569  Teri: 141 )
+  static constexpr auto INIT_P_POP_BRUCE = 3977801; // Bruce the Big ( Pos: 20.077999 13.099220 53.796730  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_A_01 = 3977803; // Duskwight freelancer ( Pos: 10.177820 12.674599 34.741260  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_A_02 = 3977804; // Duskwight freelancer ( Pos: 8.259507 12.795539 36.157840  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_A_03 = 3977805; // Duskwight freelancer ( Pos: 5.835096 12.516369 37.926490  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_B_01 = 3977807; // Duskwight freelancer ( Pos: 36.684188 12.999919 90.764450  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_B_02 = 3977808; // Duskwight freelancer ( Pos: 33.570888 13.634929 91.804031  Teri: 141 )
+  static constexpr auto INIT_POP_ENEMY_B_03 = 3977809; // Duskwight freelancer ( Pos: 31.440240 13.170000 92.307830  Teri: 141 )
+  static constexpr auto INIT_ACTION_FLASH = 14; //Flash action
 
 public:
-  UldahsMostWanted() : Sapphire::ScriptAPI::QuestBattleScript( 49 )
+  UldahsMostWanted() : Sapphire::ScriptAPI::QuestBattleScript( 19 )
   { }
 
   void onInit( QuestBattle& instance ) override
@@ -124,18 +136,110 @@ public:
     instance.addEObj( "LaNosceanlilybell_2", 2000777, 0, 3782540, 4, { 68.917198f, 46.204788f, 676.176086f }, 0.869717f, 1.012555f, 0); 
 
   }
+  enum vars
+  {
+    Wave2,
+    Boss,
+    SuccessCalled
+  };
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( 0.f );
+    player.setPos( { 27.219801f, 13.000000f, 51.848900f } );
+  }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto wave2 = instance.getDirectorVar( Wave2 );
+    auto boss = instance.getDirectorVar( Boss );
+    auto successCalled = instance.getDirectorVar( SuccessCalled );
 
+    auto pPlayer = instance.getPlayerPtr();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( instance.getCountEnemyBNpc() == 0 )
+    {
+      if( wave2 == 0 )
+      {
+        // spawn wave 2:
+        //    2x lv8 1x lv9 south entrance
+        instance.setDirectorVar( Wave2, 1 );
+        auto b1 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_01, 1440 /* find real val */, Common::BNpcType::Enemy, pPlayer->getId() );
+        auto b2 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_02, 1440 /* find real val */, Common::BNpcType::Enemy, pPlayer->getId() );
+        auto b3 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_03, 1440 /* find real val */, Common::BNpcType::Enemy, pPlayer->getId() );
+        b1->setFlag( Entity::NoDeaggro );
+        b2->setFlag( Entity::NoDeaggro );
+        b3->setFlag( Entity::NoDeaggro );
+
+        b1->hateListAdd( pPlayer, 1 );
+        b2->hateListAdd( pPlayer, 1 );
+        b3->hateListAdd( pPlayer, 1 );
+        return;
+      }
+
+      if( boss == 0 )
+      {
+        // Todo: bruce talk on screen
+        // spawn boss:
+        //    1x duskwight freelancer captain lv10
+        instance.setDirectorVar( Boss, 1 );
+        auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 14000 /* find real val */, Common::BNpcType::Enemy, pPlayer->getId() );
+        boss->setFlag( Entity::NoDeaggro );
+
+        boss->hateListAdd( pPlayer, 1 );
+        return;
+      }
+
+      // duty complete
+      if( successCalled == 0 )
+      {
+        instance.setDirectorVar( SuccessCalled, 1 );
+        instance.success();
+        return;
+      }
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
-
+    player.setOnEnterEventDone( true );
   }
 
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    auto nextSeq = quest.getSeq() + 1;
+    quest.setSeq( nextSeq );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    // spawn bruce
+    auto bruce = instance.createBNpcFromLayoutId( INIT_P_POP_BRUCE, 14000 /* find real val */, Common::BNpcType::Friendly, player.getId() );
+
+    // spawn wave 1:
+    //    3x lv8 duskwight freelancer north entrance
+    auto a1 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_01, 1440 /* find real val */, Common::BNpcType::Enemy, player.getId() );
+    auto a2 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_02, 1440 /* find real val */, Common::BNpcType::Enemy, player.getId() );
+    auto a3 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_03, 1440 /* find real val */, Common::BNpcType::Enemy, player.getId() );
+    a1->setFlag( Entity::NoDeaggro );
+    a2->setFlag( Entity::NoDeaggro );
+    a3->setFlag( Entity::NoDeaggro );
+
+    a1->hateListAdd( player.getAsPlayer(), 1 );
+    a2->hateListAdd( player.getAsPlayer(), 1 );
+    a3->hateListAdd( player.getAsPlayer(), 1 );
+  }
 };
 
 EXPOSE_SCRIPT( UldahsMostWanted );

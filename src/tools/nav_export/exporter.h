@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "threadpool.h"
+#include "DatCategories/bg/vec3.h"
 
 enum ExportFileType : int
 {
@@ -50,6 +51,7 @@ struct ExportedZone
 {
   std::string name;
   std::map< std::string, ExportedGroup > groups;
+  std::vector< vec3 > mapRanges;
 };
 
 #endif

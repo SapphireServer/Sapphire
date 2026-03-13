@@ -6,6 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
+#include "DatCategories/InstanceObject.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -815,7 +816,7 @@ namespace Sapphire::Common
   {
     uint32_t id;
     uint32_t teri;
-    FFXIVARR_POSITION3 pos;
+    Vector3 pos;
     float radius;
   };
 
@@ -934,20 +935,23 @@ namespace Sapphire::Common
 
   enum class StatusEffectFlag : uint32_t
   {
-    BuffCategory = 1,
-    DebuffCategory = 2,
-    Permanent = 4,
-    IsGaze = 8,
-    Transfiguration = 16,
-    CanDispel = 32,
-    LockActions = 64,
-    LockControl = 128,
-    LockMovement = 256,
-    Invisibilty = 512,
-    CanStatusOff = 1024,
-    FcBuff = 2048,
-    RemoveOnSuccessfulHit = 4096,
-    ReplaceSameCaster = 8192
+    BuffCategory = 0x01,
+    DebuffCategory = 0x02,
+    Permanent = 0x04,
+    IsGaze = 0x08,
+    Transfiguration = 0x10,
+    CanDispel = 0x20,
+    LockActions = 0x40,
+    LockControl = 0x80,
+    LockMovement = 0x100,
+    Invisibilty = 0x200,
+    CanStatusOff = 0x400,
+    FcBuff = 0x800,
+    RemoveOnSuccessfulHit = 0x1000,
+    ReplaceSameCaster = 0x2000,
+    GroundTarget = 0x4000,
+    RemoveOnDeath = 0x8000,
+    RemoveOnActionUse = 0x10000
   };
 
   enum class StatusRefreshPolicy : uint8_t
@@ -958,6 +962,12 @@ namespace Sapphire::Common
     ExtendOrApply = 3,
     Reject = 4,
     Custom = 255
+  };
+
+  enum class GroundAOEType : uint8_t
+  {
+    Damage = 0,
+    Heal = 1
   };
 
   enum struct ActionAspect : uint8_t
@@ -1429,16 +1439,30 @@ namespace Sapphire::Common
   {
     None1 = 0,
     HideUILockChar = 1, // as the name suggests, hides the ui and logs the char...
-    InCombat = 18, // in Combat, locks gearchange/return/teleport
-    Casting = 19,
-    EventAction = 22,
-    InNpcEvent = 24, // when talking to an npc, locks ui giving "occupied" message
+
+    EventAction = 21,
+    InNpcEvent = 23, // when talking to an npc, locks ui giving "occupied" message
 
  //   InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-    BoundByDuty = 10,
-    BetweenAreas = 21,
-    WatchingCutscene = 34,
+    //fixed for 3.35
+
+    InCombat = 18, // in Combat, locks gearchange/return/teleport
+    Casting = 19,
+
+    BoundByDuty = 26,
+
+    Crafting = 32,
+    PreparingToCraft = 33,
+    Gathering = 34,
+    Fishing = 35,
+
+    BetweenAreas = 37,
+    Stealthed = 38,
+
+    AutoRunActive = 41,
+
+    WatchingCutscene = 50,
 
   };
 
@@ -1919,7 +1943,7 @@ namespace Sapphire::Common
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
   // todo: load BNpcBase and other exd data into this struct
-  struct BNPCInstanceObject
+  struct BNPCData
   {
     uint16_t territoryType;
     std::string bnpcName;
@@ -1957,7 +1981,7 @@ namespace Sapphire::Common
     int8_t Nonpop;
     float HorizontalPopRange;
     float VerticalPopRange;
-    int32_t BNpcBaseData;
+    int32_t BNpcBaseDataId;
     uint8_t RepopId;
     uint8_t BNPCRankId;
     uint16_t TerritoryRange;
@@ -1967,6 +1991,33 @@ namespace Sapphire::Common
     uint32_t ServerPathId;
     uint32_t EquipmentID;
     uint32_t CustomizeID;
+  };
+
+  enum SenseType : uint8_t
+  {
+    NONE = 0,
+    VISION = 1,
+    HEARING = 2,
+    PRESENCE = 3,
+    VITALITY = 4,
+    MAGIC = 5,
+    ABILITIE = 6,
+    WEAPON_SKILL = 7,
+    POISON = 8,
+    SENSE_COUNT
+  };
+
+  struct BNpcCacheEntry : BNPCData
+  {
+    BNpcBaseData baseData;
+  };
+
+
+  struct CachedServerPath
+  {
+    vec3 position;
+    uint32_t instanceId;
+    std::vector< PathControlPoint > points;
   };
 
   /*

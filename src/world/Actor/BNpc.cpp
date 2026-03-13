@@ -58,6 +58,9 @@
 #include <AI/Fsm/StateCombat.h>
 #include <AI/Fsm/StateRetreat.h>
 #include <AI/Fsm/StateDead.h>
+#include <AI/Fsm/StateFollowPath.h>
+#include <AI/Fsm/StateResumePath.h>
+#include <AI/TargetHelper.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World;
@@ -72,7 +75,8 @@ BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone ) : Npc( ObjKind::BattleNpc )
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone ) : Npc(
+                                                                                                            ObjKind::BattleNpc )
 {
   m_id = id;
   m_pInfo = pInfo;
@@ -100,7 +104,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
-
+  m_senseData = pInfo->baseData;
 
   // Striking Dummy
   if( pInfo->NameId == 541 )
@@ -118,7 +122,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_modelChara = bNpcBaseData->data().Model;
   m_enemyType = bNpcBaseData->data().Battalion;
 
-  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
+  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
     setFlag( NoRoam | Immobile );
 
   m_class = ClassJob::Gladiator;
@@ -127,6 +131,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_territoryId = zone.getGuId();
 
   m_spawnPos = m_pos;
+  m_spawnRot = pInfo->rotation;
 
   m_timeOfDeath = 0;
   m_targetId = Common::INVALID_GAME_OBJECT_ID64;
@@ -149,6 +154,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
 
   m_radius = bNpcBaseData->data().Scale;
+  m_baseScale = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
@@ -175,7 +181,9 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
     auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
     {
-      m_radius *= modelSkeleton->data().Radius;
+      m_radius = modelSkeleton->data().Radius * m_baseScale;
+      m_walkSpeed = modelSkeleton->data().WalkSpeed;
+      m_runSpeed = modelSkeleton->data().RunSpeed;
     }
   }
 
@@ -186,11 +194,10 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
   //if( m_bnpcType == BNpcType::Friendly )
   //  m_maxHp *= 5;
-
 }
 
-BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
-  Npc( ObjKind::BattleNpc )
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const Territory& zone, uint32_t hp,
+            Common::BNpcType type ) : Npc( ObjKind::BattleNpc )
 {
   m_id = id;
   m_pInfo = pInfo;
@@ -218,6 +225,8 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
+  m_senseData = pInfo->baseData;
+
   m_territoryTypeId = zone.getTerritoryTypeId();
   m_territoryId = zone.getGuId();
 
@@ -239,6 +248,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_class = ClassJob::Gladiator;
 
   m_spawnPos = m_pos;
+  m_spawnRot = pInfo->rotation;
 
   m_timeOfDeath = 0;
   m_targetId = Common::INVALID_GAME_OBJECT_ID64;
@@ -258,6 +268,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
 
   m_radius = bNpcBaseData->data().Scale;
+  m_baseScale = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
     auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
@@ -283,7 +294,11 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   {
     auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
-      m_radius *= modelSkeleton->data().Radius;
+    {
+      m_radius = modelSkeleton->data().Radius * m_baseScale;
+      m_walkSpeed = modelSkeleton->data().WalkSpeed;
+      m_runSpeed = modelSkeleton->data().RunSpeed;
+    }
   }
 
   // todo: is this actually good?
@@ -304,6 +319,31 @@ float BNpc::getNaviTargetReachedDistance() const
   return m_naviTargetReachedDistance;
 }
 
+uint64_t BNpc::getLastNaviMoveRequest() const
+{
+  return m_naviLastMoveRequest;
+}
+
+bool BNpc::getNaviIsPathing() const
+{
+  return m_naviIsPathing;
+}
+
+void BNpc::setNaviIsPathing( bool pathing )
+{
+  m_naviIsPathing = true;
+}
+
+Common::Vector3 BNpc::getNaviLastMoveTarget() const
+{
+  return m_naviLastTarget;
+}
+
+Common::Vector3 BNpc::getNaviMoveTarget() const
+{
+  return m_naviTarget;
+}
+
 uint8_t BNpc::getEnemyType() const
 {
   return m_enemyType;
@@ -317,6 +357,11 @@ uint64_t BNpc::getWeaponMain() const
 uint64_t BNpc::getWeaponSub() const
 {
   return m_weaponSub;
+}
+
+const BNpcBaseData& BNpc::getSenseData() const
+{
+  return m_senseData;
 }
 
 uint16_t BNpc::getModelChara() const
@@ -363,7 +408,14 @@ void BNpc::setState( BNpcState state )
   m_state = state;
 }
 
-bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
+float BNpc::getCurrentSpeed() const
+{
+  auto state = getState();
+  bool isRunning = state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat;
+  return isRunning ? getRunSpeed() : getWalkSpeed();
+}
+
+bool BNpc::moveTo( const Vector3& pos )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -376,19 +428,25 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
+  auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
   auto distance = Common::Util::distance( pos1, pos );
 
-  if( distance < getNaviTargetReachedDistance() )
+  if( distance <= getNaviTargetReachedDistance() )
   {
     // Reached destination
     face( pos );
     setPos( pos1 );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed() );
     setAgentId( newAgentId );
+    m_naviTarget = pos;
+    m_naviLastTarget = pos;
+    m_naviIsPathing = false;
     return true;
   }
 
+  m_naviLastTarget = pos;
+  m_naviTarget = pos;
+  m_naviIsPathing = true;
   pZone->updateActorPosition( *this );
   face( pos );
   if( distance > 2.0f )
@@ -401,54 +459,52 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
 bool BNpc::moveTo( const Chara& targetChara )
 {
-
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  auto pNaviProvider = pZone->getNaviProvider();
-
-  if( !pNaviProvider )
-  {
-    Logger::error( "No NaviProvider for zone#{0} - {1}", pZone->getGuId(), pZone->getInternalName() );
-    return false;
-  }
-
-  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
-  auto distance = Common::Util::distance( pos1, targetChara.getPos() );
-
-  if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
-  {
-    // Reached destination
-    face( targetChara.getPos() );
-    setPos( pos1 );
-    pNaviProvider->resetMoveTarget( getAgentId() );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
-    setAgentId( newAgentId );
-    return true;
-  }
-
-  pZone->updateActorPosition( *this );
-  if( distance > 2.0f )
-    face( { ( pos1.x - getPos().x ) + pos1.x, 1.0f, ( pos1.z - getPos().z ) + pos1.z } );
-  else
-    face( targetChara.getPos() );
-  setPos( pos1 );
-  return false;
+  return moveTo( targetChara.getPos() );
 }
 
-void BNpc::sendPositionUpdate()
+float mapSpeedToRange( float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f )
 {
+  // Clamp the speed to valid range
+  speed = std::max( minSpeed, std::min( maxSpeed, speed ) );
+
+  // Map from [minSpeed, maxSpeed] to [-π, π]
+  float normalized = ( speed - minSpeed ) / ( maxSpeed - minSpeed );// [0, 1]
+  return ( normalized * 2.0f - 1.0f ) * 3.1415927f;                 // [-π, π]
+}
+
+
+void BNpc::sendPositionUpdate( uint64_t tickCount )
+{
+  if( ( tickCount - m_lastPosUpdate ) <= 333 )
+    return;
+
+  m_lastPosUpdate = tickCount;
+
   uint8_t animationType = 2;
 
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z )
+  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_pos.z || m_lastRot != m_rot )
   {
-    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+    if( !pZone )
+    {
+      Logger::error( "BNpc::sendPositionUpdate: No zone for id: {}", getTerritoryId() );
+      return;
+    }
+
+    // not 100% certain of this range, but with limited samples i tested, it looked somewhat correct
+    float s1 = mapSpeedToRange( getCurrentSpeed(), 0, 25.5f );
+    uint8_t dirS1 = Common::Util::floatToUInt8Rot( s1 );
+
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, dirS1 );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;
+  m_lastRot = m_rot;
 }
 
 const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
@@ -505,7 +561,6 @@ uint32_t BNpc::hateListGetHighestValue()
   return 0;
 }
 
-
 CharaPtr BNpc::hateListGetHighest()
 {
   auto it = m_hateList.begin();
@@ -530,18 +585,19 @@ void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
 {
   if( hateAmount > 0 )
   {
-  auto hateEntry = std::make_shared< HateListEntry >();
+    auto hateEntry = std::make_shared< HateListEntry >();
     hateEntry->m_hateAmount = hateAmount;
-  hateEntry->m_pChara = pChara;
+    hateEntry->m_pChara = pChara;
 
-  m_hateList.insert( hateEntry );
-  if( pChara->isPlayer() )
-  {
-    auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( *this );
-      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+    m_hateList.insert( hateEntry );
+    if( pChara->isPlayer() )
+    {
+      auto pPlayer = pChara->getAsPlayer();
+      pPlayer->hateListAdd( *this );
+      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount,
+                                            hateAmount );
+    }
   }
-}
 }
 
 void BNpc::hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount )
@@ -569,7 +625,8 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
       if( auto player = pChara->getAsPlayer() )
       {
         player->hateListLetterUpdate( *this );
-        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount,
+                                              hateAmount );
       }
       break;
     }
@@ -581,7 +638,7 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   }
 
   hateListUpdatePlayers();
-    }
+}
 
 void BNpc::hateListRemove( const CharaPtr& pChara )
 {
@@ -647,6 +704,21 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   auto& pRNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
+
+  if( !hateListHasActor( pChara ) )
+  {
+    hateListAdd( pChara, 1000 );
+    //if( getTargetId() == pChara->getId() )
+    {
+      updateAggroTarget();
+      hateListUpdatePlayers();
+    }
+    if( m_pOwner == pChara )
+    {
+      setOwner( hateListGetHighest() );
+    }
+  }
+
   if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )
   {
     m_pGambitPack->getAsTimeLine()->start();
@@ -660,7 +732,7 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle, 1 );
 
   changeTarget( pChara->getId() );
-  }
+}
 
 void BNpc::deaggro( const CharaPtr& pChara )
 {
@@ -682,12 +754,12 @@ void BNpc::deaggro( const CharaPtr& pChara )
     notifyPlayerDeaggro( pChara );
 }
 
-void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
+void BNpc::notifyPlayerDeaggro( const CharaPtr& pChara )
 {
   if( m_hateList.empty() )
   {
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
   }
 
   PlayerPtr tmpPlayer = pChara->getAsPlayer();
@@ -696,7 +768,7 @@ void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
   if( getTriggerOwnerId() == pChara->getId() )
   {
     auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-    auto bnpc = *getAsBNpc();
+    auto& bnpc = *getAsBNpc();
     scriptMgr.onTriggerOwnerDeaggro( *tmpPlayer, bnpc );
   }
 }
@@ -714,9 +786,10 @@ void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
 
+  checkAggro();
   // removed check for now, replaced by position check to last position
   //if( m_dirtyFlag & DirtyFlag::Position )
-  sendPositionUpdate();
+  sendPositionUpdate( tickCount );
 
   m_fsm->update( *this, tickCount );
 }
@@ -740,7 +813,7 @@ void BNpc::onActionHostile( CharaPtr pSource, int32_t aggro )
 {
   hateListUpdate( pSource, aggro );
 
-  if( getCanSwapTarget() ) // todo: only call on global server tick
+  if( getCanSwapTarget() )// todo: only call on global server tick
     updateAggroTarget();
 
   if( !m_pOwner )
@@ -774,6 +847,8 @@ void BNpc::onDeath()
       // todo: get this outta here!
       taskMgr.queueTask( makeLootBNpcTask( *pPlayer, "testTable", 2000 ) );
 
+      playerMgr.sendDebug( *pPlayer, ( "Killed Layout ID: " + std::to_string( getLayoutId() ) ) );
+
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }
@@ -798,62 +873,233 @@ void BNpc::checkAggro()
   if( m_aggressionMode == 1 )
     return;
 
-  CharaPtr pClosestChara = getClosestChara();
-
-  if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
+  if( !getHateList().empty() )
   {
-
-    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
-    float range = 14.f;
-
-    if( pClosestChara->getLevel() > m_level )
-    {
-      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
-
-      if( levelDiff >= 10 )
-        range = 0.f;
-      else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
-    }
-
-    auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
-
-    if( distance < range )
-    {
-      aggro( pClosestChara );
-    }
+    return;
   }
-  else if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() == 0 && pClosestChara->isBattleNpc() ) )
+
+  auto calculateAdjustedRange = []( float baseRange, int targetLevel, int sourceLevel ) -> float {
+    auto levelDiff = std::abs( targetLevel - sourceLevel );
+
+    if( levelDiff >= 10 )
+      return 0.0f;
+    else
+      return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+  };
+
+
+  bool hasAggro = false;
+  auto pCharaSelf = getAsChara();
+  static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+
+  for( uint32_t i = 0; i < 2; ++i )
   {
-    if( getBNpcType() == Common::BNpcType::Friendly )
+    float senseRange = m_senseData.SenseRange[ i ];
+
+    switch( m_senseData.Sense[ i ] )
     {
-      if( pClosestChara->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+      case SenseType::HEARING:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          if( !actor->isChara() )
+            continue;
+
+          auto pCharaTarget = actor->getAsChara();
+
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
+            continue;
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+
+          if( auto pPlayer = actor->getAsPlayer() )
+            if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+              continue;
+
+          // diminish sense range if required.
+          senseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+          if( distance < senseRange )
+          {
+            aggro( actor->getAsChara() );
+            hasAggro = true;
+            break;
+          }
+        }
+        break;
+      }
+
+      case SenseType::VISION:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          if( !actor->isChara() )
+            continue;
+
+          auto pCharaTarget = actor->getAsChara();
+
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
+            continue;
+
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+          if( !pCharaTarget->isAlive() )
+            continue;
+
+          // Check if player is within sense range first (distance check)
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+
+          // Diminish sense range if required
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+
+          if( distance > adjustedSenseRange )
+            continue;// Too far away
+
+          // Vision cone check
+          // Calculate vector from BNPC to player
+          const auto& bnpcPos = getPos();
+          const auto& playerPos = actor->getPos();
+
+          float deltaX = playerPos.x - bnpcPos.x;
+          float deltaZ = playerPos.z - bnpcPos.z;
+
+          // Calculate angle from BNPC to player
+          float angleToPlayer = atan2( deltaX, deltaZ );
+
+          // Get BNPC's facing direction (rotation)
+          float bnpcRotation = getRot();
+
+          // Calculate the difference between BNPC rotation and angle to player
+          float angleDiff = angleToPlayer - bnpcRotation;
+
+          // Normalize angle difference to [-PI, PI]
+          while( angleDiff > PI ) angleDiff -= 2.0f * PI;
+          while( angleDiff < -PI ) angleDiff += 2.0f * PI;
+
+          // Check if player is within the 75-degree vision cone (37.5 degrees on each side)
+          float halfConeAngle = ( 75.0f * PI / 180.0f ) / 2.0f;
+
+          if( abs( angleDiff ) <= halfConeAngle )
+          {
+            // Player is within vision cone, check for line of sight if needed
+            // TODO: Add line of sight check using navmesh/collision mesh raycast if required
+
+            aggro( actor->getAsChara() );
+            hasAggro = true;
+            break;
+          }
+        }
+        break;
+      }
+
+
+      case SenseType::PRESENCE:
+      {
+        auto actors = getInRangeActors();
+        for( const auto& actor : actors )
+        {
+          if( !actor->isChara() )
+            continue;
+
+          auto pCharaTarget = actor->getAsChara();
+
+          // if this chara is in our battalion, dont aggro
+          if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
+            continue;
+
+          if( auto pBNpc = pCharaTarget->getAsBNpc() )
+            if( pBNpc->hateListGetHighest() == nullptr &&
+                pBNpc->getAggressionMode() == 1 )
+              continue;
+
+          if( !pCharaTarget->isAlive() )
+            continue;
+
+          float distance = Common::Util::distance( getPos(), actor->getPos() );
+          if( distance < senseRange )
+          {
+            aggro( actor->getAsChara() );
+            hasAggro = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      default:
+        break;
+    }
+    if( hasAggro )
+      break;
+  }
+  /*
+    //legacy code
+    if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
+    {
+      // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+      float range = 14.f;
+
+      if( pClosestChara->getLevel() > m_level )
+      {
+        auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+
+        if( levelDiff >= 10 )
+          range = 0.f;
+        else
+          range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+      }
+
+      auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
+
+      if( distance < range )
+      {
+        aggro( pClosestChara );
+      }
+    }
+    else if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() == 0 && pClosestChara->isBattleNpc() ) )
+    {
+      if( getBNpcType() == Common::BNpcType::Friendly )
+      {
+        if( pClosestChara->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+          return;
+      }
+
+      if( getEnemyType() == 0 && pClosestChara->getAsBNpc()->getEnemyType() == 0 )
         return;
-    }
 
-    if( getEnemyType() == 0 && pClosestChara->getAsBNpc()->getEnemyType() == 0 )
-      return;
+      // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+      float range = 14.f;
 
-    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
-    float range = 14.f;
+      if( pClosestChara->getLevel() > m_level )
+      {
+        auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
 
-    if( pClosestChara->getLevel() > m_level )
-    {
-      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+        if( levelDiff >= 10 )
+          range = 0.f;
+        else
+          range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+      }
 
-      if( levelDiff >= 10 )
-        range = 0.f;
-      else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
-    }
+      auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
 
-    auto distance = Common::Util::distance( getPos(), pClosestChara->getPos() );
-
-    if( distance < range )
-    {
-      aggro( pClosestChara );
-    }
-  }
+      if( distance < range )
+      {
+        aggro( pClosestChara );
+      }
+    }*/
 }
 
 void BNpc::setOwner( const CharaPtr& m_pChara )
@@ -879,11 +1125,15 @@ uint32_t BNpc::getLevelId() const
   return m_levelId;
 }
 
+uint32_t BNpc::getFlags() const
+{
+  return m_flags;
+}
+
 bool BNpc::hasFlag( uint32_t flag ) const
 {
   return m_flags & flag;
 }
-
 
 void BNpc::resetFlags( uint32_t flags )
 {
@@ -903,7 +1153,7 @@ void BNpc::resetFlags( uint32_t flags )
     pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
-  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile &&
            ( m_flags & Entity::Immobile ) != Entity::Immobile )
   {
     Logger::debug( "{} Pathing activated", m_id );
@@ -915,7 +1165,6 @@ void BNpc::resetFlags( uint32_t flags )
     setPathingActive( true );
   }
 }
-
 
 void BNpc::setFlag( uint32_t flag )
 {
@@ -935,8 +1184,8 @@ void BNpc::setFlag( uint32_t flag )
     pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
-  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
-             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
   {
     Logger::debug( "{} Pathing activated", m_id );
     auto pNaviProvider = pZone->getNaviProvider();
@@ -1016,7 +1265,6 @@ void BNpc::calculateStats()
   setStatValue( BaseParam::AttackPower, str );
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
-
 }
 
 void BNpc::updateAggroTarget()
@@ -1086,27 +1334,50 @@ void BNpc::initFsm()
   auto stateIdle = make_StateIdle();
   auto stateCombat = make_StateCombat();
   auto stateDead = make_StateDead();
-  if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( m_pInfo->ServerPathId != 0 && pZone && pZone->getServerPath( m_pInfo->ServerPathId ) )
   {
-    auto stateRoam = make_StateRoam();
-    stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
-    stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-    stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    stateRoam->addTransition( stateDead, make_IsDeadCondition() );
-    m_fsm->addState( stateRoam );
+    auto statePath = make_StateFollowPath();
+    auto stateResumePath = make_StateResumePath();
+    statePath->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+    statePath->addTransition( stateDead, make_IsDeadCondition() );
+
+    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
+    stateCombat->addTransition( stateResumePath, make_HateListEmptyCondition() );
+    stateResumePath->addTransition( statePath, make_RoamTargetReachedCondition() );
+
+    m_fsm->addState( statePath );
+
+    m_fsm->setCurrentState( statePath );
   }
-  stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-  stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
-  stateIdle->addTransition( stateDead, make_IsDeadCondition() );
-  stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-  m_fsm->addState( stateIdle );
-  if( !hasFlag( NoDeaggro ) )
+  else
   {
-    auto stateRetreat = make_StateRetreat();
-    stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
-    stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+    if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
+    {
+      auto stateRoam = make_StateRoam();
+      stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
+      stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+      stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+      stateRoam->addTransition( stateDead, make_IsDeadCondition() );
+      m_fsm->addState( stateRoam );
+    }
+    stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+    //stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
+    stateIdle->addTransition( stateDead, make_IsDeadCondition() );
+    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
+    m_fsm->addState( stateIdle );
+    if( !hasFlag( NoDeaggro ) )
+    {
+      auto stateRetreat = make_StateRetreat();
+      stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
+      stateCombat->addTransition( stateRetreat, make_HateListEmptyCondition() );
+      stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+    }
+    m_fsm->setCurrentState( stateIdle );
   }
-  m_fsm->setCurrentState( stateIdle );
 }
 
 void BNpc::processGambits( uint64_t tickCount )
@@ -1126,7 +1397,7 @@ void BNpc::setLastRoamTargetReachedTime( uint32_t time )
   m_lastRoamTargetReachedTime = time;
 }
 
-std::shared_ptr< Common::BNPCInstanceObject > BNpc::getInstanceObjectInfo() const
+std::shared_ptr< Common::BNPCData > BNpc::getInstanceObjectInfo() const
 {
   return m_pInfo;
 }
@@ -1141,19 +1412,24 @@ bool BNpc::isRoamTargetReached() const
   return m_roamTargetReached;
 }
 
-void BNpc::setRoamTargetPos( const FFXIVARR_POSITION3& targetPos )
+void BNpc::setRoamTargetPos( const Vector3& targetPos )
 {
   m_roamPos = targetPos;
 }
 
-const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
+const Common::Vector3& BNpc::getRoamTargetPos() const
 {
   return m_roamPos;
 }
 
-const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
+const Common::Vector3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
+}
+
+float BNpc::getSpawnRot() const
+{
+  return m_spawnRot;
 }
 
 bool BNpc::getCanSwapTarget()
@@ -1165,7 +1441,7 @@ void BNpc::setCanSwapTarget( bool value )
 {
   m_canSwapTarget = value;
 
-  if( m_canSwapTarget ) // todo: only call on global server tick
+  if( m_canSwapTarget )// todo: only call on global server tick
   {
     updateAggroTarget();
   }
@@ -1176,7 +1452,7 @@ void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
   Chara::setPos( x, y, z, broadcastUpdate );
 }
 
-void BNpc::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void BNpc::setPos( const Vector3& pos, bool broadcastUpdate )
 {
   setPos( pos.x, pos.y, pos.z, broadcastUpdate );
 }

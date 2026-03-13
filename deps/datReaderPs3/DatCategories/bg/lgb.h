@@ -12,7 +12,8 @@
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
-#include "LgbTypes.h"
+#include "datReader/DatCategories/InstanceObject.h"
+#include "datReaderPs3/DatCategories/bg/LgbTypes.h"
 #include "../../bparse.h"
 
 
@@ -65,22 +66,22 @@ public:
     m_buf = buf;
     m_offset = offset;
     header = *reinterpret_cast< InstanceObject* >( buf + offset );
-    header.instanceId = xivps3::utils::bparse::byteswap( header.instanceId );
-    header.nameOffset = xivps3::utils::bparse::byteswap( header.nameOffset );
-    header.type = xivps3::utils::bparse::byteswap( header.type );
+    header.InstanceID = xivps3::utils::bparse::byteswap( header.InstanceID );
+    header.Name = xivps3::utils::bparse::byteswap( header.Name );
+    header.AssetType = xivps3::utils::bparse::byteswap( header.AssetType );
 
-    header.transform.translation.x = xivps3::utils::bparse::byteswap( header.transform.translation.x );
-    header.transform.translation.y = xivps3::utils::bparse::byteswap( header.transform.translation.y );
-    header.transform.translation.z = xivps3::utils::bparse::byteswap( header.transform.translation.z );
+    header.Transformation.Translation.x = xivps3::utils::bparse::byteswap( header.Transformation.Translation.x );
+    header.Transformation.Translation.y = xivps3::utils::bparse::byteswap( header.Transformation.Translation.y );
+    header.Transformation.Translation.z = xivps3::utils::bparse::byteswap( header.Transformation.Translation.z );
 
-    header.transform.rotation.x = xivps3::utils::bparse::byteswap( header.transform.rotation.x );
-    header.transform.rotation.y = xivps3::utils::bparse::byteswap( header.transform.rotation.y );
-    header.transform.rotation.z = xivps3::utils::bparse::byteswap( header.transform.rotation.z );
+    header.Transformation.Rotation.x = xivps3::utils::bparse::byteswap( header.Transformation.Rotation.x );
+    header.Transformation.Rotation.y = xivps3::utils::bparse::byteswap( header.Transformation.Rotation.y );
+    header.Transformation.Rotation.z = xivps3::utils::bparse::byteswap( header.Transformation.Rotation.z );
   };
 
   const LgbEntryType getType() const
   {
-    return header.type;
+    return static_cast< LgbEntryType >( header.AssetType );
   };
 
   virtual ~LgbEntry()
@@ -92,7 +93,7 @@ public:
 class LGB_BGPARTS_ENTRY : public LgbEntry
 {
 public:
-  BgPartsData data;
+  BgData data;
   std::string name;
   std::string modelFileName;
   std::string collisionFileName;
@@ -103,39 +104,79 @@ public:
 
   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< BgPartsData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + data.modelFileOffset );
-    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
+    data = *reinterpret_cast< BgData* >( buf + offset );
+    data.CollisionAssetPath = xivps3::utils::bparse::byteswap( data.CollisionAssetPath );
+    data.AssetPath = xivps3::utils::bparse::byteswap( data.AssetPath );
+    data.Name = xivps3::utils::bparse::byteswap( data.Name );
+    name = std::string( buf + offset + header.Name );
+    modelFileName = std::string( buf + offset + data.AssetPath );
+    collisionFileName = std::string( buf + offset + data.CollisionAssetPath );
   };
 };
 
-class LGB_GIMMICK_ENTRY : public LgbEntry
+class LGB_SERVERPATH_ENTRY : public LgbEntry
 {
 public:
-  GimmickData data;
+  ServerPathData data;
+  std::vector< PathControlPoint > points;
+  std::string name;
+
+  LGB_SERVERPATH_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  {
+    data = *reinterpret_cast< ServerPathData* >( buf + offset );
+    name = std::string( buf + offset + header.Name );
+    data.ControlPoint_Count = xivps3::utils::bparse::byteswap( data.ControlPoint_Count );
+    data.ControlPoints = xivps3::utils::bparse::byteswap( data.ControlPoints );
+    data.Reserved1 = xivps3::utils::bparse::byteswap( data.Reserved1 );
+    data.Reserved2 = xivps3::utils::bparse::byteswap( data.Reserved2 );
+
+    int innerOff = offset + data.ControlPoints;
+    for( int i = 0; i < data.ControlPoint_Count; ++i )
+    {
+      PathControlPoint point;
+      point = *reinterpret_cast< PathControlPoint* >( buf + innerOff );
+
+      point.PointID = xivps3::utils::bparse::byteswap( point.PointID );
+      point.Translation.x = xivps3::utils::bparse::byteswap( point.Translation.x );
+      point.Translation.y = xivps3::utils::bparse::byteswap( point.Translation.y );
+      point.Translation.z = xivps3::utils::bparse::byteswap( point.Translation.z );
+      points.push_back( point );
+      innerOff += sizeof( PathControlPoint );
+
+    }
+
+  };
+};
+
+class LGB_SG_ENTRY : public LgbEntry
+{
+public:
+  SGData data;
   std::string name;
   std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_SG_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< GimmickData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
+    data = *reinterpret_cast< SGData* >( buf + offset );
+    name = std::string( buf + offset + header.Name );
+    gimmickFileName = std::string( buf + offset + xivps3::utils::bparse::byteswap( data.AssetPath ) );
+
+
   };
 };
+
 
 class LGB_ENPC_ENTRY : public LgbEntry
 {
 public:
-  ENpcData data;
+  ENPCData data;
   std::string name;
 
   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
     LgbEntry( buf, offset )
   {
-    data = *reinterpret_cast< ENpcData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    data = *reinterpret_cast< ENPCData* >( buf + offset );
+    name = std::string( buf + offset +  header.Name );
   };
 };
 
@@ -159,21 +200,21 @@ public:
     data.FateLayoutLabelId = xivps3::utils::bparse::byteswap( data.FateLayoutLabelId );
     data.HorizontalPopRange = xivps3::utils::bparse::byteswap( data.HorizontalPopRange );
 
-    data.type = xivps3::utils::bparse::byteswap( data.type );
-    data.instanceId = xivps3::utils::bparse::byteswap( data.instanceId );
-    data.nameOffset = xivps3::utils::bparse::byteswap( data.nameOffset );
+    data.AssetType = xivps3::utils::bparse::byteswap( data.AssetType );
+    data.InstanceID = xivps3::utils::bparse::byteswap( data.InstanceID );
+    data.Name = xivps3::utils::bparse::byteswap( data.Name );
 
-    data.transform.translation.x = xivps3::utils::bparse::byteswap( data.transform.translation.x );
-    data.transform.translation.y = xivps3::utils::bparse::byteswap( data.transform.translation.y );
-    data.transform.translation.z = xivps3::utils::bparse::byteswap( data.transform.translation.z );
+    data.Transformation.Translation.x = xivps3::utils::bparse::byteswap( data.Transformation.Translation.x );
+    data.Transformation.Translation.y = xivps3::utils::bparse::byteswap( data.Transformation.Translation.y );
+    data.Transformation.Translation.z = xivps3::utils::bparse::byteswap( data.Transformation.Translation.z );
 
-    data.transform.rotation.x = xivps3::utils::bparse::byteswap( data.transform.rotation.x );
-    data.transform.rotation.y = xivps3::utils::bparse::byteswap( data.transform.rotation.y );
-    data.transform.rotation.z = xivps3::utils::bparse::byteswap( data.transform.rotation.z );
+    data.Transformation.Rotation.x = xivps3::utils::bparse::byteswap( data.Transformation.Rotation.x );
+    data.Transformation.Rotation.y = xivps3::utils::bparse::byteswap( data.Transformation.Rotation.y );
+    data.Transformation.Rotation.z = xivps3::utils::bparse::byteswap( data.Transformation.Rotation.z );
 
-    data.transform.scale.x = xivps3::utils::bparse::byteswap( data.transform.scale.x );
-    data.transform.scale.y = xivps3::utils::bparse::byteswap( data.transform.scale.y );
-    data.transform.scale.z = xivps3::utils::bparse::byteswap( data.transform.scale.z );
+    data.Transformation.Scale.x = xivps3::utils::bparse::byteswap( data.Transformation.Scale.x );
+    data.Transformation.Scale.y = xivps3::utils::bparse::byteswap( data.Transformation.Scale.y );
+    data.Transformation.Scale.z = xivps3::utils::bparse::byteswap( data.Transformation.Scale.z );
 
     data.PopWeather = xivps3::utils::bparse::byteswap( data.PopWeather );
     data.MoveAI = xivps3::utils::bparse::byteswap( data.MoveAI );
@@ -185,13 +226,10 @@ public:
     data.VerticalPopRange = xivps3::utils::bparse::byteswap( data.VerticalPopRange );
     data.NameId = xivps3::utils::bparse::byteswap( data.NameId );
 
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
 
     baseData = *reinterpret_cast< BNpcBaseData* >( buf + offset + data.BNpcBaseData );
-
     baseData.TerritoryRange = xivps3::utils::bparse::byteswap( baseData.TerritoryRange );
-
-    std::cout << data.BNpcBaseData << "\n";
 
   };
 };
@@ -205,7 +243,7 @@ public:
   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< EObjData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
   };
 };
 
@@ -218,7 +256,7 @@ public:
   LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< MapRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
   };
 };
 
@@ -231,7 +269,7 @@ public:
   LGB_EXIT_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ExitRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string( buf + offset + header.Name );
   };
 };
 
@@ -316,35 +354,39 @@ struct LGB_GROUP
         const auto type =  xivps3::utils::bparse::byteswap( *reinterpret_cast< LgbEntryType* >( buf + entryOffset ) );
         if( type == LgbEntryType::BgParts )
         {
-        //  entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
         }
-        else if( type == LgbEntryType::Gimmick )
+        else if( type == LgbEntryType::SharedGroup )
         {
-        //  entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_SG_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::EventNpc )
         {
-        //  entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::EventObject )
         {
-        //  entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::ExitRange )
         {
-        //  entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::MapRange )
         {
-        //  entries.push_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::BattleNpc )
         {
           entries.push_back( std::make_shared< LGB_BNPC_ENTRY >( buf, entryOffset ) );
         }
+        else if( type == LgbEntryType::ServerPath )
+        {
+          entries.push_back( std::make_shared< LGB_SERVERPATH_ENTRY >( buf, entryOffset ) );
+        }
         else
         {
-       //   entries.push_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
         }
       }
       catch( std::exception& e )
@@ -361,10 +403,10 @@ struct LGB_FILE_HEADER
   uint32_t fileSize;
   uint32_t unknown;
   char magic2[4]; // LGP1
-  uint32_t dataOffset;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
+  uint32_t chunkSize;
+  uint32_t layerGroupId;
+  uint32_t nameOff;
+  uint32_t groups;
   int32_t groupCount;
 };
 
@@ -376,13 +418,14 @@ struct LGB_FILE
 
   LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
   {
-    m_name = name;
+    header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
+    m_name = std::string( buf + 20 + xivps3::utils::bparse::byteswap( header.nameOff ) );
   }
 
   LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
-
+    m_name = std::string( buf + 20 + xivps3::utils::bparse::byteswap( header.nameOff ) );
     header.fileSize = xivps3::utils::bparse::byteswap( header.fileSize );
 
 
@@ -395,12 +438,12 @@ struct LGB_FILE
 
     auto baseOffset = sizeof( header );
 
-    header.dataOffset = xivps3::utils::bparse::byteswap( header.dataOffset );
+    header.chunkSize = xivps3::utils::bparse::byteswap( header.chunkSize );
 
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );
 
-   if( strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0  )
+    if( strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0  )
     {
       throw std::runtime_error( "Invalid LGB file, LGP section not found!" );
       /*     if( strncmp( &header.magic2[ 0 ] + 0x14 , "LGP1", 4 ) == 0 )

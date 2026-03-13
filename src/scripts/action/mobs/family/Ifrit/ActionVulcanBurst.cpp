@@ -30,21 +30,27 @@ public:
     if( !pActionBuilder )
       return;
 
+    const auto& originPos = pSource->getPos();
     for( auto& pActor : pSource->getInRangeActors() )
     {
       if( !pActor->isPlayer() )
         continue;
 
       auto pTarget = pActor->getAsChara();
-      auto distance = Common::Util::distance( pSource->getPos(), pActor->getPos() );
+      auto distance = Common::Util::distance( originPos, pActor->getPos() );
       if( distance > 20.f )
         continue;
 
+      // todo: this can probably be made generic
       auto dmg = action.calcDamage( Potency );
-      pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
+      if( dmg.first > 0 )
+      {
+        // todo: proper knockback implementation using navmesh, this is wrong
+        //pTarget->knockback( originPos, 10.f - distance );
 
-    if( dmg.first > 0 )
-      pTarget->knockback( pSource->getPos(), 20.f );
+        pActionBuilder->knockback( pTarget, 1, distance );
+      }
+      pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
     }
   }
 };

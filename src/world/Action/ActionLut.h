@@ -4,9 +4,18 @@
 #include <unordered_map>
 #include <vector>
 #include "Common.h"
+#include "Service.h"
 
 namespace Sapphire::World::Action
 {
+  struct GroundAOE
+  {
+    uint16_t vfxId;
+    uint16_t actionId;
+    float radius;
+    Common::GroundAOEType aoeType;
+  };
+
   struct StatusModifier
   {
     Common::ParamModifier modifier;
@@ -21,6 +30,7 @@ namespace Sapphire::World::Action
     uint8_t statusRefreshPolicy;
     uint32_t flag;
     std::vector< StatusModifier > modifiers;
+    GroundAOE groundAOE;
   };
 
   struct StatusEffect
@@ -50,9 +60,16 @@ namespace Sapphire::World::Action
     using Lut = std::unordered_map< uint16_t, ActionEntry >;
 
     static bool validEntryExists( uint16_t actionId );
+
     static const ActionEntry& getEntry( uint16_t actionId );
 
-    static Lut m_actionLut;
+    // Process-wide accessor through the Service locator
+    static Lut& lut()
+    {
+      if( Sapphire::Common::Service< Lut >::empty() )
+        Sapphire::Common::Service< Lut >::set< Lut >();
+      return Sapphire::Common::Service< Lut >::ref();
+    }
   };
 
   Sapphire::Common::StatusRefreshPolicy getStatusRefreshPolicy( uint8_t statusRefreshPolicy, bool sameSource );

@@ -47,7 +47,7 @@ namespace Sapphire
   private:
     uint32_t m_landSetId;
     Common::LandIdent m_landIdent;
-    uint32_t m_houseId;
+    uint32_t m_houseId;// TODO: should this be uint64_t?
 
     uint64_t m_buildTime{};
     bool m_hasAetheryte{};

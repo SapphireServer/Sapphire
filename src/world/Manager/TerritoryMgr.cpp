@@ -1,10 +1,12 @@
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Exd/ExdData.h>
+#include <Util/Util.h>
 
 #include "WorldServer.h"
 #include "Session.h"
 
+#include <optional>
 #include <unordered_map>
 #include <Service.h>
 
@@ -52,18 +54,33 @@ bool TerritoryMgr::isValidTerritory( uint32_t territoryTypeId ) const
 
 bool TerritoryMgr::init()
 {
+  const auto initStartMs = Common::Util::getTimeMs();
+
   try
   {
+    const auto territoryTypeCacheStartMs = Common::Util::getTimeMs();
     loadTerritoryTypeDetailCache();
+    Logger::info( "TerritoryMgr: Cached {} territory type entries in {}ms",
+                  m_territoryTypeDetailCacheMap.size(),
+                  Common::Util::getTimeMs() - territoryTypeCacheStartMs );
 
+    const auto defaultTerritoriesStartMs = Common::Util::getTimeMs();
     createDefaultTerritories();
+    Logger::info( "TerritoryMgr: Default territory setup completed in {}ms",
+                  Common::Util::getTimeMs() - defaultTerritoriesStartMs );
+
+    const auto housingTerritoriesStartMs = Common::Util::getTimeMs();
     createHousingTerritories();
+    Logger::info( "TerritoryMgr: Housing territory setup completed in {}ms",
+                  Common::Util::getTimeMs() - housingTerritoriesStartMs );
   }
   catch( const std::runtime_error& ex )
   {
     Logger::fatal( "Caught exception during territory init: {}", ex.what() );
     return false;
   }
+
+  Logger::info( "TerritoryMgr: Initialization completed in {}ms", Common::Util::getTimeMs() - initStartMs );
 
   return true;
 }
@@ -153,6 +170,19 @@ bool TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
   return pTeri->data().IntendedUse == TerritoryIntendedUse::HousingArea;
 }
 
+uint8_t TerritoryMgr::getHousingIndex( uint32_t territoryTypeId ) const
+{
+  int housingIndex = 0xFF;
+  if( territoryTypeId == 339 )
+    housingIndex = 0;
+  else if( territoryTypeId == 340 )
+    housingIndex = 1;
+  else if( territoryTypeId == 341 )
+    housingIndex = 2;
+
+  return housingIndex;
+}
+
 uint32_t TerritoryMgr::getInstanceContentId( uint32_t territoryTypeId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -171,7 +201,12 @@ uint32_t TerritoryMgr::getInstanceContentId( uint32_t territoryTypeId ) const
 
 bool TerritoryMgr::createDefaultTerritories()
 {
+  const auto startMs = Common::Util::getTimeMs();
   auto& exdData = Common::Service< Data::ExdData >::ref();
+  size_t createdCount = 0;
+  size_t privateCount = 0;
+  size_t withNaviCount = 0;
+
   // for each entry in territoryTypeExd, check if it is a normal and if so, add the zone object
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
@@ -195,15 +230,20 @@ bool TerritoryMgr::createDefaultTerritories()
     pZone->init();
 
     bool hasNaviMesh = pZone->getNaviProvider() != nullptr;
+    ++createdCount;
+    if( isPrivateTerritory( territoryTypeId ) )
+      ++privateCount;
+    if( hasNaviMesh )
+      ++withNaviCount;
 
-    Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
-                  std::to_string( territoryTypeId ),
-                  guid,
-                  territoryData.IntendedUse,
-                  territoryInfo->getString( territoryData.Name ),
-                  ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
-                  hasNaviMesh ? "NAVI" : "",
-                  pPlaceName->getString( pPlaceName->data().Text.SGL ) );
+    Logger::debug( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
+                   std::to_string( territoryTypeId ),
+                   guid,
+                   territoryData.IntendedUse,
+                   territoryInfo->getString( territoryData.Name ),
+                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
+                   hasNaviMesh ? "NAVI" : "",
+                   pPlaceName->getString( pPlaceName->data().Text.SGL ) );
 
     InstanceIdToTerritoryPtrMap instanceMap;
     instanceMap[ guid ] = pZone;
@@ -213,19 +253,33 @@ bool TerritoryMgr::createDefaultTerritories()
 
   }
 
+  const auto publicCount = createdCount - privateCount;
+  const auto withoutNaviCount = createdCount - withNaviCount;
+  Logger::info( "TerritoryMgr: Created {} default territories (public={}, private={}, navi={}, no_navi={}) in {}ms",
+                createdCount,
+                publicCount,
+                privateCount,
+                withNaviCount,
+                withoutNaviCount,
+                Common::Util::getTimeMs() - startMs );
+
   return true;
 }
 
 bool TerritoryMgr::createHousingTerritories()
 {
+  const auto startMs = Common::Util::getTimeMs();
   //separate housing zones from default
   auto& exdData = Common::Service< Data::ExdData >::ref();
+  size_t territoryTemplateCount = 0;
+  size_t wardCreatedCount = 0;
+
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
     auto territoryTypeId = territory.first;
     auto territoryInfo = territory.second;
     uint32_t wardNum;
-    uint32_t wardMaxNum = 8;
+    uint32_t wardMaxNum = 12;
 
     if( territoryInfo->getString( territoryInfo->data().Name ).empty() )
       continue;
@@ -235,20 +289,23 @@ bool TerritoryMgr::createHousingTerritories()
     if( !pPlaceName || pPlaceName->getString( pPlaceName->data().Text.SGL ).empty() || !isHousingTerritory( territoryTypeId ) )
       continue;
 
+    ++territoryTemplateCount;
+
     for( wardNum = 0; wardNum < wardMaxNum; wardNum++ )
     {
 
       auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, territoryInfo->getString( territoryInfo->data().Name ),
                                                                 pPlaceName->getString( pPlaceName->data().Text.SGL ) );
       pHousingZone->init();
+      ++wardCreatedCount;
 
-      Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t\t{4}#{5}",
-                    territoryTypeId,
-                    pHousingZone->getLandSetId(),
-                    territoryInfo->data().IntendedUse,
-                    territoryInfo->getString( territoryInfo->data().Name ),
-                    pPlaceName->getString( pPlaceName->data().Text.SGL ),
-                    wardNum );
+      Logger::debug( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t\t{4}#{5}",
+             territoryTypeId,
+             pHousingZone->getLandSetId(),
+             territoryInfo->data().IntendedUse,
+             territoryInfo->getString( territoryInfo->data().Name ),
+             pPlaceName->getString( pPlaceName->data().Text.SGL ),
+             wardNum );
 
       InstanceIdToTerritoryPtrMap instanceMap;
       instanceMap[ pHousingZone->getLandSetId() ] = pHousingZone;
@@ -258,6 +315,11 @@ bool TerritoryMgr::createHousingTerritories()
     }
 
   }
+
+  Logger::info( "TerritoryMgr: Created {} housing territories from {} templates in {}ms",
+                wardCreatedCount,
+                territoryTemplateCount,
+                Common::Util::getTimeMs() - startMs );
 
   return true;
 }
@@ -291,16 +353,16 @@ TerritoryPtr TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
   return pZone;
 }
 
-TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
+TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questId, uint16_t questBattleId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto pQuestBattleInfo = exdData.getRow< Excel::QuestBattle >( questBattleId );
-  if( !pQuestBattleInfo )
+  auto pQuestInfo = exdData.getRow< Excel::Quest >( questId );
+  if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
     return nullptr;
 
-  auto pQuestInfo = exdData.getRow< Excel::Quest >( pQuestBattleInfo->data().Quest );
-  if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
+  auto pQuestBattleInfo = exdData.getRow< Excel::QuestBattle >( questBattleId );
+  if( !pQuestBattleInfo )
     return nullptr;
 
   auto teriList = exdData.getRows< Excel::TerritoryType >();
@@ -358,12 +420,13 @@ TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t contentFinderId )
 
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", contentFinderId, name );
 
-  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition, instanceContentData.TerritoryType, getNextInstanceId(), " ", name, pContentFinderCondition->data().InstanceContentId );
-  pZone->init();
-
+  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition, instanceContentData.TerritoryType, getNextInstanceId(), pTeri->getString( pTeri->data().Name ), name, pContentFinderCondition->data().InstanceContentId );
   m_instanceContentIdToInstanceMap[ pContentFinderCondition->data().InstanceContentId ][ pZone->getGuId() ] = pZone;
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
+  pZone->init();
+
+
 
   return pZone;
 }
@@ -643,9 +706,9 @@ void TerritoryMgr::disableCurrentFestival()
   setCurrentFestival( 0 );
 }
 
-void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t questBattleId )
+void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint32_t questId, uint16_t questBattleId )
 {
-  auto qb = createQuestBattle( questBattleId );
+  auto qb = createQuestBattle( questId, questBattleId );
   if( !qb )
     return;
 

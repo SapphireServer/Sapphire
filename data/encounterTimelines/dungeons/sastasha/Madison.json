@@ -1,0 +1,79 @@
+{
+  "actors": [
+    {
+      "hp": 600,
+      "id": 1,
+      "layoutId": 3988325,
+      "name": "Captain Madison",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": [
+            {
+              "data": {},
+              "description": "todo: movepath on hp < 50%",
+              "id": 1,
+              "startTime": 0,
+              "type": "idle"
+            }
+          ]
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 65300,
+      "id": 2,
+      "layoutId": 3981887,
+      "name": "Shallowtail Reaver",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 65300,
+      "id": 3,
+      "layoutId": 3981888,
+      "name": "Shallowtail Reaver",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    }
+  ],
+  "conditions": [
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": true,
+      "id": 1,
+      "loop": false,
+      "paramData": {
+        "hpMax": 50,
+        "hpMin": 0,
+        "sourceActor": "Captain Madison"
+      },
+      "targetActor": "Captain Madison",
+      "targetSchedule": "Initial Schedule"
+    }
+  ],
+  "name": "Brand new timeline",
+  "selectors": [],
+  "version": 21
+}

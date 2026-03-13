@@ -146,6 +146,7 @@ doxygen/*.tmp
 config/*.ini
 !config/config.ini.default
 /CMakeSettings.json
+/CMakeUserPresets.json
 
 imgui.ini
 .DS_Store

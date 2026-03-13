@@ -46,7 +46,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Pos[ 0 ] = bnpc.getPos().x;
       m_data.Pos[ 1 ] = bnpc.getPos().y;
       m_data.Pos[ 2 ] = bnpc.getPos().z;
-      m_data.Dir = Common::Util::floatToUInt16Rot( bnpc.getRot() );
+      m_data.Dir = bnpc.getRotUInt16();
       m_data.BindId = bnpc.getBoundInstanceId();
 
       m_data.Rank = bnpc.getRank();
@@ -76,6 +76,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
       m_data.NpcId = bnpc.getBNpcBaseId();
       m_data.NameId = bnpc.getBNpcNameId();
+
+      // todo: map out flags
+      if( bnpc.hasFlag( Entity::BNpcFlag::Untargetable ) )
+        m_data.Flag |= 0x08;
+
+      m_data.PermissionInvisibility = bnpc.getPermissionInvisibility();
 
       if( bnpc.getInstanceObjectInfo() )
       {

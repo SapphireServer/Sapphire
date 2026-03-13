@@ -1,5 +1,6 @@
 #include <ScriptObject.h>
 #include <Territory/InstanceContent.h>
+#include <Actor/EventObject.h>
 
 using namespace Sapphire;
 
@@ -11,16 +12,35 @@ public:
 
   void onInit( InstanceContent& instance ) override
   {
-    instance.addEObj( "unknown_0", 2000623, 4328290, 4294952, 4, { -7.770457f, 54.493511f, -29.083250f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_1", 2000666, 4323972, 4303002, 4, { -3.001781f, 50.022308f, -7.576328f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_2", 2000682, 0, 4312941, 4, { -0.531223f, 50.025429f, 6.100062f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_3", 2001151, 0, 4330504, 4, { 11.681320f, 50.085152f, -0.915123f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_4", 2001150, 0, 4330505, 4, { 14.631230f, 50.087898f, 1.687731f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_5", 2001168, 0, 4333456, 4, { 17.845060f, 50.181900f, -0.676077f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "unknown_6", 2002664, 0, 4335293, 4, { -7.768790f, 50.005032f, -4.092178f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "Allaganterminal", 2001163, 4328464, 4330643, 4, { 51.910549f, 48.460838f, 72.757553f }, 1.000000f, 0.000000f, 0); 
-    instance.addEObj( "Entrance", 2000631, 4294944, 4294942, 5, { -26.751080f, 100.099998f, -128.204498f }, 1.000000f, 0.000000f, 0); 
+    Entity::EventObjectPtr pEObj;
+
+    pEObj = instance.addEObj( "Entrance", 2000631, 4294944, 4294942, 5, { -26.751080f, 100.099998f, -128.204498f }, 1.000000f, 0.000000f, 0 ); 
     // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    pEObj->addCollisionBox( { -26.751080, 102.099998, -131.204498 }, -0.000000, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -26.741278, 102.099998, -125.204498 }, -0.000000, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -23.751080, 102.099998, -128.200607 }, -1.570451, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -29.751080, 102.099998, -128.193527 }, -1.570451, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -28.851080, 102.099998, -130.304504 }, -0.785398, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -24.651079, 102.099998, -126.104500 }, -0.785398, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -24.651079, 102.099998, -130.304504 }, 0.785398, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -28.851080, 102.099998, -126.104500 }, 0.785398, 1.400000, 4.000000, 0.250000 );
+
+    pEObj = instance.addEObj( "unknown_0", 2000623, 4328290, 4294952, 4, { -7.770457f, 54.493511f, -29.083250f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_1", 2000666, 4323972, 4303002, 4, { -3.001781f, 50.022308f, -7.576328f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_2", 2000682, 0, 4312941, 4, { -0.531223f, 50.025429f, 6.100062f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_3", 2001151, 0, 4330504, 4, { 11.681320f, 50.085152f, -0.915123f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_4", 2001150, 0, 4330505, 4, { 14.631230f, 50.087898f, 1.687731f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "Allaganterminal", 2001163, 4328464, 4330643, 4, { 51.910549f, 48.460838f, 72.757553f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_5", 2001168, 0, 4333456, 4, { 17.845060f, 50.181900f, -0.676077f }, 1.000000f, 0.000000f, 0 ); 
+
+    pEObj = instance.addEObj( "unknown_6", 2002664, 0, 4335293, 4, { -7.768790f, 50.005032f, -4.092178f }, 1.000000f, 0.000000f, 0 ); 
+
 
   }
 
@@ -29,8 +49,23 @@ public:
 
   }
 
+  void onTalk( InstanceContent& instance, Entity::Player& player, Entity::EventObject& eobj, uint32_t eventId ) override
+  {
+
+  }
+
+  void onTalk( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint64_t actorId ) override
+  {
+
+  }
+
   void onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
+  {
+
+  }
+
+  void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override
   {
 
   }

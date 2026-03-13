@@ -3,8 +3,10 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-
-#include "Common.h"
+#include <set>
+#include <filesystem>
+#include <regex>
+#include "commonshader.h"
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
@@ -15,6 +17,33 @@
 // Add Detour includes for navmesh
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+
+
+struct CachedEObjCollision
+{
+  std::string eobjName;
+  uint32_t baseId{ 0 };
+  uint32_t instanceId{ 0 };
+  // eobj world origin (for position marker)
+  glm::vec3 eobjPos{ 0.f, 0.f, 0.f };
+  float eobjRot{ 0.f };
+  // collision shape type (should just use Sapphire::Entity::EventObjectCollisionType tbh)
+  enum class ShapeType : uint32_t { Box = 1, Sphere = 3, Cylinder = 4 } type{ ShapeType::Box };
+  // collision shape world position / orientation
+  glm::vec3 collPos{ 0.f, 0.f, 0.f };
+  float collRot{ 0.f };
+  // box half-extents (already full w/h/d stored; halved in geometry parser)
+  float width{ 1.f }, height{ 1.f }, depth{ 1.f };
+  // cylinder / sphere
+  float radius{ 1.f }, cylinderH{ 1.f };
+};
+
+struct CachedServerPath
+{
+  vec3 position;
+  uint32_t instanceId;
+  std::vector< PathControlPoint > points;
+};
 
 struct CachedBnpc
 {
@@ -66,6 +95,27 @@ struct CachedBnpc
   uint32_t CustomizeID;
 
   std::string nameString;
+  std::string groupName;
+
+  enum SenseType : uint8_t
+  {
+    NONE = 0,
+    VISION = 1,
+    HEARING = 2,
+    PRESENCE = 3,
+    VITALITY = 4,
+    MAGIC = 5,
+    ABILITIE = 6,
+    WEAPON_SKILL = 7,
+    POISON = 8,
+    SENSE_COUNT
+  };
+  struct BNpcBaseData
+  {
+    uint16_t TerritoryRange;
+    SenseType Sense[2];
+    uint8_t SenseRange[2];
+  } baseData;
 };
 
 struct CachedZoneInfo
@@ -139,6 +189,16 @@ private:
     CachedBnpc *bnpc;
   };
 
+  glm::vec3 m_focusWorldPos = glm::vec3( 0.0f );
+  bool m_shouldFocusOnMap = false;
+
+  // Add these new members for group color coding
+  std::unordered_map< std::string, ImU32 > m_groupColorMap;
+
+  // Helper method to generate group colors
+  ImU32 getGroupColor( const std::string& groupName );
+
+
   std::vector< BnpcWorldPos > m_bnpcWorldPositions;
 
   // Helper functions
@@ -181,6 +241,53 @@ private:
   bool m_worldEditingMode = false;
   glm::vec3 m_lastClickWorldPos = glm::vec3( 0.0f );
   bool m_showClickMarker = false;
+  bool m_showServerPathWindow = true;
+  uint32_t m_selectedServerPathId = 0;
+  GLuint m_serverPathVAO = 0;
+  GLuint m_serverPathVBO = 0;
+  int m_serverPathVertexCount = 0;
+
+  void initializeServerPathShader();
+
+  void initializeServerPathRendering();
+  void buildServerPathGeometry();
+  bool m_showServerPathsInNavmesh = true;
+  GLuint m_serverPathShader = 0;
+
+  void renderServerPaths();
+
+  // ---- EObj collision visualisation ----
+  std::vector< CachedEObjCollision > m_cachedEObjCollisions;
+
+  // VAO/VBO for collision shape wireframes (boxes/cylinders/spheres)
+  GLuint m_eobjCollisionVAO{ 0 };
+  GLuint m_eobjCollisionVBO{ 0 };
+  int    m_eobjCollisionVertexCount{ 0 };
+
+  // VAO/VBO for EObj origin marker crosses
+  GLuint m_eobjMarkerVAO{ 0 };
+  GLuint m_eobjMarkerVBO{ 0 };
+  int    m_eobjMarkerVertexCount{ 0 };
+
+  bool m_showEObjCollisions{ true };
+  bool m_showEObjMarkers{ true };
+
+  // Path of the last successfully parsed script
+  std::string m_loadedScriptPath;
+  char        m_scriptPathBuffer[ 512 ]{};
+
+  // One-time index: InstanceContentScript id  →  source file path
+  std::unordered_map< uint32_t, std::filesystem::path > m_scriptIndexCache;
+  bool m_scriptIndexBuilt{ false };
+
+  void buildScriptIndexCache();
+  void autoDetectInstanceScript();
+  void parseInstanceScript( const std::filesystem::path& path );
+  void buildEObjCollisionGeometry();
+  void buildEObjMarkerGeometry();
+  void renderEObjCollisions();
+  void renderEObjMarkers();
+  void cleanupEObjRendering();
 
 
   // Camera/view controls for navmesh
@@ -188,7 +295,7 @@ private:
   glm::vec3 m_navCameraTarget = glm::vec3( 0.0f, 0.0f, 0.0f );
   float m_navCameraDistance = 50.0f;
   float m_navCameraYaw = 0.0f;
-  float m_navCameraPitch = -30.0f;
+  float m_navCameraPitch = 30.0f;
   // Mouse interaction state
   bool m_navMouseDragging = false;
   bool m_navMousePanning = false;
@@ -220,6 +327,10 @@ private:
   bool m_showObjModel = false;
   std::string m_currentObjPath;
 
+  std::string m_selectedGroupName = "";
+  std::set< uint32_t > m_selectedBnpcInstanceIds; // Store instance IDs of selected BNPCs
+  bool m_groupSelectionMode = true; // Toggle between group and individual selection
+
   // Methods for OBJ model support
   bool loadObjModel( const std::string& filepath );
 
@@ -231,12 +342,13 @@ private:
 
   std::string getObjFilePath();
 
-
-  // Add these methods
   void cleanupNavmeshGeometry(); // Separate from full cleanup
 
-  // Add these methods
   void showBnpcWindow();
+
+  void showBnpcWindow2();
+
+  void showServerPathWindow();
 
   void updateBnpcSearchFilter();
 
@@ -258,8 +370,78 @@ private:
 
   void renderNavmeshToTexture();
 
+  struct BnpcNameCacheEntry
+  {
+    std::string name;
+    Excel::BNpcName data;
+  };
 
   std::vector< std::shared_ptr< CachedBnpc > > m_bnpcs;
+  std::unordered_map< uint32_t, Excel::BNpcBase > m_bnpcBaseCache;
+  std::unordered_map< uint32_t, CachedServerPath > m_serverPathCache;
+  std::unordered_map< uint32_t, BnpcNameCacheEntry > m_bnpcNameCache;
+  std::unordered_map< uint32_t, Excel::BNpcCustomize > m_bnpcCustomizeCache;
+
+  // Add these to ZoneEditor.h in the private section:
+  bool m_showBnpcNameSelector = false;
+  bool m_showBnpcBaseSelector = false;
+  char m_nameSearchBuffer[256] = "";
+  char m_baseSearchBuffer[256] = "";
+
+  // Add these method declarations to the public section:
+  void showBnpcNameSelector();
+  void showBnpcBaseSelector();
+  // BNPC Window UI Functions
+  void showBnpcWindowHeader();
+  void showBnpcTreeView( float splitterWidth, const ImVec2& windowSize );
+  void showBnpcSplitter( float& splitterWidth, const ImVec2& windowSize );
+  void showBnpcDetailsView( const ImVec2& windowSize );
+  void showBnpcSelectors();
+
+  // BNPC Tree View Functions
+  void showBnpcGroupNode( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void showBnpcNodesInGroup( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void showBnpcNode( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs );
+
+  // BNPC Selection Handling Functions
+  void handleGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void handleCollapsedGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs );
+  void handleBnpcSelection( const std::string& groupName, CachedBnpc* bnpc, const std::vector< CachedBnpc * >& groupBnpcs );
+
+  // BNPC Context Menu Functions
+  void showGroupContextMenu( const std::string& groupName, const std::string& contextIdPrefix );
+  void showBnpcContextMenu( CachedBnpc* bnpc );
+  void showBnpcTreeContextMenu();
+
+  // BNPC Details Panel Functions
+  bool showBnpcBasicInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcPositionInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcPopulationInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcAIBehaviorInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcLinkInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcAppearanceInfo( CachedBnpc* selectedBnpc );
+  bool showBnpcInstanceInfo( CachedBnpc* selectedBnpc );
+  void showBnpcActionButtons( CachedBnpc* selectedBnpc );
+  bool showBnpcBaseDataInfo( CachedBnpc* selectedBnpc );
+
+
+  // Add these new members for sense range rendering
+  GLuint m_senseRangeVAO = 0;
+  GLuint m_senseRangeVBO = 0;
+  GLuint m_senseRangeShader = 0;
+  int m_senseRangeVertexCount = 0;
+  bool m_showSenseRanges = true;
+
+  // Add these methods
+  void initializeSenseRangeRendering();
+  void buildSenseRangeGeometry();
+  void renderSenseRanges();
+  void cleanupSenseRangeRendering();
+
+  // Helper methods for geometry creation
+  std::vector<float> createCircleVertices(float radius, int segments = 64);
+  std::vector<float> createConeVertices(float radius, float angle, int segments = 32);
+
 
 public:
   ZoneEditor();
@@ -305,14 +487,17 @@ public:
   }
 
   bool m_showBnpcIcons = true;
-  float m_bnpcIconSize = 8.0f;
+  float m_bnpcIconSize = 2.0f;
   ImU32 m_bnpcIconColor = IM_COL32( 255, 255, 0, 255 ); // Yellow
   ImU32 m_selectedBnpcIconColor = IM_COL32( 255, 0, 0, 255 ); // Red for selected
   float m_mapScale = 100.0f; // You'll need to get this from the map data
   ImVec2 m_mapOffset = ImVec2( 1024.0f, 1024.0f ); // Default offset
 
+  bool m_showNavCameraOnMap = true;
+
   // Helper methods
   void drawBnpcIcons();
+  void drawNavCameraOnMap( const ImVec2& imagePos, const ImVec2& imageSize );
 
   ImVec2 worldToScreenPos( float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize );
 
@@ -333,16 +518,17 @@ public:
 
   void cleanupBnpcMarkerRendering();
 
-  void drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize );
-
   glm::vec2 worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize );
-
+  void focusOn3DPosition( const glm::vec3& position );
+  void showGambitEditor();
 private:
   void initializeCache();
 
   void updateSearchFilter();
 
   void loadBnpcs();
+
+  void loadServerPaths();
 
   void onSelectionChanged();
 

@@ -71,6 +71,8 @@ namespace World::AI::Fsm
   TYPE_FORWARD( StateCombat );
   TYPE_FORWARD( StateRetreat );
   TYPE_FORWARD( StateDead );
+  TYPE_FORWARD( StateFollowPath );
+  TYPE_FORWARD( StateResumePath );
 
   TYPE_FORWARD( RoamNextTimeReachedCondition );
   TYPE_FORWARD( RoamTargetReachedCondition );
@@ -94,8 +96,8 @@ TYPE_FORWARD( LootTableResult );
 
 namespace Inventory
 {
-using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
-using InventoryTypeList = std::vector< Common::InventoryType >;
+  using InventoryContainerPair = std::pair< Common::InventoryType, uint16_t >;
+  using InventoryTypeList = std::vector< Common::InventoryType >;
 TYPE_FORWARD( HousingItem );
 }
 
@@ -119,6 +121,7 @@ TYPE_FORWARD( Chara );
 TYPE_FORWARD( Player );
 TYPE_FORWARD( EventObject );
 TYPE_FORWARD( BNpc );
+TYPE_FORWARD( AreaObject );
 }
 
 namespace Event

@@ -18,6 +18,8 @@
 
 #include "Network/Util/PacketUtil.h"
 
+#include "AI/TargetHelper.h"
+
 #include "Action/Action.h"
 #include "WorldServer.h"
 #include "Session.h"
@@ -27,6 +29,8 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
+#include "Script/ScriptMgr.h"
+
 #include "Navi/NaviProvider.h"
 #include "Common.h"
 
@@ -39,14 +43,12 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Chara::Chara( ObjKind type ) :
-  GameObject( type ),
-  m_pose( 0 ),
-  m_targetId( INVALID_GAME_OBJECT_ID64 ),
-  m_directorId( 0 ),
-  m_radius( 1.f )
+Chara::Chara( ObjKind type ) : GameObject( type ),
+                               m_pose( 0 ),
+                               m_targetId( INVALID_GAME_OBJECT_ID64 ),
+                               m_directorId( 0 ),
+                               m_radius( 2.f )
 {
-
   m_lastTickTime = 0;
   m_lastUpdate = 0;
   m_lastAttack = Common::Util::getTimeMs();
@@ -196,7 +198,7 @@ bool Chara::isAlive() const
   return ( m_hp > 0 );
 }
 
-void Chara::setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate )
 {
   GameObject::setPos( pos, broadcastUpdate );
   m_dirtyFlag |= DirtyFlag::Position;
@@ -286,6 +288,10 @@ Sets hp/mp/tp, sets status, plays animation and fires onDeath event
 */
 void Chara::die()
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
   m_status = ActorStatus::Dead;
   m_hp = 0;
   m_mp = 0;
@@ -294,9 +300,21 @@ void Chara::die()
   // fire onDeath event
   onDeath();
 
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( auto pInstance = pTeri->getAsInstanceContent() )
+  {
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    scriptMgr.onInstanceActorDeath( *pInstance, *this );
+  }
+
+  removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnDeath );
+
   // if the actor is a player, the update needs to be send to himself too
   bool selfNeedsUpdate = isPlayer();
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( selfNeedsUpdate ), getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( selfNeedsUpdate ), getId(), SetStatus,
+                                           static_cast< uint8_t >( ActorStatus::Dead ) );
   Network::Util::Packet::sendActorControl( getInRangePlayerIds( selfNeedsUpdate ), getId(), DeathAnimation );
 }
 
@@ -316,16 +334,26 @@ position
 
 \param Position to look towards
 */
-bool Chara::face( const FFXIVARR_POSITION3& p )
+bool Chara::face( const Vector3& p )
 {
   float oldRot = getRot();
-  float rot = Common::Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
-  float newRot = PI - rot + ( PI / 2 );
+
+  float dx = p.x - getPos().x;
+  float dz = p.z - getPos().z;
+
+  if( dx == 0.0f && dz == 0.0f )
+    return true;
+
+  // -3.14 == 3.14 in-game so normalize+clamp (-3.14, 3.14).
+  float newRot = atan2f( dx, dz );
+  if( newRot >= PI )
+    newRot = -PI;
 
   setRot( newRot );
 
-  return ( fabs( oldRot - newRot ) <= std::numeric_limits< float >::epsilon() * fmax( fabs( oldRot ), fabs( newRot ) ) );
+  return ( oldRot == newRot );
 }
+
 
 /*!
 Set and propagate the actor stance to in range players
@@ -342,25 +370,36 @@ void Chara::setStance( Stance stance )
 /*!
 Check if an action is queued for execution, if so update it
 and if fully performed, clean up again.
-
-\return true if a queued action has been updated
 */
-bool Chara::checkAction()
+void Chara::processActions()
 {
-
   if( m_pCurrentAction == nullptr )
-    return false;
+    return;
 
-  if( m_pCurrentAction->update() )
+  // delay removing action for 3 tick after interrupting
+  // todo: why does this need to be held for 3 ticks for TimelinePack to pick this up?
+  if( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptTickCount() < 3 )
+  {
+    if( m_pCurrentAction->getInterruptTickCount() == -1 )
+      m_pCurrentAction->update();
+    else
+      m_pCurrentAction->addInterruptTickCount();
+  }
+  else if( m_pCurrentAction->update() )
+  {
     m_pCurrentAction.reset();
+  }
+}
 
-  return true;
-
+bool Chara::hasAction() const
+{
+  return m_pCurrentAction != nullptr;
 }
 
 void Chara::update( uint64_t tickCount )
 {
   updateStatusEffects();
+  processActions();
 
   if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
   {
@@ -400,8 +439,15 @@ magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
-void Chara::takeDamage( uint32_t damage )
+void Chara::takeDamage( uint32_t damage, bool broadcastUpdate )
 {
+  // dont keep dying
+  if( m_status == ActorStatus::Dead )
+    return;
+
+  if( m_invincibilityType == InvincibilityIgnoreDamage )
+    damage = 0;
+
   if( damage >= m_hp )
   {
     switch( m_invincibilityType )
@@ -422,6 +468,14 @@ void Chara::takeDamage( uint32_t damage )
   }
   else
     m_hp -= damage;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(),
+                                             Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeDamageHp, damage );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 /*!
@@ -431,7 +485,7 @@ in range
 
 \param amount of hp to be healed
 */
-void Chara::heal( uint32_t amount )
+void Chara::heal( uint32_t amount, bool broadcastUpdate )
 {
   if( ( m_hp + amount ) > getMaxHp() )
   {
@@ -439,6 +493,14 @@ void Chara::heal( uint32_t amount )
   }
   else
     m_hp += amount;
+
+  if( broadcastUpdate )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(),
+                                             Network::ActorControl::ActorControlType::HPFloatingText, 0,
+                                             Common::CalcResultType::TypeRecoverHp, amount );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 }
 
 void Chara::restoreMP( uint32_t amount )
@@ -486,7 +548,7 @@ void Chara::autoAttack( CharaPtr pTarget )
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
 
     auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Common::Util::floatToUInt16Rot( getRot() ) );
+    effectPacket->setRotation( getRotUInt16() );
 
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage );
@@ -497,7 +559,7 @@ void Chara::autoAttack( CharaPtr pTarget )
 
     server().queueForPlayers( getInRangePlayerIds(), effectPacket );
 
-    pTarget->takeDamage( damage );
+    pTarget->takeDamage( damage, false );
   }
 }
 
@@ -515,6 +577,10 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
   pEffect->setSlot( nextSlot );
   m_statusEffectMap[ nextSlot ] = pEffect;
   pEffect->applyStatus();
+
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( false ), getId(), StatusEffectGain,
+                                           pEffect->getId() );
+  Network::Util::Packet::sendHudParam( *this );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -543,7 +609,7 @@ int8_t Chara::getStatusEffectFreeSlot()
     freeEffectSlot = 0;
   else
     freeEffectSlot = static_cast< int8_t >( *m_statusEffectSlots.rbegin() + 1 );
-  
+
   m_statusEffectSlots.insert( freeEffectSlot );
 
   Logger::warn( "Slot id being added: {}", freeEffectSlot );
@@ -563,13 +629,13 @@ void Chara::replaceSingleStatusEffect( uint32_t slotId, StatusEffect::StatusEffe
   pStatus->applyStatus();
 }
 
-void Chara::replaceSingleStatusEffectById( uint32_t id )
+void Chara::replaceSingleStatusEffectById( uint32_t id, StatusEffect::StatusEffectPtr pStatus )
 {
   for( const auto& effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first, false );
+      replaceSingleStatusEffect( effectIt.first, pStatus );
       break;
     }
   }
@@ -609,7 +675,7 @@ void Chara::removeSingleStatusEffectByFlag( Common::StatusEffectFlag flag )
 {
   for( const auto& effectIt : m_statusEffectMap )
   {
-    if( effectIt.second->getFlag() & static_cast<uint32_t>( flag ) )
+    if( effectIt.second->getFlag() & static_cast< uint32_t >( flag ) )
     {
       removeStatusEffect( effectIt.first );
       return;
@@ -628,7 +694,8 @@ void Chara::removeStatusEffectByFlag( Common::StatusEffectFlag flag )
   }
 }
 
-std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::removeStatusEffect( uint8_t effectSlotId, bool updateStatus )
+std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::removeStatusEffect(
+        uint8_t effectSlotId, bool updateStatus )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -656,15 +723,16 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
 
     effectIt->second->setSlot( effectIt->second->getSlot() - 1 );
 
-    Logger::warn( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
+    Logger::debug( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
     ++effectIt;
   }
 
-  Logger::warn( "Slot id being freed: {}", effectSlotId );
+  Logger::debug( "Slot id being freed: {}", effectSlotId );
 
   if( updateStatus )
   {
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), StatusEffectLose, pEffect->getId() );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), StatusEffectLose,
+                                             pEffect->getId() );
     Network::Util::Packet::sendHudParam( *this );
   }
 
@@ -716,7 +784,8 @@ void Chara::sendStatusEffectUpdate()
   for( const auto& effectIt : m_statusEffectMap )
   {
     float timeLeft = static_cast< float >( effectIt.second->getDuration() -
-                                           ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+                                           ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) /
+                     1000;
     statusEffectList->data().effect[ slot ].Time = timeLeft;
     statusEffectList->data().effect[ slot ].Id = effectIt.second->getId();
     statusEffectList->data().effect[ slot ].Source = effectIt.second->getSrcActorId();
@@ -764,9 +833,60 @@ bool Chara::hasStatusEffect( uint32_t id )
   return false;
 }
 
+bool Chara::hasStatusEffectByFlag( Common::StatusEffectFlag flag )
+{
+  auto uflag = static_cast< uint32_t >( flag );
+  for( const auto& [ key, pEffect ] : m_statusEffectMap )
+  {
+    if( ( pEffect->getFlag() & uflag ) != 0 )
+      return true;
+  }
+  return false;
+}
+
 int64_t Chara::getLastUpdateTime() const
 {
   return m_lastUpdate;
+}
+
+float Chara::getWalkSpeed() const
+{
+  return m_walkSpeed;
+}
+
+float Chara::getRunSpeed() const
+{
+  return m_runSpeed;
+}
+
+std::shared_ptr< Common::CachedServerPath > Chara::getActiveServerPath() const
+{
+  return m_pActiveServerPath;
+}
+
+void Chara::setActiveServerPath( std::shared_ptr< Common::CachedServerPath > pPath )
+{
+  m_pActiveServerPath = pPath;
+}
+
+void Chara::setActiveServerPathPointIndex( uint8_t index )
+{
+  m_serverPathPointIndex = index;
+}
+
+uint8_t Chara::getActiveServerPathPointIndex() const
+{
+  return m_serverPathPointIndex;
+}
+
+bool Chara::isReversePath() const
+{
+  return m_isReversePath;
+}
+
+void Chara::setReversePath( bool reverse )
+{
+  m_isReversePath = reverse;
 }
 
 void Chara::setLastComboActionId( uint32_t actionId )
@@ -899,8 +1019,9 @@ float Chara::getMagicalWeaponDamage()
 }
 
 // Compute forward direction based on rotation angle (assuming rotation around Z axis)
-FFXIVARR_POSITION3 Chara::getForwardVector() const {
-  return Common::Util::normalize( FFXIVARR_POSITION3{ std::sin( getRot() ), 0, std::cos( getRot() ) } );
+Vector3 Chara::getForwardVector() const
+{
+  return Common::Util::normalize( Vector3{ std::sin( getRot() ), 0, std::cos( getRot() ) } );
 }
 
 // Function to check if actor is facing target
@@ -909,28 +1030,38 @@ bool Chara::isFacingTarget( const Chara& other, float threshold )
   auto toActor = Common::Util::normalize( Common::Util::projectY( other.getPos() - getPos() ) );
 
   auto forward = getForwardVector();
-  
+
   float dot = Common::Util::dot( forward, toActor );
-  
+
   // The threshold is used to determine how closely the actors need to be facing each other
   // 1.0 means they need to be perfectly facing each other
   // Lower values allow for some deviation
   return dot >= threshold;
 }
 
-bool Sapphire::Entity::Chara::isHostile( const Chara& chara )
+bool Sapphire::Entity::Chara::isHostile( Chara& chara )
 {
-  return m_objKind != chara.getObjKind();
+  static auto pBattalionFilter = std::make_shared< AI::OwnBattalionFilter >();
+
+  auto pTarget = chara.getAsChara();
+  auto pSrc = getAsChara();
+
+  return !pBattalionFilter->isApplicable( pSrc, pTarget );
 }
 
-bool Sapphire::Entity::Chara::isFriendly( const Chara& chara )
+bool Sapphire::Entity::Chara::isFriendly( Chara& chara )
 {
-  return m_objKind == chara.getObjKind();
+  static auto pBattalionFilter = std::make_shared< AI::OwnBattalionFilter >();
+
+  auto pTarget = chara.getAsChara();
+  auto pSrc = getAsChara();
+
+  return pBattalionFilter->isApplicable( pSrc, pTarget );
 }
 
 void Chara::onTick()
 {
-  if ( !isAlive() )
+  if( !isAlive() )
     return;
 
   uint32_t thisTickDmg = 0;
@@ -960,23 +1091,15 @@ void Chara::onTick()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeDamageHp, thisTickDmg );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickHeal );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             CalcResultType::TypeRecoverMp, thisTickHeal );
-
-    Network::Util::Packet::sendHudParam( *this );
   }
 }
 
-void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ignoreNav )
+void Chara::knockback( const Vector3& origin, float distance, bool ignoreNav )
 {
   auto kbPos = Common::Util::getKnockbackPosition( origin, m_pos, distance );
   auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
@@ -987,11 +1110,11 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
     auto pNav = pTeri->getNaviProvider();
     auto path = pNav->findFollowPath( m_pos, kbPos );
 
-    FFXIVARR_POSITION3 navPos{origin};
-    float prevDistance{1000.f};
+    Vector3 navPos{ origin };
+    float prevDistance{ 1000.f };
     for( const auto& point : path )
     {
-      auto navDist = Common::Util::distance( kbPos, point );  
+      auto navDist = Common::Util::distance( kbPos, point );
       if( navDist < prevDistance )
       {
         navPos = point;
@@ -999,13 +1122,59 @@ void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ig
       }
     }
     setPos( navPos );
-    pNav->updateAgentPosition( getAgentId(), getPos(), getRadius() );
+
+    // speed needs to be reset properly here
+    if( !isPlayer() )
+      setAgentId( pNav->updateAgentPosition( getAgentId(), getPos(), getRadius(), pNav->getAgentSpeed( getAgentId() ) ) );
   }
   else
   {
     setPos( kbPos );
   }
   pTeri->updateActorPosition( *this );
+
+  auto pTransferPacket = makeZonePacket< FFXIVIpcTransfer >( getId() );
+  pTransferPacket->data().dir = Common::Util::floatToUInt16Rot( getRot() );
+  pTransferPacket->data().pos[ 0 ] = Common::Util::floatToUInt16( kbPos.x );
+  pTransferPacket->data().pos[ 1 ] = Common::Util::floatToUInt16( kbPos.y );
+  pTransferPacket->data().pos[ 2 ] = Common::Util::floatToUInt16( kbPos.z );
+  pTransferPacket->data().duration = 1.0f;
+
   // todo: send the correct knockback packet to player
-  server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
+  server().queueForPlayers( getInRangePlayerIds(),
+                            pTransferPacket );
+}
+
+void Chara::createAreaObject( uint32_t actionId, uint32_t actionPotency, uint32_t vfxId, float scale,
+                              const Common::Vector3& pos )
+{
+  removeAreaObject();
+  removeSingleStatusEffectByFlag( Common::StatusEffectFlag::GroundTarget );
+
+  // todo: delay spawning the ground target til action shows hit effect
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  m_pAreaObject = std::make_shared< Entity::AreaObject >( pTeri->getNextActorId(), actionId, actionPotency, vfxId,
+                                                          scale, shared_from_this(), pos );
+
+  pTeri->pushActor( m_pAreaObject );
+}
+
+void Chara::removeAreaObject()
+{
+  if( m_pAreaObject )
+  {
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+    pTeri->removeActor( m_pAreaObject );
+
+    m_pAreaObject = nullptr;
+  }
+}
+
+const AreaObjectPtr Chara::getAreaObject() const
+{
+  return m_pAreaObject;
 }

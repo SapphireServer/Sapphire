@@ -16,6 +16,8 @@ void AI::Fsm::StateRetreat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     bnpc.setRoamTargetReached( true );
     bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
   }
+  if( bnpc.getHpPercent() < 100 )
+    bnpc.heal( bnpc.getMaxHp() / 10.f );
 }
 
 void AI::Fsm::StateRetreat::onEnter( Entity::BNpc& bnpc )
@@ -37,5 +39,8 @@ void AI::Fsm::StateRetreat::onExit( Entity::BNpc& bnpc )
   bnpc.setOwner( nullptr );
   bnpc.setRoamTargetReached( false );
   bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+  bnpc.setRot( bnpc.getSpawnRot() );
+  if( bnpc.getHpPercent() < 100 )
+    bnpc.heal( bnpc.getMaxHp() );
 }
 

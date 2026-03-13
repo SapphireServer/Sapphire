@@ -8,11 +8,13 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <functional>
 
 #include "matrix4.h"
 #include "vec3.h"
 #include "sgb.h"
-#include "LgbTypes.h"
+#include "DatCategories/bg/LgbTypes.h"
+#include "DatCategories/Layer.h"
 
 // based on https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Lgb/
 struct LGB_FILE;
@@ -26,12 +28,12 @@ public:
   char* m_buf;
   uint32_t m_offset;
   InstanceObject header;
-
+  std::string name;
   LgbEntry()
   {
     m_buf = nullptr;
     m_offset = 0;
-    memset( &header, 0, sizeof( header ) );
+    header = {};
   };
 
   LgbEntry( char* buf, size_t offset )
@@ -41,9 +43,9 @@ public:
     header = *reinterpret_cast< InstanceObject* >( buf + offset );
   };
 
-  const LgbEntryType getType() const
+  const eAssetType getType() const
   {
-    return header.type;
+    return static_cast< eAssetType >( header.AssetType );
   };
 
   virtual ~LgbEntry()
@@ -56,7 +58,6 @@ class LGB_BGPARTS_ENTRY : public LgbEntry
 {
 public:
   BgPartsData data;
-  std::string name;
   std::string modelFileName;
   std::string collisionFileName;
 
@@ -65,159 +66,35 @@ public:
   LGB_BGPARTS_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + data.modelFileOffset );
-    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
+    name = std::string( buf + offset + header.Name );
+    modelFileName = std::string( buf + offset + data.AssetPath );
+    collisionFileName = std::string( buf + offset + data.CollisionAssetPath );
   };
 };
 
-class LGB_GIMMICK_ENTRY : public LgbEntry
-{
-public:
-  GimmickData data;
-  std::string name;
-  std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< GimmickData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
-  };
-};
 
-struct LGB_ENPC_ENTRY : public LgbEntry
-{
-public:
-  ENpcData data;
-  std::string name;
 
-  LGB_ENPC_ENTRY( char* buf, size_t offset ) :
-    LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< ENpcData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-  };
-};
 
-struct LGB_EOBJ_ENTRY : public LgbEntry
-{
-public:
-  EObjData data;
-  std::string name;
-
-  LGB_EOBJ_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< EObjData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-  };
-};
-
-struct LGB_MAP_RANGE_ENTRY : public LgbEntry
-{
-public:
-  MapRangeData data;
-  std::string name;
-
-  LGB_MAP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< MapRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-  };
-};
-
-struct LGB_EXIT_RANGE_ENTRY : public LgbEntry
-{
-public:
-  ExitRangeData data;
-  std::string name;
-
-  LGB_EXIT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< ExitRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-  };
-};
-
-struct LGB_POP_RANGE_ENTRY : public LgbEntry
-{
-public:
-  PopRangeData data;
-
-  LGB_POP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< PopRangeData* >( buf + offset );
-  };
-};
-
-struct LGB_EVENT_RANGE_ENTRY : public LgbEntry
-{
-public:
-  EventRangeData data;
-
-  LGB_EVENT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
-  {
-    data = *reinterpret_cast< EventRangeData* >( buf + offset );
-  };
-};
-
-enum LayerSetReferencedType
-{
-  All = 0x0,
-  Include = 0x1,
-  Exclude = 0x2,
-  Undetermined = 0x3,
-};
-
-struct LayerSetReferenced
-{
-  uint32_t LayerSetID;
-};
-
-struct LayerSetReferencedList
-{
-  LayerSetReferencedType ReferencedType;
-  int32_t LayerSets;
-  int32_t LayerSetCount;
-};
-
-struct LGB_GROUP_HEADER
-{
-  uint32_t id;
-  int32_t groupNameOffset;
-  int32_t entriesOffset;
-  int32_t entryCount;
-  int8_t ToolModeVisible;
-  int8_t ToolModeReadOnly;
-  int8_t IsBushLayer;
-  int8_t PS3Visible;
-  int32_t LayerSetRef;
-  uint16_t FestivalID;
-  uint16_t FestivalPhaseID;
-  int8_t IsTemporary;
-  int8_t IsHousing;
-  uint16_t VersionMask;
-  uint32_t Reserved;
-  int32_t OBSetReferencedList;
-  int32_t OBSetReferencedList_Count;
-  int32_t OBSetEnableReferencedList;
-  int32_t OBSetEnableReferencedList_Count;
-};
 
 struct LGB_GROUP
 {
+  using AssetTypeFilter = std::function< bool( eAssetType ) >;
+
   LGB_FILE* parent;
-  LGB_GROUP_HEADER header;
+  Layer header;
   LayerSetReferencedList layerSetReferencedList;
   std::string name;
-  std::vector< std::shared_ptr< LgbEntry > > entries;
+  std::vector< std::shared_ptr< InstanceObjectEntry > > entries;
   std::vector< LayerSetReferenced > refs;
 
-  LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset )
+  LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset, const AssetTypeFilter* pTypeFilter = nullptr )
   {
     parent = parentStruct;
-    header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.groupNameOffset );
+    header = *reinterpret_cast< Layer* >( buf + offset );
+    name = std::string( buf + offset + header.Name );
+
+    //std::cout << name << " groups: " << header.InstanceObject_Count << " " << header.InstanceObjects << std::endl;
 
     layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
 
@@ -227,61 +104,76 @@ struct LGB_GROUP
       memcpy( (char*)&refs[0], buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
     }
 
-    entries.reserve( header.entryCount );
+    entries.reserve( header.InstanceObject_Count );
 
-    const auto entriesOffset = offset + header.entriesOffset;
-    for( auto i = 0; i < header.entryCount; ++i )
+    const auto entriesOffset = offset + header.InstanceObjects;
+
+    for( auto i = 0; i < header.InstanceObject_Count; ++i )
     {
       const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + i * 4 ) );
 
       try
       {
-        const auto type = *reinterpret_cast< LgbEntryType* >( buf + entryOffset );
+        const auto type = *reinterpret_cast< eAssetType* >( buf + entryOffset );
+
+        if( pTypeFilter && !( *pTypeFilter )( type ) )
+          continue;
+
         switch( type )
         {
-          case LgbEntryType::BgParts:
+          case eAssetType::BG:
           {
-            entries.emplace_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< BGEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::Gimmick:
+          case eAssetType::SharedGroup:
           {
-            entries.emplace_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< SharedGroupEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::EventNpc:
+          case eAssetType::EventNPC:
           {
-            entries.emplace_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< EventNPCEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::EventObject:
+          case eAssetType::EventObject:
           {
-            entries.emplace_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< EventObjectEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::ExitRange:
+          case eAssetType::ExitRange:
           {
-            entries.emplace_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< ExitRangeEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::EventRange:
+          case eAssetType::EventRange:
           {
-            entries.emplace_back( std::make_shared< LGB_EVENT_RANGE_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< EventRangeEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::PopRange:
+          case eAssetType::PopRange:
           {
-            entries.emplace_back( std::make_shared< LGB_POP_RANGE_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< PopRangeEntry >( buf, entryOffset ) );
             break;
           }
-          case LgbEntryType::MapRange:
+          case eAssetType::MapRange:
           {
-            entries.emplace_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< MapRangeEntry >( buf, entryOffset ) );
+            break;
+          }
+          case eAssetType::BattleNPC:
+          {
+            entries.emplace_back( std::make_shared< BattleNPCEntry >( buf, entryOffset ) );
+            break;
+          }
+          case eAssetType::CollisionBox:
+          {
+            entries.emplace_back( std::make_shared< CollisionBoxEntry >( buf, entryOffset ) );
             break;
           }
           default:
           {
-            entries.emplace_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
+            entries.emplace_back( std::make_shared< InstanceObjectEntry >( buf, entryOffset ) );
             break;
           }
         }
@@ -298,38 +190,41 @@ struct LGB_FILE_HEADER
 {
   char magic[4]; // LGB 1
   uint32_t fileSize;
-  uint32_t unknown;
+  uint32_t totalChunkCount;
   char magic2[4]; // LGP1
-  uint32_t unknown2;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
+  uint32_t chunkSize;
+  uint32_t layerGroupId;
+  uint32_t nameOff;
+  uint32_t groups;
   int32_t groupCount;
 };
 
 struct LGB_FILE
 {
+  using AssetTypeFilter = std::function< bool( eAssetType ) >;
+
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
   std::string m_name;
 
-  LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
+  LGB_FILE( char* buf, const std::string& name, const AssetTypeFilter* pTypeFilter = nullptr ) : LGB_FILE( buf, pTypeFilter )
   {
-    m_name = name;
+    m_name = std::string( buf + 20 + header.nameOff );
   }
 
-  LGB_FILE( char* buf )
+  LGB_FILE( char* buf, const AssetTypeFilter* pTypeFilter = nullptr )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
+    m_name = std::string( buf + 20 +  header.nameOff );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
       throw std::runtime_error( "Invalid LGB file!" );
 
     constexpr auto baseOffset = sizeof( header );
+    groups.reserve( header.groupCount );
     for( size_t i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
-      const auto group = LGB_GROUP( buf, this, groupOffset );
-      groups.push_back( group );
+      groups.emplace_back( buf, this, groupOffset, pTypeFilter );
     }
   };
 };

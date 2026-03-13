@@ -14,13 +14,14 @@ using namespace Sapphire::Api;
 
 bool SapphireApi::login( const std::string& username, const std::string& pass, std::string& sId )
 {
-  std::string query =
-    "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::ACCOUNT_SEL_BY_NAME_PASS );
+  stmt->setString( 1, username );
+  stmt->setString( 2, pass );
 
   // check if a user with that name / password exists
-  auto pQR = g_charaDb.query( query );
+  auto pQR = g_charaDb.query( stmt );
   // found?
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return false;
 
   // user found, proceed
@@ -33,13 +34,13 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
   for( int32_t i = 0; i < 64 / 4; ++i )
   {
     short number = 0x1111 + rand() % 0xFFFF;
-    char part[5];
+    char part[ 5 ];
     sprintf( part, "%04hx", number );
 
     if( i == 15 )
     {
-      part[2] = 0;
-      part[3] = 0;
+      part[ 2 ] = 0;
+      part[ 3 ] = 0;
     }
     sessionId += std::string( part );
   }
@@ -53,7 +54,6 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
   sId = sessionId;
 
   return true;
-
 }
 
 
@@ -67,37 +67,41 @@ bool SapphireApi::insertSession( const uint32_t accountId, std::string& sId )
   m_sessionMap[ sId ] = pSession;
 
   return true;
-
 }
 
 bool SapphireApi::createAccount( const std::string& username, const std::string& pass, std::string& sId )
 {
   // get account from login name
-  auto pQR = g_charaDb.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::ACCOUNT_SEL_BY_NAME );
+  stmt->setString( 1, username );
+
+  auto pQR = g_charaDb.query( stmt );
   // found?
-  if( pQR->next() )
+  if( pQR && pQR->next() )
     return false;
 
   // we are clear and can create a new account
   // get the next free account id
-  pQR = g_charaDb.query( "SELECT MAX(account_id) FROM accounts;" );
-  if( !pQR->next() )
+  auto stmtMaxId = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::ACCOUNT_SEL_MAX_ID );
+  pQR = g_charaDb.query( stmtMaxId );
+  if( !pQR || !pQR->next() )
     return false;
   uint32_t accountId = pQR->getUInt( 1 ) + 1;
 
+  auto stmtInsert = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::ACCOUNT_INS );
+  stmtInsert->setUInt( 1, accountId );
+  stmtInsert->setString( 2, username );
+  stmtInsert->setString( 3, pass );
+  stmtInsert->setUInt( 4, static_cast< uint32_t >( time( nullptr ) ) );
+
   // store the account to the db
-  g_charaDb.directExecute( "INSERT INTO accounts (account_Id, account_name, account_pass, account_created) VALUE( " +
-                           std::to_string( accountId ) + ", '" +
-                           username + "', '" +
-                           pass + "', " +
-                           std::to_string( time( nullptr ) ) + ");" );
+  g_charaDb.directExecute( stmtInsert );
 
 
   if( !login( username, pass, sId ) )
     return false;
 
   return true;
-
 }
 
 int SapphireApi::createCharacter( const uint32_t accountId, const std::string& name,
@@ -125,7 +129,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   std::vector< int32_t > tmpVector;
   std::vector< int32_t > tmpVector2;
 
-  for( auto& v : json["content"] )
+  for( auto& v : json[ "content" ] )
   {
     if( v.is_array() )
     {
@@ -152,7 +156,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   //         if( !v.second.data().empty() )
   //           tmpVector2.push_back( std::stoi( v.second.data() ) );
   //       }
-  
+
   std::vector< int32_t >::iterator it = tmpVector.begin();
   for( int32_t i = 0; it != tmpVector.end(); ++it, i++ )
   {
@@ -201,6 +205,9 @@ void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
   g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId = " + std::to_string( id ) + ";" );
   g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId = " + std::to_string( id ) + ";" );
   g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfoachievement WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaitemcurrency WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charamonsternote WHERE CharacterId = " + std::to_string( id ) + ";" );
 }
 
 std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
@@ -208,8 +215,12 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
 
   std::vector< Api::PlayerMinimal > charList;
 
-  auto pQR = g_charaDb.query(
-    "SELECT CharacterId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_BY_ACCOUNT_ID );
+  stmt->setUInt( 1, accountId );
+
+  auto pQR = g_charaDb.query( stmt );
+  if( !pQR )
+    return charList;
 
   while( pQR->next() )
   {
@@ -224,15 +235,14 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
   return charList;
 }
 
-bool SapphireApi::checkNameTaken( std::string name )
+bool SapphireApi::checkNameTaken( std::string_view name )
 {
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_BY_NAME );
+  stmt->setString( 1, std::string( name ) );
 
-  g_charaDb.escapeString( name );
-  std::string query = "SELECT * FROM charainfo WHERE Name = '" + name + "';";
+  auto pQR = g_charaDb.query( stmt );
 
-  auto pQR = g_charaDb.query( query );
-
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return false;
   else
     return true;
@@ -244,7 +254,7 @@ uint32_t SapphireApi::getNextEntityId()
 
   auto pQR = g_charaDb.query( "SELECT MAX(EntityId) FROM charainfo" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0x00200001;
 
   charId = pQR->getUInt( 1 ) + 1;
@@ -260,7 +270,7 @@ uint64_t SapphireApi::getNextCharaId()
 
   auto pQR = g_charaDb.query( "SELECT MAX(CharacterId) FROM charainfo" );
 
-  if( !pQR->next() )
+  if( !pQR || !pQR->next() )
     return 0x0040000001000001;
 
   contentId = pQR->getUInt64( 1 ) + 1;

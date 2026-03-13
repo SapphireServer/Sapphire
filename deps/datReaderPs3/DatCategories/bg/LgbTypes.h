@@ -1,5 +1,5 @@
-#ifndef SAPPHIRE_LGBTYPES_H
-#define SAPPHIRE_LGBTYPES_H
+#ifndef SAPPHIRE_LGBTYPES_PS3_H
+#define SAPPHIRE_LGBTYPES_PS3_H
 
 #include "vec3.h"
 
@@ -10,8 +10,7 @@ enum class LgbEntryType : uint32_t
   Light = 3,
   Vfx = 4,
   PositionMarker = 5,
-  Gimmick = 6,
-  SharedGroup6 = 6,// secondary variable is set to 2
+  SharedGroup = 6,// secondary variable is set to 2
   Sound = 7,
   EventNpc = 8,
   BattleNpc = 9,
@@ -87,197 +86,8 @@ enum class LgbEntryType : uint32_t
   StableChocobo = 79
 };
 
-enum PopType : uint32_t
-{
-  PopTypePC = 0x1,
-  PopTypeNPC = 0x2,
-  PopTypeBNPC = 0x2,
-  PopTypeContent = 0x3,
-};
-
-struct Transformation
-{
-  vec3 translation;
-  vec3 rotation;
-  vec3 scale;
-};
-
-struct RelativePositions_
-{
-  int32_t Pos;
-  int32_t PosCount;
-};
-
-struct InstanceObject
-{
-  LgbEntryType type;
-  uint32_t instanceId;
-  uint32_t nameOffset;
-  Transformation transform;
-};
-
-struct GameInstanceObject : public InstanceObject
-{
-  uint32_t BaseId;
-};
-
-struct NPCInstanceObject : public GameInstanceObject
-{
-  uint32_t PopWeather;
-  uint8_t PopTimeStart;
-  uint8_t PopTimeEnd;
-  uint8_t Padding00[2];
-  uint32_t MoveAI;
-  uint8_t WanderingRange;
-  uint8_t Route;
-  uint16_t EventGroup;
-  uint32_t Reserved1;
-  uint32_t Reserved2;
-};
-
-
-struct BNpcBaseData
-{
-  uint16_t TerritoryRange;
-  uint8_t Sense[2];
-  uint8_t SenseRange[2];
-};
-
-
-struct BNPCInstanceObject : public NPCInstanceObject
-{
-  uint32_t NameId;
-  uint32_t DropItem;
-  float SenseRangeRate;
-  uint16_t Level;
-  uint8_t ActiveType;
-  uint8_t PopInterval;
-  uint8_t PopRate;
-  uint8_t PopEvent;
-  uint8_t LinkGroup;
-  uint8_t LinkFamily;
-  uint8_t LinkRange;
-  uint8_t LinkCountLimit;
-  int8_t NonpopInitZone;
-  int8_t InvalidRepop;
-  int8_t LinkParent;
-  int8_t LinkOverride;
-  int8_t LinkReply;
-  int8_t Nonpop;
-  RelativePositions_ RelativePositions;
-  float HorizontalPopRange;
-  float VerticalPopRange;
-  int32_t BNpcBaseData;
-  uint8_t RepopId;
-  uint8_t BNPCRankId;
-  uint16_t TerritoryRange;
-  uint32_t BoundInstanceID;
-  uint32_t FateLayoutLabelId;
-  uint32_t NormalAI;
-  uint32_t ServerPathId;
-  uint32_t EquipmentID;
-  uint32_t CustomizeID;
-};
-
-struct BgPartsData : public InstanceObject
-{
-  uint32_t modelFileOffset;
-  uint32_t collisionFileOffset;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
-};
 
 
 
-struct PopRangeData : public InstanceObject
-{
-  PopType popType;
-  RelativePositions_ relativePositions;
-  float innerRadiusRatio;
-  uint8_t index;
-  uint8_t padding00[3];
-  uint32_t reserved;
-};
-
-struct GimmickData : public InstanceObject
-{
-  uint32_t gimmickFileOffset;
-  char unknownBytes[100];
-};
-
-struct ENpcData : public InstanceObject
-{
-  uint32_t enpcId;
-  uint8_t unknown1[0x24];
-};
-
-struct EObjData : public InstanceObject
-{
-  uint32_t eobjId;
-  uint32_t levelHierachyId;
-  uint8_t unknown1[0xC];
-};
-
-enum TriggerBoxShape : uint32_t
-{
-  TriggerBoxShapeBox = 0x1,
-  TriggerBoxShapeSphere = 0x2,
-  TriggerBoxShapeCylinder = 0x3,
-  TriggerBoxShapeBoard = 0x4,
-  TriggerBoxShapeMesh = 0x5,
-  TriggerBoxShapeBoardBothSides = 0x6,
-};
-
-struct TriggerBoxInstanceObject
-{
-  TriggerBoxShape triggerBoxShape;
-  int16_t priority;
-  int8_t enabled;
-  uint8_t padding;
-  uint32_t reserved;
-};
-
-struct ExitRangeData : public InstanceObject
-{
-  TriggerBoxInstanceObject triggerBoxType;
-  uint32_t exitType;
-  uint16_t zoneId;
-  uint16_t destTerritoryType;
-  int index;
-  uint32_t destInstanceObjectId;
-  uint32_t returnInstanceObjectId;
-  float direction;
-  uint32_t reserved;
-};
-
-struct MapRangeData : public InstanceObject
-{
-  TriggerBoxInstanceObject triggerBoxType;
-  uint32_t mapId;
-  uint32_t placeNameBlock;
-  uint32_t placeNameSpot;
-  uint32_t bGM;
-  uint32_t weather;
-  uint32_t reserved;
-  uint32_t reserved2;
-  uint16_t reserved3;
-  uint8_t housingBlockId;
-  int8_t restBonusEffective;
-  uint8_t discoveryIndex;
-  int8_t mapEnabled;
-  int8_t placeNameEnabled;
-  int8_t discoveryEnabled;
-  int8_t bGMEnabled;
-  int8_t weatherEnabled;
-  int8_t restBonusEnabled;
-  int8_t bGMPlayZoneInOnly;
-  int8_t liftEnabled;
-  int8_t housingEnabled;
-  uint16_t padding;
-};
 
 #endif //SAPPHIRE_LGBTYPES_H

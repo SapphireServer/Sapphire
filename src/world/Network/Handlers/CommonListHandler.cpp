@@ -1,3 +1,5 @@
+#include <type_traits>
+
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketContainer.h>
@@ -85,14 +87,14 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       }
 
       auto id = idVec[ i ];
-      auto pPlayer = playerMgr.getPlayer( id );
-      
-      if( !pPlayer )
+      if( id == 0 )
         continue;
-        
+
+      auto pPlayer = playerMgr.findPlayer( id );
+
       PlayerEntry entry{};
       memset( &entry, 0, sizeof( PlayerEntry ) );
-      bool isConnected = pPlayer->isConnected();
+      bool isConnected = pPlayer && pPlayer->isConnected();
 
       if( isConnected )
       {
@@ -101,7 +103,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 
         entry.CurrentClassID = static_cast< uint8_t >( pPlayer->getClass() );
         entry.SelectClassID = static_cast< uint8_t >( pPlayer->getSearchSelectClass() );
-          
+
         entry.CurrentLevel = pPlayer->getLevel();
         entry.SelectLevel = pPlayer->getLevel();
         entry.Identity = pPlayer->getGender();
@@ -117,8 +119,21 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
         strcpy( entry.FcTag, "Awoo" );
       }
 
-      entry.CharacterID = pPlayer->getCharacterId();
-      strcpy( entry.CharacterName, pPlayer->getName().c_str() );
+      if( pPlayer )
+      {
+        entry.CharacterID = pPlayer->getCharacterId();
+        strcpy( entry.CharacterName, pPlayer->getName().c_str() );
+      }
+      else if constexpr( std::is_same_v< std::decay_t< decltype( id ) >, uint64_t > )
+      {
+        entry.CharacterID = id;
+        const auto playerName = playerMgr.getPlayerNameFromDb( id, true );
+        strcpy( entry.CharacterName, playerName.c_str() );
+      }
+      else
+      {
+        continue;
+      }
 
       if( !hierarchyVec.empty() )
       {

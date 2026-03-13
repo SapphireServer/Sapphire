@@ -39,7 +39,10 @@ namespace Sapphire::World::AI
 
       AllianceA,
       AllianceB,
-      AllianceC
+      AllianceC,
+
+      IsDead,
+      SameEncounter
     };
 
   protected:
@@ -123,7 +126,7 @@ namespace Sapphire::World::AI
   class PlayerFilter : public TargetSelectFilter
   {
   public:
-    PlayerFilter(  ) :
+    PlayerFilter() :
       TargetSelectFilter( Type::Player )
     {
     }
@@ -134,7 +137,7 @@ namespace Sapphire::World::AI
   class AllyFilter : public TargetSelectFilter
   {
   public:
-    AllyFilter(  ) :
+    AllyFilter() :
       TargetSelectFilter( Type::Ally )
     {
     }
@@ -145,7 +148,7 @@ namespace Sapphire::World::AI
   class OwnBattalionFilter : public TargetSelectFilter
   {
   public:
-    OwnBattalionFilter(  ) :
+    OwnBattalionFilter() :
       TargetSelectFilter( Type::OwnBattalion )
     {
     }
@@ -156,7 +159,7 @@ namespace Sapphire::World::AI
   class TankFilter : public TargetSelectFilter
   {
   public:
-    TankFilter(  ) :
+    TankFilter() :
       TargetSelectFilter( Type::Tank )
     {
     }
@@ -167,7 +170,7 @@ namespace Sapphire::World::AI
   class HealerFilter : public TargetSelectFilter
   {
   public:
-    HealerFilter(  ) :
+    HealerFilter() :
       TargetSelectFilter( Type::Healer )
     {
     }
@@ -178,7 +181,7 @@ namespace Sapphire::World::AI
   class DpsFilter : public TargetSelectFilter
   {
   public:
-    DpsFilter(  ) :
+    DpsFilter() :
       TargetSelectFilter( Type::Dps )
     {
     }
@@ -214,7 +217,7 @@ namespace Sapphire::World::AI
   class SecondAggroFilter : public TargetSelectFilter
   {
   public:
-    SecondAggroFilter(  ) :
+    SecondAggroFilter() :
       TargetSelectFilter( Type::SecondAggro )
     {
     }
@@ -225,8 +228,30 @@ namespace Sapphire::World::AI
   class PartyMemberFilter : public TargetSelectFilter
   {
   public:
-    PartyMemberFilter(  ) :
+    PartyMemberFilter() :
       TargetSelectFilter( Type::PartyMember )
+    {
+    }
+
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
+  };
+
+  class IsDeadFilter : public TargetSelectFilter
+  {
+  public:
+    IsDeadFilter() :
+      TargetSelectFilter( Type::IsDead )
+    {
+    }
+
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
+  };
+
+  class SameEncounterFilter : public TargetSelectFilter
+  {
+  public:
+    SameEncounterFilter() :
+      TargetSelectFilter( Type::SameEncounter )
     {
     }
 
@@ -243,7 +268,7 @@ namespace Sapphire::World::AI
     struct CharaEntry
     {
       uint32_t m_entityId;
-      Common::FFXIVARR_POSITION3 m_pos;
+      Common::Vector3 m_pos;
       float m_rot;
       // todo: status effects?
     };
@@ -256,7 +281,7 @@ namespace Sapphire::World::AI
   public:
     Snapshot() {}
 
-    void createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
+    void createSnapshot( Entity::Chara& src, const std::set< Entity::GameObjectPtr >& inRange,
                          uint32_t count, bool fillWithRandom,
                          const std::vector< TargetSelectFilterPtr >& filters,
                          const std::vector< uint32_t >& exclude = {} );

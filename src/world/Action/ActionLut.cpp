@@ -6,9 +6,10 @@ using namespace Sapphire::World::Action;
 
 bool ActionLut::validEntryExists( uint16_t actionId )
 {
-  auto it = m_actionLut.find( actionId );
+  auto& map = lut();
+  auto it = map.find( actionId );
 
-  if( it == m_actionLut.end() )
+  if( it == map.end() )
     return false;
 
   const auto& entry = it->second;
@@ -21,14 +22,16 @@ bool ActionLut::validEntryExists( uint16_t actionId )
 
 const ActionEntry& ActionLut::getEntry( uint16_t actionId )
 {
-  auto it = m_actionLut.find( actionId );
+  auto& map = lut();
+  auto it = map.find( actionId );
 
-  assert( it != m_actionLut.end() );
+  assert( it != map.end() );
 
   return it->second;
 }
 
-Sapphire::Common::StatusRefreshPolicy Sapphire::World::Action::getStatusRefreshPolicy( uint8_t statusRefreshPolicy, bool sameSource )
+Sapphire::Common::StatusRefreshPolicy Sapphire::World::Action::getStatusRefreshPolicy(
+  uint8_t statusRefreshPolicy, bool sameSource )
 {
   uint8_t policy = sameSource ? statusRefreshPolicy >> 4 : statusRefreshPolicy & 0x0F;
   return static_cast< Sapphire::Common::StatusRefreshPolicy >( policy );

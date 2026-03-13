@@ -151,6 +151,8 @@ namespace Sapphire
 
     void setFlags( uint8_t value );
 
+    void setCustomVar( uint32_t var, uint64_t value ) override;
+
     void startQte();
 
     void startEventCutscene();
@@ -175,6 +177,8 @@ namespace Sapphire
     bool hasPlayerPreviouslySpawned( Entity::Player& player ) const;
 
     InstanceContentState getState() const;
+
+    void setState( InstanceContentState state );
 
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > getInstanceConfiguration() const;
 

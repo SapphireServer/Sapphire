@@ -28,6 +28,7 @@ if( ENABLE_SANITIZERS )
     # which causes issues with symbols being defined in multiple places.
     set( CMAKE_EXE_LINKER_FLAGS "${ASAN_LINKER_FLAGS}" )
     set( CMAKE_SHARED_LINKER_FLAGS "${ASAN_LINKER_FLAGS}" )
+    set( CMAKE_MODULE_LINKER_FLAGS "${ASAN_LINKER_FLAGS}" )
 
     if( WIN32 )
       # NOTE: The sanitizer library only supports the static release runtime
@@ -70,6 +71,9 @@ elseif( WIN32 )
 
     # Increase number of sections in .obj file
     add_compile_options( /bigobj )
+
+    # Disable permissive mode
+    add_compile_options( /permissive- )
   endif()
 
   # Visual Studio generator specific flags

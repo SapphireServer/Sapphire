@@ -7,7 +7,6 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
-#include <Encounter/EncounterTimeline.h>
 #include "ForwardsZone.h"
 
 #include <set>
@@ -32,7 +31,7 @@ namespace Sapphire
   struct SpawnInfo
   {
     std::shared_ptr< Entity::BNpc > bnpcPtr;
-    std::shared_ptr< Common::BNPCInstanceObject > infoPtr;
+    std::shared_ptr< Common::BNpcCacheEntry > infoPtr;
     uint32_t lastSpawn;
     uint32_t timeOfDeath;
   };
@@ -50,8 +49,12 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::PlayerPtr > m_playerMap;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bNpcMap;
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventObjects;
+    std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_playerAreaObjects;
+    std::unordered_map< uint32_t, Entity::AreaObjectPtr > m_bNpcAreaObjects;
 
-    std::unordered_map< uint32_t, std::shared_ptr< Common::BNPCInstanceObject > > m_bNpcBaseMap;
+    std::unordered_map< uint32_t, std::shared_ptr< Common::CachedServerPath > > m_serverPathCache;
+
+    std::unordered_map< uint32_t, std::shared_ptr< Common::BNpcCacheEntry > > m_bNpcBaseMap;
 
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;
@@ -68,6 +71,7 @@ namespace Sapphire
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
+    uint32_t m_nextEncounterId{ 1 };
 
     std::vector< SpawnInfo > m_spawnInfo;
 
@@ -78,10 +82,10 @@ namespace Sapphire
 
     float m_inRangeDistance;
 
-    TimelinePack m_timelinePack;
-
   public:
     Territory();
+
+    void loadServerPaths();
 
     Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
@@ -101,6 +105,8 @@ namespace Sapphire
     std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > getTerritoryTypeInfo() const;
 
     uint64_t getLastActivityTime() const;
+
+    std::shared_ptr< Common::CachedServerPath > getServerPath( uint32_t instanceId );
 
     virtual bool init();
 
@@ -174,14 +180,16 @@ namespace Sapphire
 
     void updateSessions( uint64_t tickCount, bool changedWeather );
 
-    Entity::EventObjectPtr addEObj( const std::string& name, uint32_t objectId, uint32_t mapLink, uint32_t instanceId,
-                                    uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+    Entity::EventObjectPtr addEObj( const std::string& name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
+                                    uint8_t state, Common::Vector3 pos, float scale,
                                     float rotation, uint8_t permissionInv );
 
     void addEObj( Entity::EventObjectPtr object );
 
     Entity::BNpcPtr createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
     Entity::BNpcPtr createBNpcFromLayoutIdNoPush( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
+
+    Entity::GameObjectPtr getEntityById( uint32_t entityId );
 
     Entity::BNpcPtr getActiveBNpcByEntityId( uint32_t entityId );
 
@@ -190,6 +198,10 @@ namespace Sapphire
     Entity::BNpcPtr getActiveBNpcByLayoutIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId );
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
+
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId );
+
+    Entity::EventObjectPtr getEObjByName( const std::string& name );
 
     Entity::PlayerPtr getPlayer( uint32_t playerId );
 
@@ -202,6 +214,8 @@ namespace Sapphire
     void updateSpawnPoints();
 
     uint32_t getNextActionResultId();
+
+    uint32_t getNextEncounterId();
 
     std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };

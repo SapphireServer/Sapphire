@@ -19,17 +19,19 @@ namespace Sapphire::World::Action
     void heal( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None, float aggroModifier = 1.0f );
     void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
+    void knockback( uint32_t kbExdKey, float offset );
+
     void comboSucceed();
     void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool applyAggro, bool shouldOverride );
-    void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride );
+    void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+                            uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE );
     void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, bool applyAggro, bool shouldOverride );
     void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
-                                uint32_t flag, bool applyAggro, bool shouldOverride );
+                                uint32_t flag, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE );
     void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                              const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro );
+                              const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, const World::Action::GroundAOE& groundAOE );
     void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
-                                  const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro );
+                                  const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro, const World::Action::GroundAOE& groundAOE );
     void mount( uint16_t mountId );
 
     Entity::CharaPtr getTarget() const;

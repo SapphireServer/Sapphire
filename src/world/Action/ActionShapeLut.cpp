@@ -6,9 +6,10 @@ using namespace Sapphire::World::Action;
 
 bool ActionShapeLut::validConeEntryExists( uint16_t actionId )
 {
-  auto it = m_coneLut.find( actionId );
+  auto& map = lut();
+  auto it = map.find( actionId );
 
-  if( it == m_coneLut.end() )
+  if( it == map.end() )
     return false;
 
   const auto& entry = it->second;
@@ -19,9 +20,10 @@ bool ActionShapeLut::validConeEntryExists( uint16_t actionId )
 
 const ConeEntry& ActionShapeLut::getConeEntry( uint16_t actionId )
 {
-  auto it = m_coneLut.find( actionId );
+  auto& map = lut();
+  auto it = map.find( actionId );
 
-  assert( it != m_coneLut.end() );
+  assert( it != map.end() );
 
   return it->second;
 }

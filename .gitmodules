@@ -6,7 +6,8 @@
 	url = https://github.com/gabime/spdlog.git
 [submodule "deps/recastnavigation"]
 	path = deps/recastnavigation
-	url = https://github.com/SapphireServer/recastnavigation
+	url = https://github.com/takhlaq/recastnavigation.git
+	branch = update2
 [submodule "deps/ffxiv-actions"]
 	path = deps/ffxiv-actions
 	url = https://github.com/SapphireServer/ffxiv-actions.git
@@ -22,3 +23,6 @@
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "deps/FastLZ"]
+	path = deps/FastLZ
+	url = https://github.com/ariya/FastLZ

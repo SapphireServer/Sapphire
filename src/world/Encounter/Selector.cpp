@@ -120,11 +120,13 @@ namespace Sapphire
       pFilter->setEnforcedOnRandomFill( enforceOnRandom );
       m_filters.push_back( pFilter );
     }
+    // always filter by encounter
+    m_filters.push_back( std::make_shared< World::AI::SameEncounterFilter >() );
   }
 
-  void Selector::createSnapshot( Entity::CharaPtr pSrc, const std::vector< uint32_t >& exclude )
+  void Selector::createSnapshot( Entity::Chara& src, const std::vector< uint32_t >& exclude )
   {
-    m_snapshot.createSnapshot( pSrc, pSrc->getInRangeActors(), m_count, m_fillWithRandom, m_filters, exclude );
+    m_snapshot.createSnapshot( src, src.getInRangeActors(), m_count, m_fillWithRandom, m_filters, exclude );
   }
 
   const World::AI::Snapshot::Results& Selector::getResults()

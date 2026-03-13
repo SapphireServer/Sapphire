@@ -1,5 +1,5 @@
 #include <Common.h>
-#include <Vector3.cpp>
+#include <Vector3.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
@@ -7,9 +7,6 @@
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Util/Util.h>
-
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
 
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
@@ -46,6 +43,7 @@
 #include "Session.h"
 #include "WorldServer.h"
 #include "Forwards.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -222,6 +220,11 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
     }
   }
 
+  if( animationSpeed == MoveSpeed::Run )
+    player.setRunning( true );
+  else if( animationSpeed == MoveSpeed::Walk )
+    player.setRunning( false );
+
   if( animColType == MoveState::EnterCollision )
   {
     animationType = 2;
@@ -271,17 +274,17 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   auto pExitRange = instanceObjectCache.getExitRange( player.getTerritoryTypeId(), exitBoxId );
 
-  Common::FFXIVARR_POSITION3 targetPos{};
-  Common::FFXIVARR_POSITION3 targetRot{};
+  Common::Vector3 targetPos{};
+  Common::Vector3 targetRot{};
   uint32_t targetZone{128};
   float rotation = 0.0f;
 
   if( pExitRange )
   {
-    auto pPopRange = instanceObjectCache.getPopRangeInfo( pExitRange->data.destInstanceObjectId );
+    auto pPopRange = instanceObjectCache.getPopRangeInfo( pExitRange->header.destInstanceObjectId );
     if( pPopRange )
     {
-      targetZone = pExitRange->data.destTerritoryType;
+      targetZone = pExitRange->header.destTerritoryType;
       targetPos = pPopRange->m_pos;
       rotation = pPopRange->m_rotation;
       PlayerMgr::sendDebug( player, "ZoneLine #{0} found. Rotation: {1}, Zone: #{2} ", exitBoxId, rotation, targetZone );
@@ -317,9 +320,9 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
   auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
   discoveryPacket->data().mapId = tInfo->data().Map;
-  discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
+  discoveryPacket->data().mapPartId = pRefInfo->header.discoveryIndex;
   server().queueForPlayer( player.getCharacterId(), discoveryPacket );
-  playerMgr().onDiscoverArea( player, tInfo->data().Map, pRefInfo->data.discoveryIndex );
+  playerMgr().onDiscoverArea( player, tInfo->data().Map, pRefInfo->header.discoveryIndex );
 
 }
 

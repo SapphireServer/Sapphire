@@ -31,6 +31,7 @@
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
+#include "Action/Action.h"
 #include "Action/ActionLutData.h"
 #include "Action/ActionShapeLutData.h"
 
@@ -86,7 +87,6 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
-  registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
   registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
   registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
 }
@@ -194,32 +194,35 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
-    int32_t posX;
-    int32_t posY;
-    int32_t posZ;
+    float fPosX{ 0.f };
+    float fPosY{ 0.f };
+    float fPosZ{ 0.f };
+    float fRot{ 0.f };
 
-    sscanf( params.c_str(), "%d %d %d", &posX, &posY, &posZ );
-
-    if( ( posX == 0xcccccccc ) || ( posY == 0xcccccccc ) || ( posZ == 0xcccccccc ) )
+    const auto parsedCount = sscanf( params.c_str(), "%f %f %f %f", &fPosX, &fPosY, &fPosZ, &fRot );
+    if( ( parsedCount != 3 ) && ( parsedCount != 4 ) )
     {
       PlayerMgr::sendUrgent( player, "Syntaxerror." );
       return;
     }
 
     if( subCommand == "pos" )
-      player.setPos( static_cast< float >( posX ),
-                     static_cast< float >( posY ),
-                     static_cast< float >( posZ ) );
+      player.setPos( fPosX, fPosY, fPosZ );
     else
-      player.setPos( player.getPos().x + static_cast< float >( posX ),
-                     player.getPos().y + static_cast< float >( posY ),
-                     player.getPos().z + static_cast< float >( posZ ) );
+      player.setPos( player.getPos().x + fPosX,
+                     player.getPos().y + fPosY,
+                     player.getPos().z + fPosZ );
+
+    if( parsedCount == 4 )
+      player.setRot( fRot );
 
     auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    server.queueForPlayer( player.getCharacterId(), setActorPosPacket );
+    setActorPosPacket->data().Dir = player.getRotUInt16();
+
+    server.queueForPlayers( player.getInRangePlayerIds( true ), setActorPosPacket );
   }
   else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {
@@ -227,6 +230,16 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     sscanf( params.c_str(), "%i", &aetheryteId );
 
     Common::Service< WarpMgr >::ref().requestPlayerTeleport( player, static_cast< uint16_t >( aetheryteId ), 1 );
+  }
+  else if( ( subCommand == "condition" ) && ( !params.empty() ) )
+  {
+    int32_t conditionId, value;
+    sscanf( params.c_str(), "%i %i", &conditionId, &value );
+
+    if( value == 1 )
+      player.setCondition( static_cast< Common::PlayerCondition >( conditionId ) );
+    else
+      player.removeCondition( static_cast< Common::PlayerCondition >( conditionId ) );
   }
   else if( ( subCommand == "discovery" ) && ( !params.empty() ) )
   {
@@ -320,32 +333,32 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     {
       case 8:
       {
-        quest.setBitFlag8( questBit, true );
+        quest.setBitFlag8( questBit, !quest.getBitFlag8( questBit ) );
         break;
       }
       case 16:
       {
-        quest.setBitFlag16( questBit, true );
+        quest.setBitFlag16( questBit, !quest.getBitFlag16( questBit ) );
         break;
       }
       case 24:
       {
-        quest.setBitFlag24( questBit, true );
+        quest.setBitFlag24( questBit, !quest.getBitFlag24( questBit ) );
         break;
       }
       case 32:
       {
-        quest.setBitFlag32( questBit, true );
+        quest.setBitFlag32( questBit, !quest.getBitFlag32( questBit ) );
         break;
       }
       case 40:
       {
-        quest.setBitFlag40( questBit, true );
+        quest.setBitFlag40( questBit, !quest.getBitFlag40( questBit ) );
         break;
       }
       case 48:
       {
-        quest.setBitFlag48( questBit, true );
+        quest.setBitFlag48( questBit, !quest.getBitFlag48( questBit ) );
         break;
       }
     }
@@ -548,7 +561,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     sscanf( params.c_str(), "%hu", &param1 );
 
     auto effectPacket = std::make_shared< EffectPacket >( player.getId(), static_cast< uint32_t >( player.getTargetId() ), param1 );
-    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+    effectPacket->setRotation( player.getRotUInt16() );
 
     Common::CalcResultParam entry{};
     entry.Value = static_cast< int16_t >( param1 );
@@ -567,7 +580,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     uint8_t speed{ 20 };
     float x{ 0 }, y{ 0 }, z{ 0 };
 
-    sscanf( params.c_str(), "%u %u %u %d %d %d", &animationType, &animationState, &speed, &x, &y, &z );
+    sscanf( params.c_str(), "%" SCNu8 " %" SCNu8 " %" SCNu8 " %f %f %f", &animationType, &animationState, &speed, &x, &y, &z );
     auto targetId = static_cast< uint32_t >( player.getTargetId() );
     auto actorMovePacket = makeZonePacket< FFXIVIpcActorMove >( targetId, player.getId() );
 
@@ -584,8 +597,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     if( pTarget )
     {
-      actorMovePacket->data().dir = Common::Util::floatToUInt8Rot( pTarget->getRot() );
-      actorMovePacket->data().dirBeforeSlip = Common::Util::floatToUInt8Rot( pTarget->getRot() );
+      actorMovePacket->data().dir = pTarget->getRotUInt8();
+      actorMovePacket->data().dirBeforeSlip = pTarget->getRotUInt8();
       actorMovePacket->data().flag = animationType;
       actorMovePacket->data().flag2 = animationState;
       actorMovePacket->data().speed = speed;
@@ -607,6 +620,21 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
         pBNpc->knockback( player.getPos(), distance );
     }
   }
+  else if( subCommand == "interrupt" )
+  {
+    auto targetId = player.getTargetId();
+    for( auto& pActor : player.getInRangeActors() )
+    {
+      if( auto pChara = pActor->getAsChara(); pChara && pChara->getId() == targetId )
+      {
+        if( pChara->getCurrentAction() )
+        {
+          pChara->getCurrentAction()->interrupt();
+          break;
+        }
+      }
+    }
+  }
   else if( subCommand == "achvGeneral" )
   {
     uint32_t achvSubtype;
@@ -618,11 +646,34 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     achvMgr.progressAchievementByType< Common::Achievement::Type::General >( player, achvSubtype, progress );
   }
-  else
+  else if( subCommand == "obstacle" )
   {
-    PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );
-  }
+    float radius{ 0.f };
+    float height{ 0.f };
+    float depth{ 0.f };
 
+    int paramCount = sscanf( params.c_str(), "%f %f %f", &radius, &height, &depth );
+    if( paramCount < 2 )
+    {
+      PlayerMgr::sendUrgent( player, "Usage: <radius> <height> or <width> <height> <depth>." );
+      return;
+    }
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      auto& obstacleRef = player.getObstacleRef();
+
+      if( obstacleRef != 0 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, radius, false );
+
+      if( paramCount == 3 )
+        pNavi->toggleBox( obstacleRef, player.getPos(), { radius, height, depth }, player.getRot(), true );
+      else if( paramCount == 2 )
+        pNavi->toggleObstacle( obstacleRef, player.getPos(), radius, height, true );
+    }
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
@@ -656,6 +707,29 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
     PlayerMgr::sendServerNotice( player, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                                  player.getPos().x, player.getPos().y, player.getPos().z,
                                  player.getRot(), map_id, player.getTerritoryTypeId() );
+  }
+  else if( subCommand == "los" )
+  {
+    auto targetId = player.getTargetId();
+    bool los = false;
+    bool naviLos = false;
+    auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+    auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    for( auto pActor : player.getInRangeActors() )
+    {
+      if( auto pChara = pActor->getAsChara(); pChara && pChara->getId() == targetId )
+      {
+        if( auto pNavi = pTeri->getNaviProvider() )
+        {
+          los = player.isFacingTarget( *pChara );
+          naviLos = pNavi->hasLineOfSight( player.getPos(), pChara->getPos() );
+        }
+        break;
+      }
+    }
+
+    PlayerMgr::sendServerNotice( player, "Facing: {0} NaviLos: {1}\n", los ? "true" : "false", naviLos ? "true" : "false" );
   }
   else
   {
@@ -780,7 +854,7 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().Dir = Common::Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().Dir = player.getRotUInt16();
     server().queueForPlayer( player.getCharacterId(), setActorPosPacket );
   }
 }
@@ -1080,7 +1154,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
       return;
     }
 
-    obj->setAnimationFlag( state1, state2 );
+    obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {
@@ -1179,14 +1253,15 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
 
   if( subCommand == "create" || subCommand == "cr" )
   {
-    uint32_t contentFinderConditionId;
-    sscanf( params.c_str(), "%d", &contentFinderConditionId );
+    uint32_t questId;
+    uint16_t questBattleId;
+    sscanf( params.c_str(), "%d %d", &questId, &questBattleId );
 
-    auto instance = terriMgr.createQuestBattle( contentFinderConditionId );
+    auto instance = terriMgr.createQuestBattle( questId, questBattleId );
     if( instance )
       PlayerMgr::sendDebug( player, "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
-      PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", contentFinderConditionId );
+      PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", questBattleId );
   }
   else if( subCommand == "complete" )
   {
@@ -1283,7 +1358,7 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
       return;
     }
 
-    obj->setAnimationFlag( state1, state2 );
+    obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {

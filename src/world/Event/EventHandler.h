@@ -63,6 +63,7 @@ namespace Sapphire::Event
       OutsideRange = 11,
       GameStart = 12,
       GameProgress = 13,
+      Unknown = 14,
       EnterTerritory = 15,
       GameComeBack = 17,
       ActionResult = 18,

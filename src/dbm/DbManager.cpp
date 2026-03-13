@@ -1,5 +1,5 @@
 #include "DbManager.h"
-#include <MySqlConnector.h>
+#include "MySqlConnection.h"
 #include <string>
 #include <fstream>
 #include <streambuf>
@@ -13,7 +13,6 @@ using namespace Sapphire::Common;
 
 #include <filesystem>
 namespace fs = std::filesystem;
-
 
 DbManager::DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port ) :
   m_host( host ),
@@ -52,9 +51,9 @@ void DbManager::setForceMode( bool mode )
 bool DbManager::connect()
 {
   std::shared_ptr< Mysql::MySqlBase > base( new Mysql::MySqlBase() );
-  Mysql::optionMap options;
-  options[ Mysql::MYSQL_OPT_RECONNECT ] = "1";
-  options[ Mysql::MYSQL_SET_CHARSET_NAME ] = "utf8";
+  Mysql::OptionMap options;
+  options[ Mysql::Option::OptReconnect ] = "1";
+  options[ Mysql::Option::SetCharsetName ] = "utf8";
 
   try
   {
@@ -164,7 +163,7 @@ bool DbManager::modeInit()
       auto stmt = m_pConnection->createStatement();
       auto resultSet = stmt->executeQuery( query );
 
-      if( !resultSet->next() )
+      if( !resultSet || !resultSet->next() )
         return false;
 
       auto count = resultSet->getUInt( 1 );
@@ -296,6 +295,8 @@ bool DbManager::modeLiquidate()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {
@@ -341,6 +342,8 @@ bool DbManager::modeCheck()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {
@@ -394,6 +397,8 @@ bool DbManager::modeMigrate()
   {
     auto stmt = m_pConnection->createStatement();
     auto resultSet = stmt->executeQuery( query );
+    if( !resultSet )
+      return false;
 
     while( resultSet->next() )
     {

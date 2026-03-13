@@ -64,3 +64,4 @@ SpacesInParentheses: true
 SpacesInSquareBrackets: true
 TabWidth: 2
 UseTab: Never
+SortIncludes: false

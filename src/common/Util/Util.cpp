@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <fstream>
 #include <string>
 
 using namespace Sapphire::Common;
@@ -145,6 +146,34 @@ void Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t&
   uint8_t bitIndex = id % 8;
 
   outVal = 1 << bitIndex;
+}
+
+std::string Util::readFileToString( const std::string& filename )
+{
+  // Open the file for reading
+  std::ifstream file( filename );
+
+  // Check if the file was opened successfully
+  if( !file )
+  {
+    throw std::runtime_error( "Failed to open file" );
+  }
+
+  // Read the contents of the file into a string
+  std::string fileContents( ( std::istreambuf_iterator< char >( file ) ),
+                              std::istreambuf_iterator< char >() );
+
+  // Close the file
+  file.close();
+
+  // Remove all newlines from the file contents
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\n' ), fileContents.end() );
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\r' ), fileContents.end() );
+
+
+  // Return the file contents as a string
+  return fileContents;
+
 }
 
 

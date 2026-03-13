@@ -12,6 +12,9 @@ namespace Sapphire::World::Manager
     PlayerMgr() = default;
 
     std::string getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad = false );
+    Entity::PlayerPtr findPlayer( uint32_t entityId ) const;
+    Entity::PlayerPtr findPlayer( uint64_t characterId ) const;
+    Entity::PlayerPtr findPlayer( const std::string& playerName ) const;
     Entity::PlayerPtr getPlayer( uint32_t entityId );
     Entity::PlayerPtr getPlayer( uint64_t characterId );
     Entity::PlayerPtr getPlayer( const std::string& playerName );
@@ -40,7 +43,7 @@ namespace Sapphire::World::Manager
 
     void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
 
-    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint8_t id );
+    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint32_t id );
 
     void onExitInstance( Sapphire::Entity::Player& player );
 

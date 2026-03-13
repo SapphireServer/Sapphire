@@ -1,6 +1,6 @@
 #include "Timepoint.h"
 #include "TimelineActor.h"
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
 #include "Encounter.h"
 
 #include <Action/Action.h>
@@ -14,6 +14,9 @@
 
 #include <Manager/ActionMgr.h>
 #include <Manager/PlayerMgr.h>
+
+#include <Random/RNGMgr.h>
+
 #include <Service.h>
 
 #include <Territory/QuestBattle.h>
@@ -60,7 +63,9 @@ namespace Sapphire
       { "setBGM",              TimepointDataType::SetBgm },
 
       { "setCondition",        TimepointDataType::SetCondition },
-      { "snapshot",            TimepointDataType::Snapshot }
+      { "snapshot",            TimepointDataType::Snapshot },
+      { "interruptAction",     TimepointDataType::InterruptAction },
+      { "rollRNG",             TimepointDataType::RollRNG }
     };
 
     const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
@@ -87,10 +92,11 @@ namespace Sapphire
 
     const static std::unordered_map< std::string, ActionTargetType > actionTypeMap =
     {
-      { "none",     ActionTargetType::None },
-      { "self",     ActionTargetType::Self },
-      { "target",   ActionTargetType::Target },
-      { "selector", ActionTargetType::Selector }
+      { "none",           ActionTargetType::None },
+      { "self",           ActionTargetType::Self },
+      { "target",         ActionTargetType::Target },
+      { "selectorPos",    ActionTargetType::SelectorPos },
+      { "selectorTarget", ActionTargetType::SelectorTarget },
     };
 
     const static std::unordered_map< std::string, SetPosType > setPosTypeMap =
@@ -101,10 +107,18 @@ namespace Sapphire
 
     const static std::unordered_map< std::string, SetPosTargetType > setPosTargetTypeMap =
     {
-      { "none",     SetPosTargetType::None },
-      { "self",     SetPosTargetType::Self },
-      { "target",   SetPosTargetType::Target },
-      { "selector", SetPosTargetType::Selector }
+      { "none",           SetPosTargetType::None },
+      { "self",           SetPosTargetType::Self },
+      { "target",         SetPosTargetType::Target },
+      { "selectorPos",    SetPosTargetType::SelectorPos },
+      { "selectorTarget", SetPosTargetType::SelectorTarget }
+    };
+
+    const static std::unordered_map< std::string, VarType > varTypeMap =
+    {
+      { "director", VarType::Director },
+      { "custom",   VarType::Custom },
+      { "pack",     VarType::Pack }
     };
 
     TimepointDataType tpType{ 0 };
@@ -134,7 +148,7 @@ namespace Sapphire
         auto selectorIndex = dataJ.at( "selectorIndex" ).get< uint32_t >();
 
         m_pData = std::make_shared< TimepointDataAction >( sourceRef, actionId, targetType,
-                                                           selectorRef, selectorIndex - 1 );
+                                                           selectorRef, selectorIndex );
       }
       break;
       case TimepointDataType::SetPos:
@@ -283,7 +297,16 @@ namespace Sapphire
         // todo: batallion
         // auto battalion = dataJ.at( "batallion" ).get< uint32_t >();
         auto bnpcType = Common::BNpcType::Enemy;//bnpcTypeMap.at( dataJ.at( "type" ).get< std::string >() );
+        auto flagsMaskJ = dataJ.at( "flagsMask" );
+        auto flagsMask = 0xFFFFFFFF;
+        auto invulnJ = dataJ.at( "invulnType" );
+        auto invincibilityType = Common::InvincibilityNone;
 
+        if( !flagsMaskJ.is_null() )
+          flagsMask = flagsMaskJ.get< uint32_t >();
+
+        if( !invulnJ.is_null() )
+          invincibilityType = invulnJ.get< Common::InvincibilityType >();
         // todo: hateSrc
 
         uint32_t layoutId = Common::INVALID_GAME_OBJECT_ID;
@@ -292,7 +315,7 @@ namespace Sapphire
         else
           throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: BNpcSpawn invalid actor ref: {}" ), actorRef ) );
 
-        m_pData = std::make_shared< TimepointDataBNpcSpawn >( layoutId, flags, bnpcType );
+        m_pData = std::make_shared< TimepointDataBNpcSpawn >( layoutId, flags, flagsMask, invincibilityType, bnpcType );
       }
       break;
       case TimepointDataType::BNpcFlags:
@@ -300,6 +323,16 @@ namespace Sapphire
         auto& dataJ = json.at( "data" );
         auto actorRef = dataJ.at( "targetActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
+        auto flagsMaskJ = dataJ.at( "flagsMask" );
+        auto flagsMask = 0xFFFFFFFF;
+        auto invulnJ =  dataJ.at( "invulnType" );
+        auto invincibilityType = Common::InvincibilityNone;
+
+        if( !flagsMaskJ.is_null() )
+          flagsMask = flagsMaskJ.get< uint32_t >();
+
+        if( !invulnJ.is_null() )
+          invincibilityType = invulnJ.get< Common::InvincibilityType >();
 
         // todo: hateSrc
 
@@ -309,8 +342,7 @@ namespace Sapphire
         //else
         //  throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: BNpcFlags invalid actor ref: {}" ), actorRef ) );
 
-        m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
-        // todo: SetBNpcFlags
+        m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags, flagsMask, invincibilityType );
       }
       break;
 
@@ -338,7 +370,6 @@ namespace Sapphire
         m_pData = std::make_shared< TimepointDataCondition >( conditionId, enabled );
       }
       break;
-
       case TimepointDataType::Snapshot:
       {
         auto& dataJ = json.at( "data" );
@@ -348,6 +379,26 @@ namespace Sapphire
         // todo: use exclude selector when added to ui
 
         m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef, excludeSelector );
+      }
+      break;
+      case TimepointDataType::InterruptAction:
+      {
+        auto& dataJ = json.at( "data" );
+        auto actorRef = dataJ.at( "sourceActor" ).get< std::string >();
+        auto actionId = dataJ.at( "actionId" ).get< uint32_t >();
+
+        m_pData = std::make_shared< TimepointDataInterruptAction >( actorRef, actionId );
+      }
+      break;
+      case TimepointDataType::RollRNG:
+      {
+        auto& dataJ = json.at( "data" );
+        auto min = dataJ.at( "min" ).get< uint32_t >();
+        auto max = dataJ.at( "max" ).get< uint32_t >();
+        auto type = varTypeMap.at( dataJ.at( "type" ).get< std::string >() );
+        auto idx = dataJ.at( "index" ).get< uint32_t >();
+
+        m_pData = std::make_shared< TimepointDataRollRNG >( min, max, type, idx );
       }
       break;
       default:
@@ -390,6 +441,7 @@ namespace Sapphire
       {
         auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
         auto pBNpc = pack.getBNpcByRef( pActionData->m_sourceRef, pEncounter );
+        Common::Vector3 pos = pBNpc->getPos();
         // todo: filter the correct target
         // todo: tie to mechanic script?
         // todo: mechanic should probably just be an Action::onTick, with instance/director passed to it
@@ -407,11 +459,17 @@ namespace Sapphire
             case ActionTargetType::Self:
               targetId = pBNpc->getId();
               break;
-            case ActionTargetType::Selector:
+            case ActionTargetType::SelectorPos:
+            case ActionTargetType::SelectorTarget:
             {
-              const auto& results = pack.getSnapshotTargetIds( pActionData->m_selectorRef );
+              const auto& results = pack.getSnapshotResults( pActionData->m_selectorRef );
+
               if( pActionData->m_selectorIndex < results.size() )
-                targetId = results[ pActionData->m_selectorIndex ];
+              {
+                const auto& res = results[ pActionData->m_selectorIndex ];
+                targetId = res.m_entityId;
+                pos = res.m_pos;
+              }
             }
             break;
             default:
@@ -420,15 +478,46 @@ namespace Sapphire
           auto& actionMgr = Common::Service< Sapphire::World::Manager::ActionMgr >::ref();
           auto pAction = pBNpc->getCurrentAction();
 
-          // todo: this is probably wrong
-          if( !pAction || pAction->isInterrupted() )
+          // todo: probably a flag on TimelinePack for PauseIfOutOfRange? idk
+          // we need to pause the timeline if the player is out of range
+          auto topHateId = pBNpc->getTargetId();
           {
-            actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, pTeri->getNextActionResultId() );
-            //actionMgr.handlePlacedAction( *pBNpc, pActionData->m_actionId, pBNpc->getPos(), pTeri->getNextActionResultId() );
+            auto pTargetActor = pEncounter->getTeriPtr()->getEntityById( topHateId );
+
+            if( pTargetActor )
+            {
+              if( auto pTargetChara = pTargetActor->getAsChara() )
+              {
+                if( targetId != pBNpc->getId() )
+                {
+                  // stall if not facing target
+                  if( !pBNpc->isFacingTarget( *pTargetChara, 0.99f ) )
+                    return false;
+
+                  auto bnpcPos = pBNpc->getPos();
+                  auto targPos = pTargetChara->getPos();
+
+                  auto distance = Common::Util::distance( bnpcPos.x, bnpcPos.y, bnpcPos.z, targPos.x, targPos.y, targPos.z );
+                  if( distance >= 3.f + pBNpc->getRadius() + pTargetChara->getRadius() )
+                  {
+                    // pause at this timepoint
+                    return false;
+                  }
+                }
+              }
+            }
           }
-          else
-          {
+
+          if( pAction )
             return false;
+
+          // todo: this is probably wrong
+          //if( !pAction || pAction->isInterrupted() )
+          {
+            if( pActionData->m_targetType == ActionTargetType::SelectorPos )
+              actionMgr.handlePlacedAction( *pBNpc, pActionData->m_actionId, pos, pTeri->getNextActionResultId(), targetId );
+            else
+              actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, pTeri->getNextActionResultId() );
           }
         }
       }
@@ -458,13 +547,33 @@ namespace Sapphire
               }
             }
             break;
-            case SetPosTargetType::Selector:
+            case SetPosTargetType::SelectorPos:
             {
               const auto& results = pack.getSnapshotResults( pSetPosData->m_selectorName );
               if( pSetPosData->m_selectorIndex < results.size() )
               {
                 pos = results[ pSetPosData->m_selectorIndex ].m_pos;
                 rot = results[ pSetPosData->m_selectorIndex ].m_rot;
+              }
+            }
+            break;
+            // todo: idk what i was thinking here but should this just be the snapshotted position as above rather than live pos?
+            case SetPosTargetType::SelectorTarget:
+            {
+              const auto& results = pack.getSnapshotResults( pSetPosData->m_selectorName );
+              if( pSetPosData->m_selectorIndex < results.size() )
+              {
+                // find the target by id and copy their pos
+                auto targetId = results[ pSetPosData->m_selectorIndex ].m_entityId;
+                for( const auto& pActor : pBNpc->getInRangeActors() )
+                {
+                  if( pActor->getId() == targetId )
+                  {
+                    pos = pActor->getPos();
+                    rot = pActor->getRot();
+                    break;
+                  }
+                }
               }
             }
             break;
@@ -476,21 +585,38 @@ namespace Sapphire
           {
             case SetPosType::Absolute:
             {
-              pBNpc->setRot( pSetPosData->m_rot );
-              pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
+              // dont use absolute pos for selector, just use the selector pos
+              if( pSetPosData->m_targetType == SetPosTargetType::SelectorPos || pSetPosData->m_targetType == SetPosTargetType::SelectorTarget )
+              {
+                pBNpc->setRot( rot );
+                pBNpc->setPos( pos, true );
+              }
+              else
+              {
+                pos = { pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z };
+                rot = pSetPosData->m_rot;
+              }
             }
             break;
             case SetPosType::Relative:
             {
               auto offsetPos = Common::Util::getOffsettedPosition( pos, rot, pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z );
-              pBNpc->setRot( rot );
-              pBNpc->setPos( offsetPos );
+              pos = offsetPos;
             }
             break;
             default:
               break;
           }
 
+          // todo: handling agent should really be somewhere else
+          if( pBNpc->getAgentId() != -1 )
+          {
+            auto pNavi = pTeri->getNaviProvider();
+            if( pNavi )
+              pBNpc->setAgentId( pNavi->updateAgentPosition( pBNpc->getAgentId(), pos, pBNpc->getRadius(), pNavi->getAgentSpeed( pBNpc->getAgentId() ) ) );
+          }
+          pBNpc->setRot( rot );
+          pBNpc->setPos( pos, true );
         }
       }
       break;
@@ -537,7 +663,7 @@ namespace Sapphire
         }
       }
       break;
-      */
+      //*/
       case TimepointDataType::LogMessage:
       {
         auto pLogMessage = std::dynamic_pointer_cast< TimepointDataLogMessage, TimepointData >( m_pData );
@@ -574,9 +700,7 @@ namespace Sapphire
 
         // todo: this does not always need to be a director, and can also be an eventhandler
         //       needs further investigation
-        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
-        if( pDirector == nullptr )
-          pDirector = pTeri->getAsQuestBattle();
+        Event::DirectorPtr pDirector = pEncounter->getDirector();
 
         if( pDirector )
           handlerId = pDirector->getDirectorId();
@@ -604,9 +728,7 @@ namespace Sapphire
         uint32_t param = 0;
 
         // todo: expand for fates
-        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
-        if( pDirector == nullptr )
-          pDirector = pTeri->getAsQuestBattle();
+        Event::DirectorPtr pDirector = pEncounter->getDirector();
 
         // todo: this should never not be set?
         // todo: probably should use ContentDirector
@@ -673,7 +795,6 @@ namespace Sapphire
               break;
           }
 
-          // todo: resend packets
           switch( m_type )
           {
             case TimepointDataType::DirectorVar:
@@ -688,6 +809,9 @@ namespace Sapphire
             default:
               break;
           }
+
+          for( const auto& player : pTeri->getPlayers() )
+            pDirector->sendDirectorVars( *player.second );
         }
       }
       break;
@@ -718,15 +842,24 @@ namespace Sapphire
 
         // todo: probably have this info in the timepoint data
         if( !pBNpc )
-          pBNpc = pTeri->createBNpcFromLayoutId( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
+          pBNpc = pTeri->createBNpcFromLayoutIdNoPush( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
 
         if( pBNpc )
         {
-          pBNpc->resetFlags( pSpawnData->m_flags );
+          auto flagsMask = pSpawnData->m_flagsMask;
+          auto currFlag = pBNpc->getFlags();
+          auto flags = ( currFlag & ~flagsMask ) | ( pSpawnData->m_flags & flagsMask );
+
+          pBNpc->resetFlags( flags );
+          pBNpc->setInvincibilityType( static_cast< Common::InvincibilityType >( pSpawnData->m_invincibilityType ) );
           pBNpc->init();
 
-          pTeri->pushActor( pBNpc );
+          pEncounter->addBNpc( pBNpc );
+          // make sure we bind this bnpc
+          if( pEncounter->isLocked() )
+            pEncounter->bindActor( pBNpc );
 
+          pTeri->pushActor( pBNpc );
         }
       }
       break;
@@ -737,7 +870,12 @@ namespace Sapphire
 
         if( pBNpc )
         {
-          pBNpc->resetFlags( pBNpcFlagData->m_flags );
+          auto flagsMask = pBNpcFlagData->m_flagsMask;
+          auto currFlag = pBNpc->getFlags();
+          auto flags = ( currFlag & ~flagsMask ) | ( pBNpcFlagData->m_flags & flagsMask );
+          
+          pBNpc->resetFlags( flags );
+          pBNpc->setInvincibilityType( static_cast< Common::InvincibilityType >( pBNpcFlagData->m_invincibilityType ) );
           // todo: resend some bnpc packet/actrl?
         }
       }
@@ -793,10 +931,59 @@ namespace Sapphire
         if( pBNpc )
         {
           const auto& exclude = pack.getSnapshotTargetIds( pSnapshotData->m_excludeSelector );
-          pack.createSnapshot( pSnapshotData->m_selector, pBNpc, exclude );
+          pack.createSnapshot( pSnapshotData->m_selector, *pBNpc, exclude );
         }
       }
       break;
+      case TimepointDataType::InterruptAction:
+      {
+        auto pInterruptData = std::dynamic_pointer_cast< TimepointDataInterruptAction, TimepointData >( m_pData );
+        auto pBNpc = pack.getBNpcByRef( pInterruptData->m_actorRef, pEncounter );
+
+        if( pBNpc )
+        {
+          auto pAction = pBNpc->getCurrentAction();
+          if( pAction && pAction->getId() == pInterruptData->m_actionId )
+          {
+            pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+            pAction->interrupt();
+          }
+        }
+      }
+      break;
+      case TimepointDataType::RollRNG:
+      {
+        auto pRNGData = std::dynamic_pointer_cast< TimepointDataRollRNG, TimepointData >( m_pData );
+
+        auto& rngMgr = Common::Service< Common::Random::RNGMgr >::ref();
+        auto val = rngMgr.getRandGenerator( pRNGData->m_min, pRNGData->m_max ).next();
+
+        switch( pRNGData->m_type )
+        {
+          case VarType::Director:
+          {
+            auto pDirector = pEncounter->getDirector();
+            if( pDirector)
+              pDirector->setDirectorVar( pRNGData->m_idx, val );
+          }
+          break;
+          case VarType::Custom:
+          {
+            auto pDirector = pEncounter->getDirector();
+            if( pDirector )
+              pDirector->setCustomVar( pRNGData->m_idx, val );
+          }
+          break;
+          case VarType::Pack:
+          {
+            // todo: probably get rid of this?
+            pack.setVar( pRNGData->m_idx, val );
+          }
+          break;
+        }
+      }
+      break;
+
       default:
         break;
     }

@@ -9,6 +9,10 @@ namespace Sapphire::World::AI::Fsm
 {
   class StateCombat : public State
   {
+  private:
+    uint64_t m_lastTick{ 0 };
+    uint64_t m_lastMoveTime{ 0 };
+    uint64_t m_lastRotTime{ 0 };
   public:
     virtual ~StateCombat() = default;
 

@@ -1,0 +1,54 @@
+{
+  "actors": [
+    {
+      "hp": 65300,
+      "id": 1,
+      "layoutId": 4035011,
+      "name": "Chopper",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Phase 1",
+          "timepoints": [
+            {
+              "data": {
+                "actionId": 351,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Chopper",
+                "targetType": "self"
+              },
+              "description": "",
+              "id": 1,
+              "startTime": 16000,
+              "type": "castAction"
+            }
+          ]
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    }
+  ],
+  "conditions": [
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 3,
+      "loop": true,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Chopper"
+      },
+      "targetActor": "Chopper",
+      "targetSchedule": "Phase 1"
+    }
+  ],
+  "name": "Brand new timeline",
+  "selectors": [],
+  "version": 21
+}

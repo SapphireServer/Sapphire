@@ -1,7 +1,7 @@
 #include "ScheduleCondition.h"
 
 #include "Encounter.h"
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
 #include "TimelineActor.h"
 #include "TimelineActorState.h"
 
@@ -35,16 +35,15 @@ namespace Sapphire
         auto hpPct = pBNpc->getHpPercent();
         return hpPct > m_hp.min && hpPct < m_hp.max;
       }
+      default:
+        break;
     }
     return false;
   };
 
   bool ConditionDirectorVar::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto pTeri = pEncounter->getTeriPtr();
-    Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
-    if( pDirector == nullptr )
-      pDirector = pTeri->getAsQuestBattle();
+    auto pDirector = pEncounter->getDirector();
 
     switch( m_conditionType )
     {
@@ -60,6 +59,8 @@ namespace Sapphire
         return pDirector->getSequence() == m_param.seq;
       case ConditionType::DirectorSeqGreaterThan:
         return pDirector->getSequence() > m_param.seq;
+      default:
+        break;
     }
     return false;
   }
@@ -70,7 +71,9 @@ namespace Sapphire
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
 
     if( !pBNpc )
+    {
       return false;
+    }
 
     // todo: these should really use callbacks when the state transitions or we could miss this tick
     switch( m_combatState )
@@ -86,7 +89,9 @@ namespace Sapphire
       case CombatStateType::JustDied:
         return pBNpc->getState() == Entity::BNpcState::JustDied;
       case CombatStateType::Dead:
-        return pBNpc->getState() == Entity::BNpcState::Dead;
+        return pBNpc->getState() == Entity::BNpcState::Dead ||
+               pBNpc->getState() == Entity::BNpcState::JustDied ||
+               pBNpc->getStatus() == Common::ActorStatus::Dead;
       default:
         break;
     }
@@ -111,12 +116,60 @@ namespace Sapphire
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
-    return pBNpc && pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() == m_actionId;
+
+    if( pBNpc )
+    {
+      auto pAction = pBNpc->getCurrentAction();
+      return pAction && pAction->getId() == m_actionId && !pAction->isInterrupted();
+    }
+    return false;
   }
 
   bool ConditionScheduleActive::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     return pack.isScheduleActive( m_actorName, m_scheduleName );
+  }
+
+  bool ConditionInterruptedAction::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  {
+    auto pTeri = pEncounter->getTeriPtr();
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
+
+    if( pBNpc )
+    {
+      auto pAction = pBNpc->getCurrentAction();
+      return pAction && pAction->getId() == m_actionId && pAction->isInterrupted();
+    }
+    return false;
+  }
+
+  bool ConditionVarEquals::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  {
+    auto pDirector = pEncounter->getDirector();
+
+    switch( m_type )
+    {
+      case VarType::Director:
+      {
+        if( pDirector )
+          return pDirector->getDirectorVar( m_index ) == m_val;
+      }
+      break;
+      case VarType::Custom:
+      {
+        if( pDirector )
+          return pDirector->getCustomVar( m_index ) == m_val;
+      }
+      break;
+      case VarType::Pack:
+      {
+        return pack.getVar( m_index ) == m_val;
+      }
+      break;
+      default:
+        break;
+    }
+    return false;
   }
 
   void ConditionHp::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
@@ -212,6 +265,7 @@ namespace Sapphire
                                       const std::unordered_map< std::string, TimelineActor >& actors )
   {
     ScheduleCondition::from_json( json, phase, condition, actors );
+
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
 
@@ -256,6 +310,43 @@ namespace Sapphire
     m_scheduleName = scheduleName;
   }
 
+  void ConditionInterruptedAction::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    ScheduleCondition::from_json( json, phase, condition, actors );
+
+    auto& paramData = json.at( "paramData" );
+    auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
+    auto actionId = paramData.at( "actionId" ).get< std::uint32_t >();
+
+    // resolve the actor whose name we are checking
+    if( auto it = actors.find( actorRef ); it != actors.end() )
+      m_layoutId = it->second.m_layoutId;
+    else
+      throw std::runtime_error( fmt::format( std::string( "ConditionInterruptedAction::from_json unable to find actor by name: %s" ), actorRef ) );
+
+    m_actionId = actionId;
+  }
+
+  void ConditionVarEquals::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    ScheduleCondition::from_json( json, phase, condition, actors );
+
+    auto& paramData = json.at( "paramData" );
+    auto index = paramData.at( "index" ).get< uint32_t >();
+    auto val = paramData.at( "val" ).get< uint32_t >();
+    auto type = paramData.at( "type" ).get< std::string >();
+
+    if( type == "director" )
+      m_type = VarType::Director;
+    else if( type == "custom" )
+      m_type = VarType::Custom;
+    else
+      m_type = VarType::Pack;
+
+    m_index = index;
+    m_val = val;
+  }
+
   // todo: i wrote this very sleep deprived, ensure it is actually sane
 
   void Schedule::execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
@@ -279,11 +370,17 @@ namespace Sapphire
 
       if( elapsed >= timepoint.m_offset )
       {
-        state.m_scheduleInfo.m_lastTimepointTime = time;
-        state.m_scheduleInfo.m_lastTimepointIndex = ++i;
-
-        timepoint.execute( self, pack, pEncounter, time );
-        continue;
+        // todo: stall the timeline while auto attack is queued
+        if( timepoint.execute( self, pack, pEncounter, time ) )
+        {
+          state.m_scheduleInfo.m_lastTimepointTime = time;
+          state.m_scheduleInfo.m_lastTimepointIndex = ++i;
+          continue;
+        }
+        else
+        {
+          state.m_scheduleInfo.m_pauseTime = time;
+        }
       }
       break;
     }
@@ -292,6 +389,7 @@ namespace Sapphire
   void Schedule::reset( ConditionState& state ) const
   {
     state.m_scheduleInfo.m_startTime = 0;
+    state.m_scheduleInfo.m_pauseTime = 0;
     state.m_scheduleInfo.m_lastTimepointIndex = 0;
     state.m_scheduleInfo.m_lastTimepointTime = 0;
   }
@@ -300,4 +398,5 @@ namespace Sapphire
   {
     return state.m_scheduleInfo.m_lastTimepointIndex == m_timepoints.size();
   }
-}// namespace Sapphire::Encounter
+
+}// namespace Sapphire

@@ -1,6 +1,6 @@
 #include "TimelineActor.h"
 
-#include "EncounterTimeline.h"
+#include "TimelinePack.h"
 
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
@@ -163,7 +163,8 @@ namespace Sapphire
     // todo: retail straight up respawns sub actors, even bnpc parts (qarn adjudicator body parts respawn each time with new ids)
     auto flags = Entity::BNpcFlag::Invincible | Entity::BNpcFlag::Untargetable |
                  Entity::BNpcFlag::Immobile | Entity::BNpcFlag::AutoAttackDisabled |
-                 Entity::BNpcFlag::TurningDisabled | Entity::BNpcFlag::NoDeaggro;
+                 Entity::BNpcFlag::TurningDisabled | Entity::BNpcFlag::NoDeaggro |
+                 Entity::BNpcFlag::Invisible;
 
     auto pActor = getSubActor( name );
     if( pActor == nullptr )

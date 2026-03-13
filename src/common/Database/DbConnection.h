@@ -1,20 +1,14 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
+
 #include "Util/LockedWaitQueue.h"
 #include "DbCommon.h"
-
-namespace Mysql
-{
-  class Connection;
-  class ResultSet;
-  class PreparedResultSet;
-  class PreparedStatement;
-}
+#include "MySqlConnection.h"
 
 namespace Sapphire::Db
 {
@@ -37,6 +31,8 @@ namespace Sapphire::Db
     public std::enable_shared_from_this< DbConnection >
   {
   public:
+    constexpr static bool DEFAULT_STREAMING = false;
+
     // Constructor for synchronous connections.
     DbConnection( ConnectionInfo& connInfo );
 
@@ -55,7 +51,7 @@ namespace Sapphire::Db
 
     bool execute( std::shared_ptr< PreparedStatement > stmt );
 
-    std::shared_ptr< Mysql::ResultSet > query( const std::string& sql );
+    std::shared_ptr< Mysql::ResultSet > query( const std::string& sql, bool streaming = DEFAULT_STREAMING );
 
     std::shared_ptr< Mysql::ResultSet > query( std::shared_ptr< PreparedStatement > stmt );
 
@@ -82,7 +78,7 @@ namespace Sapphire::Db
 
     void prepareStatement( uint32_t index, const std::string& sql, ConnectionFlags flags );
 
-    virtual void doPrepareStatements() = 0;
+    virtual void doPrepareStatements() {};
 
   protected:
     std::vector< std::shared_ptr< Mysql::PreparedStatement > > m_stmts;
@@ -96,7 +92,7 @@ namespace Sapphire::Db
     std::shared_ptr< Mysql::Connection > m_pConnection;
     ConnectionInfo& m_connectionInfo;
     ConnectionFlags m_connectionFlags;
-    std::mutex m_mutex;
+    std::atomic_bool m_inUse{ false };
 
     DbConnection( DbConnection const& right ) = delete;
 

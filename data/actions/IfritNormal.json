@@ -9,7 +9,7 @@
     "curePotency": 0,
     "restorePercentage": 0,
     "nextCombo": [],
-    "targetFilter": 0,
+    "targetFilter": 2,
     "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
@@ -26,7 +26,24 @@
     "curePotency": 0,
     "restorePercentage": 0,
     "nextCombo": [],
-    "targetFilter": 0,
+    "targetFilter": 2,
+    "aggroModifier": 1.0,
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
+  "455": {
+    "name": "Eruption",
+    "potency": 1,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "targetFilter": 2,
     "aggroModifier": 1.0,
     "statuses": {
       "caster": [],
@@ -42,7 +59,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
-    "targetFilter": 0,
+    "targetFilter": 2,
     "nextCombo": [],
     "aggroModifier": 1.0,
     "statuses": {
@@ -59,22 +76,11 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
-    "targetFilter": 0,
+    "targetFilter": 2,
     "nextCombo": [],
     "aggroModifier": 1.0,
     "statuses": {
-      "caster": [
-        {
-          "id": 394,
-          "duration": 8000,
-          "modifiers": [
-            {
-              "modifier": "DamageTakenPercent",
-              "value": -100
-            }
-          ]
-        }
-      ],
+      "caster": [],
       "target": []
     }
   },
@@ -87,7 +93,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
-    "targetFilter": 0,
+    "targetFilter": 2,
     "nextCombo": [],
     "aggroModifier": 1.0,
     "statuses": {
@@ -104,7 +110,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
-    "targetFilter": 0,
+    "targetFilter": 2,
     "nextCombo": [],
     "aggroModifier": 1.0,
     "statuses": {

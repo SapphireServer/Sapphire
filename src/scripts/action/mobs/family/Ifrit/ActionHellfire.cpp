@@ -23,6 +23,24 @@ public:
 
   static constexpr auto Potency = 300;
 
+  virtual void onStart( Sapphire::World::Action::Action& action ) override
+  {
+    /*
+    auto pChara = action.getSourceChara();
+
+    // todo: should just put the modifier in the status script?
+    std::vector< World::Action::StatusModifier > modifiers = {
+      { { Common::ParamModifier::DamageTakenPercent, -100 } }
+    };
+    
+    auto pEffect = std::make_shared< Sapphire::StatusEffect::StatusEffect >(
+            325, pChara, pChara, 8000, modifiers, 0, 3000
+    );
+
+    pChara->addStatusEffect( pEffect );
+    //*/
+  }
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();

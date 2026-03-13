@@ -18,9 +18,9 @@
 #include "exportmgr.h"
 
 #include "cache.h"
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include "DatCategories/bg/pcb.h"
+#include "DatCategories/bg/lgb.h"
+#include "DatCategories/bg/sgb.h"
 
 #include <GameData.h>
 #include <File.h>
@@ -28,13 +28,17 @@
 #include <ExdData.h>
 #include <ExdCat.h>
 #include <Exd.h>
+#include <DatCategories/DatCommon.h>
+#include <DatCategories/InstanceObjectParser.h>
+#include <DatCategories/InstanceObject.h>
+#include <DatCategories/Layer.h>
 
 using namespace Sapphire;
 
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "C:\\Data\\Dev\\ffxiv3.35\\game\\sqpack" );
+std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -44,12 +48,12 @@ std::set< std::string > zoneDumpList;
 std::shared_ptr< Cache > pCache;
 std::map< uint32_t, uint16_t > eobjSgbPaths;
 
-xiv::dat::GameData* gameData = nullptr;
-xiv::exd::ExdData* eData = nullptr;
+xiv::dat::GameData *gameData = nullptr;
+xiv::exd::ExdData *eData = nullptr;
 
 
 enum class TerritoryTypeExdIndexes :
-  size_t
+    size_t
 {
   TerritoryType = 0,
   Path = 1
@@ -64,11 +68,13 @@ void initExd( const std::string& gamePath )
   pCache = std::make_shared< Cache >( gameData );
 }
 
-void replaceAll( std::string& str, const std::string& from, const std::string& to ) {
+void replaceAll( std::string& str, const std::string& from, const std::string& to )
+{
   if( from.empty() )
     return;
   size_t start_pos = 0;
-  while( ( start_pos = str.find( from, start_pos ) ) != std::string::npos ) {
+  while( ( start_pos = str.find( from, start_pos ) ) != std::string::npos )
+  {
     str.replace( start_pos, from.length(), to );
     start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
   }
@@ -93,19 +99,19 @@ std::string getEobjSgbPath( uint32_t eobjId )
     auto& fields = row.second;
 
     auto path = std::get< std::string >( fields.at( 0 ) );
-    exportedSgMap[id] = path;
+    exportedSgMap[ id ] = path;
   }
 
-  uint16_t exportedSgId{0};
+  uint16_t exportedSgId{ 0 };
 
   for( auto& row : eObjExd.get_rows() )
   {
     auto id = row.first;
     auto& fields = row.second;
 
-    eobjSgbPaths[id] = std::get< uint16_t >( fields.at( 11 ) );
+    eobjSgbPaths[ id ] = std::get< uint16_t >( fields.at( 11 ) );
   }
-  return exportedSgMap[exportedSgId];
+  return exportedSgMap[ exportedSgId ];
 }
 
 std::string zoneNameToPath( const std::string& name )
@@ -137,7 +143,7 @@ std::string zoneNameToPath( const std::string& name )
     //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
     //path = std::string( "ffxiv/" ) + path;
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
-    printf( "[Info] Found path for %s\n", name.c_str() );
+    //printf( "[Info] Found path for %s\n", name.c_str() );
   }
   else
   {
@@ -149,12 +155,13 @@ std::string zoneNameToPath( const std::string& name )
 }
 
 int totalModels = 0;
+
 void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& exportedGroup,
-                         const std::string& name, const std::string& groupName,
-                         const vec3* scale = nullptr,
-                         const vec3* rotation = nullptr,
-                         const vec3* translation = nullptr,
-                         const SGB_MODEL_ENTRY* pSgbEntry = nullptr )
+                      const std::string& name, const std::string& groupName,
+                      const vec3 *scale = nullptr,
+                      const vec3 *rotation = nullptr,
+                      const vec3 *translation = nullptr,
+                      const InstanceObject *pSgbEntry = nullptr )
 {
   auto& pcb_file = *pPcbFile.get();
 
@@ -178,17 +185,17 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
     {
       if( pSgbEntry )
       {
-        v.x *= pSgbEntry->header.scale.x;
-        v.y *= pSgbEntry->header.scale.y;
-        v.z *= pSgbEntry->header.scale.z;
+        v.x *= pSgbEntry->Transformation.Scale.x;
+        v.y *= pSgbEntry->Transformation.Scale.y;
+        v.z *= pSgbEntry->Transformation.Scale.z;
 
-        v = v * matrix4::rotateX( pSgbEntry->header.rotation.x );
-        v = v * matrix4::rotateY( pSgbEntry->header.rotation.y );
-        v = v * matrix4::rotateZ( pSgbEntry->header.rotation.z );
+        v = v * matrix4::rotateX( pSgbEntry->Transformation.Rotation.x );
+        v = v * matrix4::rotateY( pSgbEntry->Transformation.Rotation.y );
+        v = v * matrix4::rotateZ( pSgbEntry->Transformation.Rotation.z );
 
-        v.x += pSgbEntry->header.translation.x;
-        v.y += pSgbEntry->header.translation.y;
-        v.z += pSgbEntry->header.translation.z;
+        v.x += pSgbEntry->Transformation.Translation.x;
+        v.y += pSgbEntry->Transformation.Translation.y;
+        v.z += pSgbEntry->Transformation.Translation.z;
       }
 
       if( scale )
@@ -205,7 +212,6 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
         v.y += translation->y;
         v.z += translation->z;
       }
-
     };
     int verts = 0;
     int indices = 0;
@@ -244,11 +250,11 @@ void buildModelEntry( std::shared_ptr< PCB_FILE > pPcbFile, ExportedGroup& expor
     }
     model.meshes[ meshCount++ ] = mesh;
   }
-  exportedGroup.models[model.name] = model;
+  exportedGroup.models[ model.name ] = model;
 }
 
-bool pcbTransformModel( const std::string& fileName, const vec3* scale, const vec3* rotation,
-                        const vec3* translation, ExportedGroup& exportgroup, const SGB_MODEL_ENTRY* pModel = nullptr )
+bool pcbTransformModel( const std::string& fileName, const vec3 *scale, const vec3 *rotation,
+                        const vec3 *translation, ExportedGroup& exportgroup, const InstanceObject *pModel = nullptr )
 {
   if( auto pPcbFile = pCache->getPcbFile( fileName ) )
   {
@@ -257,57 +263,78 @@ bool pcbTransformModel( const std::string& fileName, const vec3* scale, const ve
   return true;
 };
 
-void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
+void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, ExportedGroup& exportgroup,
+                     bool isEobj = false )
 {
   if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
   {
-    const auto& sgbFile = *pSgbFile;
-    for( const auto& group : sgbFile.entries )
-    {
-      for( const auto& pSgbEntry : group.entries )
-      {
-        auto pModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSgbEntry.get() );
-        std::string fileName = pModel->collisionFileName;
-        if( pModel->type == SgbGroupEntryType::Gimmick )
-        {
-          if( auto pSubSgbFile = pCache->getSgbFile( pModel->modelFileName ) )
-          {
-            for( const auto& subGroup : pSubSgbFile->entries )
-            {
-              for( const auto& pSubEntry : subGroup.entries )
-              {
-                auto pSubModel = dynamic_cast< SGB_MODEL_ENTRY* >( pSubEntry.get() );
-                std::string subModelFile = pSubModel->modelFileName;
-                //"bg/ex1/02_dra_d2/alx/common/bgparts/d2a0_a7_btog2.mdl"
-                //"bg/ex1/02_dra_d2/alx/common/collision/d2a0_a1_twl01.pcb"
-                replaceAll( subModelFile, "/bgparts/", "/collision/" );
-                replaceAll( subModelFile, ".mdl", ".pcb ");
+    auto& sgbFile = *pSgbFile;
 
-                if( pSubModel && pSubModel->type == SgbGroupEntryType::Model )
-                  pcbTransformModel( subModelFile, &pGimmick->header.scale, &pGimmick->header.rotation,
-                                     &pGimmick->header.translation, exportgroup, pSubModel );
-              }
+    for( const auto& layer : sgbFile.layers )
+    {
+      auto& layerInstances = sgbFile.layerInstanceObjects[ layer.LayerID ];
+      for( const auto& instance : layerInstances )
+      {
+        switch( instance->getType() )
+        {
+          case BG:
+          {
+            auto model = dynamic_cast< BGEntry * >( instance.get() );
+            std::string collisionFile = model->collisionFileName;
+            pcbTransformModel( collisionFile, &pSg->header.Transformation.Scale,
+                               &pSg->header.Transformation.Rotation,
+                               &pSg->header.Transformation.Translation,
+                               exportgroup, &instance->header );
+            break;
+          }
+
+
+          case SharedGroup:
+          {
+            auto sharedGroup = dynamic_cast< SharedGroupEntry * >( instance.get() );
+            if( sharedGroup->header.NotCreateNavimeshDoor )
+            {
+              std::cout << "Skipping for NotCreateNavimeshDoor -> " << sharedGroup->AssetPath << "\n";
+              continue;
             }
+            auto newinstance = *instance;
+
+            auto& translate = newinstance.header.Transformation.Translation;
+
+            newinstance.header.Transformation.Scale.x *= pSg->header.Transformation.Scale.x;
+            newinstance.header.Transformation.Scale.y *= pSg->header.Transformation.Scale.y;
+            newinstance.header.Transformation.Scale.z *= pSg->header.Transformation.Scale.z;
+
+            translate = translate * matrix4::rotateX( pSg->header.Transformation.Rotation.x );
+            translate = translate * matrix4::rotateY( pSg->header.Transformation.Rotation.y );
+            translate = translate * matrix4::rotateZ( pSg->header.Transformation.Rotation.z );
+
+            newinstance.header.Transformation.Translation.x += pSg->header.Transformation.Translation.x;
+            newinstance.header.Transformation.Translation.y += pSg->header.Transformation.Translation.y;
+            newinstance.header.Transformation.Translation.z += pSg->header.Transformation.Translation.z;
+
+
+            exportSgbModel( sharedGroup->AssetPath, &newinstance, exportgroup );
+            break;
           }
         }
-        pcbTransformModel( fileName, &pGimmick->header.scale, &pGimmick->header.rotation,
-                           &pGimmick->header.translation, exportgroup, pModel );
 
       }
     }
   }
 };
 
-int main( int argc, char* argv[] )
+
+int main( int argc, char *argv[ ] )
 {
-  printf("Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n" \
-    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~3.5GB RAM using 16 jobs.\n");
+  printf( "Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n"
+    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~10GB RAM using 16 jobs.\n" );
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto entryStartTime = std::chrono::high_resolution_clock::now();
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
-  std::string zoneName = "r2t2";
+  std::string zoneName = "d2f1";
 
   bool generateNavmesh = true;
   bool dumpAllZones = true;
@@ -329,8 +356,7 @@ int main( int argc, char* argv[] )
   {
     initExd( gamePath );
     getEobjSgbPath( 0 );
-  }
-  catch( std::exception& e )
+  } catch( std::exception& e )
   {
     printf( "Unable to initialise EXD!\n" );
     return -1;
@@ -357,6 +383,9 @@ int main( int argc, char* argv[] )
       const auto& zonePath = zoneNameToPath( zoneName );
       if( exportedTeriMap.find( zonePath ) != exportedTeriMap.end() )
         continue;
+
+      std::unordered_map< uint32_t, SharedGroupEntry* > m_sharedGroupMap;
+      std::unordered_map< uint32_t, EventObjectEntry* > m_eventObjectMap;
 
       std::string zoneNameShort = zonePath.substr( zonePath.find_last_of( '/' ) + 1 );
 
@@ -397,15 +426,13 @@ int main( int argc, char* argv[] )
           {
             break;
           }
-          uint16_t trId = *( uint16_t* ) &section1[ offset1 ];
+          uint16_t trId = *( uint16_t * ) &section1[ offset1 ];
 
-          char someString[200];
+          char someString[ 200 ];
           sprintf( someString, "%str%04d.pcb", collisionFilePath.c_str(), trId );
           stringList.push_back( std::string( someString ) );
           //std::cout << someString << "\n";
           offset1 += 0x20;
-
-
         }
       }
       LGB_FILE bgLgb( &section[ 0 ] );
@@ -421,15 +448,14 @@ int main( int argc, char* argv[] )
           buildModelEntry( pPcbFile, exportedTerrainGroup, fileName, zoneNameShort );
       }
       exportedZone.groups.emplace( exportedTerrainGroup.name, exportedTerrainGroup );
-      
+
       for( const auto& lgb : lgbList )
       {
         for( const auto& group : lgb.groups )
         {
           ExportedGroup exportedGroup;
           exportedGroup.name = group.name;
-
-          //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
+          //std::cout << "\t" << group.name << " Size " << group.header.InstanceObject_Count << "\n";
           for( const auto& pEntry : group.entries )
           {
             std::string fileName( "" );
@@ -438,71 +464,78 @@ int main( int argc, char* argv[] )
             // write files
             switch( pEntry->getType() )
             {
-              case LgbEntryType::NaviMeshRange:
+              case eAssetType::NaviMeshRange:
               {
-                std::cout << "NaviMeshRange\n";
+              //  std::cout << "NaviMeshRange\n";
               }
               break;
 
-              case LgbEntryType::MapRange:
+              case eAssetType::MapRange:
               {
-                std::cout << "MapRange\n";
+                auto mapRange = static_cast< MapRangeEntry * >( pEntry.get() );
+                vec3 rangePos = mapRange->header.Transformation.Translation;
+                exportedZone.mapRanges.push_back( rangePos );
               }
               break;
 
-              case LgbEntryType::DoorRange:
+              case eAssetType::DoorRange:
               {
-                std::cout << "DoorRange\n";
+              //  std::cout << "DoorRange\n";
               }
-                break;
+              break;
 
-              case LgbEntryType::CollisionBox:
+              case eAssetType::CollisionBox:
               {
-                std::cout << "CollisionBox\n";
+              //  std::cout << "CollisionBox\n";
               }
-                break;
+              break;
 
-              case LgbEntryType::BgParts:
+              case eAssetType::BG:
               {
-                auto pBgParts = static_cast< LGB_BGPARTS_ENTRY* >( pEntry.get() );
+                auto pBgParts = static_cast< BGEntry * >( pEntry.get() );
                 fileName = pBgParts->collisionFileName;
-                if( !fileName.empty() && pBgParts->header.CollisionType == COLLISION_ATTRIBUTE_TYPE_None )
-                  std::cout << "BgParts -------------------- BIG WTF !!!\n";
-                pcbTransformModel( fileName, &pBgParts->header.scale, &pBgParts->header.rotation,
-                  &pBgParts->header.translation, exportedGroup );
+                if( pBgParts->collisionFileName.empty() )
+                  continue;
+                pcbTransformModel( fileName,
+                                   &pBgParts->header.Transformation.Scale,
+                                   &pBgParts->header.Transformation.Rotation,
+                                   &pBgParts->header.Transformation.Translation, exportedGroup );
               }
               break;
 
               // gimmick entry
-              case LgbEntryType::Gimmick:
+              case eAssetType::SharedGroup:
               {
-                auto pGimmick = static_cast< LGB_GIMMICK_ENTRY* >( pEntry.get() );
+                auto pSg = static_cast< SharedGroupEntry * >( pEntry.get() );
 
-                exportSgbModel( pGimmick->gimmickFileName, pGimmick, exportedGroup );
+                m_sharedGroupMap[ pEntry->header.InstanceID ] = pSg;
+
+                exportSgbModel( pSg->AssetPath, pSg, exportedGroup );
               }
               break;
 
-              case LgbEntryType::EventObject:
+              case eAssetType::EventObject:
               {
-                auto pEobj = static_cast< LGB_EOBJ_ENTRY* >( pEntry.get() );
-                pcbTransformModel( fileName, &pEntry->header.scale, &pEntry->header.rotation, &pEntry->header.translation, exportedGroup );
+                auto pEobj = static_cast< EventObjectEntry * >( pEntry.get() );
 
-                auto sgbPath = getEobjSgbPath( pEobj->header.eobjId );
-                if ( !sgbPath.empty() )
+                m_eventObjectMap[ pEntry->header.InstanceID ] = pEobj;
+
+                pcbTransformModel( fileName, &pEntry->header.Transformation.Scale,
+                                   &pEntry->header.Transformation.Rotation,
+                                   &pEntry->header.Transformation.Translation, exportedGroup );
+
+                auto sgbPath = getEobjSgbPath( pEobj->header.BaseId );
+                if( !sgbPath.empty() )
                 {
                   exportSgbModel( sgbPath, pEobj, exportedGroup, true );
-
-                  if( auto pGimmick = pCache->getSgbFile( sgbPath ) )
-                  {
-                    for( const auto& offset1cFile : pGimmick->stateEntries )
-                      exportSgbModel( offset1cFile, pEobj, exportedGroup, true );
-                  }
                 }
-                
               }
               break;
               default:
-                break;
+              {
+              //  std::cout << "Asset Type:" << pEntry->getType() << "\n";
+              }
+              break;
             }
           }
           exportedZone.groups.emplace( group.name, exportedGroup );
@@ -513,14 +546,80 @@ int main( int argc, char* argv[] )
       if( zoneCount % nJobs == 0 )
         pCache->purge();
 
+
+      // gather dynamic collisions controlled by eobj
+      for( auto [ id, object] : m_eventObjectMap )
+      {
+        if( object->header.BoundInstanceID != 0 )
+        {
+          auto pBoundGroup = m_sharedGroupMap[ object->header.BoundInstanceID ];
+          if( !pBoundGroup )
+            continue;
+
+          std::cout << "Found BoundInstanceID " << object->header.BoundInstanceID << " to " << object->header.BaseId <<"\n";
+          std::cout << "\t " << pBoundGroup->AssetPath << "\n";
+
+          if( auto pSgbFile = pCache->getSgbFile( pBoundGroup->AssetPath ) )
+          {
+            int memberIdx = 0;
+
+            for( auto& [layerId, layers]: pSgbFile->layerInstanceObjects )
+            {
+              for( auto& instanceObject : layers )
+              {
+                if( instanceObject->getType() == CollisionBox )
+                {
+                  auto collisionBox = static_cast< CollisionBoxEntry * >( instanceObject.get() );
+                  const char* shapeStr = "Unknown";
+                  switch( collisionBox->header.triggerBoxShape )
+                  {
+                    case TriggerBoxShapeBox: shapeStr = "Box"; break;
+                    case TriggerBoxShapeSphere: shapeStr = "Sphere"; break;
+                    case TriggerBoxShapeCylinder: shapeStr = "Cylinder"; break;
+                    case TriggerBoxShapeBoard: shapeStr = "Board"; break;
+                    case TriggerBoxShapeMesh: shapeStr = "Mesh"; break;
+                    case TriggerBoxShapeBoardBothSides: shapeStr = "Board Both Sides"; break;
+                    default: shapeStr = "Unknown"; break;
+                  }
+                  std::cout << "\t\t " << "- " << instanceObject->header.InstanceID  << " CollisionBox Shape:" << shapeStr << "\n";
+                }
+              }
+
+            }
+
+            if( !pSgbFile->timelines.empty() )
+              std::cout << "\t\tTimelines: " << "\n";
+            for( auto&timeline : pSgbFile->timelines )
+            {
+
+
+              std::cout << "\t\t-- " << timeline.MemberID << " - " << pSgbFile->timelineNames[ memberIdx ] << "\n";
+              const char* collisionStateStr = "Unknown";
+              switch( timeline.CollisionState )
+              {
+                case eTimelineCollisionState::NoChange: collisionStateStr = "No Change"; break;
+                case eTimelineCollisionState::On: collisionStateStr = "On"; break;
+                case eTimelineCollisionState::Off: collisionStateStr = "Off"; break;
+              }
+              std::cout << "\t\t\t-- CollisionState:" << collisionStateStr << "\n";
+              ++memberIdx;
+            }
+
+          }
+
+        }
+
+      }
+
+
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
       exportedZone.groups.clear();
 
       printf( "Built export struct for %s in %lu seconds \n",
-        zoneName.c_str(),
-        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
-    }
-    catch( std::exception& e )
+              zoneName.c_str(),
+              std::chrono::duration_cast< std::chrono::seconds >(
+                std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
+    } catch( std::exception& e )
     {
       printf( "%s", ( std::string( e.what() ) + "\n" ).c_str() );
       printf( "Unable to extract collision data.\n" );
@@ -532,10 +631,11 @@ int main( int argc, char* argv[] )
   std::cout << "\n\n\n";
 
   printf( "Finished all tasks in %lu seconds\n",
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
+          std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).
+          count() );
 
   delete eData;
   delete gameData;
-  
+
   return 0;
 }

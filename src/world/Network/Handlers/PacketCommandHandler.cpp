@@ -552,7 +552,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setPersistentEmote( 0 );
         player.setStatus( ActorStatus::Idle );
 
-        server().queueForPlayers( player.getInRangePlayerIds(), std::make_shared< MoveActorPacket >( player, player.getRot(), 2, 0, 0, 0x5A / 4 ) );
+        server().queueForPlayers( player.getInRangePlayerIds(), std::make_shared< MoveActorPacket >( player, player.getRotUInt8(), 2, 0, 0, 0x5A / 4 ) );
 
         Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player.getId(), EmoteModeInterrupt );
         Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) );
@@ -694,7 +694,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      housingMgr.sendWardLandInfo( player, static_cast< uint8_t >( data.Arg1 ), static_cast< uint8_t >( data.Arg0 ) );
+      housingMgr.sendWardLandInfo( player, static_cast< uint8_t >( data.Arg1 ), static_cast< uint16_t >( data.Arg0 ) );
 
       break;
     }

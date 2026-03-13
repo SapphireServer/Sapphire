@@ -20,7 +20,7 @@ namespace Sapphire::Entity
 
   protected:
     /*! Position of the object */
-    Common::FFXIVARR_POSITION3 m_pos{};
+    Common::Vector3 m_pos{};
     /*! Rotation of the object */
     float m_rot{};
     /*! Id of the actor */
@@ -31,7 +31,12 @@ namespace Sapphire::Entity
     uint32_t m_territoryTypeId{};
     /*! Specific GUId of the zone the actor currently is in */
     uint32_t m_territoryId{};
-
+    /*! PermissionInvisibility used in Create packet */
+    uint8_t m_permissionInvisibility{ 0 };
+    /*! Bound Encounter ID, 0 for none */
+    uint32_t m_boundEncounterId{ 0 };
+    /*! Obstacle ref used by NaviProvider */
+    uint32_t m_obstacleRef{ 0 };
     /*! list of various actors in range */
     std::set< GameObjectPtr > m_inRangeActor;
     std::set< PlayerPtr > m_inRangePlayers;
@@ -55,14 +60,18 @@ namespace Sapphire::Entity
 
     Common::ObjKind getObjKind() const;
 
-    Common::FFXIVARR_POSITION3& getPos();
-    const Common::FFXIVARR_POSITION3& getPos() const;
+    Common::Vector3& getPos();
+    const Common::Vector3& getPos() const;
 
-    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true );
 
     virtual void setPos( float x, float y, float z, bool broadcastUpdate = true );
 
     float getRot() const;
+
+    uint8_t getRotUInt8() const;
+
+    uint16_t getRotUInt16() const;
 
     virtual void setRot( float rot );
 
@@ -83,6 +92,8 @@ namespace Sapphire::Entity
     bool isHousingEventObj() const;
 
     bool isAetheryte() const;
+
+    bool isArea() const;
 
     ///// IN RANGE LOGIC ///////////////////////////////
     virtual void onRemoveInRangeActor( GameObject& pActor ) {}
@@ -120,11 +131,22 @@ namespace Sapphire::Entity
 
     BNpcPtr getAsBNpc();
 
+    AreaObjectPtr getAsArea();
+
     uint32_t getTerritoryTypeId() const;
     void setTerritoryTypeId( uint32_t territoryTypeId );
 
     uint32_t getTerritoryId() const;
     void setTerritoryId( uint32_t territoryTypeId );
+
+    // 0 visible 1 invisible
+    uint8_t getPermissionInvisibility() const;
+    virtual void setPermissionInvisibility( uint8_t permissionInvisibility );
+
+    uint32_t getBoundEncounterId() const;
+    void setBoundEncounterId( uint32_t id );
+
+    uint32_t& getObstacleRef();
 
     // get the current cell of a region the actor is in
     Common::CellId getCellId() const;

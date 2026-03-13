@@ -19,13 +19,11 @@
 #include "Inventory/ItemContainer.h"
 #include "WorldServer.h"
 
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
-
 #include "Forwards.h"
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
 #include "InstanceObjectCache.h"
+#include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -46,7 +44,7 @@ bool Sapphire::HousingZone::init()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   {
     auto res = db.query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
-    if( !res->next() )
+    if( !res || !res->next() )
     {
       db.directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
     }
@@ -105,10 +103,7 @@ bool Sapphire::HousingZone::init()
   Common::Furniture obj {};
   memset( &obj, 0x0, sizeof( Common::Furniture ) );
 
-  for( auto& arr : m_yardObjects )
-  {
-    memcpy( &arr, &m_yardObjects, sizeof( Common::Furniture ) );
-  }
+  m_yardObjects.fill( obj );
 
   auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
   auto landCache = housingMgr.getLandCacheMap();
@@ -129,6 +124,7 @@ bool Sapphire::HousingZone::init()
     // setup house
     if( entry.m_houseId )
     {
+      // TODO: m_houseId is uint64_t but house takes uint32_t?
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
       housingMgr.updateHouseModels( house );
       land->setHouse( house );
@@ -161,7 +157,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
   auto isInSubdivision = isPlayerSubInstance( player );
 
   uint32_t yardPacketNum;
-  uint32_t yardPacketTotal = 8;
+  uint32_t yardPacketTotal = 2;
 
   sendLandSet( player );
 
@@ -309,13 +305,13 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto landInfo = info->_data.Lands[ landId ];
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
 
-  FFXIVARR_POSITION3 pos{ 0, 10, 0 };
+  Vector3 pos{ 0, 10, 0 };
   auto eObjInfo = instanceObjectCache.getEObj( landInfo.SignboardEObj );
   if( eObjInfo )
   {
-    pos.x = eObjInfo->data.transform.translation.x;
-    pos.y = eObjInfo->data.transform.translation.y;
-    pos.z = eObjInfo->data.transform.translation.z;
+    pos.x = eObjInfo->header.Transformation.Translation.x;
+    pos.y = eObjInfo->header.Transformation.Translation.y;
+    pos.z = eObjInfo->header.Transformation.Translation.z;
   }
   else
   {

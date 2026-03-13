@@ -6,26 +6,45 @@
 #include <algorithm>
 #include <Service.h>
 
-#include "Manager/PlayerMgr.h"
-
+#include "Action/ActionLut.h"
 #include "Actor/Chara.h"
+#include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/GameObject.h"
+#include "Common.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/StatusEffectMgr.h"
+
+#include "Inventory/Item.h"
+
+#include <Math/CalcStats.h>
+#include "Util/UtilMath.h"
 
 #include "Script/ScriptMgr.h"
 
 #include "StatusEffect.h"
+
+#include <AI/TargetHelper.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers,
+                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate ) :
+  StatusEffect( id, sourceActor, targetActor, duration, tickRate )
+{
+  m_statusModifiers = modifiers;
+  m_flag = flag;
+}
+
+Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, const World::Action::GroundAOE& groundAOE,
                                                     uint32_t flag, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
   m_statusModifiers = modifiers;
+  m_groundAOE = groundAOE;
   m_flag = flag;
 }
 
@@ -35,7 +54,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_sourceActor( sourceActor ),
   m_targetActor( targetActor ),
   m_duration( duration ),
-  m_modifiers( 0 ),
+  m_modifiers( {} ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
@@ -92,7 +111,90 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   m_lastTick = Util::getTimeMs();
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onStatusTick( m_targetActor, *this );
+  bool hasScript = scriptMgr.onStatusTick( m_targetActor, *this );
+
+  if( !hasScript && getFlag() & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && m_groundAOE.vfxId > 0 )
+  {
+    // filter by allies
+    auto pPartyFilter = std::make_shared< World::AI::PartyMemberFilter >();
+    auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+    auto pDeadFilter = std::make_shared< World::AI::IsDeadFilter >();
+    auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
+
+    if( m_targetActor->getAreaObject() == nullptr )
+      return;
+
+    if( auto pAreaObject = m_targetActor->getAreaObject(); pAreaObject->getActionId() == m_groundAOE.actionId )
+    {
+      auto& statusEffectMgr = Common::Service< World::Manager::StatusEffectMgr >::ref();
+      auto inRange = m_targetActor->getInRangeActors( true );
+
+      // todo: probably use selectors
+      for( auto& pActor : inRange )
+      {
+        if( !pActor->isChara() )
+          continue;
+
+        auto pChara = pActor->getAsChara();
+
+        // dont hit dead targets
+        // todo: are there puddles which revive actors?
+        if( pDeadFilter->isApplicable( m_sourceActor, pChara ) || !pEncounterFilter->isApplicable( m_sourceActor, pChara ) )
+          continue;
+        
+        const auto& pos = pAreaObject->getPos();
+        const auto& potency = pAreaObject->getActionPotency();
+        if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius + pChara->getRadius() )
+        {
+          auto wepDmg = 1.f;
+
+          // todo: 
+          if( auto player = m_sourceActor->getAsPlayer() )
+          {
+            auto item = player->getEquippedWeapon();
+            assert( item );
+
+            auto role = player->getRole();
+            if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+              wepDmg = item->getMagicalDmg();
+            else
+              wepDmg = item->getPhysicalDmg();
+          }
+
+          switch( m_groundAOE.aoeType )
+          {
+            case Common::GroundAOEType::Damage:
+            {
+              // no dots on allies
+              if( pBattalionFilter->isApplicable( m_sourceActor, pChara ) ||
+                pPartyFilter->isApplicable( m_sourceActor, pChara ) || m_sourceActor == pChara )
+                continue;
+
+              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, wepDmg );
+              float damageVal = dmg.first;
+              Common::CalcResultType damageType = dmg.second;
+
+              statusEffectMgr.damage( m_sourceActor, pChara, static_cast< int32_t >( damageVal ) );
+              break;
+            }
+            case Common::GroundAOEType::Heal:
+            {
+              // dont wanna heal enemies
+              if( !pPartyFilter->isApplicable( m_sourceActor, pChara ) )
+                continue;
+
+              auto heal = Math::CalcStats::calcActionHealing( *m_sourceActor, potency, wepDmg );
+              float healVal = heal.first;
+              Common::CalcResultType healType = heal.second;
+
+              statusEffectMgr.heal( m_sourceActor, pChara, static_cast< uint32_t >( healVal ) );
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
@@ -171,6 +273,12 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
   m_modifiers.clear();
 
   m_targetActor->calculateStats();
+
+  if( auto pAreaObject = m_targetActor->getAreaObject() )
+  {
+    if( pAreaObject->getActionId() == m_groundAOE.actionId )
+      m_targetActor->removeAreaObject();
+  }
 
   scriptMgr.onStatusTimeOut( m_targetActor, m_id );
 }

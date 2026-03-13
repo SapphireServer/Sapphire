@@ -219,25 +219,25 @@ void loadEobjNames()
   }
 }
 
-void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
+void writeMapRangeEntry( std::ofstream& out, InstanceObjectEntry* pObj )
 {
-  auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pObj );
-  if( !pMapRange->data.discoveryEnabled )
+  auto pMapRange = reinterpret_cast< MapRangeEntry* >( pObj );
+  if( !pMapRange->header.discoveryEnabled )
     return;
 
   auto subArea = 0;
   auto mapId = -1;
-  auto discoveryIndex = pMapRange->data.discoveryIndex;
+  auto discoveryIndex = pMapRange->header.discoveryIndex;
 
-  vec3 translation = pObj->header.transform.translation;
+  vec3 translation = pObj->header.Transformation.Translation;
 
-  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.instanceId ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.x ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.y ) + " " +
-                      std::to_string( pMapRange->header.transform.translation.z ) + " " +
-                      std::to_string( pMapRange->header.transform.rotation.y ) + " " +
-                      std::to_string( pMapRange->data.mapId ) + " " +
-                      std::to_string( pMapRange->data.discoveryIndex ) + "\n"
+  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.InstanceID ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.x ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.y ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Translation.z ) + " " +
+                      std::to_string( pMapRange->header.Transformation.Rotation.y ) + " " +
+                      std::to_string( pMapRange->header.mapId ) + " " +
+                      std::to_string( pMapRange->header.discoveryIndex ) + "\n"
   );
 
   out.write( outStr.c_str(), outStr.size() );
@@ -310,14 +310,14 @@ int main( int argc, char* argv[] )
           totalGroups++;
           for( const auto& pEntry : group.entries )
           {
-            if( pEntry->getType() == LgbEntryType::MapRange )
+            if( pEntry->getType() == eAssetType::MapRange )
             {
               totalGroupEntries++;
               writeMapRangeEntry( discoverySql, pEntry.get() );
             }
-            else if( pEntry->getType() == LgbEntryType::ExitRange )
+            else if( pEntry->getType() == eAssetType::ExitRange )
             {
-              auto pExitRange = reinterpret_cast< LGB_EXIT_RANGE_ENTRY* >( pEntry.get() );
+              auto pExitRange = reinterpret_cast< ExitRangeEntry* >( pEntry.get() );
 
             }
           }

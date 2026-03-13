@@ -27,12 +27,7 @@ public:
 
   void Scene00001( Entity::Player& player, uint16_t returnScene )
   {
-    auto callback = []( Entity::Player& player, const Event::SceneResult& result )
-    {
-      // todo: this is fucked
-    };
-
-    //eventMgr().playScene( player, getId(), 1, 0xFB2EC8F8, { 1 }, returnScene, callback );
+    eventMgr().playScene( player, getId(), 1, 0xFB2EC8F8, { 1, returnScene }, nullptr );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

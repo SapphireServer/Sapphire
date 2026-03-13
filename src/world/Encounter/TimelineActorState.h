@@ -22,6 +22,7 @@ struct ConditionState
   struct ScheduleInfo
   {
     uint64_t m_startTime{ 0 };
+    uint64_t m_pauseTime{ 0 };
     uint64_t m_lastTimepointTime{ 0 };
     uint32_t m_lastTimepointIndex{ 0 };
 

@@ -6,9 +6,6 @@
 #include <Exd/ExdData.h>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
-#include <datReader/DatCategories/bg/pcb.h>
-#include <datReader/DatCategories/bg/lgb.h>
-#include <datReader/DatCategories/bg/sgb.h>
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
 #include "Script/ScriptMgr.h"
@@ -30,6 +27,8 @@
 
 #include <Encounter/Encounter.h>
 #include <Task/MoveTerritoryTask.h>
+
+#include "DatCategories/InstanceObjectParser.h"
 
 
 using namespace Sapphire::Common;
@@ -104,7 +103,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   }
 
   // mark player as "bound by duty"
-  player.setCondition( PlayerCondition::BoundByDuty );
+  //player.setCondition( PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 }
@@ -163,7 +162,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
 
       if( m_pEntranceEObj )
         m_pEntranceEObj->setPermissionInvisibility( 1 );
-      m_state = InstanceContentState::DutyInProgress;
+      setState( InstanceContentState::DutyInProgress );
 
       break;
     }
@@ -234,7 +233,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       m_pEntranceEObj->setPermissionInvisibility( 1 );
       sendForward();
 
-      m_state = InstanceContentState::DutyInProgress;
+      setState( InstanceContentState::DutyInProgress );
 
       m_instanceResetTime = 0;
       m_instanceResetFinishTime = 0;
@@ -254,12 +253,6 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
         m_instanceTerminate = true;
 
       updateBNpcs( tickCount );
-
-      if( m_pEncounter->getStatus() == EncounterStatus::FAIL )
-        m_state = InstanceContentState::DutyReset;
-
-      if( m_pEncounter->getStatus() == EncounterStatus::SUCCESS )
-        m_state = InstanceContentState::DutyFinished;
 
       break;
     }
@@ -285,7 +278,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       break;
     }
 
-    case Terminate:
+    case InstanceContentState::Terminate:
     {
       // exit players
       if( ( m_instanceTerminateTime + 3000 ) >= tickCount )
@@ -313,18 +306,10 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  auto oldState = m_state;
+  // only activate this for debug purposes to spawn bnpcs in dungeons
+  updateSpawnPoints();
   updateState( tickCount );
-
-  if( oldState != m_state )
-  {
-    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
-  }
-
   scriptMgr.onInstanceUpdate( *this, tickCount );
-
-  if( m_pEncounter )
-    m_pEncounter->update( tickCount );
 
   m_lastUpdate = tickCount;
 }
@@ -405,6 +390,9 @@ void Sapphire::InstanceContent::setVar( uint8_t index, uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorVarChange( *this, index, value );
 }
 
 void Sapphire::InstanceContent::setSequence( uint8_t value )
@@ -415,6 +403,8 @@ void Sapphire::InstanceContent::setSequence( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorSeqChange( *this, value );
 }
 
 void Sapphire::InstanceContent::setFlags( uint8_t value )
@@ -425,6 +415,16 @@ void Sapphire::InstanceContent::setFlags( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceDirectorFlagChange( *this, value );
+}
+
+void Sapphire::InstanceContent::setCustomVar( uint32_t var, uint64_t value )
+{
+  Director::setCustomVar( var, value );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceCustomVarChange( *this, var, value );
 }
 
 void Sapphire::InstanceContent::startQte()
@@ -462,11 +462,11 @@ void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
-  if( object->getObjectId() == 2000182 ) // start
+  if( object->getBaseId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
+  auto objData = exdData.getRow< Excel::EObj >( object->getBaseId() );
   if( objData )
   {
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
@@ -474,7 +474,7 @@ void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
   else
     Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
-                   std::to_string( object->getObjectId() ) );
+                   std::to_string( object->getBaseId() ) );
 }
 
 void Sapphire::InstanceContent::sendSharedGroup( uint32_t sharedGroupId, uint32_t timeIndex )
@@ -576,6 +576,17 @@ Sapphire::InstanceContentState Sapphire::InstanceContent::getState() const
   return m_state;
 }
 
+void Sapphire::InstanceContent::setState( InstanceContentState state )
+{
+  auto oldState = m_state;
+  m_state = state;
+  if( oldState != m_state )
+  {
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
+  }
+}
+
 void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -587,15 +598,15 @@ void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& 
   if( m_pEntranceEObj != nullptr )
   {
     if( rect )
-      player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
+      player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
     else
       player.setRot( PI - PI / 2 );
     player.setPos( m_pEntranceEObj->getPos() );
   }
   else if( rect )
   {
-    player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
-    player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
+    player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
+    player.setPos( { rect->header.Transformation.Translation.x, rect->header.Transformation.Translation.y, rect->header.Transformation.Translation.z } );
   }
   else
   {
@@ -633,7 +644,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjById( uint32_
   Entity::EventObjectPtr pEObj = nullptr;
 
   for( auto& eobj : m_eventIdToObjectMap )
-    if( eobj.second->getObjectId() == eobjId )
+    if( eobj.second->getBaseId() == eobjId )
       return pEObj;
 
   return nullptr;
@@ -752,7 +763,7 @@ void Sapphire::InstanceContent::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  player.removeCondition( PlayerCondition::BoundByDuty );
+  //player.removeCondition( PlayerCondition::BoundByDuty );
 }
 
 uint32_t Sapphire::InstanceContent::getExpireValue()
@@ -790,7 +801,7 @@ void Sapphire::InstanceContent::terminate( uint8_t reason )
     sendDutyFailed( false );
 
   m_instanceTerminateTime = Util::getTimeMs();
-  m_state = InstanceContentState::Terminate;
+  setState( InstanceContentState::Terminate );
 }
 
 bool Sapphire::InstanceContent::isTerminationReady() const

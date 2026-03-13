@@ -15,6 +15,7 @@
 #include "WorldServer.h"
 #include "Session.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/TerritoryMgr.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -24,16 +25,17 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
-                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv ) :
+EventObject::EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId,
+                          uint8_t initialState,
+                          Vector3 pos, float rotation, const std::string& givenName,
+                          uint8_t permissionInv ) :
   GameObject( ObjKind::EventObj ),
-  m_gimmickId( gimmickId ),
+  m_boundInstanceId( boundInstanceId ),
   m_instanceId( instanceId ),
   m_state( initialState ),
-  m_objectId( objectId ),
+  m_baseId( baseId ),
   m_name( givenName ),
   m_housingLink( 0 ),
-  m_permissionInvisibility( permissionInv ),
   m_ownerId( INVALID_GAME_OBJECT_ID )
 {
   m_id = actorId;
@@ -41,16 +43,22 @@ EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickI
   m_pos.y = pos.y;
   m_pos.z = pos.z;
   m_rot = rotation;
+  m_permissionInvisibility = permissionInv;
 }
 
-uint32_t EventObject::getGimmickId() const
+void EventObject::setEventObjectType( EventObjectType type )
 {
-  return m_gimmickId;
+  m_eobjType = type;
 }
 
-uint32_t EventObject::getObjectId() const
+uint32_t EventObject::getBoundInstanceId() const
 {
-  return m_objectId;
+  return m_boundInstanceId;
+}
+
+uint32_t EventObject::getBaseId() const
+{
+  return m_baseId;
 }
 
 float EventObject::getScale() const
@@ -73,9 +81,9 @@ void EventObject::setOnTalkHandler( EventObject::OnTalkEventHandler handler )
   m_onTalkEventHandler = std::move( handler );
 }
 
-void EventObject::setGimmickId( uint32_t gimmickId )
+void EventObject::setBoundInstanceId( uint32_t boundInstanceId )
 {
-  m_gimmickId = gimmickId;
+  m_boundInstanceId = boundInstanceId;
 }
 
 uint8_t EventObject::getState() const
@@ -88,9 +96,10 @@ void EventObject::setState( uint8_t state )
   m_state = state;
 }
 
-void EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
+void EventObject::playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag )
 {
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), EObjAnimation, flag, animationFlag );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), PlaySharedGroupTimeline, flag,
+                                           animationFlag );
 }
 
 void EventObject::setHousingLink( uint32_t housingLink )
@@ -120,21 +129,18 @@ void EventObject::spawn( PlayerPtr pTarget )
     return;
 
   auto& server = Common::Service< World::WorldServer >::ref();
-
-  Logger::debug( "Spawning EObj: id#{0} name={1}", getId(), getName() );
-
   auto eobjStatePacket = makeZonePacket< FFXIVIpcCreateObject >( getId(), pTarget->getId() );
   eobjStatePacket->data().Index = spawnIndex;
   eobjStatePacket->data().Kind = getObjKind();
   eobjStatePacket->data().Flag = getState();
-  eobjStatePacket->data().BaseId = getObjectId();
+  eobjStatePacket->data().BaseId = getBaseId();
   eobjStatePacket->data().LayoutId = getInstanceId();
-  eobjStatePacket->data().BindLayoutId = getGimmickId();
+  eobjStatePacket->data().BindLayoutId = getBoundInstanceId();
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().Pos = getPos();
   eobjStatePacket->data().Scale = getScale();
   eobjStatePacket->data().EntityId = getId();
-  eobjStatePacket->data().Dir = Util::floatToUInt16Rot( getRot() );
+  eobjStatePacket->data().Dir = getRotUInt16();
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().PermissionInvisibility = getPermissionInvisibility();
   eobjStatePacket->data().Args = 0xE0;
@@ -147,8 +153,6 @@ void EventObject::spawn( PlayerPtr pTarget )
 
 void EventObject::despawn( PlayerPtr pTarget )
 {
-  Logger::debug( "despawn eobj#{0}", getId() );
-
   pTarget->freeObjSpawnIndexForActorId( getId() );
 }
 
@@ -162,17 +166,94 @@ uint32_t EventObject::getInstanceId() const
   return m_instanceId;
 }
 
-uint8_t EventObject::getPermissionInvisibility() const
-{
-  return m_permissionInvisibility;
-}
-
 void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
+  m_permissionInvisibility = permissionInvisibility;
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
 }
 
-uint32_t Sapphire::Entity::EventObject::getOwnerId() const
+uint32_t EventObject::getOwnerId() const
 {
   return m_ownerId;
+}
+
+void EventObject::setCollisionEnabled( bool enabled )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  
+  if( auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() ) )
+  {
+    if( auto pNavi = pTeri->getNaviProvider() )
+    {
+      for( auto& collision : m_collision )
+      {
+        switch( collision.m_type )
+        {
+          case EventObjectCollisionType::Box:
+          {
+            auto& box = collision.m_shape.box;
+            auto pos = collision.m_pos;
+            pos.y -= box.height / 2.f;
+
+            pNavi->toggleBox( collision.m_obstacleRef, pos, { box.width / 2.f, box.height / 2.f, box.depth / 2.f }, collision.m_rot, enabled );
+          }
+          break;
+          case EventObjectCollisionType::Sphere:
+          {
+            // todo: actually make this a sphere
+            auto& sphere = collision.m_shape.sphere;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, sphere.radius, sphere.radius, enabled );
+          }
+          break;
+          case EventObjectCollisionType::Cylinder:
+          {
+            auto& cylinder = collision.m_shape.cylinder;
+            pNavi->toggleObstacle( collision.m_obstacleRef, collision.m_pos, cylinder.radius, cylinder.height, enabled );
+          }
+          break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+}
+
+void EventObject::addCollisionBox( Common::Vector3 pos, float rot, float width, float height, float depth )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Box;
+  collision.m_pos = pos;
+  collision.m_rot = rot;
+  collision.m_shape.box.width = width;
+  collision.m_shape.box.height = height;
+  collision.m_shape.box.depth = depth;
+
+  m_collision.push_back( collision );
+}
+
+void EventObject::addCollisionCylinder( Common::Vector3 pos, float radius, float height )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Cylinder;
+  collision.m_pos = pos;
+  collision.m_shape.cylinder.radius = radius;
+  collision.m_shape.cylinder.height = height;
+
+  m_collision.push_back( collision );
+}
+
+void EventObject::addCollisionSphere( Common::Vector3 pos, float radius )
+{
+  EventObjectCollision collision;
+  collision.m_type = EventObjectCollisionType::Sphere;
+  collision.m_pos = pos;
+  collision.m_shape.sphere.radius = radius;
+
+  m_collision.push_back( collision );
+}
+
+const std::vector< EventObjectCollision >& EventObject::getCollisionData() const
+{
+  return m_collision;
 }

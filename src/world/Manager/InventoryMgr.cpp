@@ -151,19 +151,19 @@ void InventoryMgr::updateHousingItemPosition( Inventory::HousingItemPtr item )
 
   auto pos = item->getPos();
 
-  auto rot = static_cast< int32_t >( item->getRot() );
+  auto rot = item->getRot();
 
   stmt->setUInt64( 1, item->getUId() );
 
   stmt->setDouble( 2, pos.x );
   stmt->setDouble( 3, pos.y );
   stmt->setDouble( 4, pos.z );
-  stmt->setInt( 5, rot );
+  stmt->setDouble( 5, rot );
 
   stmt->setDouble( 6, pos.x );
   stmt->setDouble( 7, pos.y );
   stmt->setDouble( 8, pos.z );
-  stmt->setInt( 9, rot );
+  stmt->setDouble( 9, rot );
 
   db.execute( stmt );
 }

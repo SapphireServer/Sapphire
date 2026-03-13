@@ -8,8 +8,8 @@
 #include <string>
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
-
-#include "EditorState.h"
+#include <nlohmann/json.hpp>
+#include "ServerState.h"
 
 #include "Engine/GfxApi.h"
 #include "Engine/ResourceManager.h"
@@ -41,69 +41,18 @@
 #include <cctype>
 
 #include "Common.h"
-#include "PreparedResultSet.h"
 
 #include <Navi/NaviProvider.h>
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <GL/glew.h>
 
+#include "commonshader.h"
 
-GLuint compileShader( GLenum type, const char *source )
-{
-  GLuint shader = glCreateShader( type );
-  glShaderSource( shader, 1, &source, nullptr );
-  glCompileShader( shader );
-
-  GLint success;
-  glGetShaderiv( shader, GL_COMPILE_STATUS, &success );
-  if( !success )
-  {
-    char infoLog[ 512 ];
-    glGetShaderInfoLog( shader, 512, nullptr, infoLog );
-    printf( "Shader compilation failed: %s\n", infoLog );
-    glDeleteShader( shader );
-    return 0;
-  }
-  return shader;
-}
-
-GLuint createShaderProgram( const char *vertexSource, const char *fragmentSource )
-{
-  GLuint vertexShader = compileShader( GL_VERTEX_SHADER, vertexSource );
-  GLuint fragmentShader = compileShader( GL_FRAGMENT_SHADER, fragmentSource );
-
-  if( !vertexShader || !fragmentShader )
-  {
-    if( vertexShader )
-      glDeleteShader( vertexShader );
-    if( fragmentShader )
-      glDeleteShader( fragmentShader );
-    return 0;
-  }
-
-  GLuint program = glCreateProgram();
-  glAttachShader( program, vertexShader );
-  glAttachShader( program, fragmentShader );
-  glLinkProgram( program );
-
-  GLint success;
-  glGetProgramiv( program, GL_LINK_STATUS, &success );
-  if( !success )
-  {
-    char infoLog[ 512 ];
-    glGetProgramInfoLog( program, 512, nullptr, infoLog );
-    printf( "Shader linking failed: %s\n", infoLog );
-    glDeleteProgram( program );
-    program = 0;
-  }
-
-  glDeleteShader( vertexShader );
-  glDeleteShader( fragmentShader );
-
-  return program;
-}
-
+#include <Util/Paths.h>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
 extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
@@ -117,6 +66,7 @@ ZoneEditor::~ZoneEditor()
   clearMapTexture();
   cleanupNavmeshRendering();
   cleanupObjModel();
+  cleanupSenseRangeRendering();
 
   if( m_navmeshShader )
   {
@@ -135,6 +85,8 @@ void ZoneEditor::init()
 {
   initializeCache();
   initializeNavmeshRendering();
+  initializeServerPathShader();
+
 }
 
 void ZoneEditor::initializeCache()
@@ -175,6 +127,43 @@ void ZoneEditor::initializeCache()
   // Initialize filtered list with all zones
   updateSearchFilter();
   m_needsRefresh = false;
+
+  // Get all zone IDs once
+  auto nameIds = exdD.getIdList< Excel::BNpcName >();
+  {
+    for( const auto& id : nameIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcName >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcNameCache[ id ] = { nameRow->getString( nameRow->data().Text.SGL ), nameRow->data() };
+    }
+  }
+
+  auto baseIds = exdD.getIdList< Excel::BNpcBase >();
+  {
+    for( const auto& id : baseIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcBase >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcBaseCache[ id ] = { nameRow->data() };
+    }
+  }
+
+  auto customizeIds = exdD.getIdList< Excel::BNpcCustomize >();
+  {
+    for( const auto& id : customizeIds )
+    {
+      auto nameRow = exdD.getRow< Excel::BNpcCustomize >( id );
+      if( !nameRow )
+        continue;
+
+      m_bnpcCustomizeCache[ id ] = { nameRow->data() };
+    }
+  }
 }
 
 void ZoneEditor::updateSearchFilter()
@@ -200,6 +189,8 @@ void ZoneEditor::updateSearchFilter()
     }
   }
 }
+
+
 
 void ZoneEditor::updateBnpcSearchFilter()
 {
@@ -240,263 +231,1152 @@ void ZoneEditor::updateBnpcSearchFilter()
 
 void ZoneEditor::showBnpcWindow()
 {
-  if( !m_showBnpcWindow ) return;
+  if( !m_showBnpcWindow )
+    return;
 
-  ImGui::Begin( "BNPC Information", &m_showBnpcWindow, ImGuiWindowFlags_MenuBar );
+  ImGui::Begin( "BNPC Editor", &m_showBnpcWindow );
 
-  // Menu bar
-  if( ImGui::BeginMenuBar() )
-  {
-    ImGui::Text( "Total BNPCs: %zu | Filtered: %zu", m_bnpcs.size(), m_filteredBnpcs.size() );
-    if( ImGui::Button( "Refresh" ) )
-    {
-      loadBnpcs();
-      updateBnpcSearchFilter();
-    }
-    ImGui::EndMenuBar();
-  }
+  showBnpcWindowHeader();
 
-  // Search input
-  ImGui::Text( "Search BNPCs:" );
-  ImGui::SetNextItemWidth( -1 );
-  if( ImGui::InputText( "##BnpcSearch", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
-  {
-    updateBnpcSearchFilter();
-    m_selectedBnpcIndex = -1; // Clear selection when searching
-  }
+  static float splitterWidth = 300.0f;
+  ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
-  ImGui::Separator();
+  showBnpcTreeView( splitterWidth, windowSize );
+  showBnpcSplitter( splitterWidth, windowSize );
+  showBnpcDetailsView( windowSize );
 
-  // Split into two panes: list on left, details on right
-  if( ImGui::BeginChild( "BnpcList", ImVec2( 350, 0 ), true ) )
-  {
-    // BNPC list
-    for( int i = 0; i < static_cast< int >( m_filteredBnpcs.size() ); ++i )
-    {
-      const auto& bnpc = m_filteredBnpcs[ i ];
-
-
-      // Create display text
-      std::string displayText = fmt::format( "{} - {} (BaseID: {})",
-                                             bnpc->instanceId, bnpc->nameString, bnpc->BaseId );
-
-      bool isSelected = ( m_selectedBnpcIndex == i );
-      if( ImGui::Selectable( displayText.c_str(), isSelected ) )
-      {
-        m_selectedBnpcIndex = i;
-      }
-
-      // Tooltip with basic info
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::EndTooltip();
-      }
-    }
-  }
-  ImGui::EndChild();
-
-  ImGui::SameLine();
-
-  // Details pane
-  if( ImGui::BeginChild( "BnpcDetails", ImVec2( 0, 0 ), true ) )
-  {
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
-    {
-      const auto& bnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
-
-      ImGui::Text( "BNPC Details" );
-      ImGui::Separator();
-
-      // Basic Information
-      if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Instance ID: %u", bnpc->instanceId );
-        ImGui::Text( "Name: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "Base ID: %u", bnpc->BaseId );
-        ImGui::Text( "Name ID: %u", bnpc->NameId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Territory Type: %u", bnpc->territoryType );
-        ImGui::Unindent();
-      }
-
-      // Position & Movement
-      if( ImGui::CollapsingHeader( "Position & Movement", ImGuiTreeNodeFlags_DefaultOpen ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Position: %.2f, %.2f, %.2f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Text( "Rotation: %.2f", bnpc->rotation );
-        ImGui::Text( "Move AI: %u", bnpc->MoveAI );
-        ImGui::Text( "Normal AI: %u", bnpc->NormalAI );
-        ImGui::Text( "Wandering Range: %u", bnpc->WanderingRange );
-        ImGui::Text( "Route: %u", bnpc->Route );
-        ImGui::Text( "Server Path ID: %u", bnpc->ServerPathId );
-        ImGui::Unindent();
-      }
-
-      // Spawn Information
-      if( ImGui::CollapsingHeader( "Spawn Information" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Pop Weather: %u", bnpc->PopWeather );
-        ImGui::Text( "Pop Time: %u - %u", bnpc->PopTimeStart, bnpc->PopTimeEnd );
-        ImGui::Text( "Pop Interval: %u", bnpc->PopInterval );
-        ImGui::Text( "Pop Rate: %u", bnpc->PopRate );
-        ImGui::Text( "Pop Event: %u", bnpc->PopEvent );
-        ImGui::Text( "Active Type: %u", bnpc->ActiveType );
-        ImGui::Text( "Repop ID: %u", bnpc->RepopId );
-        ImGui::Text( "Horizontal Pop Range: %.2f", bnpc->HorizontalPopRange );
-        ImGui::Text( "Vertical Pop Range: %.2f", bnpc->VerticalPopRange );
-        ImGui::Unindent();
-      }
-
-      // Combat & Interaction
-      if( ImGui::CollapsingHeader( "Combat & Interaction" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Sense Range Rate: %.2f", bnpc->SenseRangeRate );
-        ImGui::Text( "Drop Item: %u", bnpc->DropItem );
-        ImGui::Text( "Event Group: %u", bnpc->EventGroup );
-        ImGui::Text( "BNPC Rank ID: %u", bnpc->BNPCRankId );
-        ImGui::Text( "Equipment ID: %u", bnpc->EquipmentID );
-        ImGui::Text( "Customize ID: %u", bnpc->CustomizeID );
-        ImGui::Unindent();
-      }
-
-      // Linking & Grouping
-      if( ImGui::CollapsingHeader( "Linking & Grouping" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Link Group: %u", bnpc->LinkGroup );
-        ImGui::Text( "Link Family: %u", bnpc->LinkFamily );
-        ImGui::Text( "Link Range: %u", bnpc->LinkRange );
-        ImGui::Text( "Link Count Limit: %u", bnpc->LinkCountLimit );
-        ImGui::Text( "Link Parent: %d", bnpc->LinkParent );
-        ImGui::Text( "Link Override: %d", bnpc->LinkOverride );
-        ImGui::Text( "Link Reply: %d", bnpc->LinkReply );
-        ImGui::Unindent();
-      }
-
-      // Special Properties
-      if( ImGui::CollapsingHeader( "Special Properties" ) )
-      {
-        ImGui::Indent();
-        ImGui::Text( "Territory Range: %u", bnpc->TerritoryRange );
-        ImGui::Text( "Bound Instance ID: %u", bnpc->BoundInstanceID );
-        ImGui::Text( "Fate Layout Label ID: %u", bnpc->FateLayoutLabelId );
-        ImGui::Text( "Nonpop Init Zone: %d", bnpc->NonpopInitZone );
-        ImGui::Text( "Invalid Repop: %d", bnpc->InvalidRepop );
-        ImGui::Text( "Nonpop: %d", bnpc->Nonpop );
-        ImGui::Unindent();
-      }
-
-      ImGui::Separator();
-
-      // Action buttons
-      if( ImGui::Button( "Show on Map" ) )
-      {
-        // This would highlight the BNPC on the map if map is open
-        if( !m_showMapWindow && m_currentMapId > 0 )
-        {
-          m_showMapWindow = true;
-        }
-        // TODO: Add map marker/highlight functionality
-      }
-      ImGui::SameLine();
-      if( ImGui::Button( "Copy Position" ) )
-      {
-        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::SetClipboardText( posStr.c_str() );
-      }
-    }
-    else
-    {
-      ImGui::TextDisabled( "No BNPC selected - Click on a BNPC from the list" );
-    }
-  }
-  ImGui::EndChild();
+  showBnpcSelectors();
 
   ImGui::End();
 }
 
-void ZoneEditor::loadBnpcs()
+void ZoneEditor::showBnpcWindowHeader()
 {
-  auto& db = g_charaDb;
-  auto stmt = db.getPreparedStatement( Sapphire::Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
-  stmt->setUInt( 1, m_selectedZoneId );
-  auto res = db.query( stmt );
-
-  m_bnpcs.clear();
-
-  while( res->next() )
+  // Search filter
+  if( ImGui::InputText( "Search", m_bnpcSearchBuffer, sizeof( m_bnpcSearchBuffer ) ) )
   {
-    auto bnpc = std::make_shared< CachedBnpc >();
+    updateBnpcSearchFilter();
+  }
 
-    bnpc->territoryType = res->getInt( 1 );
-    bnpc->bnpcName = res->getString( 3 );
-    bnpc->instanceId = res->getInt( 4 );
-    bnpc->x = res->getFloat( 5 );
-    bnpc->y = res->getFloat( 6 );
-    bnpc->z = res->getFloat( 7 );
-    bnpc->BaseId = res->getInt( 8 );
-    bnpc->PopWeather = res->getInt( 9 );
-    bnpc->PopTimeStart = res->getInt( 10 );
-    bnpc->PopTimeEnd = res->getInt( 11 );
-    bnpc->MoveAI = res->getInt( 12 );
-    bnpc->WanderingRange = res->getInt( 13 );
-    bnpc->Route = res->getInt( 14 );
-    bnpc->EventGroup = res->getInt( 15 );
-    bnpc->NameId = res->getInt( 16 );
-    bnpc->DropItem = res->getInt( 17 );
-    bnpc->SenseRangeRate = res->getFloat( 18 );
-    bnpc->Level = res->getInt( 19 );
-    bnpc->ActiveType = res->getInt( 20 );
-    bnpc->PopInterval = res->getInt( 21 );
-    bnpc->PopRate = res->getInt( 22 );
-    bnpc->PopEvent = res->getInt( 23 );
-    bnpc->LinkGroup = res->getInt( 24 );
-    bnpc->LinkFamily = res->getInt( 25 );
-    bnpc->LinkRange = res->getInt( 26 );
-    bnpc->LinkCountLimit = res->getInt( 27 );
-    bnpc->NonpopInitZone = res->getInt( 28 );
-    bnpc->InvalidRepop = res->getInt( 29 );
-    bnpc->LinkParent = res->getInt( 30 );
-    bnpc->LinkOverride = res->getInt( 31 );
-    bnpc->LinkReply = res->getInt( 32 );
-    bnpc->HorizontalPopRange = res->getFloat( 33 );
-    bnpc->VerticalPopRange = res->getFloat( 34 );
-    bnpc->BNpcBaseData = res->getInt( 35 );
-    bnpc->RepopId = res->getInt( 36 );
-    bnpc->BNPCRankId = res->getInt( 37 );
-    bnpc->TerritoryRange = res->getInt( 38 );
-    bnpc->BoundInstanceID = res->getInt( 39 );
-    bnpc->FateLayoutLabelId = res->getInt( 40 );
-    bnpc->NormalAI = res->getInt( 41 );
-    bnpc->ServerPathId = res->getInt( 42 );
-    bnpc->EquipmentID = res->getInt( 43 );
-    bnpc->CustomizeID = res->getInt( 44 );
-    bnpc->rotation = res->getFloat( 45 );
-    bnpc->Nonpop = res->getInt( 46 );
+  // Selection info and clear button
+  if( !m_selectedGroupName.empty() )
+  {
+    ImGui::Text( "Group Selected: %s (%zu BNPCs)", m_selectedGroupName.c_str(), m_selectedBnpcInstanceIds.size() );
+  }
+  else if( m_selectedBnpcIndex >= 0 )
+  {
+    ImGui::Text( "BNPC Selected: %s", m_filteredBnpcs[ m_selectedBnpcIndex ]->bnpcName.c_str() );
 
-    //int groupId = res->getInt( 47 );
-
-    bnpc->nameString = bnpc->bnpcName;
-    auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
-
-    std::string bnpcName = bnpc->bnpcName;
-    auto bnpcNameEntry = exdD.getRow< Excel::BNpcName >( bnpc->NameId );
-    if( bnpcNameEntry )
+    uint32_t previousSelection = m_selectedServerPathId;
+    m_selectedServerPathId = m_filteredBnpcs[ m_selectedBnpcIndex ]->ServerPathId;
+    if( previousSelection != m_selectedServerPathId )
     {
-      bnpc->nameString = bnpcNameEntry->getString( bnpcNameEntry->data().Text.SGL );
+      buildServerPathGeometry();
     }
 
-    m_bnpcs.push_back( bnpc );
+  }
+  else
+  {
+    ImGui::Text( "No selection" );
+  }
+
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Selection" ) )
+  {
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+  }
+
+  ImGui::Separator();
+}
+
+
+void ZoneEditor::showBnpcTreeView( float splitterWidth, const ImVec2& windowSize )
+{
+  ImGui::BeginChild( "BNPCTreeView", ImVec2( splitterWidth, windowSize.y ), true );
+
+  // Group BNPCs by group name for tree display
+  std::map< std::string, std::vector< CachedBnpc * > > groupedBnpcs;
+  for( auto *bnpc : m_filteredBnpcs )
+  {
+    groupedBnpcs[ bnpc->groupName ].push_back( bnpc );
+  }
+
+  // Display tree view
+  for( const auto& [ groupName, bnpcs ] : groupedBnpcs )
+  {
+    showBnpcGroupNode( groupName, bnpcs );
+  }
+
+  showBnpcTreeContextMenu();
+
+  ImGui::EndChild();
+}
+
+void ZoneEditor::showBnpcGroupNode( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  ImGuiTreeNodeFlags groupFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+  // Highlight if this group is selected
+  if( m_groupSelectionMode && m_selectedGroupName == groupName )
+  {
+    groupFlags |= ImGuiTreeNodeFlags_Selected;
+  }
+
+  std::string groupNodeId = fmt::format( "{}##group_{}", groupName, groupName );
+  std::string groupDisplayText = fmt::format( "{} ({} BNPCs)", groupName, bnpcs.size() );
+
+  if( ImGui::TreeNodeEx( groupNodeId.c_str(), groupFlags, "%s", groupDisplayText.c_str() ) )
+  {
+    handleGroupSelection( groupName, bnpcs );
+    showGroupContextMenu( groupName, "GroupContextExpanded_" );
+    showBnpcNodesInGroup( groupName, bnpcs );
+    ImGui::TreePop();
+  }
+  else
+  {
+    handleCollapsedGroupSelection( groupName, bnpcs );
+    showGroupContextMenu( groupName, "GroupContextCollapsed_" );
+  }
+}
+
+void ZoneEditor::handleGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  if( ImGui::IsItemClicked() )
+  {
+    // Always select the group when clicking on a group node
+    m_selectedGroupName = groupName;
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+
+    // Add all BNPCs in this group to selection
+    for( auto *bnpc : bnpcs )
+    {
+      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+    }
+  }
+}
+
+void ZoneEditor::handleCollapsedGroupSelection( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  if( ImGui::IsItemClicked() )
+  {
+    // Always select the group when clicking on a collapsed group node
+    m_selectedGroupName = groupName;
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+
+    // Add all BNPCs in this group to selection
+    for( auto *bnpc : bnpcs )
+    {
+      m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+    }
+  }
+}
+
+
+void ZoneEditor::showGroupContextMenu( const std::string& groupName, const std::string& contextIdPrefix )
+{
+  std::string contextId = fmt::format( "{}{}", contextIdPrefix, groupName );
+  if( ImGui::BeginPopupContextItem( contextId.c_str() ) )
+  {
+    if( ImGui::MenuItem( "Create Group" ) )
+    {
+      // TODO: Implement create group functionality
+    }
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    if( ImGui::MenuItem( "Rename Group" ) )
+    {
+      // TODO: Implement rename group functionality
+    }
+    if( ImGui::MenuItem( "Delete Group" ) )
+    {
+      // TODO: Implement delete group functionality with confirmation
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void ZoneEditor::showBnpcNodesInGroup( const std::string& groupName, const std::vector< CachedBnpc * >& bnpcs )
+{
+  // Sort BNPCs within group by instance ID
+  auto sortedBnpcs = bnpcs;
+  std::sort( sortedBnpcs.begin(), sortedBnpcs.end(),
+             []( CachedBnpc *a, CachedBnpc *b ) { return a->instanceId < b->instanceId; } );
+
+  for( auto *bnpc : sortedBnpcs )
+  {
+    showBnpcNode( groupName, bnpc, bnpcs );
+  }
+}
+
+void ZoneEditor::showBnpcNode( const std::string& groupName, CachedBnpc *bnpc,
+                               const std::vector< CachedBnpc * >& groupBnpcs )
+{
+  ImGuiTreeNodeFlags leafFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+  // Highlight if selected
+  if( m_selectedBnpcIndex >= 0 && m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc )
+  {
+    leafFlags |= ImGuiTreeNodeFlags_Selected;
+  }
+
+  std::string bnpcNodeId = fmt::format( "{} {}##bnpc_{}", bnpc->bnpcName, bnpc->instanceId, bnpc->instanceId );
+  std::string bnpcDisplayText = fmt::format( "{} {} (BaseID: {})", bnpc->bnpcName, bnpc->instanceId, bnpc->BaseId );
+
+  if( ImGui::TreeNodeEx( bnpcNodeId.c_str(), leafFlags, "%s", bnpcDisplayText.c_str() ) )
+  {
+    handleBnpcSelection( groupName, bnpc, groupBnpcs );
+    showBnpcContextMenu( bnpc );
+  }
+}
+
+void ZoneEditor::handleBnpcSelection( const std::string& groupName, CachedBnpc *bnpc,
+                                      const std::vector< CachedBnpc * >& groupBnpcs )
+{
+  if( ImGui::IsItemClicked() )
+  {
+    // Always select just this individual BNPC when clicking on it
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcInstanceIds.insert( bnpc->instanceId );
+
+    // Find this BNPC in filtered list to set selected index
+    for( size_t i = 0; i < m_filteredBnpcs.size(); ++i )
+    {
+      if( m_filteredBnpcs[ i ] == bnpc )
+      {
+        m_selectedBnpcIndex = static_cast< int >( i );
+        break;
+      }
+    }
+  }
+}
+
+void ZoneEditor::showBnpcContextMenu( CachedBnpc *bnpc )
+{
+  std::string bnpcContextId = fmt::format( "BnpcContext_{}", bnpc->instanceId );
+  if( ImGui::BeginPopupContextItem( bnpcContextId.c_str() ) )
+  {
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    if( ImGui::MenuItem( "Copy BNPC" ) )
+    {
+      // TODO: Implement copy BNPC functionality
+    }
+    if( ImGui::MenuItem( "Delete BNPC" ) )
+    {
+      // TODO: Implement delete BNPC functionality with confirmation
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void ZoneEditor::showBnpcTreeContextMenu()
+{
+  if( ImGui::BeginPopupContextWindow( "EmptySpaceContext",
+                                      ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight ) )
+  {
+    if( ImGui::MenuItem( "Create Group" ) )
+    {
+      // TODO: Implement create group functionality
+    }
+    if( ImGui::MenuItem( "Create BNPC" ) )
+    {
+      // TODO: Implement create BNPC functionality
+    }
+    ImGui::EndPopup();
+  }
+}
+
+// ... existing code ...
+
+bool ZoneEditor::showBnpcBaseDataInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Base Data", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Indent();
+
+    // Territory Range
+    ImGui::Text( "Territory Range:" );
+    ImGui::SameLine( 150 );
+    if( ImGui::InputScalar( "##territoryRange", ImGuiDataType_U16, &selectedBnpc->baseData.TerritoryRange ) )
+    {
+      hasChanges = true;
+    }
+
+    ImGui::Separator();
+
+    // Sense Types and Ranges
+    ImGui::Text( "Sense Configuration:" );
+
+    // Helper lambda for sense type combo
+    auto showSenseCombo = [&]( const char *label, CachedBnpc::SenseType& senseType, uint8_t& senseRange ) -> bool
+    {
+      bool changed = false;
+
+      ImGui::Text( "%s:", label );
+      ImGui::SameLine( 150 );
+
+      // Sense Type dropdown
+      const char *senseTypeNames[ ] = {
+        "NONE", "VISION", "HEARING", "PRESENCE",
+        "VITALITY", "MAGIC", "ABILITY", "WEAPON_SKILL", "POISON"
+      };
+
+      int currentType = static_cast< int >( senseType );
+      if( ImGui::Combo( ( "##senseType" + std::string( label ) ).c_str(), &currentType, senseTypeNames,
+                        CachedBnpc::SENSE_COUNT ) )
+      {
+        senseType = static_cast< CachedBnpc::SenseType >( currentType );
+        changed = true;
+      }
+      ImGui::SameLine();
+      ImGui::Text( "(%u)", senseType );
+
+      // Sense Range input (only show if sense type is not NONE)
+      if( senseType != CachedBnpc::SenseType::NONE )
+      {
+        ImGui::Text( "Range:" );
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth( 80.0f );
+        if( ImGui::InputScalar( ( "##senseRange" + std::string( label ) ).c_str(), ImGuiDataType_U8, &senseRange ) )
+        {
+          changed = true;
+        }
+      }
+      else
+      {
+        // Reset range to 0 when sense type is NONE
+        if( senseRange != 0 )
+        {
+          senseRange = 0;
+          changed = true;
+        }
+      }
+
+      return changed;
+    };
+
+    // Primary Sense
+    if( showSenseCombo( "Primary Sense", selectedBnpc->baseData.Sense[ 0 ], selectedBnpc->baseData.SenseRange[ 0 ] ) )
+    {
+      hasChanges = true;
+    }
+
+    // Secondary Sense
+    if( showSenseCombo( "Secondary Sense", selectedBnpc->baseData.Sense[ 1 ], selectedBnpc->baseData.SenseRange[ 1 ] ) )
+    {
+      hasChanges = true;
+    }
+
+    // Optional: Add tooltips for better UX
+    if( ImGui::IsItemHovered() )
+    {
+      ImGui::SetTooltip( "Configure the NPC's detection capabilities and ranges" );
+    }
+
+    ImGui::Unindent();
+  }
+
+  return hasChanges;
+}
+
+// ... existing code ...
+
+void ZoneEditor::showBnpcSplitter( float& splitterWidth, const ImVec2& windowSize )
+{
+  ImGui::SameLine();
+  ImGui::Button( "##splitter", ImVec2( 8.0f, windowSize.y ) );
+  if( ImGui::IsItemActive() )
+  {
+    splitterWidth += ImGui::GetIO().MouseDelta.x;
+    splitterWidth = std::max( 200.0f, std::min( splitterWidth, windowSize.x - 200.0f ) );
+  }
+}
+
+void ZoneEditor::showBnpcDetailsView( const ImVec2& windowSize )
+{
+  ImGui::SameLine();
+  ImGui::BeginChild( "BNPCDetailsView", ImVec2( 0, windowSize.y ), true );
+
+  if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+  {
+    auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+    bool hasChanges = false;
+
+    ImGui::Text( "BNPC Editor - Instance ID: %u", selectedBnpc->instanceId );
+    ImGui::Separator();
+
+    hasChanges |= showBnpcBasicInfo( selectedBnpc );
+    hasChanges |= showBnpcPositionInfo( selectedBnpc );
+    hasChanges |= showBnpcBaseDataInfo( selectedBnpc );
+    hasChanges |= showBnpcPopulationInfo( selectedBnpc );
+    hasChanges |= showBnpcAIBehaviorInfo( selectedBnpc );
+    hasChanges |= showBnpcLinkInfo( selectedBnpc );
+    hasChanges |= showBnpcAppearanceInfo( selectedBnpc );
+    hasChanges |= showBnpcInstanceInfo( selectedBnpc );
+
+    showBnpcActionButtons( selectedBnpc );
+
+    if( hasChanges )
+    {
+      ImGui::SameLine();
+      ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), "Modified" );
+      buildBnpcMarkerGeometry();
+      buildSenseRangeGeometry();
+    }
+  }
+  else
+  {
+    ImGui::Text( "Select a BNPC from the tree to edit" );
+  }
+
+  ImGui::EndChild();
+}
+
+bool ZoneEditor::showBnpcBasicInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Basic Information", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    ImGui::Text( "Instance ID: %u", selectedBnpc->instanceId );
+
+    // Base ID (editable with selector)
+    ImGui::Text( "Base ID: %u", selectedBnpc->BaseId );
+    ImGui::SameLine();
+    if( ImGui::SmallButton( "Select##base" ) )
+    {
+      m_showBnpcBaseSelector = true;
+      m_baseSearchBuffer[ 0 ] = '\0';
+    }
+
+    // Name ID with name selector
+    std::string bnpcName;
+    auto it = m_bnpcNameCache.find( selectedBnpc->NameId );
+    if( it != m_bnpcNameCache.end() )
+    {
+      bnpcName = it->second.name;
+    }
+
+    ImGui::Text( "Name: %s (%u)", bnpcName.c_str(), selectedBnpc->NameId );
+    ImGui::SameLine();
+    if( ImGui::SmallButton( "Select##name" ) )
+    {
+      m_showBnpcNameSelector = true;
+      m_nameSearchBuffer[ 0 ] = '\0';
+    }
+
+    // Level (editable)
+    int level = static_cast< int >( selectedBnpc->Level );
+    if( ImGui::InputInt( "Level", &level, 1, 10 ) )
+    {
+      if( level >= 1 && level <= 90 )
+      {
+        selectedBnpc->Level = static_cast< uint8_t >( level );
+        hasChanges = true;
+      }
+    }
+
+    // Active Type (editable with combo)
+    const char *activeTypes[ ] = { "Agressive", "Passive" };
+    int currentActiveType = selectedBnpc->ActiveType;
+    if( currentActiveType >= 0 && currentActiveType < 2 )
+    {
+      if( ImGui::Combo( "Active Type", &currentActiveType, activeTypes, 2 ) )
+      {
+        selectedBnpc->ActiveType = static_cast< uint8_t >( currentActiveType );
+        hasChanges = true;
+      }
+      ImGui::SameLine();
+      ImGui::Text( "(%u)", selectedBnpc->ActiveType );
+    }
+    else
+    {
+      // Fallback for unknown values
+      int activeTypeInt = static_cast< int >( selectedBnpc->ActiveType );
+      if( ImGui::InputInt( "Active Type", &activeTypeInt, 1, 1 ) )
+      {
+        if( activeTypeInt >= 0 && activeTypeInt <= 255 )
+        {
+          selectedBnpc->ActiveType = static_cast< uint8_t >( activeTypeInt );
+          hasChanges = true;
+        }
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcPositionInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Position", ImGuiTreeNodeFlags_DefaultOpen ) )
+  {
+    float pos[ 3 ] = { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z };
+    if( ImGui::DragFloat3( "Position", pos, 0.1f, -10000.0f, 10000.0f, "%.2f" ) )
+    {
+      selectedBnpc->x = pos[ 0 ];
+      selectedBnpc->y = pos[ 1 ];
+      selectedBnpc->z = pos[ 2 ];
+      hasChanges = true;
+    }
+
+    float rotation = selectedBnpc->rotation;
+    if( ImGui::SliderAngle( "Rotation", &rotation, 0.0f, 360.0f ) )
+    {
+      selectedBnpc->rotation = rotation;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcPopulationInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Pop Settings" ) )
+  {
+    int popWeather = static_cast< int >( selectedBnpc->PopWeather );
+    if( ImGui::InputInt( "Pop Weather", &popWeather, 1, 10 ) )
+    {
+      if( popWeather >= 0 && popWeather <= 255 )
+      {
+        selectedBnpc->PopWeather = static_cast< uint8_t >( popWeather );
+        hasChanges = true;
+      }
+    }
+
+    int popTimeStart = static_cast< int >( selectedBnpc->PopTimeStart );
+    int popTimeEnd = static_cast< int >( selectedBnpc->PopTimeEnd );
+
+    if( ImGui::InputInt( "Pop Time Start", &popTimeStart, 1, 100 ) )
+    {
+      if( popTimeStart >= 0 && popTimeStart <= 2359 )
+      {
+        selectedBnpc->PopTimeStart = static_cast< uint16_t >( popTimeStart );
+        hasChanges = true;
+      }
+    }
+
+    if( ImGui::InputInt( "Pop Time End", &popTimeEnd, 1, 100 ) )
+    {
+      if( popTimeEnd >= 0 && popTimeEnd <= 2359 )
+      {
+        selectedBnpc->PopTimeEnd = static_cast< uint16_t >( popTimeEnd );
+        hasChanges = true;
+      }
+    }
+
+    int popInterval = static_cast< int >( selectedBnpc->PopInterval );
+    if( ImGui::InputInt( "Pop Interval", &popInterval, 1, 100 ) )
+    {
+      if( popInterval >= 0 )
+      {
+        selectedBnpc->PopInterval = static_cast< uint32_t >( popInterval );
+        hasChanges = true;
+      }
+    }
+
+    int popRate = static_cast< int >( selectedBnpc->PopRate );
+    if( ImGui::InputInt( "Pop Rate", &popRate, 1, 10 ) )
+    {
+      if( popRate >= 0 && popRate <= 255 )
+      {
+        selectedBnpc->PopRate = static_cast< uint8_t >( popRate );
+        hasChanges = true;
+      }
+    }
+
+    int repopId = static_cast< int >( selectedBnpc->RepopId );
+    if( ImGui::InputInt( "Repop ID", &repopId, 1, 100 ) )
+    {
+      if( repopId >= 0 )
+      {
+        selectedBnpc->RepopId = static_cast< uint32_t >( repopId );
+        hasChanges = true;
+      }
+    }
+
+    bool nonpop = selectedBnpc->Nonpop != 0;
+    if( ImGui::Checkbox( "Non-pop", &nonpop ) )
+    {
+      selectedBnpc->Nonpop = nonpop ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool invalidRepop = selectedBnpc->InvalidRepop != 0;
+    if( ImGui::Checkbox( "Invalid Repop", &invalidRepop ) )
+    {
+      selectedBnpc->InvalidRepop = invalidRepop ? 1 : 0;
+      hasChanges = true;
+    }
+
+    float popRange[ 2 ] = { selectedBnpc->HorizontalPopRange, selectedBnpc->VerticalPopRange };
+    if( ImGui::DragFloat2( "Pop Range (H/V)", popRange, 0.1f, 0.0f, 1000.0f, "%.2f" ) )
+    {
+      selectedBnpc->HorizontalPopRange = popRange[ 0 ];
+      selectedBnpc->VerticalPopRange = popRange[ 1 ];
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcAIBehaviorInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "AI & Behavior" ) )
+  {
+    int moveAI = static_cast< int >( selectedBnpc->MoveAI );
+    if( ImGui::InputInt( "Move AI", &moveAI, 1, 10 ) )
+    {
+      if( moveAI >= 0 )
+      {
+        selectedBnpc->MoveAI = static_cast< uint32_t >( moveAI );
+        hasChanges = true;
+      }
+    }
+
+    int normalAI = static_cast< int >( selectedBnpc->NormalAI );
+    if( ImGui::InputInt( "Normal AI", &normalAI, 1, 10 ) )
+    {
+      if( normalAI >= 0 )
+      {
+        selectedBnpc->NormalAI = static_cast< uint32_t >( normalAI );
+        hasChanges = true;
+      }
+    }
+
+    int wanderingRange = static_cast< int >( selectedBnpc->WanderingRange );
+    if( ImGui::InputInt( "Wandering Range", &wanderingRange, 1, 10 ) )
+    {
+      if( wanderingRange >= 0 )
+      {
+        selectedBnpc->WanderingRange = static_cast< uint32_t >( wanderingRange );
+        hasChanges = true;
+      }
+    }
+
+    int route = static_cast< int >( selectedBnpc->Route );
+    if( ImGui::InputInt( "Route", &route, 1, 10 ) )
+    {
+      if( route >= 0 )
+      {
+        selectedBnpc->Route = static_cast< uint32_t >( route );
+        hasChanges = true;
+      }
+    }
+
+    int serverPathId = static_cast< int >( selectedBnpc->ServerPathId );
+    if( ImGui::InputInt( "Server Path ID", &serverPathId, 1, 10 ) )
+    {
+      if( serverPathId >= 0 )
+      {
+        selectedBnpc->ServerPathId = static_cast< uint32_t >( serverPathId );
+        hasChanges = true;
+      }
+    }
+
+    int territoryRange = static_cast< int >( selectedBnpc->TerritoryRange );
+    if( ImGui::InputInt( "Territory Range", &territoryRange, 1, 10 ) )
+    {
+      if( territoryRange >= 0 )
+      {
+        selectedBnpc->TerritoryRange = static_cast< uint32_t >( territoryRange );
+        hasChanges = true;
+      }
+    }
+
+    float senseRangeRate = selectedBnpc->SenseRangeRate;
+    if( ImGui::DragFloat( "Sense Range Rate", &senseRangeRate, 0.01f, 0.0f, 10.0f, "%.2f" ) )
+    {
+      selectedBnpc->SenseRangeRate = senseRangeRate;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcLinkInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Linking" ) )
+  {
+    int linkGroup = static_cast< int >( selectedBnpc->LinkGroup );
+    if( ImGui::InputInt( "Link Group", &linkGroup, 1, 10 ) )
+    {
+      if( linkGroup >= 0 )
+      {
+        selectedBnpc->LinkGroup = static_cast< uint32_t >( linkGroup );
+        hasChanges = true;
+      }
+    }
+
+    int linkFamily = static_cast< int >( selectedBnpc->LinkFamily );
+    if( ImGui::InputInt( "Link Family", &linkFamily, 1, 10 ) )
+    {
+      if( linkFamily >= 0 )
+      {
+        selectedBnpc->LinkFamily = static_cast< uint32_t >( linkFamily );
+        hasChanges = true;
+      }
+    }
+
+    int linkRange = static_cast< int >( selectedBnpc->LinkRange );
+    if( ImGui::InputInt( "Link Range", &linkRange, 1, 10 ) )
+    {
+      if( linkRange >= 0 )
+      {
+        selectedBnpc->LinkRange = static_cast< uint32_t >( linkRange );
+        hasChanges = true;
+      }
+    }
+
+    int linkCountLimit = static_cast< int >( selectedBnpc->LinkCountLimit );
+    if( ImGui::InputInt( "Link Count Limit", &linkCountLimit, 1, 10 ) )
+    {
+      if( linkCountLimit >= 0 )
+      {
+        selectedBnpc->LinkCountLimit = static_cast< uint32_t >( linkCountLimit );
+        hasChanges = true;
+      }
+    }
+
+    bool linkParent = selectedBnpc->LinkParent != 0;
+    if( ImGui::Checkbox( "Link Parent", &linkParent ) )
+    {
+      selectedBnpc->LinkParent = linkParent ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool linkOverride = selectedBnpc->LinkOverride != 0;
+    if( ImGui::Checkbox( "Link Override", &linkOverride ) )
+    {
+      selectedBnpc->LinkOverride = linkOverride ? 1 : 0;
+      hasChanges = true;
+    }
+
+    bool linkReply = selectedBnpc->LinkReply != 0;
+    if( ImGui::Checkbox( "Link Reply", &linkReply ) )
+    {
+      selectedBnpc->LinkReply = linkReply ? 1 : 0;
+      hasChanges = true;
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcAppearanceInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Appearance" ) )
+  {
+    int equipmentID = static_cast< int >( selectedBnpc->EquipmentID );
+    if( ImGui::InputInt( "Equipment ID", &equipmentID, 1, 100 ) )
+    {
+      if( equipmentID >= 0 )
+      {
+        selectedBnpc->EquipmentID = static_cast< uint32_t >( equipmentID );
+        hasChanges = true;
+      }
+    }
+
+    int customizeID = static_cast< int >( selectedBnpc->CustomizeID );
+    if( ImGui::InputInt( "Customize ID", &customizeID, 1, 100 ) )
+    {
+      if( customizeID >= 0 )
+      {
+        selectedBnpc->CustomizeID = static_cast< uint32_t >( customizeID );
+        hasChanges = true;
+      }
+    }
+
+    int dropItem = static_cast< int >( selectedBnpc->DropItem );
+    if( ImGui::InputInt( "Drop Item", &dropItem, 1, 100 ) )
+    {
+      if( dropItem >= 0 )
+      {
+        selectedBnpc->DropItem = static_cast< uint32_t >( dropItem );
+        hasChanges = true;
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+bool ZoneEditor::showBnpcInstanceInfo( CachedBnpc *selectedBnpc )
+{
+  bool hasChanges = false;
+
+  if( ImGui::CollapsingHeader( "Instance" ) )
+  {
+    int boundInstanceID = static_cast< int >( selectedBnpc->BoundInstanceID );
+    if( ImGui::InputInt( "Bound Instance ID", &boundInstanceID, 1, 100 ) )
+    {
+      if( boundInstanceID >= 0 )
+      {
+        selectedBnpc->BoundInstanceID = static_cast< uint32_t >( boundInstanceID );
+        hasChanges = true;
+      }
+    }
+
+    int fateLayoutLabelId = static_cast< int >( selectedBnpc->FateLayoutLabelId );
+    if( ImGui::InputInt( "Fate Layout Label ID", &fateLayoutLabelId, 1, 100 ) )
+    {
+      if( fateLayoutLabelId >= 0 )
+      {
+        selectedBnpc->FateLayoutLabelId = static_cast< uint32_t >( fateLayoutLabelId );
+        hasChanges = true;
+      }
+    }
+  }
+
+  return hasChanges;
+}
+
+void ZoneEditor::showBnpcActionButtons( CachedBnpc *selectedBnpc )
+{
+  ImGui::Separator();
+
+  if( ImGui::Button( "Focus on Map" ) )
+  {
+    focusOn3DPosition( { selectedBnpc->x, selectedBnpc->y, selectedBnpc->z } );
+  }
+  ImGui::SameLine();
+  if( ImGui::Button( "Copy Coordinates" ) )
+  {
+    std::string coords = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                      selectedBnpc->x, selectedBnpc->y, selectedBnpc->z );
+    ImGui::SetClipboardText( coords.c_str() );
+  }
+}
+
+void ZoneEditor::showBnpcSelectors()
+{
+  // BNPC Name Selector Window
+  if( m_showBnpcNameSelector )
+  {
+    showBnpcNameSelector();
+  }
+
+  // BNPC Base Selector Window
+  if( m_showBnpcBaseSelector )
+  {
+    showBnpcBaseSelector();
+  }
+}
+
+void ZoneEditor::showBnpcNameSelector()
+{
+  ImGui::SetNextWindowSize( ImVec2( 600, 400 ), ImGuiCond_FirstUseEver );
+
+  bool open = true;
+  if( ImGui::Begin( "BNPC Name Selector", &open ) )
+  {
+    // Search filter
+    ImGui::InputText( "Search Names", m_nameSearchBuffer, sizeof( m_nameSearchBuffer ) );
+
+    ImGui::Separator();
+
+    if( ImGui::BeginChild( "NameList", ImVec2( 0, -30 ) ) )
+    {
+      std::string searchTerm = std::string( m_nameSearchBuffer );
+      std::transform( searchTerm.begin(), searchTerm.end(), searchTerm.begin(), ::tolower );
+
+      // Create sorted vector of name entries by ID
+      std::vector< std::pair< uint32_t, std::reference_wrapper< const BnpcNameCacheEntry > > > sortedNames;
+      for( const auto& [ nameId, nameData ] : m_bnpcNameCache )
+      {
+        // Filter by search term if provided
+        if( !searchTerm.empty() )
+        {
+          std::string lowerName = nameData.name;
+          std::transform( lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower );
+          std::string lowerIdStr = std::to_string( nameId );
+          std::transform( lowerIdStr.begin(), lowerIdStr.end(), lowerIdStr.begin(), ::tolower );
+
+          if( lowerName.find( searchTerm ) == std::string::npos &&
+              lowerIdStr.find( searchTerm ) == std::string::npos )
+            continue;
+        }
+
+        sortedNames.emplace_back( nameId, std::cref( nameData ) );
+      }
+
+      // Sort by ID
+      std::sort( sortedNames.begin(), sortedNames.end(),
+                 []( const auto& a, const auto& b )
+                 {
+                   return a.first < b.first;
+                 } );
+
+      for( const auto& [ nameId, nameData ] : sortedNames )
+      {
+        std::string displayText = fmt::format( "{} - {} (ID: {})", nameId, nameData.get().name, nameId );
+
+        if( ImGui::Selectable( displayText.c_str() ) )
+        {
+          // Apply selection to current BNPC
+          if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+          {
+            auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+            selectedBnpc->NameId = nameId;
+            selectedBnpc->bnpcName = nameData.get().name; // Update cached name too
+          }
+          m_showBnpcNameSelector = false;
+          break;
+        }
+      }
+    }
+    ImGui::EndChild();
+
+    ImGui::Separator();
+    if( ImGui::Button( "Cancel" ) )
+    {
+      m_showBnpcNameSelector = false;
+    }
+  }
+  ImGui::End();
+
+  if( !open )
+  {
+    m_showBnpcNameSelector = false;
+  }
+}
+
+void ZoneEditor::showBnpcBaseSelector()
+{
+  ImGui::SetNextWindowSize( ImVec2( 900, 600 ), ImGuiCond_FirstUseEver );
+
+  bool open = true;
+  if( ImGui::Begin( "BNPC Base Selector", &open ) )
+  {
+    // Search filter
+    ImGui::InputText( "Search Base ID", m_baseSearchBuffer, sizeof( m_baseSearchBuffer ) );
+
+    ImGui::Separator();
+
+    if( ImGui::BeginChild( "BaseDataGrid", ImVec2( 0, -30 ) ) )
+    {
+      // Create a table for the BNpcBase data
+      if( ImGui::BeginTable( "BNpcBaseTable", 14,
+                             ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable | ImGuiTableFlags_ScrollY |
+                             ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH ) )
+      {
+        // Setup columns
+        ImGui::TableSetupColumn( "ID", ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Scale", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Event Handler", ImGuiTableColumnFlags_WidthFixed, 100.0f );
+        ImGui::TableSetupColumn( "Normal AI", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Model", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Customize", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "Equipment", ImGuiTableColumnFlags_WidthFixed, 80.0f );
+        ImGui::TableSetupColumn( "SE Pack", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Battalion", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Link Race", ImGuiTableColumnFlags_WidthFixed, 70.0f );
+        ImGui::TableSetupColumn( "Rank", ImGuiTableColumnFlags_WidthFixed, 50.0f );
+        ImGui::TableSetupColumn( "Special", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+        ImGui::TableSetupColumn( "Parts", ImGuiTableColumnFlags_WidthFixed, 50.0f );
+        ImGui::TableSetupColumn( "Flags", ImGuiTableColumnFlags_WidthFixed, 60.0f );
+
+        ImGui::TableSetupScrollFreeze( 1, 1 ); // Freeze first column and header
+        ImGui::TableHeadersRow();
+
+        std::string searchTerm = std::string( m_baseSearchBuffer );
+
+        // Create sorted vector of base entries by ID
+        std::vector< std::pair< uint32_t, std::reference_wrapper< const Excel::BNpcBase > > > sortedBases;
+        for( const auto& [ baseId, baseData ] : m_bnpcBaseCache )
+        {
+          // Filter by search term if provided
+          if( !searchTerm.empty() )
+          {
+            if( std::to_string( baseId ).find( searchTerm ) == std::string::npos )
+              continue;
+          }
+          sortedBases.emplace_back( baseId, std::cref( baseData ) );
+        }
+
+        // Sort by ID (default ascending)
+        std::sort( sortedBases.begin(), sortedBases.end(),
+                   []( const auto& a, const auto& b )
+                   {
+                     return a.first < b.first;
+                   } );
+
+        // Handle table sorting
+        if( ImGuiTableSortSpecs *sortSpecs = ImGui::TableGetSortSpecs() )
+        {
+          if( sortSpecs->SpecsDirty && sortSpecs->SpecsCount > 0 )
+          {
+            const ImGuiTableColumnSortSpecs& spec = sortSpecs->Specs[ 0 ];
+            bool ascending = spec.SortDirection == ImGuiSortDirection_Ascending;
+
+            switch( spec.ColumnIndex )
+            {
+              case 0: // ID
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending ? a.first < b.first : a.first > b.first;
+                           } );
+                break;
+              case 1: // Scale
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Scale < b.second.get().Scale
+                                      : a.second.get().Scale > b.second.get().Scale;
+                           } );
+                break;
+              case 3: // Normal AI
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().NormalAI < b.second.get().NormalAI
+                                      : a.second.get().NormalAI > b.second.get().NormalAI;
+                           } );
+                break;
+              case 4: // Model
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Model < b.second.get().Model
+                                      : a.second.get().Model > b.second.get().Model;
+                           } );
+                break;
+              case 8: // Battalion
+                std::sort( sortedBases.begin(), sortedBases.end(),
+                           [ascending]( const auto& a, const auto& b )
+                           {
+                             return ascending
+                                      ? a.second.get().Battalion < b.second.get().Battalion
+                                      : a.second.get().Battalion > b.second.get().Battalion;
+                           } );
+                break;
+                // Add more sorting cases as needed for other columns
+            }
+            sortSpecs->SpecsDirty = false;
+          }
+        }
+
+        // Display data rows
+        for( const auto& [ baseId, baseData ] : sortedBases )
+        {
+          ImGui::TableNextRow();
+
+          // ID column - clickable
+          ImGui::TableNextColumn();
+          if( ImGui::Selectable( std::to_string( baseId ).c_str(), false, ImGuiSelectableFlags_SpanAllColumns ) )
+          {
+            // Apply selection to current BNPC
+            if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) )
+            {
+              auto *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+              selectedBnpc->BaseId = baseId;
+            }
+            m_showBnpcBaseSelector = false;
+            break;
+          }
+
+          // Scale
+          ImGui::TableNextColumn();
+          ImGui::Text( "%.2f", baseData.get().Scale );
+
+          // Event Handler
+          ImGui::TableNextColumn();
+          ImGui::Text( "%d", baseData.get().EventHandler );
+
+          // Normal AI
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().NormalAI );
+
+          // Model
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Model );
+
+          // Customize
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Customize );
+
+          // Equipment
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Equipment );
+
+          // SE Pack
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().SEPack );
+
+          // Battalion
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Battalion );
+
+          // Link Race
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().LinkRace );
+
+          // Rank
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Rank );
+
+          // Special
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Special );
+
+          // Parts
+          ImGui::TableNextColumn();
+          ImGui::Text( "%u", baseData.get().Parts );
+
+          // Flags
+          ImGui::TableNextColumn();
+          std::string flagsStr = "";
+          if( baseData.get().IsTargetLine ) flagsStr += "T";
+          if( baseData.get().IsDisplayLevel ) flagsStr += "L";
+          ImGui::Text( "%s", flagsStr.c_str() );
+        }
+
+        ImGui::EndTable();
+      }
+    }
+    ImGui::EndChild();
+
+    ImGui::Separator();
+    ImGui::Text( "T = IsTargetLine, L = IsDisplayLevel" );
+    ImGui::SameLine();
+    if( ImGui::Button( "Cancel" ) )
+    {
+      m_showBnpcBaseSelector = false;
+    }
+  }
+  ImGui::End();
+
+  if( !open )
+  {
+    m_showBnpcBaseSelector = false;
   }
 }
 
@@ -532,6 +1412,7 @@ void ZoneEditor::cleanupNavmeshRendering()
   // Clean up geometry
   cleanupNavmeshGeometry();
   cleanupBnpcMarkerRendering();
+  cleanupEObjRendering();
 
   // Clean up shader
   if( m_navmeshShader )
@@ -562,6 +1443,360 @@ void ZoneEditor::cleanupNavmeshRendering()
   printf( "Cleaned up all navmesh rendering resources\n" );
 }
 
+void ZoneEditor::showGambitEditor()
+{
+  return;
+  ImGui::Begin( "Gambit Editor" );
+  static int currentPackType = 0; // 0 = None, 1 = RuleSetPack, 2 = TimeLinePack
+  static std::vector< nlohmann::json > gambitRules; // Store rules for RuleSetPack or TimeLinePack
+  static char actionBuffer[ 256 ] = ""; // Buffer for the selected action
+  static int cooldown = 0; // Cooldown for actions
+  static int targetType = 0; // Type of TargetCondition
+  static int hpThreshold = 0; // HP threshold for specific conditions like HPSelfPctLessThanTargetCondition
+
+  ImGui::Text( "Gambit Editor" );
+
+  // Select Gambit Pack Type
+  const char *packTypes[ ] = { "None", "RuleSetPack", "TimeLinePack" };
+  ImGui::Combo( "Select Gambit Pack Type", &currentPackType, packTypes, IM_ARRAYSIZE( packTypes ) );
+  ImGui::Separator();
+
+  // Instructions
+  ImGui::TextDisabled( "Drag and drop or reorder Gambits to prioritize rules." );
+
+  if( currentPackType == 1 || currentPackType == 2 ) // RuleSetPack or TimeLinePack
+  {
+    // Add New Gambit Rule
+    ImGui::Text( "New Gambit Rule" );
+
+    // Target Condition (Dropdown)
+    const char *conditions[ ] = { "Top Aggro", "HP < % (Self)", "HP < % (Ally)" };
+    ImGui::Combo( "Condition (IF)", &targetType, conditions, IM_ARRAYSIZE( conditions ) );
+
+    // If condition needs details (e.g., HP%), add input
+    if( targetType == 1 || targetType == 2 ) // Conditions requiring HP threshold
+    {
+      ImGui::InputInt( "HP Threshold", &hpThreshold );
+    }
+
+    // Action Input
+    ImGui::InputText( "Action (THEN)", actionBuffer, IM_ARRAYSIZE( actionBuffer ) );
+    ImGui::InputInt( "Cooldown (ms)", &cooldown );
+
+    if( ImGui::Button( "Add Rule" ) )
+    {
+      nlohmann::json newRule = {
+        { "Condition", conditions[ targetType ] },
+        { "Action", std::string( actionBuffer ) },
+        { "Cooldown", cooldown }
+      };
+
+      if( targetType == 1 || targetType == 2 ) // Add HP threshold if applicable
+      {
+        newRule[ "ConditionDetails" ] = { { "HPThreshold", hpThreshold } };
+      }
+
+      gambitRules.push_back( newRule );
+      memset( actionBuffer, 0, sizeof( actionBuffer ) );
+      cooldown = 0;
+      hpThreshold = 0;
+    }
+
+    ImGui::Separator();
+
+    // Existing Gambit Rules
+    ImGui::Text( "Current Gambit Rules" );
+    for( size_t i = 0; i < gambitRules.size(); ++i )
+    {
+      ImGui::PushID( static_cast< int >( i ) );
+      ImGui::Text( "Rule %zu:", i + 1 );
+      ImGui::BulletText( "IF %s", gambitRules[ i ][ "Condition" ].get< std::string >().c_str() );
+      ImGui::BulletText( "THEN %s", gambitRules[ i ][ "Action" ].get< std::string >().c_str() );
+      ImGui::Text( "Cooldown: %d ms", gambitRules[ i ][ "Cooldown" ].get< int >() );
+
+      // Priority Reordering
+      if( i > 0 && ImGui::ArrowButton( "Move Up", ImGuiDir_Up ) )
+      {
+        std::swap( gambitRules[ i ], gambitRules[ i - 1 ] );
+      }
+      ImGui::SameLine();
+      if( i < gambitRules.size() - 1 && ImGui::ArrowButton( "Move Down", ImGuiDir_Down ) )
+      {
+        std::swap( gambitRules[ i ], gambitRules[ i + 1 ] );
+      }
+      ImGui::SameLine();
+      if( ImGui::Button( "Remove" ) )
+      {
+        gambitRules.erase( gambitRules.begin() + i );
+      }
+      ImGui::PopID();
+    }
+
+    ImGui::Separator();
+
+    // Export Gambits as JSON
+    if( ImGui::Button( "Export to JSON" ) )
+    {
+      nlohmann::json exportData = {
+        { "PackType", packTypes[ currentPackType ] },
+        { "GambitRules", gambitRules }
+      };
+
+      std::ofstream file( "gambit_pack.json" );
+      file << exportData.dump( 4 ); // Pretty print JSON
+      file.close();
+    }
+
+    if( ImGui::Button( "Clear Rules" ) )
+    {
+      gambitRules.clear();
+    }
+  }
+  ImGui::End();
+}
+
+void ZoneEditor::loadBnpcs()
+{
+  m_bnpcs.clear();
+  m_filteredBnpcs.clear();
+
+  if( !m_selectedZone )
+    return;
+
+  // Load JSON data from bnpcs folder
+  std::string jsonPath = fmt::format( "bnpcs/{}/{}.json", m_selectedZone->name, m_selectedZone->name );
+
+  // Check if JSON file exists
+  if( !std::filesystem::exists( jsonPath ) )
+  {
+    Engine::Logger::debug( "No BNPC JSON file found for zone: {}", m_selectedZone->name );
+    return;
+  }
+
+  try
+  {
+    // Read JSON file
+    std::ifstream jsonFile( jsonPath );
+    if( !jsonFile.is_open() )
+    {
+      Engine::Logger::error( "Failed to open BNPC JSON file: {}", jsonPath );
+      return;
+    }
+
+    nlohmann::json territoryData;
+    jsonFile >> territoryData;
+    jsonFile.close();
+
+    // Iterate through each group in the territory data
+    for( const auto& [ groupName, groupData ] : territoryData.items() )
+    {
+      if( !groupData.contains( "bnpcs" ) || !groupData[ "bnpcs" ].is_object() )
+      {
+        continue;
+      }
+
+      uint32_t groupId = groupData[ "groupId" ].get< uint32_t >();
+      uint32_t layerSetId = groupData[ "layerSetId" ].get< uint32_t >();
+
+      // Iterate through BNPCs in this group
+      for( const auto& [ instanceIdStr, bnpcData ] : groupData[ "bnpcs" ].items() )
+      {
+        auto cachedBnpc = std::make_shared< CachedBnpc >();
+
+        // Extract data from JSON
+        const auto& baseInfo = bnpcData[ "baseInfo" ];
+        const auto& position = baseInfo[ "position" ];
+        const auto& popInfo = bnpcData[ "popInfo" ];
+        const auto& linkData = bnpcData[ "linkData" ];
+        const auto& behaviour = bnpcData[ "Behaviour" ];
+        const auto& senseInfo = bnpcData[ "SenseInfo" ];
+
+
+        // Fill CachedBnpc structure
+        cachedBnpc->territoryType = m_selectedZone->id;
+
+        cachedBnpc->instanceId = baseInfo[ "instanceId" ].get< uint32_t >();
+        cachedBnpc->nameOffset = 0; // Not available in JSON, set default
+        cachedBnpc->x = position[ 0 ].get< float >();
+        cachedBnpc->y = position[ 1 ].get< float >();
+        cachedBnpc->z = position[ 2 ].get< float >();
+        cachedBnpc->rotation = baseInfo[ "rotation" ].get< float >();
+        cachedBnpc->BaseId = baseInfo[ "baseId" ].get< uint32_t >();
+        cachedBnpc->NameId = baseInfo[ "nameId" ].get< uint32_t >();
+
+        auto it = m_bnpcNameCache.find( cachedBnpc->NameId );
+        if( it != m_bnpcNameCache.end() )
+        {
+          cachedBnpc->bnpcName = it->second.name; // Use cached name
+        }
+
+        cachedBnpc->Level = baseInfo[ "level" ].get< uint16_t >();
+        cachedBnpc->ActiveType = baseInfo[ "activeType" ].get< uint8_t >();
+        cachedBnpc->BoundInstanceID = baseInfo[ "boundInstanceId" ].get< uint32_t >();
+        cachedBnpc->FateLayoutLabelId = baseInfo[ "fateLayoutLabelId" ].get< uint32_t >();
+        cachedBnpc->EquipmentID = baseInfo[ "equipmentId" ].get< uint32_t >();
+        cachedBnpc->CustomizeID = baseInfo[ "customizeId" ].get< uint32_t >();
+
+        // Pop info
+        cachedBnpc->RepopId = popInfo[ "repopId" ].get< uint8_t >();
+        cachedBnpc->InvalidRepop = popInfo[ "invalidRepop" ].get< int8_t >();
+        cachedBnpc->NonpopInitZone = popInfo[ "nonpopInitZone" ].get< int8_t >();
+        cachedBnpc->Nonpop = popInfo[ "nonpop" ].get< int8_t >();
+        cachedBnpc->PopWeather = popInfo[ "popWeather" ].get< uint32_t >();
+        cachedBnpc->PopTimeStart = popInfo[ "popTimeStart" ].get< uint8_t >();
+        cachedBnpc->PopTimeEnd = popInfo[ "popTimeEnd" ].get< uint8_t >();
+        cachedBnpc->PopInterval = popInfo[ "popInterval" ].get< uint8_t >();
+        cachedBnpc->PopRate = popInfo[ "popRate" ].get< uint8_t >();
+        cachedBnpc->PopEvent = popInfo[ "popEvent" ].get< uint8_t >();
+        cachedBnpc->HorizontalPopRange = popInfo[ "horizontalPopRange" ].get< float >();
+        cachedBnpc->VerticalPopRange = popInfo[ "verticalPopRange" ].get< float >();
+
+        // Link data
+        cachedBnpc->LinkGroup = linkData[ "linkGroup" ].get< uint8_t >();
+        cachedBnpc->LinkFamily = linkData[ "linkFamily" ].get< uint8_t >();
+        cachedBnpc->LinkRange = linkData[ "linkRange" ].get< uint8_t >();
+        cachedBnpc->LinkCountLimit = linkData[ "linkCountLimit" ].get< uint8_t >();
+        cachedBnpc->LinkParent = linkData[ "linkParent" ].get< int8_t >();
+        cachedBnpc->LinkOverride = linkData[ "linkOverride" ].get< int8_t >();
+        cachedBnpc->LinkReply = linkData[ "linkReply" ].get< int8_t >();
+
+        // Behavior data
+        cachedBnpc->MoveAI = behaviour[ "moveAI" ].get< uint32_t >();
+        cachedBnpc->NormalAI = behaviour[ "normalAI" ].get< uint32_t >();
+        cachedBnpc->WanderingRange = behaviour[ "wanderingRange" ].get< uint8_t >();
+        cachedBnpc->Route = behaviour[ "routeId" ].get< uint8_t >();
+        cachedBnpc->TerritoryRange = behaviour[ "territoryRange" ].get< uint16_t >();
+        cachedBnpc->DropItem = behaviour[ "dropItem" ].get< uint32_t >();
+        cachedBnpc->ServerPathId = behaviour[ "serverPathId" ].get< uint32_t >();
+
+        // Sense info
+        cachedBnpc->SenseRangeRate = senseInfo[ "senseRangeRate" ].get< float >();
+
+        cachedBnpc->baseData.Sense[ 0 ] = static_cast< CachedBnpc::SenseType >( senseInfo[ "Sense" ][ 0 ].get<
+          uint8_t >() );
+        cachedBnpc->baseData.Sense[ 1 ] = static_cast< CachedBnpc::SenseType >( senseInfo[ "Sense" ][ 1 ].get<
+          uint8_t >() );
+        cachedBnpc->baseData.SenseRange[ 0 ] = senseInfo[ "SenseRange" ][ 0 ].get< uint8_t >();
+        cachedBnpc->baseData.SenseRange[ 1 ] = senseInfo[ "SenseRange" ][ 1 ].get< uint8_t >();
+        cachedBnpc->baseData.TerritoryRange = senseInfo[ "territoryRange" ].get< uint32_t >();
+
+        // Set default values for fields that might not be in JSON
+        cachedBnpc->EventGroup = 0;
+        cachedBnpc->BNpcBaseData = 0;
+
+
+        // Generate name string for display (you might want to look up actual names)
+        cachedBnpc->nameString = fmt::format( "{} ({})", groupName, cachedBnpc->instanceId );
+        cachedBnpc->groupName = groupName;
+        m_bnpcs.push_back( cachedBnpc );
+      }
+    }
+
+    // Sort by group name first, then by instance ID for consistent ordering
+    std::sort( m_bnpcs.begin(), m_bnpcs.end(),
+               []( const std::shared_ptr< CachedBnpc >& a, const std::shared_ptr< CachedBnpc >& b )
+               {
+                 if( a->groupName != b->groupName )
+                 {
+                   return a->groupName < b->groupName;
+                 }
+                 return a->instanceId < b->instanceId;
+               } );
+
+    // Apply current search filter
+    updateBnpcSearchFilter();
+
+    Engine::Logger::info( "Loaded {} BNPCs for zone {} from JSON", m_bnpcs.size(), m_selectedZone->name );
+  } catch( const std::exception& e )
+  {
+    Engine::Logger::error( "Error loading BNPCs from JSON {}: {}", jsonPath, e.what() );
+  }
+}
+
+void ZoneEditor::loadServerPaths()
+{
+  m_serverPathCache.clear();
+
+  if( !m_selectedZone )
+    return;
+
+  // Load JSON data from bnpcs folder
+  std::string jsonPath = fmt::format( "bnpcs/{}/{}_paths.json", m_selectedZone->name, m_selectedZone->name );
+
+  // Check if JSON file exists
+  if( !std::filesystem::exists( jsonPath ) )
+  {
+    Engine::Logger::debug( "No paths JSON file found for zone: {}", m_selectedZone->name );
+    return;
+  }
+
+  try
+  {
+    // Read JSON file
+    std::ifstream jsonFile( jsonPath );
+    if( !jsonFile.is_open() )
+    {
+      Engine::Logger::error( "Failed to open paths JSON file: {}", jsonPath );
+      return;
+    }
+
+    nlohmann::json pathsData;
+    jsonFile >> pathsData;
+    jsonFile.close();
+
+    // Iterate through each path entry
+    for( auto& [instanceIdStr, pathData] : pathsData.items() )
+    {
+      uint32_t instanceId = std::stoul( instanceIdStr );
+
+      // Create cached path entry
+      auto cachedPath = CachedServerPath();
+
+      // Basic information
+      cachedPath.instanceId = instanceId;
+
+      // Position data
+      if( pathData.contains( "position" ) && pathData["position"].is_array() && pathData["position"].size() == 3 )
+      {
+        cachedPath.position.x = pathData["position"][0].get<float>();
+        cachedPath.position.y = pathData["position"][1].get<float>();
+        cachedPath.position.z = pathData["position"][2].get<float>();
+      }
+
+      // Control points
+      if( pathData.contains( "controlPoints" ) && pathData["controlPoints"].is_array() )
+      {
+        for( const auto& controlPointData : pathData["controlPoints"] )
+        {
+          PathControlPoint point;
+
+          if( controlPointData.contains( "pointId" ) )
+            point.PointID = controlPointData["pointId"].get<uint16_t>();
+
+          if( controlPointData.contains( "position" ) && controlPointData["position"].is_array() && controlPointData["position"].size() == 3 )
+          {
+            point.Translation.x = controlPointData["position"][0].get<float>();
+            point.Translation.y = controlPointData["position"][1].get<float>();
+            point.Translation.z = controlPointData["position"][2].get<float>();
+          }
+
+
+          cachedPath.points.push_back( point );
+        }
+      }
+
+      // Store in cache
+      m_serverPathCache[instanceId] = cachedPath;
+    }
+
+    Engine::Logger::info( "Loaded {} server paths for zone: {}", m_serverPathCache.size(), m_selectedZone->name );
+  }
+  catch( std::runtime_error& e )
+  {
+    Engine::Logger::error( "Error loading paths from JSON {}: {}", jsonPath, e.what() );
+  }
+
+}
 
 void ZoneEditor::onSelectionChanged()
 {
@@ -577,6 +1812,17 @@ void ZoneEditor::onSelectionChanged()
     }
 
     loadBnpcs();
+    loadServerPaths();
+    if( !m_serverPathCache.empty() )
+      buildServerPathGeometry();
+
+    // EObj collision visualisation
+    m_cachedEObjCollisions.clear();
+    cleanupEObjRendering();
+    if( !m_scriptIndexBuilt )
+      buildScriptIndexCache();
+    autoDetectInstanceScript();
+
     // Reset BNPC window state when zone changes
     m_selectedBnpcIndex = -1;
     m_filteredBnpcs.clear();
@@ -971,10 +2217,148 @@ void ZoneEditor::show()
     showBnpcWindow();
   }
 
+  if( m_showServerPathWindow )
+  {
+    showServerPathWindow();
+  }
+
   if( m_showNavmeshWindow )
   {
     showNavmeshWindow();
   }
+
+  showGambitEditor();
+}
+
+void ZoneEditor::showServerPathWindow()
+{
+  if( !m_showServerPathWindow )
+    return;
+
+  ImGui::Begin( "Server Paths", &m_showServerPathWindow );
+
+  if( m_serverPathCache.empty() )
+  {
+    ImGui::Text( "No server paths available" );
+    ImGui::End();
+    return;
+  }
+
+  // Display list of server paths
+  ImGui::Text( "Server Paths (%zu)", m_serverPathCache.size() );
+  ImGui::Separator();
+
+  uint32_t previousSelection = m_selectedServerPathId;
+
+  for( auto& [pathId, cachedPath] : m_serverPathCache )
+  {
+    ImGui::PushID( pathId );
+
+    std::string pathLabel = "Path ID: " + std::to_string( pathId );
+    if( ImGui::Selectable( pathLabel.c_str(), m_selectedServerPathId == pathId ) )
+    {
+      m_selectedServerPathId = pathId;
+    }
+
+    if( previousSelection != m_selectedServerPathId )
+    {
+      buildServerPathGeometry();
+    }
+
+
+    ImGui::PopID();
+  }
+
+  ImGui::Separator();
+
+  // Display selected server path details
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath != m_serverPathCache.end() )
+  {
+    auto& path = selectedPath->second;
+
+    ImGui::Text( "Selected Server Path Details:" );
+    ImGui::Separator();
+
+    ImGui::Text( "Instance ID: %u", path.instanceId );
+    ImGui::Text( "Position: %.3f, %.3f, %.3f",
+                 path.position.x, path.position.y, path.position.z );
+    ImGui::Text( "Control Points: %zu", path.points.size() );
+
+    ImGui::Separator();
+
+    // Display and edit control points
+    if( ImGui::TreeNode( "Control Points" ) )
+    {
+      for( size_t i = 0; i < path.points.size(); ++i )
+      {
+        auto& point = path.points[i];
+
+        ImGui::PushID( static_cast<int>( i ) );
+
+        std::string pointLabel = "Point " + std::to_string( i );
+        bool isSelected = point.Selected != 0;
+
+        if( ImGui::Checkbox( ("Selected##" + std::to_string( i )).c_str(), &isSelected ) )
+        {
+          point.Selected = isSelected ? 1 : 0;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text( "%s - Pos: %.3f, %.3f, %.3f",
+                     pointLabel.c_str(),
+                     point.Translation.x,
+                     point.Translation.y,
+                     point.Translation.z );
+
+        // Edit control point position
+        if( ImGui::TreeNode( ( "Edit Point " + std::to_string( i ) ).c_str() ) )
+        {
+          float pos[3] = { point.Translation.x, point.Translation.y, point.Translation.z };
+          if( ImGui::InputFloat3( "Position", pos ) )
+          {
+            point.Translation.x = pos[0];
+            point.Translation.y = pos[1];
+            point.Translation.z = pos[2];
+          }
+
+          ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+      }
+      ImGui::TreePop();
+    }
+
+    // Add/Remove control points
+    ImGui::Separator();
+    if( ImGui::Button( "Add Control Point" ) )
+    {
+      PathControlPoint newPoint{};
+      newPoint.Translation = path.position;
+      newPoint.PointID = static_cast<uint16_t>( path.points.size() );
+      newPoint.Selected = 0;
+      path.points.push_back( newPoint );
+    }
+
+    ImGui::SameLine();
+    if( ImGui::Button( "Remove Selected Points" ) && !path.points.empty() )
+    {
+      path.points.erase(
+        std::remove_if( path.points.begin(),
+                        path.points.end(),
+                        []( const PathControlPoint& point ) { return point.Selected != 0; } ),
+        path.points.end() );
+
+      // Update PointID to match indices after removal
+      for( size_t i = 0; i < path.points.size(); ++i )
+      {
+        path.points[i].PointID = static_cast<uint16_t>( i );
+      }
+    }
+  }
+
+  ImGui::End();
 }
 
 
@@ -1167,6 +2551,7 @@ void ZoneEditor::buildNavmeshGeometry()
     printf( "Successfully created navmesh geometry with %d triangles\n", m_navmeshIndexCount / 3 );
   }
   buildBnpcMarkerGeometry();
+  buildSenseRangeGeometry();
 }
 
 // Also add a simplified version for testing
@@ -1343,6 +2728,702 @@ void ZoneEditor::renderBnpcMarkers()
   // Unbind shader
   glUseProgram( 0 );
 }
+
+void ZoneEditor::renderServerPaths()
+{
+  if( !m_showServerPathsInNavmesh || !m_serverPathShader || !m_serverPathVAO || m_serverPathVertexCount == 0 )
+  {
+    return;
+  }
+
+  // Check if we have a valid selection
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath == m_serverPathCache.end() || selectedPath->second.points.empty() )
+  {
+    return;
+  }
+
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 model = glm::mat4( 1.0f );
+  glm::mat4 mvp = projection * view * model;
+
+  // Enhanced blending for better visibility
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+  // Temporarily disable depth writing but keep depth testing
+  // This prevents lines from being occluded too aggressively
+  glDepthMask( GL_FALSE );
+  glDisable(GL_DEPTH_TEST);
+
+  // Bias depth slightly to ensure lines appear on top
+  glEnable( GL_POLYGON_OFFSET_FILL );
+  glPolygonOffset( -1.0f, -1.0f );
+
+  // Enable line width for thicker lines (if supported)
+  glLineWidth( 3.0f );
+
+  // Use line shader
+  glUseProgram( m_serverPathShader );
+
+  // Set uniforms
+  GLint mvpLoc = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  if( mvpLoc != -1 )
+  {
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  }
+
+  // Set red color for server path lines
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( colorLoc != -1 )
+  {
+    glUniform4f( colorLoc, 1.0f, 0.0f, 0.0f, 0.8f ); // Red with slight transparency
+  }
+
+  // Render lines
+  glBindVertexArray( m_serverPathVAO );
+  glDrawArrays( GL_LINES, 0, m_serverPathVertexCount );
+  glBindVertexArray( 0 );
+
+  // Restore OpenGL state
+  glLineWidth( 1.0f );
+  glDisable( GL_POLYGON_OFFSET_FILL );
+  glDepthMask( GL_TRUE );
+
+  // Unbind shader
+  glUseProgram( 0 );
+  glEnable(GL_DEPTH_TEST);
+
+}
+
+void ZoneEditor::initializeServerPathShader()
+{
+  // Simple line shader
+  const char* vertexShaderSource = R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+
+    uniform mat4 u_mvp;
+
+    void main()
+    {
+      gl_Position = u_mvp * vec4(aPos, 1.0);
+    }
+  )";
+
+  const char* fragmentShaderSource = R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    uniform vec4 u_color;
+
+    void main()
+    {
+      FragColor = u_color;
+    }
+  )";
+
+  // Compile vertex shader
+  GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
+  glShaderSource( vertexShader, 1, &vertexShaderSource, NULL );
+  glCompileShader( vertexShader );
+
+  // Check for vertex shader compile errors
+  int success;
+  char infoLog[512];
+  glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success );
+  if( !success )
+  {
+    glGetShaderInfoLog( vertexShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog );
+    return;
+  }
+
+  // Compile fragment shader
+  GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
+  glShaderSource( fragmentShader, 1, &fragmentShaderSource, NULL );
+  glCompileShader( fragmentShader );
+
+  // Check for fragment shader compile errors
+  glGetShaderiv( fragmentShader, GL_COMPILE_STATUS, &success );
+  if( !success )
+  {
+    glGetShaderInfoLog( fragmentShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog );
+    glDeleteShader( vertexShader );
+    return;
+  }
+
+  // Link shaders
+  m_serverPathShader = glCreateProgram();
+  glAttachShader( m_serverPathShader, vertexShader );
+  glAttachShader( m_serverPathShader, fragmentShader );
+  glLinkProgram( m_serverPathShader );
+
+  // Check for linking errors
+  glGetProgramiv( m_serverPathShader, GL_LINK_STATUS, &success );
+  if( !success )
+  {
+    glGetProgramInfoLog( m_serverPathShader, 512, NULL, infoLog );
+    printf( "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog );
+  }
+
+  glDeleteShader( vertexShader );
+  glDeleteShader( fragmentShader );
+}
+
+// ============================================================
+//  eobj collision
+// ============================================================
+
+void ZoneEditor::buildScriptIndexCache()
+{
+  m_scriptIndexCache.clear();
+  m_scriptIndexBuilt = true;
+
+  // find scripts/instances directory
+  // <repo>/build/<preset>/bin/  ->  ../../../../src/scripts/instances
+  // we need source instead of compiled scripts, consider copying script source to build
+  namespace fs = std::filesystem;
+  fs::path scriptRoot;
+
+  auto exeDir = Sapphire::Common::Util::executableDir();
+  auto candidate = exeDir / "../../../../src/scripts/instances";
+  if( fs::exists( candidate ) )
+    scriptRoot = fs::canonical( candidate );
+  else
+  {
+    printf( "[EObj] Could not find scripts/instances directory (looked at: %s)\n",
+            candidate.string().c_str() );
+    return;
+  }
+
+  // regex to extract the InstanceContentScript ID from ctor
+  // match:  InstanceContentScript( 4 )   or  InstanceContentScript(20027)
+  std::regex idRe( R"(InstanceContentScript\s*\(\s*(\d+)\s*\))" );
+
+  for( auto& entry : fs::recursive_directory_iterator( scriptRoot ) )
+  {
+    if( !entry.is_regular_file() )
+      continue;
+    if( entry.path().extension() != ".cpp" )
+      continue;
+
+    std::ifstream f( entry.path() );
+    if( !f.is_open() )
+      continue;
+
+    std::string contents( ( std::istreambuf_iterator< char >( f ) ),
+                            std::istreambuf_iterator< char >() );
+
+    std::smatch m;
+    if( std::regex_search( contents, m, idRe ) )
+    {
+      uint32_t id = static_cast< uint32_t >( std::stoul( m[ 1 ] ) );
+      m_scriptIndexCache[ id ] = entry.path();
+    }
+  }
+
+  printf( "[EObj] Script index built: %zu entries\n", m_scriptIndexCache.size() );
+}
+
+void ZoneEditor::autoDetectInstanceScript()
+{
+  if( !m_selectedZone )
+    return;
+
+  auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+  auto cfcIds = exdD.getIdList< Excel::InstanceContent >();
+
+  for( auto cfcId : cfcIds )
+  {
+    auto cfc = exdD.getRow< Excel::InstanceContent >( cfcId );
+    if( !cfc )
+      continue;
+    if( cfc->data().TerritoryType != m_selectedZone->id )
+      continue;
+
+    // instancecontent is real, fetch from cache
+    auto it = m_scriptIndexCache.find( cfcId );
+    if( it != m_scriptIndexCache.end() )
+    {
+      printf( "[EObj] Auto-detected script for zone %u (InstanceContent %u): %s\n",
+              m_selectedZone->id, cfcId, it->second.string().c_str() );
+      parseInstanceScript( it->second );
+      return;
+    }
+  }
+
+  printf( "[EObj] No matching instance script found for zone %u\n", m_selectedZone->id );
+}
+
+// Helper: parse a "{x, y, z}" group out of a substring match
+static bool parseVec3( const std::string& s, glm::vec3& out )
+{
+  // Strip 'f'/'F' float-literal suffixes (e.g. "1.0f" -> "1.0 ") before parsing.
+  std::string clean = s;
+  for( auto& c : clean )
+    if( c == 'f' || c == 'F' ) c = ' ';
+
+  float x, y, z;
+  if( sscanf( clean.c_str(), "%f , %f , %f", &x, &y, &z ) == 3 ||
+      sscanf( clean.c_str(), "%f,%f,%f",     &x, &y, &z ) == 3 )
+  {
+    out = { x, y, z };
+    return true;
+  }
+  return false;
+}
+
+void ZoneEditor::parseInstanceScript( const std::filesystem::path& path )
+{
+  m_cachedEObjCollisions.clear();
+  m_loadedScriptPath.clear();
+
+  std::ifstream f( path );
+  if( !f.is_open() )
+  {
+    printf( "[EObj] Failed to open script: %s\n", path.string().c_str() );
+    return;
+  }
+  std::string src( ( std::istreambuf_iterator< char >( f ) ),
+                     std::istreambuf_iterator< char >() );
+
+  // Regex for addEObj(name, baseId, boundInstanceId, instanceId, state, {x,y,z}, scale, rotation, perm)
+  // We capture: name, baseId, instanceId, position group, rotation
+  // Note: the position is the 6th argument, preceded by state (arg5) and followed by scale (arg7)
+  // Float pattern: optional leading '-', digits/dot/exponent, optional 'f' suffix
+  // The 'f?' is outside every capture group so captured strings are pure numbers.
+  std::regex eobjRe(
+    R"~(addEObj\s*\(\s*"([^"]+)"\s*,\s*(\d+)\s*,\s*\d+\s*,\s*(\d+)\s*,\s*\d+\s*,\s*\{([^}]+)\}\s*,\s*[\d.eE+\-]+f?\s*,\s*([\d.eE+\-]+)f?\s*,)~" );
+
+  // Regex for addCollisionBox({x,y,z}, rot, w, h, d)
+  std::regex boxRe(
+    R"~(addCollisionBox\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  // Regex for addCollisionCylinder({x,y,z}, radius, height)
+  std::regex cylRe(
+    R"~(addCollisionCylinder\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  // Regex for addCollisionSphere({x,y,z}, radius)
+  std::regex sphereRe(
+    R"~(addCollisionSphere\s*\(\s*\{([^}]+)\}\s*,\s*([\d.eE+\-]+)f?)~" );
+
+  auto srcBegin = std::sregex_iterator( src.begin(), src.end(), eobjRe );
+  auto srcEnd   = std::sregex_iterator{};
+
+  for( auto it = srcBegin; it != srcEnd; ++it )
+  {
+    const auto& eobjMatch = *it;
+    std::string eobjName   = eobjMatch[ 1 ].str();
+    uint32_t    baseId     = static_cast< uint32_t >( std::stoul( eobjMatch[ 2 ] ) );
+    uint32_t    instanceId = static_cast< uint32_t >( std::stoul( eobjMatch[ 3 ] ) );
+    glm::vec3   eobjPos{};
+    float       eobjRot    = std::stof( eobjMatch[ 5 ].str() );
+
+    if( !parseVec3( eobjMatch[ 4 ].str(), eobjPos ) )
+      continue;
+
+    // Search for collision calls following this addEObj (until the next one or end of string)
+    auto searchStart = static_cast< std::string::size_type >( eobjMatch.position() + eobjMatch.length() );
+    auto nextEObj    = ( std::next( it ) != srcEnd ) ?
+                       static_cast< std::string::size_type >( std::next( it )->position() ) :
+                       src.size();
+    std::string segment = src.substr( searchStart, nextEObj - searchStart );
+
+    // --- Boxes ---
+    auto boxIt = std::sregex_iterator( segment.begin(), segment.end(), boxRe );
+    for( auto b = boxIt; b != std::sregex_iterator{}; ++b )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*b)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision c;
+      c.eobjName   = eobjName;
+      c.baseId     = baseId;
+      c.instanceId = instanceId;
+      c.eobjPos    = eobjPos;
+      c.eobjRot    = eobjRot;
+      c.type       = CachedEObjCollision::ShapeType::Box;
+      c.collPos    = cpos;
+      c.collRot    = std::stof( (*b)[ 2 ].str() );
+      c.width      = std::stof( (*b)[ 3 ].str() );
+      c.height     = std::stof( (*b)[ 4 ].str() );
+      c.depth      = std::stof( (*b)[ 5 ].str() );
+      m_cachedEObjCollisions.push_back( c );
+    }
+
+    // --- Cylinders ---
+    auto cylIt = std::sregex_iterator( segment.begin(), segment.end(), cylRe );
+    for( auto c = cylIt; c != std::sregex_iterator{}; ++c )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*c)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision col;
+      col.eobjName   = eobjName;
+      col.baseId     = baseId;
+      col.instanceId = instanceId;
+      col.eobjPos    = eobjPos;
+      col.eobjRot    = eobjRot;
+      col.type       = CachedEObjCollision::ShapeType::Cylinder;
+      col.collPos    = cpos;
+      col.collRot    = 0.f;
+      col.radius     = std::stof( (*c)[ 2 ].str() );
+      col.cylinderH  = std::stof( (*c)[ 3 ].str() );
+      m_cachedEObjCollisions.push_back( col );
+    }
+
+    // --- Spheres ---
+    auto sphIt = std::sregex_iterator( segment.begin(), segment.end(), sphereRe );
+    for( auto s = sphIt; s != std::sregex_iterator{}; ++s )
+    {
+      glm::vec3 cpos{};
+      if( !parseVec3( (*s)[ 1 ].str(), cpos ) )
+        continue;
+      CachedEObjCollision col;
+      col.eobjName   = eobjName;
+      col.baseId     = baseId;
+      col.instanceId = instanceId;
+      col.eobjPos    = eobjPos;
+      col.eobjRot    = eobjRot;
+      col.type       = CachedEObjCollision::ShapeType::Sphere;
+      col.collPos    = cpos;
+      col.collRot    = 0.f;
+      col.radius     = std::stof( (*s)[ 2 ].str() );
+      m_cachedEObjCollisions.push_back( col );
+    }
+
+    // Even if no collision was found, emit a marker-only entry so the EObj origin is shown
+    if( m_cachedEObjCollisions.empty() ||
+        m_cachedEObjCollisions.back().instanceId != instanceId )
+    {
+      CachedEObjCollision marker;
+      marker.eobjName   = eobjName;
+      marker.baseId     = baseId;
+      marker.instanceId = instanceId;
+      marker.eobjPos    = eobjPos;
+      marker.eobjRot    = eobjRot;
+      marker.type       = CachedEObjCollision::ShapeType::Box;
+      marker.collPos    = eobjPos;
+      marker.width = marker.height = marker.depth = 0.f; // zero-size -> no box drawn
+      m_cachedEObjCollisions.push_back( marker );
+    }
+  }
+
+  m_loadedScriptPath = path.filename().string();
+
+  // Build GL geometry
+  buildEObjCollisionGeometry();
+  buildEObjMarkerGeometry();
+
+  printf( "[EObj] Parsed %zu collision entries from %s\n",
+          m_cachedEObjCollisions.size(), path.string().c_str() );
+}
+
+// Rotate a point around Y axis
+static glm::vec3 rotY( const glm::vec3& p, float rad )
+{
+  float c = cosf( rad ), s = sinf( rad );
+  return { p.x * c + p.z * s, p.y, -p.x * s + p.z * c };
+}
+
+void ZoneEditor::buildEObjCollisionGeometry()
+{
+  // Clean up previous
+  if( m_eobjCollisionVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjCollisionVAO );
+    m_eobjCollisionVAO = 0;
+  }
+  if( m_eobjCollisionVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjCollisionVBO );
+    m_eobjCollisionVBO = 0;
+  }
+  m_eobjCollisionVertexCount = 0;
+
+  if( m_cachedEObjCollisions.empty() )
+    return;
+
+  std::vector< float > verts;
+  verts.reserve( m_cachedEObjCollisions.size() * 72 ); // ~24 verts * 3 floats per box
+
+  auto emit = [ & ]( const glm::vec3& v )
+  {
+    verts.push_back( v.x );
+    verts.push_back( v.y );
+    verts.push_back( v.z );
+  };
+
+  auto emitLine = [ & ]( const glm::vec3& a, const glm::vec3& b )
+  {
+    emit( a );
+    emit( b );
+  };
+
+  constexpr int CYL_SEGS   = 32;
+  constexpr int SPHERE_SEGS = 32;
+
+  for( const auto& col : m_cachedEObjCollisions )
+  {
+    const glm::vec3& p = col.collPos;
+    float r = col.collRot;
+
+    if( col.type == CachedEObjCollision::ShapeType::Box )
+    {
+      if( col.width == 0.f && col.height == 0.f && col.depth == 0.f )
+        continue; // marker-only entry
+
+      float hw = col.width  * 0.5f;
+      float hh = col.height * 0.5f;
+      float hd = col.depth  * 0.5f;
+
+      // 8 OBB corners in local space
+      glm::vec3 c0 = p + rotY( { -hw, -hh, -hd }, r );
+      glm::vec3 c1 = p + rotY( {  hw, -hh, -hd }, r );
+      glm::vec3 c2 = p + rotY( { -hw, -hh,  hd }, r );
+      glm::vec3 c3 = p + rotY( {  hw, -hh,  hd }, r );
+      glm::vec3 c4 = p + rotY( { -hw,  hh, -hd }, r );
+      glm::vec3 c5 = p + rotY( {  hw,  hh, -hd }, r );
+      glm::vec3 c6 = p + rotY( { -hw,  hh,  hd }, r );
+      glm::vec3 c7 = p + rotY( {  hw,  hh,  hd }, r );
+
+      // Bottom face
+      emitLine( c0, c1 ); emitLine( c1, c3 ); emitLine( c3, c2 ); emitLine( c2, c0 );
+      // Top face
+      emitLine( c4, c5 ); emitLine( c5, c7 ); emitLine( c7, c6 ); emitLine( c6, c4 );
+      // Vertical edges
+      emitLine( c0, c4 ); emitLine( c1, c5 ); emitLine( c2, c6 ); emitLine( c3, c7 );
+    }
+    else if( col.type == CachedEObjCollision::ShapeType::Cylinder )
+    {
+      float rad = col.radius;
+      float h   = col.cylinderH;
+      // Bottom + top circles, then 4 vertical lines
+      for( int i = 0; i < CYL_SEGS; ++i )
+      {
+        float a0 = ( float ) i       / CYL_SEGS * glm::two_pi< float >();
+        float a1 = ( float )( i + 1 ) / CYL_SEGS * glm::two_pi< float >();
+        glm::vec3 b0 = p + glm::vec3( rad * cosf( a0 ), 0.f,   rad * sinf( a0 ) );
+        glm::vec3 b1 = p + glm::vec3( rad * cosf( a1 ), 0.f,   rad * sinf( a1 ) );
+        glm::vec3 t0 = p + glm::vec3( rad * cosf( a0 ), h,     rad * sinf( a0 ) );
+        glm::vec3 t1 = p + glm::vec3( rad * cosf( a1 ), h,     rad * sinf( a1 ) );
+        emitLine( b0, b1 );
+        emitLine( t0, t1 );
+      }
+      for( int i = 0; i < 4; ++i )
+      {
+        float a  = ( float ) i / 4.f * glm::two_pi< float >();
+        glm::vec3 bot = p + glm::vec3( rad * cosf( a ), 0.f, rad * sinf( a ) );
+        glm::vec3 top = p + glm::vec3( rad * cosf( a ), h,   rad * sinf( a ) );
+        emitLine( bot, top );
+      }
+    }
+    else if( col.type == CachedEObjCollision::ShapeType::Sphere )
+    {
+      float rad = col.radius;
+      // Three great circles: XZ (equator), XY, YZ
+      for( int i = 0; i < SPHERE_SEGS; ++i )
+      {
+        float a0 = ( float ) i       / SPHERE_SEGS * glm::two_pi< float >();
+        float a1 = ( float )( i + 1 ) / SPHERE_SEGS * glm::two_pi< float >();
+        // XZ equator
+        emitLine( p + glm::vec3( rad * cosf( a0 ), 0.f,           rad * sinf( a0 ) ),
+                  p + glm::vec3( rad * cosf( a1 ), 0.f,           rad * sinf( a1 ) ) );
+        // XY circle
+        emitLine( p + glm::vec3( rad * cosf( a0 ), rad * sinf( a0 ), 0.f            ),
+                  p + glm::vec3( rad * cosf( a1 ), rad * sinf( a1 ), 0.f            ) );
+        // YZ circle
+        emitLine( p + glm::vec3( 0.f,              rad * cosf( a0 ), rad * sinf( a0 ) ),
+                  p + glm::vec3( 0.f,              rad * cosf( a1 ), rad * sinf( a1 ) ) );
+      }
+    }
+  }
+
+  if( verts.empty() )
+    return;
+
+  m_eobjCollisionVertexCount = static_cast< int >( verts.size() / 3 );
+
+  glGenVertexArrays( 1, &m_eobjCollisionVAO );
+  glGenBuffers( 1, &m_eobjCollisionVBO );
+
+  glBindVertexArray( m_eobjCollisionVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_eobjCollisionVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                static_cast< GLsizeiptr >( verts.size() * sizeof( float ) ),
+                verts.data(), GL_STATIC_DRAW );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), nullptr );
+  glEnableVertexAttribArray( 0 );
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::buildEObjMarkerGeometry()
+{
+  if( m_eobjMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjMarkerVAO );
+    m_eobjMarkerVAO = 0;
+  }
+  if( m_eobjMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjMarkerVBO );
+    m_eobjMarkerVBO = 0;
+  }
+  m_eobjMarkerVertexCount = 0;
+
+  if( m_cachedEObjCollisions.empty() )
+    return;
+
+  // Deduplicate by instanceId so we draw one cross per EObj, not one per shape
+  std::unordered_set< uint32_t > seen;
+  std::vector< float > verts;
+  verts.reserve( m_cachedEObjCollisions.size() * 18 );
+
+  constexpr float S = 1.5f; // arm length of the cross
+
+  for( const auto& col : m_cachedEObjCollisions )
+  {
+    if( !seen.insert( col.instanceId ).second )
+      continue;
+
+    const glm::vec3& p = col.eobjPos;
+    // X axis
+    verts.insert( verts.end(), { p.x - S, p.y, p.z,
+                                  p.x + S, p.y, p.z } );
+    // Y axis
+    verts.insert( verts.end(), { p.x, p.y - S, p.z,
+                                  p.x, p.y + S, p.z } );
+    // Z axis
+    verts.insert( verts.end(), { p.x, p.y, p.z - S,
+                                  p.x, p.y, p.z + S } );
+  }
+
+  if( verts.empty() )
+    return;
+
+  m_eobjMarkerVertexCount = static_cast< int >( verts.size() / 3 );
+
+  glGenVertexArrays( 1, &m_eobjMarkerVAO );
+  glGenBuffers( 1, &m_eobjMarkerVBO );
+
+  glBindVertexArray( m_eobjMarkerVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_eobjMarkerVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                static_cast< GLsizeiptr >( verts.size() * sizeof( float ) ),
+                verts.data(), GL_STATIC_DRAW );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), nullptr );
+  glEnableVertexAttribArray( 0 );
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::renderEObjCollisions()
+{
+  if( !m_showEObjCollisions || !m_serverPathShader || !m_eobjCollisionVAO ||
+      m_eobjCollisionVertexCount == 0 )
+    return;
+
+  glm::mat4 view       = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 mvp = projection * view * glm::mat4( 1.0f );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glDepthMask( GL_FALSE );
+  glDisable( GL_DEPTH_TEST );
+  glLineWidth( 2.0f );
+
+  glUseProgram( m_serverPathShader );
+
+  GLint mvpLoc   = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( mvpLoc != -1 )
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  if( colorLoc != -1 )
+    glUniform4f( colorLoc, 1.0f, 0.85f, 0.0f, 0.9f ); // amber/yellow — distinct from navmesh red/green
+
+  glBindVertexArray( m_eobjCollisionVAO );
+  glDrawArrays( GL_LINES, 0, m_eobjCollisionVertexCount );
+  glBindVertexArray( 0 );
+
+  glLineWidth( 1.0f );
+  glDepthMask( GL_TRUE );
+  glEnable( GL_DEPTH_TEST );
+  glUseProgram( 0 );
+}
+
+void ZoneEditor::renderEObjMarkers()
+{
+  if( !m_showEObjMarkers || !m_serverPathShader || !m_eobjMarkerVAO ||
+      m_eobjMarkerVertexCount == 0 )
+    return;
+
+  glm::mat4 view       = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+  glm::mat4 mvp = projection * view * glm::mat4( 1.0f );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glDepthMask( GL_FALSE );
+  glDisable( GL_DEPTH_TEST );
+  glLineWidth( 2.5f );
+
+  glUseProgram( m_serverPathShader );
+
+  GLint mvpLoc   = glGetUniformLocation( m_serverPathShader, "u_mvp" );
+  GLint colorLoc = glGetUniformLocation( m_serverPathShader, "u_color" );
+  if( mvpLoc != -1 )
+    glUniformMatrix4fv( mvpLoc, 1, GL_FALSE, glm::value_ptr( mvp ) );
+  if( colorLoc != -1 )
+    glUniform4f( colorLoc, 0.0f, 0.85f, 1.0f, 1.0f ); // cyan
+
+  glBindVertexArray( m_eobjMarkerVAO );
+  glDrawArrays( GL_LINES, 0, m_eobjMarkerVertexCount );
+  glBindVertexArray( 0 );
+
+  glLineWidth( 1.0f );
+  glDepthMask( GL_TRUE );
+  glEnable( GL_DEPTH_TEST );
+  glUseProgram( 0 );
+}
+
+void ZoneEditor::cleanupEObjRendering()
+{
+  if( m_eobjCollisionVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjCollisionVAO );
+    m_eobjCollisionVAO = 0;
+  }
+  if( m_eobjCollisionVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjCollisionVBO );
+    m_eobjCollisionVBO = 0;
+  }
+  m_eobjCollisionVertexCount = 0;
+
+  if( m_eobjMarkerVAO )
+  {
+    glDeleteVertexArrays( 1, &m_eobjMarkerVAO );
+    m_eobjMarkerVAO = 0;
+  }
+  if( m_eobjMarkerVBO )
+  {
+    glDeleteBuffers( 1, &m_eobjMarkerVBO );
+    m_eobjMarkerVBO = 0;
+  }
+  m_eobjMarkerVertexCount = 0;
+}
+
+// ============================================================
 
 void ZoneEditor::initializeBnpcMarkerRendering()
 {
@@ -1623,19 +3704,13 @@ void ZoneEditor::buildBnpcMarkerGeometry()
     }
     else
     {
-      // Brighter, more saturated colors for filtered BNPCs
-      if( bnpc->Level > 50 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.0f, 0.0f ); // Pure red for high level
-      }
-      else if( bnpc->Level > 30 )
-      {
-        instance.color = glm::vec3( 1.0f, 0.8f, 0.0f ); // Bright orange for mid level
-      }
-      else
-      {
-        instance.color = glm::vec3( 0.0f, 1.0f, 0.0f ); // Pure green for low level
-      }
+      auto col = getGroupColor( bnpc->groupName );
+      uint8_t r = static_cast< uint8_t >( ( col & 0xFF0000 ) >> 16 );
+      uint8_t g = static_cast< uint8_t >( ( col & 0x00FF00 ) >> 8 );
+      uint8_t b = static_cast< uint8_t >( col & 0x0000FF );
+      instance.color.r = static_cast< float >( r ) / 255.0f;
+      instance.color.g = static_cast< float >( g ) / 255.0f;
+      instance.color.b = static_cast< float >( b ) / 255.0f;
     }
 
     // Check if this BNPC is selected
@@ -1752,7 +3827,6 @@ glm::vec2 ZoneEditor::worldTo3DScreen( const glm::vec3& worldPos, const ImVec2& 
   return screenPos;
 }
 
-// New function to handle 3D BNPC tooltips and selection
 void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
 {
   if( !m_selectedZone || m_bnpcWorldPositions.empty() )
@@ -1812,7 +3886,10 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
     {
       m_selectedBnpcIndex = closestIndex;
       // Rebuild markers to update selection highlighting
+      handleBnpcSelection( m_filteredBnpcs[ m_selectedBnpcIndex ]->groupName, m_filteredBnpcs[ m_selectedBnpcIndex ],
+                           {} );
       buildBnpcMarkerGeometry();
+      buildSenseRangeGeometry();
     }
 
     // Show tooltip for hovered BNPC
@@ -1838,7 +3915,7 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
                         ImGuiWindowFlags_AlwaysAutoResize ) )
       {
         if( !hoveredBnpc->nameString.empty() )
-          ImGui::Text( "%s", hoveredBnpc->nameString.c_str() );
+          ImGui::Text( "%s %s", hoveredBnpc->nameString.c_str(), hoveredBnpc->bnpcName.c_str() );
         ImGui::Separator();
         ImGui::Text( "ID: %u", hoveredBnpc->instanceId );
         ImGui::Text( "Level: %u", hoveredBnpc->Level );
@@ -1867,9 +3944,10 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
           // Draw name above the selected BNPC
           ImVec2 textPos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y - 40 );
 
-          ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
+          std::string nameLabel = fmt::format( "{} {}", selectedBnpc->groupName, selectedBnpc->bnpcName );
+          ImVec2 textSize = ImGui::CalcTextSize( nameLabel.empty()
                                                    ? "not set"
-                                                   : selectedBnpc->nameString.c_str() );
+                                                   : nameLabel.c_str() );
 
           // Center the text horizontally
           textPos.x -= textSize.x * 0.5f;
@@ -1881,8 +3959,8 @@ void ZoneEditor::handle3DBnpcInteraction( ImVec2 imagePos, ImVec2 imageSize )
             IM_COL32( 0, 0, 0, 200 )
           );
 
-          if( !selectedBnpc->nameString.empty() )
-            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
+          if( !nameLabel.empty() )
+            drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), nameLabel.c_str() );
         }
         break;
       }
@@ -1928,7 +4006,7 @@ void ZoneEditor::renderNavmesh()
   ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
 
   // Display the texture
-  ImGui::Image( reinterpret_cast< void * >( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+  ImGui::Image( ImTextureRef( m_navmeshTexture ), imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
 
   // Handle 3D BNPC interaction (replaces the old 2D overlay)
   handle3DBnpcInteraction( imageScreenPos, imageSize );
@@ -2211,11 +4289,395 @@ void ZoneEditor::renderNavmeshToTexture()
   // Render BNPC markers on top
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  renderSenseRanges();
   renderBnpcMarkers();
-
+  renderServerPaths();
+  renderEObjCollisions();
+  renderEObjMarkers();
   // Unbind framebuffer (back to default)
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
+
+void ZoneEditor::renderSenseRanges()
+{
+  if( !m_showSenseRanges || m_senseRangeVAO == 0 || m_senseRangeVertexCount == 0 )
+  {
+    return;
+  }
+
+  // Check if we still have a valid selection
+  if( m_selectedBnpcIndex < 0 || m_selectedBnpcIndex >= m_filteredBnpcs.size() )
+  {
+    return;
+  }
+
+  if( m_senseRangeShader == 0 )
+  {
+    return;
+  }
+
+  glUseProgram( m_senseRangeShader );
+
+  // Set view and projection matrices (use the same as your navmesh rendering)
+  // Set up matrices (same as navmesh)
+  glm::mat4 view = glm::lookAt( m_navCameraPos, m_navCameraTarget, glm::vec3( 0, 1, 0 ) );
+  glm::mat4 projection = glm::perspective( glm::radians( 45.0f ),
+                                           ( float ) m_navmeshTextureWidth / ( float ) m_navmeshTextureHeight,
+                                           0.1f, 10000.0f );
+
+  GLint viewLoc = glGetUniformLocation( m_senseRangeShader, "view" );
+  GLint projLoc = glGetUniformLocation( m_senseRangeShader, "projection" );
+
+  if( viewLoc != -1 )
+  {
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, &view[ 0 ][ 0 ] );
+  }
+  if( projLoc != -1 )
+  {
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, &projection[ 0 ][ 0 ] );
+  }
+
+  glBindVertexArray( m_senseRangeVAO );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glLineWidth( 3.0f );
+  glDisable(GL_DEPTH_TEST);
+  // Render as line strips/loops
+  glDrawArrays( GL_LINE_LOOP, 0, m_senseRangeVertexCount );
+
+  glDisable( GL_BLEND );
+  glBindVertexArray( 0 );
+  glUseProgram( 0 );
+  glEnable(GL_DEPTH_TEST);
+}
+
+void ZoneEditor::initializeSenseRangeRendering()
+{
+  if( m_senseRangeVAO != 0 )
+  {
+    return; // Already initialized
+  }
+
+  glGenVertexArrays( 1, &m_senseRangeVAO );
+  glGenBuffers( 1, &m_senseRangeVBO );
+
+  // Simpler shader without instancing
+  const char *vertexShader = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 vertColor;
+
+void main()
+{
+    gl_Position = projection * view * vec4(aPos, 1.0);
+    vertColor = aColor;
+}
+)";
+
+  const char *fragmentShader = R"(
+#version 330 core
+in vec3 vertColor;
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(vertColor, 0.8);
+}
+)";
+
+  m_senseRangeShader = createShaderProgram( vertexShader, fragmentShader );
+}
+
+void ZoneEditor::initializeServerPathRendering()
+{
+  glGenVertexArrays( 1, &m_serverPathVAO );
+  glGenBuffers( 1, &m_serverPathVBO );
+
+  glBindVertexArray( m_serverPathVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_serverPathVBO );
+
+  // Set up vertex attributes (position and color)
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  glBindVertexArray( 0 );
+}
+
+void ZoneEditor::buildServerPathGeometry()
+{
+  if( m_serverPathVAO == 0 )
+  {
+    initializeServerPathRendering();
+  }
+
+  // Check if we have a valid selection
+  auto selectedPath = m_serverPathCache.find( m_selectedServerPathId );
+  if( selectedPath == m_serverPathCache.end() || selectedPath->second.points.empty() )
+  {
+    m_serverPathVertexCount = 0;
+    return;
+  }
+
+  const auto& path = selectedPath->second;
+  std::vector< float > vertices;
+
+  // Create line segments connecting all control points
+  for( size_t i = 0; i < path.points.size(); ++i )
+  {
+    // Calculate world position (path position + relative control point position)
+    float worldX = path.position.x + path.points[i].Translation.x;
+    float worldY = path.position.y + path.points[i].Translation.y;
+    float worldZ = path.position.z + path.points[i].Translation.z;
+
+    vertices.push_back( worldX );
+    vertices.push_back( worldY );
+    vertices.push_back( worldZ );
+
+    // If this isn't the last point, add the next point to create a line segment
+    if( i < path.points.size() - 1 )
+    {
+      float nextWorldX = path.position.x + path.points[i + 1].Translation.x;
+      float nextWorldY = path.position.y + path.points[i + 1].Translation.y;
+      float nextWorldZ = path.position.z + path.points[i + 1].Translation.z;
+
+      vertices.push_back( nextWorldX );
+      vertices.push_back( nextWorldY );
+      vertices.push_back( nextWorldZ );
+    }
+  }
+
+  if( vertices.empty() )
+  {
+    m_serverPathVertexCount = 0;
+    return;
+  }
+
+  glBindVertexArray( m_serverPathVAO );
+  glBindBuffer( GL_ARRAY_BUFFER, m_serverPathVBO );
+
+  // Upload vertex data
+  glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( float ), vertices.data(), GL_STATIC_DRAW );
+
+  // Set up vertex attributes
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  m_serverPathVertexCount = vertices.size() / 3;
+  glBindVertexArray( 0 );
+
+  printf( "Built server path geometry for Path ID %u: %d vertices\n",
+          m_selectedServerPathId, m_serverPathVertexCount );
+}
+
+
+void ZoneEditor::buildSenseRangeGeometry()
+{
+  if( m_senseRangeVAO == 0 )
+  {
+    initializeSenseRangeRendering();
+  }
+
+  // Check if we have a valid selection
+  if( m_selectedBnpcIndex < 0 || m_selectedBnpcIndex >= m_filteredBnpcs.size() )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  CachedBnpc *selectedBnpc = m_filteredBnpcs[ m_selectedBnpcIndex ];
+  if( !selectedBnpc )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  std::vector< float > allVertices;
+  std::vector< float > allColors;
+  int totalVertices = 0;
+
+  // Process both sense types of the selected BNPC
+  for( int i = 0; i < 2; ++i )
+  {
+    if( selectedBnpc->baseData.Sense[ i ] == CachedBnpc::SenseType::NONE )
+    {
+      continue;
+    }
+
+    float range = selectedBnpc->baseData.SenseRange[ i ];
+    if( range <= 0.0f ) continue;
+
+    std::vector< float > vertices;
+
+    // Create different geometry based on sense type
+    if( selectedBnpc->baseData.Sense[ i ] == CachedBnpc::SenseType::VISION )
+    {
+      // Create cone for vision
+      vertices = createConeVertices( range, 3.1415926f * ( 75.0f / 180.0f ), 32 ); // 75-degree cone
+    }
+    else
+    {
+      // Create circle for other senses
+      vertices = createCircleVertices( range, 64 );
+    }
+
+    // Transform vertices to world position and apply rotation
+    for( size_t v = 0; v < vertices.size(); v += 3 )
+    {
+      float x = vertices[ v ];
+      float y = vertices[ v + 1 ];
+      float z = vertices[ v + 2 ];
+
+      // Apply rotation around Y axis
+      float cosR = cos( -selectedBnpc->rotation );
+      float sinR = sin( -selectedBnpc->rotation );
+      float rotatedX = x * cosR - z * sinR;
+      float rotatedZ = x * sinR + z * cosR;
+
+      // Add to world position
+      allVertices.push_back( rotatedX + selectedBnpc->x );
+      allVertices.push_back( y + selectedBnpc->y );
+      allVertices.push_back( rotatedZ + selectedBnpc->z );
+
+      // Add color based on sense type
+      switch( selectedBnpc->baseData.Sense[ i ] )
+      {
+        case CachedBnpc::SenseType::VISION:
+          allColors.insert( allColors.end(), { 1.0f, 1.0f, 0.0f } ); // Yellow
+          break;
+        case CachedBnpc::SenseType::HEARING:
+          allColors.insert( allColors.end(), { 0.0f, 1.0f, 0.0f } ); // Green
+          break;
+        case CachedBnpc::SenseType::PRESENCE:
+          allColors.insert( allColors.end(), { 0.0f, 0.0f, 1.0f } ); // Blue
+          break;
+        case CachedBnpc::SenseType::VITALITY:
+          allColors.insert( allColors.end(), { 1.0f, 0.0f, 0.0f } ); // Red
+          break;
+        case CachedBnpc::SenseType::MAGIC:
+          allColors.insert( allColors.end(), { 1.0f, 0.0f, 1.0f } ); // Magenta
+          break;
+        case CachedBnpc::SenseType::ABILITIE:
+          allColors.insert( allColors.end(), { 0.0f, 1.0f, 1.0f } ); // Cyan
+          break;
+        case CachedBnpc::SenseType::WEAPON_SKILL:
+          allColors.insert( allColors.end(), { 1.0f, 0.5f, 0.0f } ); // Orange
+          break;
+        case CachedBnpc::SenseType::POISON:
+          allColors.insert( allColors.end(), { 0.5f, 1.0f, 0.0f } ); // Lime
+          break;
+        default:
+          allColors.insert( allColors.end(), { 0.5f, 0.5f, 0.5f } ); // Gray
+          break;
+      }
+      totalVertices++;
+    }
+  }
+
+  if( allVertices.empty() )
+  {
+    m_senseRangeVertexCount = 0;
+    return;
+  }
+
+  glBindVertexArray( m_senseRangeVAO );
+
+  // Upload vertices and colors
+  glBindBuffer( GL_ARRAY_BUFFER, m_senseRangeVBO );
+  glBufferData( GL_ARRAY_BUFFER,
+                ( allVertices.size() + allColors.size() ) * sizeof( float ),
+                nullptr, GL_STATIC_DRAW );
+
+  // Upload position data
+  glBufferSubData( GL_ARRAY_BUFFER, 0,
+                   allVertices.size() * sizeof( float ),
+                   allVertices.data() );
+
+  // Upload color data
+  glBufferSubData( GL_ARRAY_BUFFER,
+                   allVertices.size() * sizeof( float ),
+                   allColors.size() * sizeof( float ),
+                   allColors.data() );
+
+  // Set up vertex attributes
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), ( void * ) 0 );
+  glEnableVertexAttribArray( 0 );
+
+  glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ),
+                         ( void * ) ( allVertices.size() * sizeof( float ) ) );
+  glEnableVertexAttribArray( 1 );
+
+  m_senseRangeVertexCount = totalVertices;
+  glBindVertexArray( 0 );
+
+  printf( "Built sense range geometry for BNPC '%s': %d vertices\n",
+          selectedBnpc->nameString.c_str(), m_senseRangeVertexCount );
+}
+
+std::vector< float > ZoneEditor::createCircleVertices( float radius, int segments )
+{
+  std::vector< float > vertices;
+
+  // Create line loop for circle outline
+  for( int i = 0; i <= segments; ++i )
+  {
+    float angle = 2.0f * 3.1415926f * i / segments;
+    float x = radius * cos( angle );
+    float z = radius * sin( angle );
+    vertices.insert( vertices.end(), { x, 0.2f, z } );
+  }
+
+  return vertices;
+}
+
+std::vector< float > ZoneEditor::createConeVertices( float radius, float angle, int segments )
+{
+  std::vector< float > vertices;
+  float halfAngle = angle * 0.5f;
+
+  // Start from center
+  vertices.insert( vertices.end(), { 0.0f, 0.0f, 0.0f } );
+
+  // Add arc points
+  for( int i = 0; i <= segments; ++i )
+  {
+    float currentAngle = -halfAngle + ( angle * i / segments );
+    float x = radius * sin( currentAngle );
+    float z = radius * cos( currentAngle );
+    vertices.insert( vertices.end(), { x, 0.2f, z } );
+  }
+
+  // Close back to center
+  vertices.insert( vertices.end(), { 0.0f, 0.2f, 0.0f } );
+
+  return vertices;
+}
+
+
+void ZoneEditor::cleanupSenseRangeRendering()
+{
+  if( m_senseRangeVAO != 0 )
+  {
+    glDeleteVertexArrays( 1, &m_senseRangeVAO );
+    m_senseRangeVAO = 0;
+  }
+  if( m_senseRangeVBO != 0 )
+  {
+    glDeleteBuffers( 1, &m_senseRangeVBO );
+    m_senseRangeVBO = 0;
+  }
+  if( m_senseRangeShader != 0 )
+  {
+    glDeleteProgram( m_senseRangeShader );
+    m_senseRangeShader = 0;
+  }
+}
+
 
 glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float worldZ, ImVec2 imageSize )
 {
@@ -2253,144 +4715,39 @@ glm::vec2 ZoneEditor::worldToNavmeshScreen( float worldX, float worldY, float wo
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcOverlayMarkers( ImVec2 imagePos, ImVec2 imageSize )
+void ZoneEditor::focusOn3DPosition( const glm::vec3& position )
 {
-  if( !m_selectedZone || m_bnpcs.empty() )
-    return;
+  // Focus 3D camera on the given position
+  m_navCameraTarget = glm::vec3( position.x, position.y, position.z );
 
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
+  // Position the camera at a reasonable distance from the target
+  float distance = 85.0f; // Default viewing distance
+  float pitch = 30.0f * ( 3.1415926f / 180.0f ); // 30 degrees down in radians
+  float yaw = 0.0f; // Facing forward
 
-  // Define colors
-  ImU32 filteredColor = m_bnpcIconColor; // Yellow for filtered BNPCs
-  ImU32 selectedColor = m_selectedBnpcIconColor; // Red for selected BNPC
-  ImU32 unfilteredColor = IM_COL32( 150, 150, 150, 180 ); // Grey for unfiltered BNPCs
+  // Calculate camera position based on spherical coordinates
+  m_navCameraPos.x = m_navCameraTarget.x + distance * cos( pitch ) * sin( yaw );
+  m_navCameraPos.y = m_navCameraTarget.y + distance * sin( pitch );
+  m_navCameraPos.z = m_navCameraTarget.z + distance * cos( pitch ) * cos( yaw );
 
-  // Keep track of the selected BNPC for special rendering
-  CachedBnpc *selectedBnpc = nullptr;
-  ImVec2 selectedPos;
+  // Update camera parameters
+  m_navCameraDistance = distance;
+  m_navCameraYaw = yaw * ( 180.0f / 3.1415926f ); // Convert back to degrees
+  m_navCameraPitch = 30.0f; // 30 degrees down
 
-  // Create a set of filtered BNPC IDs for quick lookup
-  std::unordered_set< uint32_t > filteredBnpcIds;
-  for( auto *bnpc : m_filteredBnpcs )
-  {
-    filteredBnpcIds.insert( bnpc->instanceId );
-  }
+  // Ensure navmesh window is visible when focusing
+  m_showNavmeshWindow = true;
 
-  // First pass: Render all BNPCs except the selected one
-  for( const auto& bnpc : m_bnpcs )
-  {
-    // Skip BNPCs from other territories
-    if( bnpc->territoryType != m_selectedZone->id )
-      continue;
+  // Also focus the position in the 2D map view
+  m_showMapWindow = true;
 
-    // Convert 3D world position to 2D screen position
-    glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
+  // Store the focus position for the map view to use during rendering
+  // The map view should handle the coordinate conversion internally
+  m_focusWorldPos = glm::vec3( position.x, position.y, position.z );
+  m_shouldFocusOnMap = true;
 
-    // Skip if outside visible area
-    if( screenPos.x < 0 || screenPos.x > imageSize.x ||
-        screenPos.y < 0 || screenPos.y > imageSize.y )
-      continue;
-
-    // Add the window position offset
-    ImVec2 pos = ImVec2( imagePos.x + screenPos.x, imagePos.y + screenPos.y );
-
-    // Check if this is the selected BNPC
-    bool isSelected = false;
-    if( m_selectedBnpcIndex >= 0 && m_selectedBnpcIndex < m_filteredBnpcs.size() &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ]->instanceId == bnpc->instanceId )
-    {
-      isSelected = true;
-      selectedBnpc = bnpc.get();
-      selectedPos = pos;
-      continue; // Skip rendering selected BNPC in first pass
-    }
-
-    // Determine color based on filter status
-    bool isFiltered = filteredBnpcIds.find( bnpc->instanceId ) != filteredBnpcIds.end();
-    ImU32 iconColor = isFiltered ? filteredColor : unfilteredColor;
-
-    // Draw the marker
-    float iconSize = m_bnpcIconSize;
-    drawList->AddCircleFilled( pos, iconSize, iconColor );
-    drawList->AddCircle( pos, iconSize, IM_COL32( 0, 0, 0, 255 ) );
-
-    // Show tooltip on hover
-    if( ImGui::IsWindowHovered() &&
-        ImGui::IsMouseHoveringRect(
-          ImVec2( pos.x - iconSize, pos.y - iconSize ),
-          ImVec2( pos.x + iconSize, pos.y + iconSize ) ) )
-    {
-      // Draw a tooltip with BNPC info
-      ImGui::SetTooltip( "%s (ID: %u)\nPosition: %.1f, %.1f, %.1f",
-                         bnpc->nameString.c_str(),
-                         bnpc->instanceId,
-                         bnpc->x, bnpc->y, bnpc->z );
-    }
-  }
-
-  // Second pass: Render the selected BNPC on top
-  if( selectedBnpc )
-  {
-    // Draw the selected BNPC with larger size and different color
-    float iconSize = m_bnpcIconSize * 1.5f;
-    drawList->AddCircleFilled( selectedPos, iconSize, selectedColor );
-    drawList->AddCircle( selectedPos, iconSize, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
-
-    // Draw the name above the marker
-    ImVec2 textPos = ImVec2( selectedPos.x, selectedPos.y - iconSize - 20 );
-    // Add a background for better readability
-    ImVec2 textSize = ImGui::CalcTextSize( selectedBnpc->nameString.empty()
-                                             ? "not set"
-                                             : selectedBnpc->nameString.c_str() );
-    drawList->AddRectFilled(
-      ImVec2( textPos.x - textSize.x / 2 - 4, textPos.y - 2 ),
-      ImVec2( textPos.x + textSize.x / 2 + 4, textPos.y + textSize.y + 2 ),
-      IM_COL32( 0, 0, 0, 180 )
-    );
-    // Center the text
-    textPos.x -= textSize.x / 2;
-    if( !selectedBnpc->nameString.empty() )
-      drawList->AddText( textPos, IM_COL32( 255, 255, 255, 255 ), selectedBnpc->nameString.c_str() );
-  }
-
-  // Handle mouse clicks for selection
-  if( ImGui::IsWindowHovered() && ImGui::IsMouseClicked( 0 ) )
-  {
-    ImVec2 mousePos = ImGui::GetMousePos();
-    mousePos.x -= imagePos.x;
-    mousePos.y -= imagePos.y;
-
-    // Find closest BNPC to the click position
-    float closestDistance = FLT_MAX;
-    int closestIndex = -1;
-
-    for( size_t i = 0; i < m_filteredBnpcs.size(); i++ )
-    {
-      CachedBnpc *bnpc = m_filteredBnpcs[ i ];
-
-      // Convert 3D position to screen space
-      glm::vec2 screenPos = worldToNavmeshScreen( bnpc->x, bnpc->y, bnpc->z, imageSize );
-
-      // Calculate distance from mouse to BNPC icon
-      float dx = screenPos.x - mousePos.x;
-      float dy = screenPos.y - mousePos.y;
-      float distance = sqrtf( dx * dx + dy * dy );
-
-      // Check if this is within selection radius and closest so far
-      if( distance < 15.0f && distance < closestDistance ) // 15.0f = selection radius
-      {
-        closestDistance = distance;
-        closestIndex = static_cast< int >( i );
-      }
-    }
-
-    // If we found a close BNPC, select it
-    if( closestIndex >= 0 )
-    {
-      m_selectedBnpcIndex = closestIndex;
-      //onSelectionChanged(); // Update any selection-dependent state
-    }
-  }
+  // Set a reasonable zoom level for the map view
+  //m_zoomLevel = 2.0f; // Zoom in to show more detail around the focused position
 }
 
 void ZoneEditor::createNavmeshFramebuffer()
@@ -2450,6 +4807,24 @@ void ZoneEditor::showNavmeshWindow()
     ImGui::End();
     return;
   }
+  ImGui::Checkbox( "Group Selection Mode", &m_groupSelectionMode );
+  ImGui::SameLine();
+  if( ImGui::Button( "Clear Selection" ) )
+  {
+    m_selectedGroupName = "";
+    m_selectedBnpcInstanceIds.clear();
+    m_selectedBnpcIndex = -1;
+  }
+  // Show selection info
+  if( m_groupSelectionMode && !m_selectedGroupName.empty() )
+  {
+    ImGui::Text( "Selected Group: %s (%zu BNPCs)",
+                 m_selectedGroupName.c_str(), m_selectedBnpcInstanceIds.size() );
+  }
+  else if( !m_groupSelectionMode && !m_selectedBnpcInstanceIds.empty() )
+  {
+    ImGui::Text( "Selected BNPC: Instance %u", *m_selectedBnpcInstanceIds.begin() );
+  }
 
   // Auto-build navmesh when window is opened and zone is selected
   if( m_needsNavmeshRebuild || ( m_selectedZone && m_currentNavmeshZoneId != m_selectedZone->id && m_navmeshIndexCount
@@ -2488,9 +4863,53 @@ void ZoneEditor::showNavmeshWindow()
 
   // Add some debug info
   ImGui::Separator();
-  ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
-  ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
+  //ImGui::Text( "Current zone: %s", m_selectedZone ? m_selectedZone->name.c_str() : "None" );
+  //ImGui::Text( "Zone ID: %u", m_selectedZone ? m_selectedZone->id : 0 );
   ImGui::Text( "NavMesh available: %s", m_pNaviProvider && m_pNaviProvider->getNavMesh() ? "Yes" : "No" );
+
+  // eobj and collision control
+  ImGui::Separator();
+  ImGui::Text( "EObj Collisions:" );
+  ImGui::SameLine();
+  ImGui::Checkbox( "Shapes##eobj", &m_showEObjCollisions );
+  ImGui::SameLine();
+  ImGui::Checkbox( "Markers##eobj", &m_showEObjMarkers );
+
+  if( !m_loadedScriptPath.empty() )
+  {
+    int nShapes = static_cast< int >( m_cachedEObjCollisions.size() );
+    // count unique eobj id
+    std::unordered_set< uint32_t > uniqIds;
+    for( const auto& c : m_cachedEObjCollisions )
+      uniqIds.insert( c.instanceId );
+    ImGui::TextColored( ImVec4( 0.4f, 1.0f, 0.4f, 1.0f ),
+                        "Script: %s  (%zu EObjs, %d shapes)",
+                        m_loadedScriptPath.c_str(),
+                        uniqIds.size(), nShapes );
+  }
+  else
+  {
+    ImGui::TextColored( ImVec4( 1.0f, 0.6f, 0.2f, 1.0f ), "No instance script loaded" );
+  }
+
+  // pass script manually
+  ImGui::SetNextItemWidth( ImGui::GetContentRegionAvail().x - 60.f );
+  ImGui::InputText( "##scriptpath", m_scriptPathBuffer, sizeof( m_scriptPathBuffer ) );
+  ImGui::SameLine();
+  if( ImGui::Button( "Load##script" ) )
+  {
+    std::filesystem::path p( m_scriptPathBuffer );
+    if( std::filesystem::exists( p ) )
+    {
+      m_cachedEObjCollisions.clear();
+      cleanupEObjRendering();
+      parseInstanceScript( p );
+    }
+    else
+    {
+      printf( "[EObj] Script path does not exist: %s\n", m_scriptPathBuffer );
+    }
+  }
 
   // Add OBJ model info with more detailed status
   if( m_objLoaded )
@@ -2510,7 +4929,7 @@ void ZoneEditor::showNavmeshWindow()
   {
     ImGui::Separator();
     ImGui::Text( "Visualization Mode:" );
-
+    ImGui::SameLine();
     // Store old state to detect changes
     bool oldShowObj = m_showObjModel;
 
@@ -2532,52 +4951,52 @@ void ZoneEditor::showNavmeshWindow()
     }
 
     // Add a refresh button
-    if( ImGui::Button( "Refresh Visualization" ) )
-    {
-      // Force rebuild of the appropriate geometry
-      if( m_showObjModel )
+    /*  if( ImGui::Button( "Refresh Visualization" ) )
       {
-        cleanupObjModel();
-        checkForObjFile();
-      }
-      else
-      {
-        cleanupNavmeshGeometry();
-        buildNavmeshGeometry();
-      }
-    }
+        // Force rebuild of the appropriate geometry
+        if( m_showObjModel )
+        {
+          cleanupObjModel();
+          checkForObjFile();
+        }
+        else
+        {
+          cleanupNavmeshGeometry();
+          buildNavmeshGeometry();
+        }
+      }*/
   }
 
   // Add world editing controls
-  if( ImGui::CollapsingHeader( "World Editing" ) )
-  {
-    ImGui::Checkbox( "World Editing Mode", &m_worldEditingMode );
-
-    if( m_showClickMarker )
+  /*  if( ImGui::CollapsingHeader( "World Editing" ) )
     {
-      ImGui::Text( "Last click: (%.2f, %.2f, %.2f)",
-                   m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+      ImGui::Checkbox( "World Editing Mode", &m_worldEditingMode );
 
-      if( ImGui::Button( "Clear Marker" ) )
+      if( m_showClickMarker )
       {
-        m_showClickMarker = false;
+        ImGui::Text( "Last click: (%.2f, %.2f, %.2f)",
+                     m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+
+        if( ImGui::Button( "Clear Marker" ) )
+        {
+          m_showClickMarker = false;
+        }
+
+        ImGui::SameLine();
+        if( ImGui::Button( "Copy Position" ) )
+        {
+          std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
+                                            m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
+          ImGui::SetClipboardText( posStr.c_str() );
+        }
       }
 
-      ImGui::SameLine();
-      if( ImGui::Button( "Copy Position" ) )
-      {
-        std::string posStr = fmt::format( "{:.2f}, {:.2f}, {:.2f}",
-                                          m_lastClickWorldPos.x, m_lastClickWorldPos.y, m_lastClickWorldPos.z );
-        ImGui::SetClipboardText( posStr.c_str() );
-      }
-    }
-
-    ImGui::Text( "Right-click on geometry to get world position" );
-  }
+      ImGui::Text( "Right-click on geometry to get world position" );
+    }*/
 
 
   // Camera controls - only update sliders if not actively using mouse controls
-  if( ImGui::CollapsingHeader( "Camera Controls" ) )
+  /*if( ImGui::CollapsingHeader( "Camera Controls" ) )
   {
     // Disable sliders when mouse controls are active
     if( m_navCameraControlActive )
@@ -2663,8 +5082,7 @@ void ZoneEditor::showNavmeshWindow()
       // Half second delay
       m_navCameraControlActive = false;
     }
-  }
-
+  }*/
   // Get available content region
   ImVec2 contentRegion = ImGui::GetContentRegionAvail();
   if( contentRegion.x > 0 && contentRegion.y > 0 )
@@ -2719,6 +5137,7 @@ void ZoneEditor::showZoneList()
         m_selectedIndex = i;
         m_selectedZoneId = zone->id;
         m_selectedZone = zone;
+        m_zoomLevel = -1;
 
         // Only trigger selection changed if it actually changed
         if( oldSelectedId != m_selectedZoneId )
@@ -2892,8 +5311,11 @@ void ZoneEditor::showMapWindow()
     if( m_showBnpcIcons )
     {
       ImGui::SetNextItemWidth( 100 );
-      ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 4.0f, 20.0f );
+      ImGui::SliderFloat( "Icon Size", &m_bnpcIconSize, 2.0f, 10.0f );
     }
+
+    ImGui::Separator();
+    ImGui::Checkbox( "Camera##map", &m_showNavCameraOnMap );
 
     if( ImGui::Button( "Reset Zoom" ) )
     {
@@ -2902,6 +5324,12 @@ void ZoneEditor::showMapWindow()
     if( ImGui::Button( "Fit to Window" ) )
     {
       m_zoomLevel = -1.0f;
+    }
+    if( ImGui::Button( "Center Map" ) )
+    {
+      // Force centering by resetting scroll position
+      ImGui::SetScrollX( 0.0f );
+      ImGui::SetScrollY( 0.0f );
     }
     ImGui::EndMenuBar();
   }
@@ -2937,6 +5365,9 @@ void ZoneEditor::showMapWindow()
 
   if( ImGui::BeginChild( "MapScrollRegion", contentRegion, false, childFlags ) )
   {
+    // Get child window content region for proper centering calculations
+    ImVec2 childContentRegion = ImGui::GetContentRegionAvail();
+
     // Store the current scroll position for zoom centering
     float oldScrollX = ImGui::GetScrollX();
     float oldScrollY = ImGui::GetScrollY();
@@ -2980,18 +5411,21 @@ void ZoneEditor::showMapWindow()
       }
     }
 
-    // Center the image if it's smaller than the content region
-    ImVec2 availableSize = ImGui::GetContentRegionAvail();
-    ImVec2 cursorPos = ImGui::GetCursorPos();
+    // Calculate centering offsets
+    ImVec2 centeringOffset = ImVec2( 0.0f, 0.0f );
+    if( imageSize.x < childContentRegion.x )
+    {
+      centeringOffset.x = ( childContentRegion.x - imageSize.x ) * 0.5f;
+    }
+    if( imageSize.y < childContentRegion.y )
+    {
+      centeringOffset.y = ( childContentRegion.y - imageSize.y ) * 0.5f;
+    }
 
-    if( imageSize.x < availableSize.x )
-    {
-      cursorPos.x += ( availableSize.x - imageSize.x ) * 0.5f;
-    }
-    if( imageSize.y < availableSize.y )
-    {
-      cursorPos.y += ( availableSize.y - imageSize.y ) * 0.5f;
-    }
+    // Apply centering by setting cursor position
+    ImVec2 cursorPos = ImGui::GetCursorPos();
+    cursorPos.x += centeringOffset.x;
+    cursorPos.y += centeringOffset.y;
     ImGui::SetCursorPos( cursorPos );
 
     // Store image position for BNPC icon drawing
@@ -3007,6 +5441,12 @@ void ZoneEditor::showMapWindow()
     if( m_showBnpcIcons && !m_bnpcs.empty() )
     {
       drawBnpcIcons();
+    }
+
+    // Draw camera position and FOV cone overlay
+    if( m_showNavCameraOnMap )
+    {
+      drawNavCameraOnMap( imagePos, imageSize );
     }
 
     // Handle panning (drag to move when zoomed in)
@@ -3287,97 +5727,148 @@ ImVec2 ZoneEditor::worldToScreenPos( float worldX, float worldZ, const ImVec2& i
   return screenPos;
 }
 
-void ZoneEditor::drawBnpcIcons()
+void ZoneEditor::drawNavCameraOnMap( const ImVec2& imagePos, const ImVec2& imageSize )
 {
-  if( !m_showMapWindow || m_mapTextureId == 0 || m_bnpcs.empty() )
+  if( !m_selectedZone )
     return;
 
-  // Get the current image position and size
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  // camera target: the point the 3D camera orbits around
+  ImVec2 targetScreenPos = worldToScreenPos( m_navCameraTarget.x, m_navCameraTarget.z, imagePos, imageSize );
+
+  // camera position projected onto xz plane
+  ImVec2 camScreenPos = worldToScreenPos( m_navCameraPos.x, m_navCameraPos.z, imagePos, imageSize );
+
+  // view direction: from camera toward target, in screen space (x=right, z=down)
+  float yawRad = glm::radians( m_navCameraYaw );
+  // viewDir on screen: +X world -> right, +Z world -> down
+  // cam offset from target = (cos(yaw), sin(yaw)), so viewDir toward target = (-cos(yaw), -sin(yaw))
+  float vdx = -cosf( yawRad );
+  float vdz = -sinf( yawRad );
+
+  // cone length in screen pixels, use fixed size
+  const float coneLen = 36.0f;
+  const float halfFovRad = glm::radians( 22.5f ); // half of 45deg vertical FOV
+
+  // rotate viewDir by mod of halfFov to get cone edges
+  auto rot2d = []( float dx, float dy, float angle ) -> ImVec2 {
+    float c = cosf( angle ), s = sinf( angle );
+    return { dx * c - dy * s, dx * s + dy * c };
+  };
+
+  ImVec2 leftDir  = rot2d( vdx, vdz, -halfFovRad );
+  ImVec2 rightDir = rot2d( vdx, vdz,  halfFovRad );
+
+  ImVec2 coneLeft  = { camScreenPos.x + leftDir.x  * coneLen, camScreenPos.y + leftDir.y  * coneLen };
+  ImVec2 coneRight = { camScreenPos.x + rightDir.x * coneLen, camScreenPos.y + rightDir.y * coneLen };
+
+  // draw cone
+  drawList->AddTriangleFilled( camScreenPos, coneLeft, coneRight, IM_COL32( 255, 255, 255, 45 ) );
+
+  // draw cone outline
+  drawList->AddLine( camScreenPos, coneLeft,  IM_COL32( 255, 255, 255, 200 ), 1.5f );
+  drawList->AddLine( camScreenPos, coneRight, IM_COL32( 255, 255, 255, 200 ), 1.5f );
+  drawList->AddLine( coneLeft, coneRight,     IM_COL32( 255, 255, 255, 120 ), 1.0f );
+
+  // camera position dot
+  drawList->AddCircleFilled( camScreenPos, 4.0f, IM_COL32( 255, 255, 255, 230 ) );
+  drawList->AddCircle( camScreenPos, 4.0f, IM_COL32( 0, 0, 0, 180 ), 0, 1.5f );
+
+  // crosshair
+  const float crossR = 4.0f;
+  drawList->AddLine( { targetScreenPos.x - crossR, targetScreenPos.y },
+                     { targetScreenPos.x + crossR, targetScreenPos.y },
+                     IM_COL32( 255, 220, 100, 200 ), 1.5f );
+  drawList->AddLine( { targetScreenPos.x, targetScreenPos.y - crossR },
+                     { targetScreenPos.x, targetScreenPos.y + crossR },
+                     IM_COL32( 255, 220, 100, 200 ), 1.5f );
+  drawList->AddCircle( targetScreenPos, crossR + 1.0f, IM_COL32( 255, 220, 100, 160 ), 0, 1.0f );
+
+  // line cam -> target
+  drawList->AddLine( camScreenPos, targetScreenPos, IM_COL32( 255, 220, 100, 80 ), 1.0f );
+}
+
+void ZoneEditor::drawBnpcIcons()
+{
+  if( !m_showBnpcIcons || !m_selectedZone )
+    return;
+
+  ImDrawList *drawList = ImGui::GetWindowDrawList();
   ImVec2 imagePos = ImGui::GetItemRectMin();
   ImVec2 imageSize = ImGui::GetItemRectSize();
 
-  // Get draw list for drawing on top of the image
-  ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-  // Check if we're currently dragging - if so, don't process button clicks
-  bool isDragging = ImGui::IsMouseDragging( ImGuiMouseButton_Left );
-
-  // Draw each BNPC
-  for( size_t i = 0; i < m_bnpcs.size(); ++i )
+  for( const auto& bnpc : m_bnpcs )
   {
-    const auto& bnpc = m_bnpcs[ i ];
-
-    // Convert world position to screen position
     ImVec2 screenPos = worldToScreenPos( bnpc->x, bnpc->z, imagePos, imageSize );
 
-    // Check if the icon is within the visible image area
-    if( screenPos.x < imagePos.x || screenPos.x > imagePos.x + imageSize.x ||
-        screenPos.y < imagePos.y || screenPos.y > imagePos.y + imageSize.y )
+    // Check if this BNPC is selected
+    bool isSelected = false;
+    if( m_groupSelectionMode )
     {
-      continue; // Skip if outside visible area
+      isSelected = m_selectedBnpcInstanceIds.count( bnpc->instanceId ) > 0;
+    }
+    else
+    {
+      isSelected = ( m_selectedBnpcIndex >= 0 &&
+                     m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
+                     m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc.get() );
     }
 
     // Choose color based on selection
-    ImU32 iconColor = m_bnpcIconColor;
-    if( m_selectedBnpcIndex >= 0 &&
-        m_selectedBnpcIndex < static_cast< int >( m_filteredBnpcs.size() ) &&
-        m_filteredBnpcs[ m_selectedBnpcIndex ] == bnpc.get() )
+    ImU32 iconColor = isSelected ? m_selectedBnpcIconColor : m_bnpcIconColor;
+
+    // Draw larger icon if selected
+    float iconSize = isSelected ? m_bnpcIconSize * 1.5f : m_bnpcIconSize;
+
+    drawList->AddCircleFilled( screenPos, iconSize, iconColor );
+
+    // Add border for selected items
+    if( isSelected )
     {
-      iconColor = m_selectedBnpcIconColor;
-    }
-
-    // Draw diamond shape
-    float halfSize = m_bnpcIconSize * 0.5f;
-    ImVec2 points[ 4 ] = {
-      ImVec2( screenPos.x, screenPos.y - halfSize ), // Top
-      ImVec2( screenPos.x + halfSize, screenPos.y ), // Right
-      ImVec2( screenPos.x, screenPos.y + halfSize ), // Bottom
-      ImVec2( screenPos.x - halfSize, screenPos.y ) // Left
-    };
-
-    // Draw filled diamond
-    drawList->AddConvexPolyFilled( points, 4, iconColor );
-
-    // Draw border
-    drawList->AddPolyline( points, 4, IM_COL32( 0, 0, 0, 255 ), true, 1.0f );
-
-    // Only add invisible button for click detection if we're not dragging
-    if( !isDragging )
-    {
-      ImGui::SetCursorScreenPos( ImVec2( screenPos.x - halfSize, screenPos.y - halfSize ) );
-      ImGui::InvisibleButton( ( "bnpc_" + std::to_string( i ) ).c_str(), ImVec2( m_bnpcIconSize, m_bnpcIconSize ) );
-
-      // Handle click
-      if( ImGui::IsItemClicked() )
-      {
-        // Find this BNPC in filtered list and select it
-        for( int j = 0; j < static_cast< int >( m_filteredBnpcs.size() ); ++j )
-        {
-          if( m_filteredBnpcs[ j ] == bnpc.get() )
-          {
-            m_selectedBnpcIndex = j;
-            m_showBnpcWindow = true; // Show BNPC window when clicked
-            break;
-          }
-        }
-      }
-
-      // Show tooltip on hover
-      if( ImGui::IsItemHovered() )
-      {
-        ImGui::BeginTooltip();
-        if( !bnpc->nameString.empty() )
-          ImGui::Text( "%s", bnpc->nameString.c_str() );
-        ImGui::Text( "BNPC: %s", bnpc->bnpcName.c_str() );
-        ImGui::Text( "ID: %u", bnpc->instanceId );
-        ImGui::Text( "Level: %u", bnpc->Level );
-        ImGui::Text( "Position: %.1f, %.1f, %.1f", bnpc->x, bnpc->y, bnpc->z );
-        ImGui::Separator();
-        ImGui::EndTooltip();
-      }
+      drawList->AddCircle( screenPos, iconSize + 2.0f, IM_COL32( 255, 255, 255, 255 ), 0, 2.0f );
     }
   }
 }
+
+
+ImU32 ZoneEditor::getGroupColor( const std::string& groupName )
+{
+  // If we already have a color for this group, return it
+  if( m_groupColorMap.find( groupName ) != m_groupColorMap.end() )
+  {
+    return m_groupColorMap[ groupName ];
+  }
+
+  // Generate a consistent color based on group name hash
+  std::hash< std::string > hasher;
+  uint32_t hash = static_cast< uint32_t >( hasher( groupName ) );
+
+  // Use the hash to generate RGB values with good saturation and brightness
+  uint8_t r = static_cast< uint8_t >( ( hash & 0xFF0000 ) >> 16 );
+  uint8_t g = static_cast< uint8_t >( ( hash & 0x00FF00 ) >> 8 );
+  uint8_t b = static_cast< uint8_t >( hash & 0x0000FF );
+
+  // Ensure minimum brightness and saturation
+  r = std::max( r, static_cast< uint8_t >( 80 ) );
+  g = std::max( g, static_cast< uint8_t >( 80 ) );
+  b = std::max( b, static_cast< uint8_t >( 80 ) );
+
+  // Ensure at least one component is bright
+  uint8_t maxComponent = std::max( { r, g, b } );
+  if( maxComponent < 200 )
+  {
+    float scale = 200.0f / maxComponent;
+    r = static_cast< uint8_t >( std::min( 255.0f, r * scale ) );
+    g = static_cast< uint8_t >( std::min( 255.0f, g * scale ) );
+    b = static_cast< uint8_t >( std::min( 255.0f, b * scale ) );
+  }
+
+  ImU32 color = IM_COL32( r, g, b, 255 );
+  m_groupColorMap[ groupName ] = color;
+  return color;
+}
+
 
 void ZoneEditor::loadMapTexture( uint32_t mapId )
 {

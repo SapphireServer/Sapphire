@@ -134,16 +134,17 @@ bool BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint
     }
 
     auto id = idVec[ i ];
-    auto pPlayer = playerMgr.getPlayer( id );
-      
-    if( !pPlayer )
+    if( id == 0 )
       continue;
 
-    // build our packet entry for current iterated id
-    Server::BlacklistCharacter entry{};
+    // Avoid fully loading offline players here. The client only needs the character id and name.
+    auto pPlayer = playerMgr.findPlayer( id );
 
-    entry.CharacterID = pPlayer->getCharacterId();
-    strcpy( entry.CharacterName, pPlayer->getName().c_str() );
+    Server::BlacklistCharacter entry{};
+    entry.CharacterID = id;
+
+    const auto playerName = pPlayer ? pPlayer->getName() : playerMgr.getPlayerNameFromDb( id, true );
+    strcpy( entry.CharacterName, playerName.c_str() );
 
     // add to current page
     entries.emplace_back( entry );

@@ -117,7 +117,7 @@ void Action::EventAction::interrupt()
 
     if( m_pSource->isPlayer() )
     {
-      auto control1 = makeActorControlSelf( m_pSource->getId(), ActorControlType::FreeEventPos, m_eventId );
+      auto control1 = makeActorControlSelf( m_pSource->getId(), ActorControlType::SetRollbackFlag, m_eventId );
 
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );

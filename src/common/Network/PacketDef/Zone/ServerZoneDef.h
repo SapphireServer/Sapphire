@@ -1845,7 +1845,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
   struct FFXIVIpcHousingProfileList : FFXIVIpcBasePacket< HousingProfileList >
   {
     Common::LandIdent LandSetId;
-    Common::SimpleProfile ProfileList[30];
+    Common::SimpleProfile ProfileList[60];
   };
 
   struct FFXIVIpcHousingObjectTransform : FFXIVIpcBasePacket< HousingObjectTransform >
@@ -1956,7 +1956,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint8_t Args;
     uint32_t Args2;
     uint32_t Args3;
-    Common::FFXIVARR_POSITION3 Pos;
+    Common::Vector3 Pos;
   };
 
   struct FFXIVIpcDeleteObject : FFXIVIpcBasePacket< DeleteObject >

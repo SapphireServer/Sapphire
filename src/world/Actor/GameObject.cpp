@@ -14,6 +14,7 @@
 #include "EventObject.h"
 #include "Player.h"
 #include "BNpc.h"
+#include "AreaObject.h"
 
 #include "WorldServer.h"
 #include "Session.h"
@@ -48,12 +49,12 @@ ObjKind GameObject::getObjKind() const
   return m_objKind;
 }
 
-FFXIVARR_POSITION3& GameObject::getPos()
+Vector3& GameObject::getPos()
 {
   return m_pos;
 }
 
-const FFXIVARR_POSITION3& GameObject::getPos() const
+const Vector3& GameObject::getPos() const
 {
   return m_pos;
 }
@@ -73,7 +74,7 @@ void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
 
 }
 
-void GameObject::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void GameObject::setPos( const Vector3& pos, bool broadcastUpdate )
 {
   m_pos = pos;
 
@@ -88,6 +89,16 @@ void GameObject::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
 float GameObject::getRot() const
 {
   return m_rot;
+}
+
+uint8_t Sapphire::Entity::GameObject::getRotUInt8() const
+{
+  return Common::Util::floatToUInt8Rot( getRot() );
+}
+
+uint16_t Sapphire::Entity::GameObject::getRotUInt16() const
+{
+  return Common::Util::floatToUInt16Rot( getRot() );
 }
 
 void GameObject::setRot( float rot )
@@ -140,6 +151,11 @@ bool GameObject::isAetheryte() const
   return m_objKind == ObjKind::Aetheryte;
 }
 
+bool GameObject::isArea() const
+{
+  return m_objKind == ObjKind::Area;
+}
+
 
 /*! \return pointer to this instance as GameObjectPtr */
 CharaPtr GameObject::getAsChara()
@@ -171,6 +187,14 @@ BNpcPtr GameObject::getAsBNpc()
   if( !isBattleNpc() )
     return nullptr;
   return std::dynamic_pointer_cast< BNpc, GameObject >( shared_from_this() );
+}
+
+/*! \return pointer to this instance as AreaPtr */
+AreaObjectPtr GameObject::getAsArea()
+{
+  if( !isArea() )
+    return nullptr;
+  return std::dynamic_pointer_cast< AreaObject, GameObject >( shared_from_this() );
 }
 
 /*!
@@ -337,6 +361,31 @@ uint32_t GameObject::getTerritoryId() const
 void GameObject::setTerritoryId( uint32_t territoryId )
 {
   m_territoryId = territoryId;
+}
+
+uint8_t GameObject::getPermissionInvisibility() const
+{
+  return m_permissionInvisibility;
+}
+
+void GameObject::setPermissionInvisibility( uint8_t permissionInvisibility )
+{
+  m_permissionInvisibility = permissionInvisibility;
+}
+
+uint32_t GameObject::getBoundEncounterId() const
+{
+  return m_boundEncounterId;
+}
+
+void GameObject::setBoundEncounterId( uint32_t id )
+{
+  m_boundEncounterId = id;
+}
+
+uint32_t& GameObject::getObstacleRef()
+{
+  return m_obstacleRef;
 }
 
 /*!

@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -108,18 +111,114 @@ public:
     instance.addEObj( "Suspiciousthicket", 2004846, 0, 5101564, 4, { -181.445099f, 8.093226f, 101.304604f }, 0.991760f, 0.000048f, 0); 
 
   }
+  enum vars
+  {
+    Message1,
+    TrueGrit,
+    Plaincracker,
+    Message2,
+    SuccessCalled
+  };
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -1.544f );
+    player.setPos( { 258.321f, 24.f, 192.406f } );
+  }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto message1 = instance.getDirectorVar( Message1 );
+    auto trueGrit = instance.getDirectorVar( TrueGrit );
+    auto plaincracker = instance.getDirectorVar( Plaincracker );
+    auto message2 = instance.getDirectorVar( Message2 );
+    auto sucessCalled = instance.getDirectorVar( SuccessCalled );
 
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_01 );
+
+    auto pPlayer = instance.getPlayerPtr();
+
+    auto bossHpPercent = 0;
+    if( boss )
+      bossHpPercent = boss->getHpPercent();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+
+    // 65% hp triggers "You are strong" message
+    if( message1 == 0 && bossHpPercent <= 65 )
+    {
+      instance.setDirectorVar( Message1, 1 );
+      // Todo: add npc message
+    }
+
+    // 60% hp triggers use of True Grit (cone aoe)
+    if( trueGrit == 0 && bossHpPercent <= 60 )
+    {
+      instance.setDirectorVar( TrueGrit, 1 );
+      // Todo: add this with gambit later
+    }
+
+    // 30% hp triggers use of Plaincracker (circle aoe)
+    if( plaincracker == 0 && bossHpPercent <= 30 )
+    {
+      instance.setDirectorVar( Plaincracker, 1 );
+      // Todo: add this with gambit later
+    }
+
+    // 15% hp triggers "Impossible!" message
+    if( message2 == 0 && bossHpPercent <= 15 )
+    {
+      instance.setDirectorVar( Message2, 1 );
+      // Todo: add npc message
+    }
+
+    // on death Duty Complete
+    if( instance.getCountEnemyBNpc() == 0 && sucessCalled == 0 )
+    {
+      instance.setDirectorVar( SuccessCalled, 1 );
+      instance.success();
+      return;
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
-
+    // Cutscene on enter
+    eventMgr().playScene( player, instance.getDirectorId(), 1,
+                          NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                          HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                          DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                          // todo: wtf is 0x00100000
+                          DISABLE_CANCEL_EMOTE,
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            player.setOnEnterEventDone( true );
+                          } );
   }
 
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    auto nextSeq = quest.getSeq() + 1;
+    quest.setSeq( nextSeq );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    // spawn clay golem 900hp
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_01, 900 /* feels low must be higher  */, Common::BNpcType::Enemy );
+
+    boss->setFlag( Entity::NoDeaggro );
+    boss->hateListAdd( player.getAsPlayer(), 1 );
+  }
 };
 
 EXPOSE_SCRIPT( SpiritholdBroken );

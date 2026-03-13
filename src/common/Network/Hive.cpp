@@ -7,7 +7,7 @@ using namespace Sapphire;
 //-----------------------------------------------------------------------------
 
 Network::Hive::Hive() :
-  m_work_ptr( new asio::io_service::work( m_io_service ) ),
+  m_work_ptr( std::make_shared< asio::io_service::work >( m_io_service ) ),
   m_shutdown( 0 )
 {
 }
@@ -23,9 +23,7 @@ asio::io_service& Network::Hive::getService()
 
 bool Network::Hive::hasStopped()
 {
-  uint32_t v1 = 1;
-  uint32_t v2 = 1;
-  return m_shutdown.compare_exchange_strong( v1, v2 );
+  return m_shutdown.load() != 0;
 }
 
 void Network::Hive::poll()
@@ -40,23 +38,27 @@ void Network::Hive::run()
 
 void Network::Hive::stop()
 {
-  uint32_t v1 = 1;
-  uint32_t v2 = 0;
-  if( !m_shutdown.compare_exchange_strong( v1, v2 ) )
+  // Mark shutdown; idempotent
+  uint32_t expected = 0;
+  if( m_shutdown.compare_exchange_strong( expected, 1 ) )
   {
+    // Destroy work to allow io_service::run() to exit when queue is empty
     m_work_ptr.reset();
-    m_io_service.run();
+    // Post a no-op to wake the service if it's blocked
+    m_io_service.post( []
+    {
+    } );
+    // Request stop; this will cause run() to return ASAP
     m_io_service.stop();
   }
 }
 
 void Network::Hive::reset()
 {
-  uint32_t v1 = 0;
-  uint32_t v2 = 1;
-  if( m_shutdown.compare_exchange_strong( v1, v2 ) )
+  // Only reset if we were stopped
+  if( m_shutdown.exchange( 0 ) != 0 )
   {
     m_io_service.reset();
-    m_work_ptr.reset( new asio::io_service::work( m_io_service ) );
+    m_work_ptr = std::make_shared< asio::io_service::work >( m_io_service );
   }
 }

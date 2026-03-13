@@ -4,82 +4,13 @@
 #include <Territory/InstanceContent.h>
 #include <Logging/Logger.h>
 #include <Actor/BNpc.h>
+#include <Encounter/Forwards.h>
+
+#include "Network/PacketDef/ServerIpcs.h"
+
 
 namespace Sapphire
 {
-  using EncounterCallback = std::function< void( EncounterPtr, EncounterState ) >;
-
-  class EncounterState
-  {
-  public:
-    using EncounterStatePtr = std::shared_ptr< EncounterState >;
-    using StateStack = std::stack< EncounterStatePtr >;
-    using StateStackPtr = std::shared_ptr< StateStack >;
-
-  protected:
-    bool m_bShouldFinish{ false };
-    StateStackPtr m_stateStack;
-    std::shared_ptr< Encounter > m_pEncounter;
-    uint64_t m_startTime{ 0 };
-    uint64_t m_currTime{ 0 };
-
-    EncounterCallback m_onInitCb;
-    EncounterCallback m_onUpdateCb;
-    EncounterCallback m_onFinishCb;
-
-  public:
-    EncounterState( std::shared_ptr< Encounter > pEncounter ) :
-      m_pEncounter( pEncounter )
-    {
-    };
-
-    bool shouldFinish() const { return m_bShouldFinish; };
-
-    void setFinishFlag() { m_bShouldFinish = true; };
-
-    uint64_t getStartTime() const { return m_startTime; };
-    uint64_t getCurrTime() const { return m_currTime; };
-    uint64_t getElapsedTime() const { return m_currTime - m_startTime; };
-
-    void init()
-    {
-      if( m_onInitCb )
-        m_onInitCb( m_pEncounter, *this );
-    }
-
-    void update( uint64_t currTime )
-    {
-      if( m_startTime == 0 )
-        m_startTime = currTime;
-
-      m_currTime = currTime;
-
-      if( m_onUpdateCb )
-        m_onUpdateCb( m_pEncounter, *this );
-    }
-
-    void finish()
-    {
-      if( m_onFinishCb )
-        m_onFinishCb( m_pEncounter, *this );
-    }
-
-    void setOnInitCallback( EncounterCallback cb )
-    {
-      m_onInitCb = cb;
-    }
-
-    void setOnUpdateCallback( EncounterCallback cb )
-    {
-      m_onUpdateCb = cb;
-    }
-
-    void setOnFinishCallback( EncounterCallback cb )
-    {
-      m_onFinishCb = cb;
-    }
-  };
-
   enum class EncounterStatus
   {
     UNINITIALIZED,
@@ -89,102 +20,187 @@ namespace Sapphire
     SUCCESS
   };
 
+  enum class EncounterShape
+  {
+    BOX,
+    CYLINDER
+  };
+
+  enum class EncounterLogMessage : uint32_t
+  {
+    WillBeSealed = 2012,
+    IsSealed = 2013,
+    IsNoLongerSealed = 2014
+  };
+
+  struct EncounterEObj
+  {
+    std::string name;
+    uint32_t baseId;
+    uint32_t boundInstanceId;
+    uint32_t instanceId;
+    uint8_t state;
+    Common::Vector3 pos;
+    float scale;
+    float rotation;
+    uint8_t permissionInvisibility;
+  };
+
+  struct EncounterBNpc
+  {
+    uint32_t layoutId;
+    uint32_t hp;
+    Common::BNpcType type;
+    uint32_t flags;
+    bool isBoss{ false };
+  };
+
+  struct EncounterSetup
+  {
+    std::string timelineName;
+    std::vector< EncounterBNpc > bnpcSetupList;
+    std::vector< EncounterEObj > eobjSetupList;
+    std::vector< EncounterEObj > lockoutEntrances;
+    std::vector< EncounterEObj > lockoutExits;
+    EncounterShape encounterShape;
+    // for BOX shape, this would be m_position = min, m_position2 = max
+    // for CYLINDER m_position = center, m_position2.x radius, position2.y height
+    Common::Vector3 position;
+    Common::Vector3 position2;
+    uint64_t duration{ 0 };    // todo: implement this
+    uint32_t placeName{ 0 };
+
+    // todo: all FATEs need bgm handling too, currently only instances are handled
+    uint16_t bgmOnEnterRange{ 0 };          // todo: (FATE) implement this in onEnterRange, FATEs change bgm for player on entering
+    uint16_t bgmOnExitRangeTeri{ 0 };       // todo: (FATE) implement this in onExitRange
+    uint16_t bgmOnExitRangeTeriCombat{ 0 }; // todo: (FATE) implement this in onExitRange
+
+    uint16_t bgmInCombat{ 0 };              // bgm when encounter is active
+
+    uint16_t bgmToRestore{ 0 };             // default teri bgm, set when encounter has failed
+    uint16_t bgmToRestoreCombat{ 0 };       // default teri combat bgm, set when encounter has failed
+
+    uint16_t bgmOnFinishTeri{ 0 };          // new teri bgm after encounter success
+    uint16_t bgmOnFinishTeriCombat{ 0 };    // new teri bgm in combat after encounter success // todo: implement this, sastasha uses different combat bgm for trash after first boss
+
+    bool hasLockout{ false };
+  };
+
   class Encounter : public std::enable_shared_from_this< Encounter >
   {
   public:
-    Encounter( TerritoryPtr pInstance, const std::string& timelineName ) :
-            m_pTeri( pInstance ),
-            m_timelineName( timelineName ),
-            m_status( EncounterStatus::UNINITIALIZED )
-    {
-    };
+    Encounter( TerritoryPtr pInstance,
+               Event::DirectorPtr pDirector,
+               const std::string& timelineName );
 
-    virtual ~Encounter() = default;
+    virtual ~Encounter();
 
-    void init()
-    {
-      m_pTimeline = EncounterTimeline::createTimelinePack( m_timelineName );
-      m_pTimeline->setEncounter( shared_from_this() );
-      m_status = EncounterStatus::IDLE;
-      m_startTime = 0;
-    };
+    uint32_t getId() const;
 
-    virtual void start() { m_status = EncounterStatus::ACTIVE; };
-    virtual void update( uint64_t currTime )
-    {
-      m_pTimeline->update( currTime );
-    }
+    void init();
 
-    void reset()
-    {
-      removeBNpcs();
-      m_pTimeline->reset( shared_from_this() );
-      init();
-    }
+    void setEncounterSetup( const EncounterSetup& setup );
 
-    void removeBNpcs()
-    {
-      for (auto it = m_bnpcs.begin(); it != m_bnpcs.end(); )
-      {
-        m_pTeri->removeActor( it->second);
-        it = m_bnpcs.erase(it);
-      }
-    }
+    virtual void start();
 
-    void setStartTime( uint64_t startTime )
-    {
-      m_startTime = startTime;
-    }
+    virtual void update( uint64_t currTime );
 
-    void addState( EncounterState::EncounterStatePtr pState, bool initState = true )
-    {
-      m_stateStack->push( pState );
-      if( initState )
-        pState->init();
-    }
+    void reset();
 
-    EncounterStatus getStatus() const
-    {
-      return m_status;
-    }
+    void removeBNpcs( bool removeBoss = false );
 
-    void setStatus( EncounterStatus status )
-    {
-      m_status = status;
-    }
+    void setStartTime( uint64_t startTime );
 
-    void addBNpc( Entity::BNpcPtr pBNpc )
-    {
-      m_bnpcs[ pBNpc->getLayoutId() ] = pBNpc;
-    }
+    EncounterStatus getStatus() const;
 
-    Entity::BNpcPtr getBNpc( uint32_t layoutId ) const
-    {
-      auto bnpc = m_bnpcs.find( layoutId );
-      if( bnpc != std::end( m_bnpcs ) )
-        return bnpc->second;
+    void setStatus( EncounterStatus status );
 
-      return nullptr;
-    }
+    void addBNpc( Entity::BNpcPtr pBNpc, bool bind = false );
 
-    void removeBNpc( uint32_t layoutId )
-    {
-      m_bnpcs.erase( layoutId );
-    }
+    Entity::BNpcPtr getBNpc( uint32_t layoutId ) const;
 
-    TerritoryPtr getTeriPtr()
-    {
-      return m_pTeri;
-    }
+    void removeBNpc( uint32_t layoutId );
+
+    void addPlayer( Entity::PlayerPtr pPlayer, bool bind = false );
+
+    void removePlayer( Entity::PlayerPtr pPlayer );
+
+    void removePlayers();
+
+    const std::set< Entity::PlayerPtr >& getPlayers() const;
+
+    const std::set< Entity::PlayerPtr >& getPlayersInside() const;
+
+    const std::set< Entity::GameObjectPtr >& getActorsInside() const;
+
+    TerritoryPtr getTeriPtr();
+
+    Event::DirectorPtr getDirector();
+
+    EncounterSetup& getSetup();
+
+    uint64_t getLockoutTime() const;
+
+    bool isLocked() const;
+
+    virtual void onEnterRange( Entity::GameObjectPtr pActor );
+
+    virtual void onExitRange( Entity::GameObjectPtr pActor );
+
+    virtual void onChangeStatus( EncounterStatus oldStatus, EncounterStatus newStatus );
+
+    virtual void onLockout();
+
+    void setEntranceEObjLocked( bool locked );
+
+    void setExitEObjLocked( bool locked );
+
+    bool isPositionInside( const Common::Vector3& pos ) const;
+
+    //void addEObj( Entity::EventObjectPtr pEObj );
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId ) const;
+    Entity::EventObjectPtr getEObjByName( const std::string& name ) const;
+    void removeEObj( Entity::EventObjectPtr pEObj );
+    void removeEObjs();
+
+    bool canBindActors() const;
+    void bindActor( Entity::GameObjectPtr pActor );
+    void unbindActor( Entity::GameObjectPtr pActor );
+    void unbindActors();
+    bool isActorBound( Entity::GameObjectPtr pActor ) const;
 
   protected:
+    uint32_t m_id{ 0 };
     uint64_t m_startTime{ 0 };
-    std::string m_timelineName;
-    EncounterState::StateStackPtr m_stateStack;
+    uint64_t m_duration{ 0 }; // 0 for unlimited duration
+    uint64_t m_lastTick{ 0 };
+    uint64_t m_lastRangeTick{ 0 };
+    uint64_t m_lockoutTime{ 0 };
+    uint64_t m_failTime{ 0 };
+    uint64_t m_finishTime{ 0 };
+    uint32_t m_placeName{ 0 };
+
+    Common::Vector3 m_position;
+
+    std::set< Entity::EventObjectPtr > m_eobjs;
+    std::set< Entity::EventObjectPtr > m_entranceEObjs;
+    std::set< Entity::EventObjectPtr > m_exitEObjs;
+
+    std::set< Entity::GameObjectPtr > m_actorsInside;
+    std::set< Entity::GameObjectPtr > m_boundActors;
+    std::set< Entity::PlayerPtr > m_playersInside;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
-    TerritoryPtr m_pTeri;
+    std::unordered_map< uint32_t, Entity::BNpcPtr > m_bossBnpcs;
     EncounterStatus m_status{ EncounterStatus::IDLE };
+    Event::DirectorPtr m_pDirector;
+    TerritoryPtr m_pTeri;
     std::shared_ptr< TimelinePack > m_pTimeline;
+
+    // encountersetup
+    EncounterSetup m_setup;
+
   };
+
+
 }

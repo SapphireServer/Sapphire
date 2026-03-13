@@ -9,7 +9,6 @@
 
 namespace Sapphire::World::Manager
 {
-
   enum UpdateStatus : int32_t
   {
     NONE_8 = 0x0,
@@ -50,18 +49,27 @@ namespace Sapphire::World::Manager
 
     /// Perform required actions for events
     void onJoin( Entity::Player& joiner, Entity::Player& inviter );
+
     void onLeave( Entity::Player& leavingPlayer );
+
     void onMoveZone( Entity::Player& movingPlayer );
+
     void onDisband( Entity::Player& disbandingPlayer );
-    void onKick( const std::string& kickPlayerName, Entity::Player& leader );
-    void onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader );
+
+    void onKick( const Entity::Player& kickedPlayer, const Entity::Player& leader );
+
+    void onChangeLeader( Entity::Player& newLeader, Entity::Player& oldLeader );
 
     void onMemberDisconnect( Entity::Player& disconnectingPlayer );
+
     void onMemberRejoin( Entity::Player& joiningPlayer );
 
     void onJoinBuddy( Entity::Player& buddyOwner, Party& party );
+
     void onLeaveBuddy( Entity::Player& buddyOwner, Party& party );
+
     void onStartReadyCheck( Entity::Player& startingPlayer, Party& party );
+
     void onReplyReadyCheck( Entity::Player& replyingPlayer, Party& party );
 
     ///////////////////////////
@@ -72,17 +80,21 @@ namespace Sapphire::World::Manager
     uint64_t m_maxPartyId = 0x0000044000000000;
 
     uint64_t createParty();
+
     void removeParty( uint64_t partyId );
+
     uint64_t getNextPartyId();
+
     std::unordered_map< uint64_t, PartyPtr > m_partyIdMap;
 
     static void sendPartyUpdate( Party& party );
+
     static void removeMember( Party& party, const Entity::PlayerPtr& pMember );
+
     static std::vector< Entity::PlayerPtr > getPartyMembers( Party& party );
+
     static Entity::PlayerPtr getPartyLeader( Party& party );
 
     static int8_t getPartyLeaderIndex( const Party& party );
-
   };
-
 }

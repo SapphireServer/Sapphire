@@ -69,6 +69,13 @@ void ActionResult::startCombo( uint16_t actionId )
   m_result.Type = CalcResultType::TypeCombo;
 }
 
+void ActionResult::knockback( uint32_t kbExdKey, float offset )
+{
+  m_result.Arg0 = offset;
+  m_result.Value = kbExdKey;
+  m_result.Type = CalcResultType::TypeKnockBack;
+}
+
 void ActionResult::comboSucceed()
 {
   // no EffectOnSource flag on this
@@ -88,8 +95,8 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_applyStatusAggro = applyAggro;
 }
 
-void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                      const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride )
+void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, const std::vector< StatusModifier >& modifiers,
+                                      uint32_t flag, bool statusToSource, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -98,7 +105,7 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
     m_result.Flag = static_cast< uint8_t >( ActionResultFlag::EffectOnSource );
 
   m_bShouldOverride = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, groundAOE, flag, 3000 );
   m_pStatus->setParam( param );
 
   m_applyStatusAggro = applyAggro;
@@ -119,7 +126,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
 }
 
 void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
-                                          uint32_t flag, bool applyAggro, bool shouldOverride )
+                                          uint32_t flag, bool applyAggro, bool shouldOverride, const World::Action::GroundAOE& groundAOE )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -127,24 +134,24 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
 
   m_bShouldOverride = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, groundAOE, flag, 3000 );
   m_pStatus->setParam( param );
 
   m_applyStatusAggro = applyAggro;
 }
 
 void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro )
+                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro, const World::Action::GroundAOE& groundAOE )
 {
-  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false, applyAggro );
+  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, applyAggro, false, groundAOE );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
 
 void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
-                                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro )
+                                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro, const World::Action::GroundAOE& groundAOE )
 {
-  applyStatusEffectSelf( id, duration, param, modifiers, flag, applyAggro, false );
+  applyStatusEffectSelf( id, duration, param, modifiers, flag, applyAggro, false, groundAOE );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
@@ -178,12 +185,12 @@ void ActionResult::execute()
     {
       auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
       auto statusEffects( m_target->getStatusEffectMap() );
-      for( auto status : statusEffects )
+      for( auto& status : statusEffects )
       {
         scriptMgr.onPlayerHit( m_target, *status.second );
       }
 
-      m_target->takeDamage( m_result.Value );
+      m_target->takeDamage( m_result.Value, false );
       int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *m_source, m_result.Value, m_aggroModifier );
       m_target->onActionHostile( m_source, aggro );
       break;
@@ -192,7 +199,7 @@ void ActionResult::execute()
     case CalcResultType::TypeRecoverHp:
     case CalcResultType::TypeCriticalRecoverHp:
     {
-      m_target->heal( m_result.Value );
+      m_target->heal( m_result.Value, false );
 
       if( m_aggroModifier != 0 )
       {
@@ -280,6 +287,9 @@ void ActionResult::splitAggroApplication( float aggro )
   aggro = aggro / hateList.size();
   for( auto entry : hateList )
   {
-    entry->onActionHostile( m_source, aggro );
+    if( entry && entry->isAlive() )
+    {
+      entry->onActionHostile( m_source, aggro );
+    }
   }
 }

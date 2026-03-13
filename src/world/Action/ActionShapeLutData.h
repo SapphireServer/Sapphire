@@ -8,6 +8,7 @@ namespace Sapphire::World::Action
   {
   public:
     static bool cacheShapes();
+
     static bool reloadShapes();
   };
 

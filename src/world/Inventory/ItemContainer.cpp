@@ -37,23 +37,22 @@ uint16_t Sapphire::ItemContainer::getEntryCount() const
 
 void Sapphire::ItemContainer::removeItem( uint16_t slotId, bool removeFromDb )
 {
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto it = m_itemMap.find( slotId );
-
   if( it != m_itemMap.end() )
   {
     if( m_isPersistentStorage && removeFromDb )
-      db.execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
+    {
+      auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+      auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
+      stmt->setUInt64( 1, it->second->getUId() );
+      db.execute( stmt );
+    }
 
     m_itemMap.erase( it );
-
     Logger::debug( "Dropped item from slot {0}", slotId );
   }
-  else
-  {
-    Logger::debug( "Item could not be dropped from slot {0}", slotId );
-  }
 }
+
 
 Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap()
 {
@@ -86,9 +85,6 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
     return nullptr;
   }
   
-  if( m_itemMap.find( slotId ) == m_itemMap.end() )
-    return nullptr;
-
   if( m_itemMap.find( slotId ) == m_itemMap.end() )
     return nullptr;
 

@@ -5,6 +5,7 @@
 #include <Exd/ExdData.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
+#include "Common.h"
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -37,6 +38,8 @@
 
 #include "Job/Warrior.h"
 #include "Job/Bard.h"
+
+#include "AI/TargetHelper.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -95,7 +98,7 @@ bool Action::Action::init()
 
     m_actionData = actionData;
   }
-  auto teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
   m_resultId = zone->getNextActionResultId();
 
@@ -175,12 +178,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( const Common::FFXIVARR_POSITION3& pos )
+void Action::Action::setPos( const Common::Vector3& pos )
 {
   m_pos = pos;
 }
 
-const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
+const Common::Vector3& Action::Action::getPos() const
 {
   return m_pos;
 }
@@ -213,6 +216,16 @@ bool Action::Action::hasClientsideTarget() const
 bool Action::Action::isInterrupted() const
 {
   return m_interruptType != Common::ActionInterruptType::None;
+}
+
+int Action::Action::getInterruptTickCount() const
+{
+  return m_interruptTickCount;
+}
+
+void Action::Action::addInterruptTickCount()
+{
+  m_interruptTickCount++;
 }
 
 Common::ActionInterruptType Action::Action::getInterruptType() const
@@ -293,7 +306,7 @@ bool Action::Action::update()
     }
 
     player->setLastActionTick( tickCount );
-    uint64_t delayMs = 100 - lastTickMs;
+    uint64_t delayMs = 100ull - lastTickMs;
     castTime = ( m_castTimeMs + delayMs );
     m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) - static_cast< uint64_t >( std::difftime( tickCount, startTime ) );
   }
@@ -421,13 +434,14 @@ void Action::Action::interrupt()
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1.
     // This enables the cast interrupt effect.
+    // todo: use the correct interrupt effect for players locked out
     auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, interruptEffect );
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
   }
 
   onInterrupt();
-
+  addInterruptTickCount();
 }
 
 void Action::Action::onInterrupt()
@@ -439,8 +453,23 @@ void Action::Action::onInterrupt()
 void Action::Action::execute()
 {
   assert( m_pSource );
+
+  bool shouldInterrupt = false;
+
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
   if( !consumeResources() )
+    shouldInterrupt = true;
+
+  if( m_pTarget )
+  {
+    if( m_pSource->getTerritoryId() != m_pTarget->getTerritoryId() )
+      shouldInterrupt = true;
+    // todo: is this correct?
+    if( m_pSource->getBoundEncounterId() != m_pTarget->getBoundEncounterId() )
+      shouldInterrupt = true;
+  }
+
+  if( shouldInterrupt )
   {
     interrupt();
     return;
@@ -476,10 +505,17 @@ void Action::Action::execute()
     else // clear last combo action if the combo breaks
       m_pSource->setLastComboActionId( 0 );
   }
+
+  m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnActionUse );
 }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
+  // NOTE: we truncate the float to uint32_t here (not round it), the game works the same way (supposedly)
+  auto truncate = []( const std::pair< float, Common::CalcResultType >& dmg ) {
+    return std::make_pair( static_cast< uint32_t >( dmg.first ), dmg.second );
+  };
+
   Common::BaseParam calcStat;
   switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
   {
@@ -507,6 +543,7 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     calcStat = Common::BaseParam::Dexterity;
 
   auto wepDmg = m_pSource->getPhysicalWeaponDamage();
+
   if( auto player = m_pSource->getAsPlayer() )
   {
     auto role = player->getRole();
@@ -515,10 +552,10 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
 
     // is auto attack
     if( getId() == 7 || getId() == 8 )
-      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg );
+      return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg ) );
   }
 
-  return Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg );
+  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg ) );
   }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
@@ -562,6 +599,7 @@ void Action::Action::buildActionResults()
 
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
+    handleStatusEffects();
     scriptMgr.onAfterBuildEffect( *this );
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( m_hitActors );
@@ -657,6 +695,8 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   auto hasSameStatus = false;
   auto hasSameStatusFromSameCaster = false;
   Sapphire::StatusEffect::StatusEffectPtr referenceStatus = nullptr;
+  status.groundAOE.actionId = getId();
+  status.groundAOE.radius = this->getActionData()->data().EffectRange;
 
   for( auto const& entry : statusToSource ? source->getStatusEffectMap() : target->getStatusEffectMap() )
   {
@@ -682,15 +722,15 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   {
     case Common::StatusRefreshPolicy::Stack:
     {
-      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false, status.groundAOE );
       break;
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
-      if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
-        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+      if( ( status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster ) || hasSameStatus )
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, status.groundAOE );
       else
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       break;
     }
     case Common::StatusRefreshPolicy::Extend:
@@ -706,7 +746,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
 
       if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       }
       break;
     }
@@ -714,7 +754,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     {
       if( !hasSameStatus )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true, status.groundAOE );
       }
       else
       {
@@ -749,6 +789,13 @@ void Action::Action::handleStatusEffects()
         applyStatusEffect( true, m_hitActors[ 0 ], m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true ); // statusToSource true
       else if( m_lutEntry.potency == 0 )*/
+      if( status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::GroundTarget ) && status.groundAOE.vfxId > 0 )
+      {
+        if( status.groundAOE.aoeType == GroundAOEType::Damage )
+          m_pSource->createAreaObject( getId(), m_lutEntry.potency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
+        else
+          m_pSource->createAreaObject( getId(), m_lutEntry.curePotency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
+      }
       applyStatusEffect( true, m_pSource, m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
     }
@@ -990,39 +1037,49 @@ void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
-    // todo: figure these out and remove 5/RectangularAOE to own handler
-    case( Common::CastType ) 5:
     case Common::CastType::SingleTarget:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
       addActorFilter( filter );
       break;
     }
-
+    // todo: what is this CastType::Unknown (5)? seems to be another circular aoe?
+    case Common::CastType::Unknown:
     case Common::CastType::Circle:
     {
-      auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
+      auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange + m_pSource->getRadius() );
       addActorFilter( filter );
       break;
     }
     case Common::CastType::Box:
     {
-      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange + m_pSource->getRadius() );
       addActorFilter( filter );
       break;
     }
     case Common::CastType::Cone:
     {
+      // todo: account for Caster radius and Target radius
       ConeEntry shapeEntry = { 0, 0 };
       if( ActionShapeLut::validConeEntryExists( static_cast< uint16_t >( getId() ) ) )
       {
         shapeEntry = ActionShapeLut::getConeEntry( static_cast< uint16_t >( getId() ) );
       }
 
-      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), m_range );
+      auto p1 = m_pSource->getPos();
+      auto p2 = m_pos;
+      Logger::debug( "Action#{} Range:{} EffectRange:{} EffectWidth:{} SrcPos:({},{},{}) Pos:({},{},{}) ", m_id, m_range, m_effectRange, m_effectWidth, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z );
+
+      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), m_effectRange + m_pSource->getRadius() );
       addActorFilter( rangeFilter );
       auto coneFilter = std::make_shared< World::Util::ActorFilterCone >( m_pSource->getPos(), m_pos, shapeEntry.startAngle, shapeEntry.endAngle );
       addActorFilter( coneFilter );
+      break;
+    }
+    case Common::CastType::PersistentArea:
+    {
+      auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
+      addActorFilter( filter );
       break;
     }
 
@@ -1038,14 +1095,20 @@ void Action::Action::addDefaultActorFilters()
 
 bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
 {
-  if( m_castType == Common::CastType::SingleTarget ) // client filters any single target action by itself
+  if( m_castType == Common::CastType::SingleTarget && m_pSource->isPlayer() ) // client filters any single target action by itself
     return true;
 
   auto kind = actor.getObjKind();
-  auto chara = actor.getAsChara();
+  auto pChara = actor.getAsChara();
+  auto pSrc = m_pSource->getAsChara();
 
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
+    return false;
+
+  // todo: is this correct?
+  auto pEncounterFilter = std::make_shared< World::AI::SameEncounterFilter >();
+  if( !pEncounterFilter->isApplicable( pSrc, pChara ) )
     return false;
 
   bool actorApplicable = false;
@@ -1058,13 +1121,16 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
     }
     case Common::TargetFilter::Players:
     {
+      // todo: should pets fall under TargetFilter::Players or Allies?
       actorApplicable = kind == ObjKind::Player;
       break;
     }
     case Common::TargetFilter::Allies:
     {
-      // Todo: Make this work for allies properly
-      actorApplicable = kind != ObjKind::BattleNpc;
+      if( kind == ObjKind::Player )
+        actorApplicable = true;
+      else if( kind == ObjKind::BattleNpc && pChara->getAsBNpc()->getEnemyType() == 0 )
+        actorApplicable = true;
       break;
     }
     case Common::TargetFilter::Party:
@@ -1090,15 +1156,15 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
     }
     case Common::TargetFilter::Enemies:
     {
-      actorApplicable = kind == ObjKind::BattleNpc;
+      actorApplicable = kind == ObjKind::BattleNpc && pChara->getAsBNpc()->getEnemyType() != 0;
       break;
     }
   }
   
-  if( chara->isAlive() && ( m_lutEntry.curePotency > 0 || m_canTargetFriendly ) && m_pSource->isFriendly( *chara ) )
+  if( pChara->isAlive() && ( m_lutEntry.curePotency > 0 || m_canTargetFriendly ) && m_pSource->isFriendly( *pChara ) )
     return actorApplicable;
 
-  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) > 0 && m_pSource->isHostile( *chara ) )
+  if( pChara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) && m_pSource->isHostile( *pChara ) )
     return actorApplicable;
 
   return false;

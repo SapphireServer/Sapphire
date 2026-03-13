@@ -109,7 +109,7 @@ public:
         if( quest.getSeq() == Seq2 )
         {
           eventMgr().eventActionStart(
-                  player, getId(), 0x1A,
+                  player, getId(), EventAction,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                     Scene00004( quest, player );
                   },
@@ -122,7 +122,7 @@ public:
         if( quest.getSeq() == Seq2 )
         {
           eventMgr().eventActionStart(
-                  player, getId(), 0x1A,
+                  player, getId(), EventAction,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                     Scene00007( quest, player );
                   },
@@ -135,7 +135,7 @@ public:
         if( quest.getSeq() == Seq2 )
         {
           eventMgr().eventActionStart(
-                  player, getId(), 0x1A,
+                  player, getId(), EventAction,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                     Scene00010( quest, player );
                   },
@@ -148,7 +148,7 @@ public:
         if( quest.getSeq() == Seq2 )
         {
           eventMgr().eventActionStart(
-                  player, getId(), 0x1A,
+                  player, getId(), EventAction,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                     Scene00013( quest, player );
                   },
@@ -161,7 +161,7 @@ public:
         if( quest.getSeq() == Seq2 )
         {
           eventMgr().eventActionStart(
-                  player, getId(), 0x1A,
+                  player, getId(), EventAction,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                     Scene00013( quest, player );
                   },
@@ -208,6 +208,11 @@ private:
     if( quest.getUI8AL() >= 5 )
     {
       quest.setUI8AL( 0 );
+      quest.setBitFlag8( 1, false );
+      quest.setBitFlag8( 2, false );
+      quest.setBitFlag8( 3, false );
+      quest.setBitFlag8( 4, false );
+      quest.setBitFlag8( 5, false );
       quest.setSeq( Seq3 );
     }
   }
@@ -463,7 +468,7 @@ private:
       auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+      pTeriMgr.createAndJoinQuestBattle( player, m_id, Questbattle0 );
     }
   }
 

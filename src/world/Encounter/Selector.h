@@ -18,7 +18,7 @@ namespace Sapphire
 
   public:
     Selector(){}
-    void createSnapshot( Entity::CharaPtr pSrc, const std::vector< uint32_t >& exclude = {} );
+    void createSnapshot( Entity::Chara& src, const std::vector< uint32_t >& exclude = {} );
     const World::AI::Snapshot::Results& getResults();
     const World::AI::Snapshot::TargetIds& getTargetIds();
     void clearResults();

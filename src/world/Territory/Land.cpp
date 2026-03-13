@@ -7,9 +7,6 @@
 #include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
 
-#include <MySqlBase.h>
-#include <Connection.h>
-
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Service.h>
@@ -26,7 +23,7 @@
 
 using namespace Sapphire::Common;
 
-Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
+Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint16_t landId, uint32_t landSetId,
                       std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > info ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
@@ -130,7 +127,7 @@ void Sapphire::Land::setHouse( Sapphire::HousePtr house )
   m_pHouse = house;
 }
 
-FFXIVARR_POSITION3 Sapphire::Land::getMapMarkerPosition()
+Vector3 Sapphire::Land::getMapMarkerPosition()
 {
   return m_mapMarkerPosition;
 }

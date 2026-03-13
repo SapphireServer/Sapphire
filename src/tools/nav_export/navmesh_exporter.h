@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <fstream>
 #include <string>
+#include <memory>
 
 #include <chrono>
 
@@ -13,6 +14,7 @@
 #include "nav/TiledNavmeshGenerator.h"
 
 #include <filesystem>
+
 
 namespace fs = std::filesystem;
 
@@ -39,7 +41,7 @@ public:
       return;
     }
 
-    if( !gen.buildNavmesh() )
+    if( !gen.buildTiledCache() )
     {
       printf( "[Navmesh] Failed to build navmesh for '%s'\n", zone.name.c_str() );
       return;

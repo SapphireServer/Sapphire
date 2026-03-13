@@ -131,7 +131,6 @@ if( UNIX )
       /usr/bin/
     DOC
       "path to your mysql binary."
-    REQUIRED
   )
 elseif( WIN32 )
   function( check_mysql dir out_error out_include out_library out_executable )
@@ -157,8 +156,7 @@ elseif( WIN32 )
 
     set( MYSQL_EXECUTABLE "${MYSQL_DIR}/bin/mysql.exe" )
     if( NOT EXISTS "${MYSQL_EXECUTABLE}" )
-      set( ${out_error} "Could not find mysql.exe in ${MYSQL_DIR}" PARENT_SCOPE )
-      return()
+      set( MYSQL_EXECUTABLE "" )
     endif()
 
     set( ${out_include} "${MYSQL_INCLUDE_DIR}" PARENT_SCOPE )
@@ -236,7 +234,6 @@ elseif( WIN32 )
   endif()
 
   STRING( REGEX REPLACE "(.lib)$" ".dll" MYSQL_DLL ${MYSQL_LIBRARY} )
-  file( COPY ${MYSQL_DLL} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin" )
 else()
   message( FATAL_ERROR "Unsupported platform!" )
 endif()
@@ -244,5 +241,9 @@ endif()
 set( MYSQL_FOUND 1 )
 message( STATUS "Found MySQL library: ${MYSQL_LIBRARY}" )
 message( STATUS "Found MySQL headers: ${MYSQL_INCLUDE_DIR}" )
-message( STATUS "Found MySQL executable: ${MYSQL_EXECUTABLE}" )
+if( MYSQL_EXECUTABLE )
+  message( STATUS "Found MySQL executable: ${MYSQL_EXECUTABLE}" )
+else()
+  message( STATUS "MySQL executable not found; using client library + headers only" )
+endif()
 mark_as_advanced( MYSQL_FOUND MYSQL_LIBRARY MYSQL_EXTRA_LIBRARIES MYSQL_INCLUDE_DIR MYSQL_EXECUTABLE )

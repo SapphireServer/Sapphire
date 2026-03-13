@@ -90,7 +90,7 @@ Player::Player() :
   m_onlineStatus = 0;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
-  m_radius = 1.f;
+  m_radius = 0.f;
 
   memset( m_name, 0, sizeof( m_name ) );
   memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
@@ -811,14 +811,6 @@ void Player::removeCondition( Common::PlayerCondition flag )
 
   m_condition[ index ] ^= value;
   Network::Util::Packet::sendCondition( *this );
-}
-
-void Player::update( uint64_t tickCount )
-{
-  // todo: better way to handle this override chara update
-  Service< World::Manager::PlayerMgr >::ref().onUpdate( *this, tickCount );
-
-  Chara::update( tickCount );
 }
 
 void Player::freePlayerSpawnId( uint32_t actorId )
@@ -1576,10 +1568,10 @@ void Player::resetRecastGroups()
   Network::Util::Packet::sendRecastGroups( *this );
 }
 
-bool Player::checkAction()
+void Player::processActions()
 {
   if( m_pCurrentAction == nullptr )
-    return false;
+    return;
 
   if( m_pCurrentAction->update() )
   {
@@ -1596,8 +1588,6 @@ bool Player::checkAction()
       m_pQueuedAction = nullptr;
     }
   }
-
-  return true;
 }
 
 uint64_t Player::getPartyId() const
@@ -1625,7 +1615,7 @@ Player::FriendListIDVec& Player::getBlacklistId()
   return m_blacklist;
 }
 
-void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool ignoreDamage )
+void Player::setFalling( bool state, const Common::Vector3& pos, bool ignoreDamage )
 {
   bool isFalling = m_falling;
   auto initialPos = m_initialFallPos;
@@ -1665,12 +1655,12 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
           surviveDamage = ( getHp() - 1 );
         }
 
-        takeDamage( surviveDamage );
+        takeDamage( surviveDamage, false );
       }
       else
       {
         // no mercy on hated players
-        takeDamage( damage );
+        takeDamage( damage, false );
       }
       Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
       // todo: this used to work without refreshing the entire UI state
@@ -1685,6 +1675,17 @@ bool Player::isFalling() const
   return m_falling;
 }
 
+void Entity::Player::setRunning( bool isRunning )
+{
+  m_running = isRunning;
+}
+
+bool Entity::Player::isRunning() const
+{
+  return m_running;
+}
+
+
 void Player::setLastPcSearchResult( std::vector< uint32_t > result )
 {
   m_lastPcSearch = std::move( result );
@@ -1695,7 +1696,7 @@ std::vector< uint32_t >& Player::getLastPcSearchResult()
   return m_lastPcSearch;
 }
 
-const FFXIVARR_POSITION3& Player::getPrevPos() const
+const Vector3& Player::getPrevPos() const
 {
   return m_prevPos;
 }

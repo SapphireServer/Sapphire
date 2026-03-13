@@ -36,6 +36,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       std::memcpy( &m_data.CalcResult[ m_data.TargetCount ].CalcResultTg[ m_targetEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
 
+      // todo: this is probably wrong, we should be able to have multiple ActionResults on the same target
+      /*
       // iterate and see if we already have this target added
       bool targetAlreadyAdded = false;
       for( int i = 0; i < sizeof( m_data.Target ) / sizeof( uint64_t ); ++i )
@@ -46,11 +48,11 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
           break;
         }
       }
-
+      */
       m_data.Target[ m_data.TargetCount ] = targetId;
 
-      if( !targetAlreadyAdded )
-        m_data.TargetCount++;
+      //if( !targetAlreadyAdded )
+      m_data.TargetCount++;
     }
 
     void addSourceEffect( const Common::CalcResultParam& effect )
@@ -89,7 +91,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ResultId = static_cast< uint32_t >( resultId );
     }
 
-    void setTargetPosition( Common::FFXIVARR_POSITION3& pos )
+    void setTargetPosition( Common::Vector3& pos )
     {
       m_data.TargetPos[ 0 ] = Common::Util::floatToUInt16( pos.x );
       m_data.TargetPos[ 1 ] = Common::Util::floatToUInt16( pos.y );

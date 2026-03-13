@@ -9,7 +9,6 @@ using namespace Sapphire;
 using namespace Sapphire::World::Action;
 namespace fs = std::filesystem;
 
-ActionLut::Lut ActionLut::m_actionLut;
 
 std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifierStringMap =
 {
@@ -140,10 +139,11 @@ bool ActionLutData::cacheActions()
         auto id = std::stoi( i.key() );
         auto action = i.value().get< ActionEntry >();
 
-        if( ActionLut::m_actionLut.count( id ) > 0 )
-          throw std::runtime_error( fmt::format( "Action with ID {} cannot be defined more than once (defined again in {})", i.key(), p.path().string() ) );
+        if( ActionLut::lut().count( id ) > 0 )
+          throw std::runtime_error( fmt::format(
+            "Action with ID {} cannot be defined more than once (defined again in {})", i.key(), p.path().string() ) );
 
-        ActionLut::m_actionLut.try_emplace( id, action );
+        ActionLut::lut().try_emplace( static_cast< uint16_t >( id ), action );
       }
 
       f.close();
@@ -151,7 +151,7 @@ bool ActionLutData::cacheActions()
     }
   }
 
-  if( ActionLut::m_actionLut.empty() )
+  if( ActionLut::lut().empty() )
     return false;
 
   return true;
@@ -159,8 +159,8 @@ bool ActionLutData::cacheActions()
 
 bool ActionLutData::reloadActions()
 {
-  if( !ActionLut::m_actionLut.empty() )
-    ActionLut::m_actionLut.clear();
+  if( !ActionLut::lut().empty() )
+    ActionLut::lut().clear();
 
   return cacheActions();
 }

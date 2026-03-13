@@ -28,8 +28,8 @@ namespace Sapphire::World::Action
 
     bool init();
 
-    void setPos( const Common::FFXIVARR_POSITION3& pos );
-    const Common::FFXIVARR_POSITION3& getPos() const;
+    void setPos( const Common::Vector3& pos );
+    const Common::Vector3& getPos() const;
 
     void setRot( float rot );
     float getRot() const;
@@ -39,6 +39,10 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
+
+    int getInterruptTickCount() const;
+    void addInterruptTickCount();
+
     Common::ActionInterruptType getInterruptType() const;
     void setInterrupted( Common::ActionInterruptType type );
 
@@ -224,10 +228,11 @@ namespace Sapphire::World::Action
     bool m_enableGenericHandler{};
 
     Common::ActionInterruptType m_interruptType;
+    int m_interruptTickCount{ -1 };
 
     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > m_actionData;
 
-    Common::FFXIVARR_POSITION3 m_pos{};
+    Common::Vector3 m_pos{};
     float m_rot{};
 
     ActionResultBuilderPtr m_actionResultBuilder;

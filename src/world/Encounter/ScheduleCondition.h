@@ -35,7 +35,10 @@ namespace Sapphire
     BNpcHasFlags,
 
     GetAction,
-    ScheduleActive
+    ScheduleActive,
+    InterruptedAction,
+
+    VarEquals
   };
 
   class Schedule : public std::enable_shared_from_this< Schedule >
@@ -80,7 +83,7 @@ namespace Sapphire
       this->m_id = json.at( "id" ).get< uint32_t >();
     }
 
-    const std::string& getScheduleName()
+    const std::string& getScheduleName() const
     {
       return m_schedule.m_name;
     }
@@ -241,4 +244,26 @@ namespace Sapphire
     bool isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;
   };
 
-}// namespace Sapphire::Encounter
+  class ConditionInterruptedAction : public ScheduleCondition
+  {
+  public:
+    uint32_t m_layoutId;
+    uint32_t m_actionId;
+
+    void from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;
+  };
+
+  class ConditionVarEquals : public ScheduleCondition
+  {
+  public:
+    uint32_t m_index;
+    uint32_t m_val;
+
+    VarType m_type;
+
+    void from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;
+  };
+
+}// namespace Sapphire

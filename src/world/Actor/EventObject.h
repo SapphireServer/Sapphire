@@ -4,18 +4,65 @@
 
 namespace Sapphire::Entity
 {
+  enum EventObjectType : uint32_t
+  {
+    Obstacle,
+    Door
+  };
+
+  enum EventObjectCollisionType : uint32_t
+  {
+    None,
+    Box,
+    Sphere,
+    Cylinder,
+    Mesh,
+    Board
+  };
+
+  struct EventObjectCollision
+  {
+    EventObjectCollisionType m_type;
+    Common::Vector3 m_pos;
+    float m_rot;
+    uint32_t m_obstacleRef{ 0 };
+    union
+    {
+      struct
+      {
+        float width;
+        float height;
+        float depth;
+      } box;
+
+      struct
+      {
+        float radius;
+      } sphere;
+
+      struct
+      {
+        float radius;
+        float height;
+      } cylinder;
+      // todo: mesh?
+
+    } m_shape;
+  };
 
   class EventObject : public GameObject
   {
   public:
-    EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
-                 Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
+    EventObject( uint32_t actorId, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t initialState,
+                 Common::Vector3 pos, float rotation, const std::string& givenName, uint8_t permissionInv );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr, TerritoryPtr, uint64_t ) >;
 
-    uint32_t getGimmickId() const;
+    void setEventObjectType( EventObjectType type );
 
-    void setGimmickId( uint32_t gimmickId );
+    uint32_t getBoundInstanceId() const;
+
+    void setBoundInstanceId( uint32_t boundInstanceId );
 
     uint8_t getState() const;
 
@@ -29,7 +76,7 @@ namespace Sapphire::Entity
 
     OnTalkEventHandler getOnTalkHandler() const;
 
-    uint32_t getObjectId() const;
+    uint32_t getBaseId() const;
 
     const std::string& getName() const;
 
@@ -41,7 +88,7 @@ namespace Sapphire::Entity
 
     void despawn( PlayerPtr pTarget ) override;
 
-    void setAnimationFlag( uint32_t flag, uint32_t animationFlag );
+    void playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag );
 
     void setHousingLink( uint32_t housingLink );
 
@@ -49,24 +96,34 @@ namespace Sapphire::Entity
 
     uint32_t getInstanceId() const;
 
-    uint8_t getPermissionInvisibility() const;
-    void setPermissionInvisibility( uint8_t permissionInvisibility );
+    void setPermissionInvisibility( uint8_t permissionInvisibility ) override;
 
     uint32_t getOwnerId() const;
 
+    void setCollisionEnabled( bool enabled );
+
+    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
+
+    void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
+
+    void addCollisionSphere( Common::Vector3 pos, float radius );
+
+    const std::vector< EventObjectCollision >& getCollisionData() const;
+
+
   protected:
+    EventObjectType m_eobjType;
     uint32_t m_instanceId;
     uint32_t m_housingLink;
-    uint32_t m_gimmickId;
-    uint32_t m_objectId;
+    uint32_t m_boundInstanceId;
+    uint32_t m_baseId;
     uint32_t m_ownerId;
     uint8_t m_state;
-    uint8_t m_permissionInvisibility;
     float m_scale{};
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
-
+    std::vector< EventObjectCollision > m_collision;
 
   };
 }

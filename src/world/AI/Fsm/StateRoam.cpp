@@ -28,6 +28,9 @@ void AI::Fsm::StateRoam::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   {
     bnpc.setRoamTargetReached( true );
     bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+
+    if( bnpc.getEnemyType() == Common::Friendly )
+      bnpc.setRot( bnpc.getSpawnRot() );
   }
 
 }
@@ -44,8 +47,15 @@ void AI::Fsm::StateRoam::onEnter( Entity::BNpc& bnpc )
     return;
   }
 
-  auto pos = pNaviProvider->findRandomPositionInCircle( bnpc.getSpawnPos(), bnpc.getInstanceObjectInfo()->WanderingRange );
-  bnpc.setRoamTargetPos( pos );
+  if( bnpc.getEnemyType() == Common::Friendly )
+  {
+    bnpc.setRoamTargetPos( bnpc.getSpawnPos() );
+  }
+  else
+  {
+    auto pos = pNaviProvider->findRandomPositionInCircle( bnpc.getSpawnPos(), bnpc.getInstanceObjectInfo()->WanderingRange );
+    bnpc.setRoamTargetPos( pos );
+  }
 }
 
 void AI::Fsm::StateRoam::onExit( Entity::BNpc& bnpc )
