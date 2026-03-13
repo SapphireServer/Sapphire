@@ -23,6 +23,7 @@ namespace Sapphire
       constexpr uint32_t NAVMESH_CACHE_MAGIC = 0xFF14DEAD;
       constexpr uint32_t NAVMESH_CACHE_VERSION = 1;
       constexpr uint32_t NAVMESH_CACHE_MAX_TILE_BYTES = 32 * 1024 * 1024;
+      constexpr uint64_t NAVMESH_CACHE_MAX_TOTAL_BYTES = 512ull * 1024ull * 1024ull;
 
       std::filesystem::path getNavMeshCachePath( const std::filesystem::path& navPath );
       bool isNavMeshCacheFresh( const std::filesystem::path& navPath, const std::filesystem::path& cachePath );

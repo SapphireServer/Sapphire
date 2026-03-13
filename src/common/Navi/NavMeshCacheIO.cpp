@@ -88,6 +88,7 @@ namespace Sapphire
           return false;
         }
 
+        uint64_t totalTileBytes = 0;
         for( uint32_t i = 0; i < header.numTiles; ++i )
         {
           uint32_t tileSize = 0;
@@ -104,6 +105,15 @@ namespace Sapphire
           {
             if( errorMessage )
               *errorMessage = "invalid tile size";
+
+            return false;
+          }
+
+          totalTileBytes += tileSize;
+          if( totalTileBytes > NAVMESH_CACHE_MAX_TOTAL_BYTES )
+          {
+            if( errorMessage )
+              *errorMessage = "cache exceeds total size budget";
 
             return false;
           }

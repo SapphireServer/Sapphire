@@ -309,6 +309,8 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
   memcpy( &header.cacheParams, m_tileCache->getParams(), sizeof( dtTileCacheParams ) );
   memcpy( &header.meshParams, m_navMesh->getParams(), sizeof( dtNavMeshParams ) );
   out.write( reinterpret_cast< const char* >( &header ), sizeof( TileCacheSetHeader ) );
+  if( !out )
+    return;
 
   // Store tiles.
   for( int i = 0; i < m_tileCache->getTileCount(); ++i )
@@ -321,11 +323,21 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
     tileHeader.tileRef = m_tileCache->getTileRef( tile );
     tileHeader.dataSize = tile->dataSize;
     out.write( reinterpret_cast< const char* >( &tileHeader ), sizeof( tileHeader ) );
+    if( !out )
+      return;
 
     out.write( reinterpret_cast< const char* >( tile->data ), tile->dataSize );
+    if( !out )
+      return;
   }
 
+  out.flush();
+  if( !out )
+    return;
+
   out.close();
+  if( out.fail() )
+    return;
 
   // export navmesh_cache file so server inits faster
   const auto cacheFileName = Sapphire::Common::Navi::getNavMeshCachePath( fileName );
