@@ -60,7 +60,7 @@ bool ItemManipulationAction::update()
   uint64_t tickCount = Common::Util::getTimeMs();
   uint32_t delayTime = m_delayTimeMs;
 
-  if( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > delayTime )
+  if( tickCount - m_startTime > m_delayTimeMs )
   {
     onFinish();
     return true;

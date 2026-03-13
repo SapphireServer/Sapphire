@@ -27,7 +27,10 @@ void ShopMgr::cacheShop( uint32_t shopId )
         auto item = exdData.getRow< Excel::Item >( shopItem->data().ItemId );
         if( !item || item->data().Price == 0 )
           continue;
-
+        
+        if( count >= 40 )
+          break;
+        
         m_shopItemPrices[ shopId ][ count ] = item->data().Price;
         count++;
       }
@@ -39,7 +42,7 @@ void ShopMgr::cacheShop( uint32_t shopId )
 
 uint32_t ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
 {
-  if( index > 40 )
+  if( index >= 40 )
     return 0;
 
   auto it = m_shopItemPrices.find( shopId );

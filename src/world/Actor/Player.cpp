@@ -259,7 +259,7 @@ uint64_t Player::getOnlineStatusCustomMask() const
 void Player::addOnlineStatus( OnlineStatus status )
 {
   uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
-  uint64_t newFlags = ( getOnlineStatusMask() & getOnlineStatusCustomMask() ) | statusValue;
+  uint64_t newFlags = ( getOnlineStatusMask() | getOnlineStatusCustomMask() ) | statusValue;
 
   setOnlineStatusMask( newFlags );
 
@@ -503,7 +503,7 @@ void Player::fillRewardFlags()
 
 void Player::setBorrowAction( uint8_t slot, uint32_t action )
 {
-  if( slot > Common::ARRSIZE_BORROWACTION )
+  if( slot >= Common::ARRSIZE_BORROWACTION )
     return;
 
   auto& borrowAction = getBorrowAction();
@@ -723,8 +723,11 @@ void Player::setVoiceId( uint8_t voiceId )
 void Player::setGrandCompany( uint8_t gc )
 {
   m_gc = gc;
-  if( m_gcRank[ gc ] == 0 )
-    m_gcRank[ gc ] = 1;
+  if( gc == 0 || gc > m_gcRank.size() )
+    return;
+  if( m_gcRank[ gc - 1 ] == 0 )
+    m_gcRank[ gc - 1 ] = 1;
+
   Network::Util::Packet::sendGrandCompany( *this );
 }
 
@@ -925,8 +928,9 @@ void Player::setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const cha
 {
   m_searchSelectRegion = selectRegion;
   m_searchSelectClass = selectClass;
-  memset( &m_searchMessage[ 0 ], 0, sizeof( searchMessage ) );
-  strcpy( &m_searchMessage[ 0 ], searchMessage );
+  memset( &m_searchMessage[ 0 ], 0, sizeof( m_searchMessage ) );
+  std::strncpy( &m_searchMessage[ 0 ], searchMessage, sizeof( m_searchMessage ) - 1 );
+  m_searchMessage[ sizeof( m_searchMessage ) - 1 ] = '\0';
 }
 
 const char* Player::getSearchMessage() const
@@ -946,11 +950,11 @@ uint8_t Player::getSearchSelectClass() const
 
 void Player::updateHowtosSeen( uint32_t howToId )
 {
-  uint8_t index = howToId / 8;
+  uint32_t index = howToId / 8;
   uint8_t bitIndex = howToId % 8;
-
+  if( index >= m_howTo.size() )
+    return;
   uint8_t value = 1 << bitIndex;
-
   m_howTo[ index ] |= value;
 }
 
@@ -1139,7 +1143,8 @@ uint8_t Player::getMaxGearSets() const
 
 void Player::setConfigFlags( uint16_t state )
 {
-  m_configFlags = static_cast< uint8_t >( state );
+  // todo: FFXIVIpcConfig flag is 16bits, are upper bytes ignored?
+  m_configFlags = static_cast< uint8_t >( state & 0xFF );
   Network::Util::Packet::sendConfigFlags( *this );
 }
 
@@ -1291,8 +1296,13 @@ void Player::teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket )
   if( !targetAetheryte )
    return;
 
-  auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
+  auto fromTeri = exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() );
+  if( !fromTeri )
+    return; // teleport failed msg to player?
 
+  auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( fromTeri->data().Aetheryte );
+  if( !fromAetheryte )
+    return;
   // calculate cost - does not apply for favorite points or homepoints
   // if using aetheryte ticket, cost is 0
   auto cost = useAetheryteTicket ? 0 : static_cast< uint16_t > (
@@ -1407,7 +1417,7 @@ void Player::glamourItemFromGlamouringInfo()
   auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
   //auto prismToUse = getItemAt( glamourBagContainer, glamourBagSlot );
 
-  if( !itemToGlamour )
+  if( !itemToGlamour || ( shouldGlamour && !glamourToUse ) )
     return;
 
   //if( !removeItem( prismToUse->getId() ) )

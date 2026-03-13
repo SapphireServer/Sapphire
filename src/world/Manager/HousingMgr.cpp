@@ -366,6 +366,9 @@ void HousingMgr::sendLandSignFree( Entity::Player& player, const Common::LandIde
     return;
 
   auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
+  if( !land )
+    return;
+
   auto plotPricePacket = makeZonePacket< FFXIVIpcHousingAuction >( player.getId() );
   plotPricePacket->data().Price = land->getCurrentPrice();
   plotPricePacket->data().Timer = land->getDevaluationTime();
@@ -375,13 +378,12 @@ void HousingMgr::sendLandSignFree( Entity::Player& player, const Common::LandIde
 
 LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone& zone, uint16_t plot, uint8_t state )
 {
-
-  auto plotPrice = zone.getLand( plot )->getCurrentPrice();
-  auto gilAvailable = player.getCurrency( Common::CurrencyType::Gil );
   auto pLand = zone.getLand( plot );
-
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;
+
+  auto plotPrice = pLand->getCurrentPrice();
+  auto gilAvailable = player.getCurrency( Common::CurrencyType::Gil );
 
   if( pLand->getStatus() != Common::HouseStatus::ForSale )
     return LandPurchaseResult::ERR_NOT_AVAILABLE;
@@ -432,8 +434,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
   // TODO: Add checks for land state before relinquishing
 
   auto pLand = zone.getLand( plot );
-  auto plotMaxPrice = pLand->getCurrentPrice();
-
+  
   // can't relinquish when you are not the owner
   // TODO: actually use permissions here for FC houses
   if( !pLand || !hasPermission( player, *pLand, 0 ) )
@@ -449,6 +450,8 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
     Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::LogMsg, 3315 );
     return false;
   }
+
+  auto plotMaxPrice = pLand->getCurrentPrice();
 
   pLand->setCurrentPrice( pLand->getMaxPrice() );
   pLand->setOwnerId( 0 );
@@ -738,6 +741,8 @@ void HousingMgr::requestEstateRename( Entity::Player& player, const Common::Land
     return;
 
   auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
+  if( !land )
+    return;
 
   auto house = land->getHouse();
   if( !house )
@@ -929,9 +934,9 @@ void HousingMgr::updateHouseModels( HousePtr house )
       // but the models array starts from the 2nd entry of the enum
       // so we skip the first one, and then any subsequent entries is slotid - 1
 
-      auto slotId = item.first - 1;
-      if( slotId < 0 )
+      if( item.first == 0 )
         continue;
+      auto slotId = static_cast< uint16_t >( item.first - 1 );
 
       house->setExteriorModel( static_cast< Common::HouseExteriorSlot >( slotId ),
                                getItemAdditionalData( item.second->getId() ), item.second->getStain() );
@@ -1080,11 +1085,13 @@ void HousingMgr::reqPlaceItemInStore( Entity::Player& player, uint16_t landId, u
 
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
+    if( !hZone )
+      return;
 
     land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
   }
 
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return;
 
   auto& invMgr = Common::Service< InventoryMgr >::ref();

@@ -495,7 +495,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 
   auto pTargetPlayer = playerMgr().getPlayer( data.toName );
 
-  if( !pTargetPlayer || pTargetPlayer->isConnected() )
+  if( !pTargetPlayer || !pTargetPlayer->isConnected() )
   {
     auto tellErrPacket = makeZonePacket< Packets::Server::FFXIVIpcTellNotFound >( player.getId() );
     strcpy( tellErrPacket->data().toName, data.toName );

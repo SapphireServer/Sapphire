@@ -123,7 +123,7 @@ void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& s
     auto pPlayer = playerMgr.getPlayer( id );
 
     // check if player is online to recv message
-    if( !pPlayer->isConnected() )
+    if( !pPlayer || !pPlayer->isConnected() )
       continue;
 
     // prepare message packet, associating message and sender info with channel data

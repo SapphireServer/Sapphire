@@ -328,8 +328,8 @@ std::vector< Entity::PlayerPtr > PartyMgr::getPartyMembers( Party& party )
       continue;
 
     auto pPlayer = playerMgr.getPlayer( memberId );
-
-    members.push_back( pPlayer );
+    if( pPlayer )
+      members.push_back( pPlayer );
   }
   return members;
 }

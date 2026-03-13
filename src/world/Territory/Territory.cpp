@@ -141,7 +141,7 @@ void Territory::loadServerPaths()
     }
 
     Logger::info( "Loaded {} server paths for zone: {}", m_serverPathCache.size(), m_internalName );
-  } catch( std::runtime_error& e )
+  } catch( std::exception& e )
   {
     Logger::error( "Error loading paths from JSON {}: {}", jsonPath, e.what() );
   }
@@ -322,8 +322,9 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
   uint32_t cellX = getPosX( pActor->getPos().x );
   uint32_t cellY = getPosY( pActor->getPos().z );
 
-  uint32_t endX = cellX <= _sizeX ? cellX + 1 : ( _sizeX - 1 );
-  uint32_t endY = cellY <= _sizeY ? cellY + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( cellX + 1 < _sizeX ) ? cellX + 1 : ( _sizeX - 1 );
+  uint32_t endY = ( cellY + 1 < _sizeY ) ? cellY + 1 : ( _sizeY - 1 );
+
   uint32_t startX = cellX > 0 ? cellX - 1 : 0;
   uint32_t startY = cellY > 0 ? cellY - 1 : 0;
   uint32_t posX, posY;
@@ -621,14 +622,14 @@ void Territory::updateSessions( uint64_t tickCount, bool changedWeather )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   // update sessions in this zone
-  for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
+  for( auto it = m_playerMap.begin(); it != m_playerMap.end(); )
   {
     auto pPlayer = it->second;
 
     if( !pPlayer )
     {
-      m_playerMap.erase( it );
-      return;
+      it = m_playerMap.erase( it );
+      continue;
     }
 
     // this session is not linked to this area anymore, remove it from zone session list
@@ -657,13 +658,16 @@ void Territory::updateSessions( uint64_t tickCount, bool changedWeather )
     // this session is not linked to this area anymore, remove it from zone session list
     if( pPlayer->getTerritoryId() != getGuId() )
       return;
+
+    ++it;
   }
 }
 
 bool Territory::isCellActive( uint32_t x, uint32_t y )
 {
-  uint32_t endX = ( ( x + 1 ) <= _sizeX ) ? x + 1 : ( _sizeX - 1 );
-  uint32_t endY = ( ( y + 1 ) <= _sizeY ) ? y + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( x + 1 < _sizeX ) ? x + 1 : ( _sizeX - 1 );
+  uint32_t endY = ( y + 1 < _sizeY ) ? y + 1 : ( _sizeY - 1 );
+
   uint32_t startX = x > 0 ? x - 1 : 0;
   uint32_t startY = y > 0 ? y - 1 : 0;
   uint32_t posX;
@@ -688,8 +692,9 @@ bool Territory::isCellActive( uint32_t x, uint32_t y )
 
 void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
 {
-  uint32_t endX = ( x + radius ) <= _sizeX ? x + radius : ( _sizeX - 1 );
-  uint32_t endY = ( y + radius ) <= _sizeY ? y + radius : ( _sizeY - 1 );
+  uint32_t endX = ( x + radius < _sizeX ) ? x + radius : ( _sizeX - 1 );
+  uint32_t endY = ( y + radius < _sizeY ) ? y + radius : ( _sizeY - 1 );
+    
   uint32_t startX = x - radius > 0 ? x - radius : 0;
   uint32_t startY = y - radius > 0 ? y - radius : 0;
   uint32_t posX, posY;
@@ -778,8 +783,9 @@ void Territory::updateActorPosition( Entity::GameObject& actor )
   }
 
   // update in range actor set
-  uint32_t endX = cellX <= _sizeX ? cellX + 1 : ( _sizeX - 1 );
-  uint32_t endY = cellY <= _sizeY ? cellY + 1 : ( _sizeY - 1 );
+  uint32_t endX = ( cellX + 1 < _sizeX ) ? cellX + 1 : ( _sizeX - 1 );
+  uint32_t endY = ( cellY + 1 < _sizeY ) ? cellY + 1 : ( _sizeY - 1 );
+
   uint32_t startX = cellX > 0 ? cellX - 1 : 0;
   uint32_t startY = cellY > 0 ? cellY - 1 : 0;
   uint32_t posX, posY;

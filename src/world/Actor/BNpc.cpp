@@ -331,7 +331,7 @@ bool BNpc::getNaviIsPathing() const
 
 void BNpc::setNaviIsPathing( bool pathing )
 {
-  m_naviIsPathing = true;
+  m_naviIsPathing = pathing;
 }
 
 Common::Vector3 BNpc::getNaviLastMoveTarget() const
@@ -923,9 +923,9 @@ void BNpc::checkAggro()
               continue;
 
           // diminish sense range if required.
-          senseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
           float distance = Common::Util::distance( getPos(), actor->getPos() );
-          if( distance < senseRange )
+          if( distance < adjustedSenseRange )
           {
             aggro( actor->getAsChara() );
             hasAggro = true;
@@ -1169,7 +1169,6 @@ void BNpc::resetFlags( uint32_t flags )
 void BNpc::setFlag( uint32_t flag )
 {
   uint32_t oldFlags = m_flags;
-  m_flags = 0;
   m_flags |= flag;
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();

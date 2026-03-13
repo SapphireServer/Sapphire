@@ -702,7 +702,7 @@ namespace Sapphire::Entity
     using InvSlotPair = std::pair< uint16_t, int8_t >;
     using InvSlotPairVec = std::vector< InvSlotPair >;
 
-    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
+    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false );
 
     bool loadInventory();
 
@@ -720,6 +720,7 @@ namespace Sapphire::Entity
     void splitItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot, uint16_t splitCount );
     void mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
     ItemPtr getItemAt( uint16_t containerId, uint16_t slotId );
+    bool isValidInventoryContainer( uint16_t containerId ) const;
     bool updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem );
 
     /*! calculate and return player ilvl based off equipped gear */

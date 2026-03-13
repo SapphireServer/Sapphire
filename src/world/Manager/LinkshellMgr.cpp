@@ -98,6 +98,7 @@ void LinkshellMgr::writeLinkshell( uint64_t lsId )
   if( !ls )
   {
     Logger::error( "Linkshell {} not found for write!", lsId );
+    return;
   }
 
   auto query = db.getPreparedStatement( Db::LINKSHELL_UP );

@@ -5,6 +5,7 @@
 #include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
+#include <type_traits>
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
@@ -697,7 +698,7 @@ void Player::insertDbQuest( const World::Quest& quest, uint8_t index ) const
   db.execute( stmt );
 }
 
-ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity )
+ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity, bool isHq )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
@@ -708,9 +709,9 @@ ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity )
   if( !itemInfo )
     return nullptr;
 
-  uint8_t flags = 0;
+  uint8_t flags = isHq ? 1 : 0;
 
-  ItemPtr pItem = make_Item( itemMgr.getNextUId(), catalogId );
+  ItemPtr pItem = make_Item( itemMgr.getNextUId(), catalogId, isHq );
 
   pItem->setStackSize( quantity );
 

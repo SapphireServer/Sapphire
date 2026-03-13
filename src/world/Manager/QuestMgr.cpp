@@ -68,7 +68,11 @@ bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint3
 
   if( !questInfo )
     return false;
+
   auto paramGrowth = exdData.getRow< Excel::ParamGrow >( questInfo->data().ClassLevel );
+  if( !paramGrowth )
+    return false;
+
   uint32_t exp = ( questInfo->data().Reward.ExpBonus * paramGrowth->data().BaseExp * paramGrowth->data().EventExpRate ) / 100;
   uint32_t gilReward = questInfo->data().Reward.Gil;
 
@@ -145,6 +149,8 @@ uint16_t QuestMgr::getItemIcon(uint32_t itemId)
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto eventItem = exdData.getRow< Excel::EventItem >( itemId );
-
+  if( !eventItem )
+    return 0;
+  
   return eventItem->_data.Icon;
 }

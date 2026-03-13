@@ -13,7 +13,7 @@ namespace Sapphire::World::Manager
 
     ItemPtr loadItem( uint64_t uId );
 
-    uint32_t getNextUId();
+    uint64_t getNextUId();
 
     /*! check if weapon category qualifies the weapon as onehanded */
     static bool isOneHandedWeapon( Common::ItemUICategory weaponCategory );

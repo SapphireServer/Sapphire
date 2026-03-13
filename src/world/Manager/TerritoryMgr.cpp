@@ -335,9 +335,11 @@ TerritoryPtr TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto pTeri = getTerritoryDetail( territoryTypeId );
+  if( !pTeri )
+    return nullptr;
+  
   auto pPlaceName = exdData.getRow< Excel::PlaceName >( pTeri->data().Area );
-
-  if( !pTeri || !pPlaceName )
+  if( !pPlaceName )
     return nullptr;
 
   auto placeName = pPlaceName->getString( pPlaceName->data().Text.SGL );
@@ -583,7 +585,10 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
     {
       auto zone = std::dynamic_pointer_cast< QuestBattle >( inIt->second );
       if( !zone )
+      {
+        ++inIt;
         continue;
+      }
 
       auto diff = std::difftime( tickCount, zone->getLastActivityTime() );
 
@@ -609,8 +614,11 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
     {
       auto zone = std::dynamic_pointer_cast< InstanceContent >( inIt->second );
       if( !zone )
+      {
+        ++inIt;
         continue;
-
+      }
+      
       if( zone->isTerminationReady() )
       {
         Logger::info( "Removing InstanceContent#{0} - marked for terminate", zone->getGuId() );
