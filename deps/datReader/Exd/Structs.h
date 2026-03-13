@@ -96,7 +96,8 @@ namespace Excel
     uint16_t RecastTime;
     uint16_t Action;
     uint16_t Salvage;
-    int16_t BonusValue[7];
+    uint16_t Unknown; //collectable?
+    int16_t BonusValue[6];
     uint8_t EquipLevel;
     uint8_t EquipPvPRank;
     uint8_t Category;

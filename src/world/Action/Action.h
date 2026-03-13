@@ -102,6 +102,12 @@ namespace Sapphire::World::Action
     bool isWeaponskill() const;
 
     /*!
+     * @brief Tests whether the action is a spell
+     * @return true if action is a spell
+     */
+    bool isSpell() const;
+
+    /*!
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */

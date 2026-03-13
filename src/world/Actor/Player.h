@@ -390,6 +390,10 @@ namespace Sapphire::Entity
 
     void calculateStats() override;
 
+    float getPhysicalWeaponDamage() override;
+
+    float getMagicalWeaponDamage() override;
+
     // Aetheryte / Action / Attribute bitmasks
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! register aetheryte aetheryteId and send update */

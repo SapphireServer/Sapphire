@@ -33,7 +33,7 @@ namespace Sapphire::Math
     /*!
      * @brief Calculates the probability of a block happening
      */
-    static float blockProbability( const Sapphire::Entity::Chara& chara );
+    static uint16_t blockProbability( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a critical hit happening
@@ -53,17 +53,17 @@ namespace Sapphire::Math
      * @brief Weapon damage is the contribution the weapon's damage rating
      *
      * @param chara The source/casting character.
+     * @param calcStat primary stat of the action
      * @param weaponDamage the weapons physical or magic damage
      */
-    static float weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage );
+    static float weaponDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float weaponDamage );
 
     /*!
      * @brief Calculates the contribution of attack power to damage dealt with consideration for the primary stat
-     * @todo Only works at level 70
-     *
      * @param chara The source/casting character.
+     * @param calcStat primary stat of the action
      */
-    static float getPrimaryAttackPower( const Sapphire::Entity::Chara& chara );
+    static float getPrimaryPower( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat );
 
     static float attackPower( const Sapphire::Entity::Chara& chara );
 
@@ -123,7 +123,7 @@ namespace Sapphire::Math
      */
     static float blockStrength( const Sapphire::Entity::Chara& chara );
 
-    static float autoAttack( const Sapphire::Entity::Chara& chara );
+    static float autoAttack( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float wepDmg );
 
     /*!
      * @brief Calculates the multiplier that healing magic potency affects healing output
@@ -136,9 +136,9 @@ namespace Sapphire::Math
 
     ////////////////////////////////////////////
 
-    static std::pair< float, Common::CalcResultType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+    static std::pair< float, Common::CalcResultType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float wepDmg );
 
-    static std::pair< float, Common::CalcResultType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::CalcResultType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg );
 
     static std::pair< float, Common::CalcResultType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
