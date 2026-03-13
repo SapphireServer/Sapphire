@@ -516,7 +516,7 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     return std::make_pair( static_cast< uint32_t >( dmg.first ), dmg.second );
   };
 
-  Common::BaseParam calcStat = Common::BaseParam::Strength;;
+  Common::BaseParam calcStat = Common::BaseParam::Strength;
   switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
   {
     case Common::ClassJob::Conjurer:

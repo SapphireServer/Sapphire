@@ -147,12 +147,13 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
         if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius + pChara->getRadius() )
         {
           // We assume the correct stats based on role
+          // todo: Find out what we do with BNpcs. They use STR for now
           auto wepDmg = m_sourceActor->getPhysicalWeaponDamage();
           Common::BaseParam calcStat = Common::BaseParam::Strength;
 
           if( auto player = m_sourceActor->getAsPlayer() )
           {
-            switch ( Common::Role role = player->getRole() )
+            switch( Common::Role role = player->getRole() )
             {
               case Common::Role::Melee:
               {
