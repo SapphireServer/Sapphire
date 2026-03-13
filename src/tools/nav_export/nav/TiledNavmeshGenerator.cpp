@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include <cstring>
+#include <fstream>
+#include <limits>
 
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 #include <recastnavigation/RecastDemo/Source/InputGeom.cpp>
@@ -13,6 +15,20 @@
 #include <corecrt_io.h>
 #endif
 namespace fs = std::filesystem;
+
+namespace
+{
+  struct NavMeshCacheHeader
+  {
+    int32_t magic;
+    int32_t version;
+    int32_t numTiles;
+  };
+
+  constexpr int32_t NAVMESH_CACHE_MAGIC = 0xFF14DEAD;
+  constexpr int32_t NAVMESH_CACHE_VERSION = 1;
+  constexpr int32_t NAVMESH_CACHE_MAX_TILE_BYTES = 32 * 1024 * 1024;
+}
 
 
 FileIO::~FileIO()
@@ -288,11 +304,11 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
 
   fs::create_directories( dir );
 
-  FILE* fp = fopen( fileName.string().c_str(), "wb" );
-  if( !fp )
+  std::ofstream out( fileName, std::ios::binary );
+  if( !out.is_open() )
     return;
 
-	// Store header.
+  // Store header.
   TileCacheSetHeader header;
   header.magic = TILECACHESET_MAGIC;
   header.version = TILECACHESET_VERSION;
@@ -306,7 +322,7 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
 
   memcpy( &header.cacheParams, m_tileCache->getParams(), sizeof( dtTileCacheParams ) );
   memcpy( &header.meshParams, m_navMesh->getParams(), sizeof( dtNavMeshParams ) );
-  fwrite( &header, sizeof( TileCacheSetHeader ), 1, fp );
+  out.write( reinterpret_cast<const char*>( &header ), sizeof( TileCacheSetHeader ) );
 
   // Store tiles.
   for( int i = 0; i < m_tileCache->getTileCount(); ++i )
@@ -317,12 +333,70 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
     TileCacheTileHeader tileHeader;
     tileHeader.tileRef = m_tileCache->getTileRef( tile );
     tileHeader.dataSize = tile->dataSize;
-    fwrite( &tileHeader, sizeof( tileHeader ), 1, fp );
+    out.write( reinterpret_cast<const char*>( &tileHeader ), sizeof( tileHeader ) );
 
-    fwrite( tile->data, tile->dataSize, 1, fp );
+    out.write( reinterpret_cast<const char*>( tile->data ), tile->dataSize );
   }
 
-  fclose( fp );
+  out.close();
+
+  // export navmesh_cache file so server inits faster
+  auto cacheFileName = dir / ( name + ".navmesh_cache" );
+  std::ofstream cacheStream( cacheFileName, std::ios::binary | std::ios::trunc );
+  if( cacheStream.is_open() )
+  {
+    int32_t numNavTiles = 0;
+    bool cacheWriteOk = true;
+    const int maxTiles = m_navMesh->getMaxTiles();
+    const dtNavMesh* navMesh = const_cast< const dtNavMesh* >( m_navMesh );
+    for( int i = 0; i < maxTiles; ++i )
+    {
+      const dtMeshTile* mt = navMesh->getTile( i );
+      if( mt && mt->header )
+      {
+        if( numNavTiles == std::numeric_limits< int32_t >::max() )
+        {
+          cacheWriteOk = false;
+          break;
+        }
+
+        numNavTiles++;
+      }
+    }
+
+    if( cacheWriteOk )
+    {
+      NavMeshCacheHeader cacheHeader{ NAVMESH_CACHE_MAGIC, NAVMESH_CACHE_VERSION, numNavTiles };
+      cacheStream.write( reinterpret_cast< const char* >( &cacheHeader ), sizeof( NavMeshCacheHeader ) );
+      cacheWriteOk = static_cast< bool >( cacheStream );
+    }
+
+    for( int i = 0; i < maxTiles && cacheWriteOk; ++i )
+    {
+      const dtMeshTile* mt = navMesh->getTile( i );
+      if( !mt || !mt->header )
+        continue;
+
+      if( mt->dataSize <= 0 || mt->dataSize > NAVMESH_CACHE_MAX_TILE_BYTES )
+      {
+        printf( "[Navmesh] Failed to export navmesh_cache due to invalid tile size %d\n", mt->dataSize );
+        cacheWriteOk = false;
+        break;
+      }
+
+      const int32_t tSize = static_cast< int32_t >( mt->dataSize );
+      cacheStream.write( reinterpret_cast< const char* >( &tSize ), sizeof( int32_t ) );
+      cacheStream.write( reinterpret_cast< const char* >( mt->data ), static_cast< std::streamsize >( tSize ) );
+      cacheWriteOk = static_cast< bool >( cacheStream );
+    }
+
+    if( !cacheWriteOk )
+    {
+      printf( "[Navmesh] Failed to export navmesh_cache to %s\n", cacheFileName.string().c_str() );
+    }
+
+    cacheStream.close();
+  }
 }
 
 bool TiledNavmeshGenerator::buildNavmesh()
