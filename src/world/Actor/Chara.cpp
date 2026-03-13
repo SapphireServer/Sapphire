@@ -706,25 +706,31 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  auto it = m_statusEffectMap.erase( pEffectIt );
+  m_statusEffectMap.erase( pEffectIt );
 
-  for( auto effectIt = it; effectIt != m_statusEffectMap.end(); )
+  for( auto effectIt = m_statusEffectMap.upper_bound( effectSlotId ); effectIt != m_statusEffectMap.end(); )
   {
     // if the status is *after* the one being removed, shift the slots down by one
-    auto shifted_slot = effectIt->first - 1;
+    const auto currentSlot = effectIt->first;
+    const auto shiftedSlot = static_cast< uint8_t >( currentSlot - 1 );
+    ++effectIt;
 
-    auto node_slot = m_statusEffectSlots.extract( effectIt->first );
-    node_slot.value() = shifted_slot;
-    m_statusEffectSlots.insert( std::move( node_slot ) );
+    auto node_slot = m_statusEffectSlots.extract( currentSlot );
+    if( !node_slot.empty() )
+    {
+      node_slot.value() = shiftedSlot;
+      m_statusEffectSlots.insert( std::move( node_slot ) );
+    }
 
-    auto node_status = m_statusEffectMap.extract( effectIt->first );
-    node_status.key() = shifted_slot;
+    auto node_status = m_statusEffectMap.extract( currentSlot );
+    if( node_status.empty() )
+      continue;
+
+    node_status.key() = shiftedSlot;
+    node_status.mapped()->setSlot( shiftedSlot );
     m_statusEffectMap.insert( std::move( node_status ) );
 
-    effectIt->second->setSlot( effectIt->second->getSlot() - 1 );
-
-    Logger::debug( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
-    ++effectIt;
+    Logger::debug( "Shifted slot {} to slot: {}", currentSlot, shiftedSlot );
   }
 
   Logger::debug( "Slot id being freed: {}", effectSlotId );
@@ -736,7 +742,7 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
     Network::Util::Packet::sendHudParam( *this );
   }
 
-  return it;
+  return m_statusEffectMap.lower_bound( effectSlotId );
 }
 
 std::map< uint8_t, StatusEffect::StatusEffectPtr > Chara::getStatusEffectMap() const
