@@ -3,6 +3,7 @@
 
 #include <Random/RNGMgr.h>
 
+#include "NavMeshCacheIO.h"
 #include "NaviProvider.h"
 
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
@@ -11,22 +12,7 @@
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <filesystem>
 #include <fstream>
-#include <limits>
 #include <Service.h>
-
-namespace
-{
-  struct NavMeshCacheHeader
-  {
-    int32_t magic;
-    int32_t version;
-    int32_t numTiles;
-  };
-
-  constexpr int32_t NAVMESH_CACHE_MAGIC = 0xFF14DEAD;
-  constexpr int32_t NAVMESH_CACHE_VERSION = 1;
-  constexpr int32_t NAVMESH_CACHE_MAX_TILE_BYTES = 32 * 1024 * 1024;
-}
 
 Sapphire::Common::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
   m_naviMesh( nullptr ),
@@ -613,103 +599,24 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   };
 
   bool loadedFromCache = false;
-  std::filesystem::path binPath( path );
-  std::filesystem::path cachePath = binPath;
-  cachePath.replace_extension( ".navmesh_cache" );
+  // todo: allow nav cache to be optional from config.ini??? unsure
+  const std::filesystem::path navPath( path );
+  const std::filesystem::path cachePath = getNavMeshCachePath( navPath );
 
-  std::error_code ec;
-  bool tryLoadCache = false;
-  if( std::filesystem::exists( cachePath, ec ) && !ec )
+  if( isNavMeshCacheFresh( navPath, cachePath ) )
   {
-    std::error_code binTimeEc;
-    std::error_code cacheTimeEc;
-    auto binTime = std::filesystem::last_write_time( binPath, binTimeEc );
-    auto cacheTime = std::filesystem::last_write_time( cachePath, cacheTimeEc );
-    if( !binTimeEc && !cacheTimeEc && cacheTime >= binTime )
-      tryLoadCache = true;
-  }
-
-  if( tryLoadCache )
-  {
-    std::ifstream cfp( cachePath, std::ios::binary );
-    if( cfp.is_open() )
+    std::string cacheError;
+    if( loadNavMeshCache( cachePath, m_naviMesh, &cacheError ) )
     {
-      NavMeshCacheHeader cacheHeader{};
-      cfp.read( reinterpret_cast< char* >( &cacheHeader ), sizeof( NavMeshCacheHeader ) );
-
-      if( !cfp )
+      loadedFromCache = true;
+      Logger::info( "Loaded navmesh from fast-cache for {}", path );
+    }
+    else
+    {
+      Logger::warn( "Rejected navmesh cache {}: {}", cachePath.string(), cacheError );
+      if( !resetNavMesh() )
       {
-        Logger::warn( "Unable to read navmesh cache header from {}", cachePath.string() );
-      }
-      else if( cacheHeader.magic != NAVMESH_CACHE_MAGIC )
-      {
-        Logger::warn( "Rejected navmesh cache {} due to invalid magic", cachePath.string() );
-      }
-      else if( cacheHeader.version != NAVMESH_CACHE_VERSION )
-      {
-        Logger::warn( "Rejected navmesh cache {} due to unsupported version {}", cachePath.string(), cacheHeader.version );
-      }
-      else if( cacheHeader.numTiles < 0 || cacheHeader.numTiles > m_naviMesh->getMaxTiles() )
-      {
-        Logger::warn( "Rejected navmesh cache {} due to invalid tile count {}", cachePath.string(), cacheHeader.numTiles );
-      }
-      else
-      {
-        bool cacheOk = true;
-        for( int32_t i = 0; i < cacheHeader.numTiles; ++i )
-        {
-          int32_t tSize = 0;
-          cfp.read( reinterpret_cast< char* >( &tSize ), sizeof( int32_t ) );
-          if( !cfp )
-          {
-            Logger::warn( "Rejected navmesh cache {} due to truncated tile-size data", cachePath.string() );
-            cacheOk = false;
-            break;
-          }
-
-          if( tSize <= 0 || tSize > NAVMESH_CACHE_MAX_TILE_BYTES )
-          {
-            Logger::warn( "Rejected navmesh cache {} due to invalid tile size {}", cachePath.string(), tSize );
-            cacheOk = false;
-            break;
-          }
-
-          auto* data = static_cast< unsigned char* >( dtAlloc( tSize, DT_ALLOC_PERM ) );
-          if( !data )
-          {
-            Logger::warn( "Rejected navmesh cache {} due to allocation failure for tile size {}", cachePath.string(), tSize );
-            cacheOk = false;
-            break;
-          }
-
-          cfp.read( reinterpret_cast< char* >( data ), static_cast< std::streamsize >( tSize ) );
-          if( !cfp )
-          {
-            dtFree( data );
-            Logger::warn( "Rejected navmesh cache {} due to truncated tile payload", cachePath.string() );
-            cacheOk = false;
-            break;
-          }
-
-          dtStatus st = m_naviMesh->addTile( data, tSize, DT_TILE_FREE_DATA, 0, nullptr );
-          if( dtStatusFailed( st ) )
-          {
-            dtFree( data );
-            Logger::warn( "Rejected navmesh cache {} because addTile failed with status {:#x}", cachePath.string(), st );
-            cacheOk = false;
-            break;
-          }
-        }
-
-        if( cacheOk )
-        {
-          loadedFromCache = true;
-          Logger::info( "Loaded navmesh from fast-cache for {}", path );
-        }
-        else if( !resetNavMesh() )
-        {
-          return false;
-        }
+        return false;
       }
     }
   }
@@ -754,90 +661,14 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
 
   if( rebuildNavMesh )
   {
-    std::filesystem::path tempCachePath = cachePath;
-    tempCachePath += ".tmp";
-
-    std::ofstream cfp( tempCachePath, std::ios::binary | std::ios::trunc );
-    bool cacheWriteOk = cfp.is_open();
-
-    if( cacheWriteOk )
+    std::string cacheError;
+    if( writeNavMeshCache( cachePath, m_naviMesh, &cacheError ) )
     {
-      int32_t numNavTiles = 0;
-      const int maxTiles = m_naviMesh->getMaxTiles();
-      const dtNavMesh* navMesh = const_cast< const dtNavMesh* >( m_naviMesh );
-      for( int i = 0; i < maxTiles; ++i )
-      {
-        const dtMeshTile* mt = navMesh->getTile( i );
-        if( mt && mt->header )
-        {
-          if( numNavTiles == std::numeric_limits< int32_t >::max() )
-          {
-            cacheWriteOk = false;
-            break;
-          }
-
-          numNavTiles++;
-        }
-      }
-
-      if( cacheWriteOk )
-      {
-        NavMeshCacheHeader cacheHeader{ NAVMESH_CACHE_MAGIC, NAVMESH_CACHE_VERSION, numNavTiles };
-        cfp.write( reinterpret_cast< const char* >( &cacheHeader ), sizeof( NavMeshCacheHeader ) );
-        cacheWriteOk = static_cast< bool >( cfp );
-      }
-
-      for( int i = 0; i < maxTiles && cacheWriteOk; ++i )
-      {
-        const dtMeshTile* mt = navMesh->getTile( i );
-        if( !mt || !mt->header )
-          continue;
-
-        if( mt->dataSize <= 0 || mt->dataSize > NAVMESH_CACHE_MAX_TILE_BYTES )
-        {
-          Logger::warn( "Skipping navmesh cache write for {} due to invalid tile size {}", path, mt->dataSize );
-          cacheWriteOk = false;
-          break;
-        }
-
-        const int32_t tSize = static_cast< int32_t >( mt->dataSize );
-        cfp.write( reinterpret_cast< const char* >( &tSize ), sizeof( int32_t ) );
-        if( !cfp )
-        {
-          cacheWriteOk = false;
-          break;
-        }
-
-        cfp.write( reinterpret_cast< const char* >( mt->data ), static_cast< std::streamsize >( tSize ) );
-        cacheWriteOk = static_cast< bool >( cfp );
-      }
-    }
-
-    cfp.close();
-
-    if( cacheWriteOk )
-    {
-      std::error_code removeEc;
-      std::filesystem::remove( cachePath, removeEc );
-
-      std::error_code renameEc;
-      std::filesystem::rename( tempCachePath, cachePath, renameEc );
-      if( renameEc )
-      {
-        Logger::warn( "Unable to finalize navmesh cache file {}: {}", cachePath.string(), renameEc.message() );
-        std::error_code cleanupEc;
-        std::filesystem::remove( tempCachePath, cleanupEc );
-      }
-      else
-      {
-        Logger::info( "Created fast-cache navmesh for {}", path );
-      }
+      Logger::info( "Created fast-cache navmesh for {}", path );
     }
     else
     {
-      Logger::warn( "Unable to write fast-cache navmesh for {}", path );
-      std::error_code cleanupEc;
-      std::filesystem::remove( tempCachePath, cleanupEc );
+      Logger::warn( "Unable to write fast-cache navmesh for {}: {}", path, cacheError );
     }
   }
 
