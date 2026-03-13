@@ -760,7 +760,7 @@ void DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::sha
 
   auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
-    pSession->getZoneConnection()->injectPacket( &packetData[ 0 ], player );
+    pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
 void DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
@@ -775,7 +775,7 @@ void DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player, std:
 
   auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
-    pSession->getChatConnection()->injectPacket( &packetData[ 0 ], player );
+    pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
 void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
