@@ -201,12 +201,6 @@ public:
     pEObj = instance.addEObj( "sgvf_w_lvd_b0094", 2001507, 4035750, 4056798, 4, { -2.841087f, 23.114571f, 38.090420f }, 0.991760f, 0.000048f, 0 ); 
     // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
 
-    pEObj = instance.addEObj( "Bloodymemo", 2000212, 0, 4072691, 4, { 320.812988f, 47.862450f, -130.776306f }, 0.600000f, -0.898762f, 0 ); 
-
-    pEObj = instance.addEObj( "Bloodymemo_1", 2001548, 0, 4072692, 4, { 320.812988f, 47.862450f, -130.776306f }, 0.600000f, -0.898762f, 0 ); 
-
-    pEObj = instance.addEObj( "Bloodymemo_2", 2001549, 0, 4072693, 4, { 320.812988f, 47.862450f, -130.776306f }, 0.600000f, -0.898762f, 0 ); 
-
     pEObj = instance.addEObj( "Entrance", 2000182, 4096706, 4096707, 5, { 361.881714f, 46.092751f, -225.181305f }, 1.000000f, 0.000000f, 0 ); 
     // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     pEObj->addCollisionBox( { 359.516113, 47.920158, -228.417206 }, 0.000000, 2.600000, 8.000000, 0.500000 );
@@ -357,8 +351,8 @@ public:
         setup.position2 = { 40, 10, 0 };
         //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
         setup.bnpcSetupList = { { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
-        setup.lockoutEntrances = { { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1 } };
+        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+        setup.lockoutEntrances = { { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess } };
         setup.lockoutExits = { {} };
         setup.hasLockout = true;
         setup.placeName = PLACENAME_CATTERY;
@@ -460,9 +454,9 @@ public:
       setup.position2 = { 40, 10, 0 };
       //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
       setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility } }
-      setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1 } };
-      setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 } };
+      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+      setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess } };
+      setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, EncounterEntityRemoveFlag::None} };
       setup.hasLockout = true;
       setup.placeName = PLACENAME_RAMBADE;
       setup.bgmInCombat = 37;

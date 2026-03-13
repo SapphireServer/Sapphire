@@ -66,7 +66,7 @@ namespace Sapphire
         m_bossBnpcs.emplace( pBNpc->getId(), pBNpc );
     }
 
-    for( const auto& eobj : m_setup.eobjSetupList )
+    for( const auto& eobj : m_setup.onInitEObjSetupList )
     {
       auto pEObj = m_pTeri->getEObjByName( eobj.name );
 
@@ -84,7 +84,8 @@ namespace Sapphire
         pEObj->setState( eobj.state );
         pEObj->setPermissionInvisibility( eobj.permissionInvisibility );
 
-        m_eobjs.emplace( pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), eobj );
       }
     }
 
@@ -107,8 +108,9 @@ namespace Sapphire
         pEObj->setState( entrance.state );
         pEObj->setPermissionInvisibility( entrance.permissionInvisibility );
 
-        m_entranceEObjs.emplace( pEObj );
-        m_eobjs.emplace( pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), entrance );
+        m_entranceEObjs.emplace( pEObj->getName(), pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
       }
     }
 
@@ -131,8 +133,9 @@ namespace Sapphire
         pEObj->setState( exit.state );
         pEObj->setPermissionInvisibility( exit.permissionInvisibility );
 
-        m_exitEObjs.emplace( pEObj );
-        m_eobjs.emplace( pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), exit );
+        m_exitEObjs.emplace( pEObj->getName(), pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
       }
     }
   }
@@ -491,6 +494,9 @@ namespace Sapphire
       // todo: despawn entrance eobjs?
       setEntranceEObjLocked( false );
       setExitEObjLocked( false );
+
+      // todo: this causes entrance eobj to not despawn
+      removeEObjs();
     }
     else if( newStatus == EncounterStatus::IDLE )
     {
@@ -541,8 +547,10 @@ namespace Sapphire
 
   void Encounter::setEntranceEObjLocked( bool locked )
   {
-    for( auto& pEObj : m_entranceEObjs )
+    for( auto& eobj : m_entranceEObjs )
     {
+      Entity::EventObjectPtr pEObj = eobj.second;
+
       if( pEObj )
       {
         if( locked )
@@ -561,8 +569,10 @@ namespace Sapphire
 
   void Encounter::setExitEObjLocked( bool locked )
   {
-    for( auto& pEObj : m_exitEObjs )
+    for( auto& eobj : m_exitEObjs )
     {
+      Entity::EventObjectPtr pEObj = eobj.second;
+
       if( pEObj )
       {
         if( locked )
@@ -612,40 +622,56 @@ namespace Sapphire
 
   Entity::EventObjectPtr Encounter::getEObjByBaseId( uint32_t baseId ) const
   {
-    for( const auto& pEObj : m_eobjs )
-      if( pEObj->getBaseId() == baseId )
-        return pEObj;
+    for( const auto& eobj : m_eobjs )
+      if( eobj.second->getBaseId() == baseId )
+        return eobj.second;
 
     return nullptr;
   }
 
   Entity::EventObjectPtr Encounter::getEObjByName( const std::string& name ) const
   {
-    for( const auto& pEObj : m_eobjs )
-      if( pEObj->getName() == name )
-        return pEObj;
+    auto it = m_eobjs.find( name );
+    if( it != m_eobjs.end() )
+      return it->second;
 
     return nullptr;
   }
 
   void Encounter::removeEObj( Entity::EventObjectPtr pEObj )
   {
-    m_entranceEObjs.erase( pEObj );
-    m_exitEObjs.erase( pEObj );
-    m_eobjs.erase( pEObj );
+    m_entranceEObjs.erase( pEObj->getName() );
+    m_exitEObjs.erase( pEObj->getName() );
+    m_eobjs.erase( pEObj->getName() );
 
     unbindActor( pEObj );
-    m_pTeri->removeActor( pEObj );
+
+    if( auto it = m_setupEObjs.find( pEObj->getName() ); it != m_setupEObjs.end() )
+    {
+      auto status = getStatus();
+      auto flag = static_cast< uint8_t >( it->second.entityRemoveFlag );
+      constexpr auto SuccessFlag = static_cast< uint8_t >( EncounterEntityRemoveFlag::OnSuccess );
+      constexpr auto FailFlag = static_cast< uint8_t >( EncounterEntityRemoveFlag::OnFail );
+
+      if( ( status == EncounterStatus::SUCCESS && flag & SuccessFlag ) || ( status == EncounterStatus::FAIL && flag & FailFlag ) )
+      {
+        pEObj->setPermissionInvisibility( 1 );
+        // todo: this doesnt despawn eobjs client side?
+        m_pTeri->removeActor( pEObj );
+      }
+    }
   }
 
   void Encounter::removeEObjs()
   {
-    std::set< Entity::EventObjectPtr > toRemove = m_eobjs;
-    for( auto& pEObj : toRemove )
+    std::map< std::string, Entity::EventObjectPtr > toRemove = m_eobjs;
+    
+    for( auto& eobj : toRemove )
     {
-      // todo: should these be removed from the teri?
+      auto pEObj = eobj.second;
+
       unbindActor( pEObj );
-      //removeEObj( pEObj );
+      removeEObj( pEObj );
     }
 
     m_entranceEObjs.clear();

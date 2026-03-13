@@ -33,6 +33,13 @@ namespace Sapphire
     IsNoLongerSealed = 2014
   };
 
+  enum class EncounterEntityRemoveFlag : uint8_t
+  {
+    None      = 0x00,
+    OnFail    = 0x01,
+    OnSuccess = 0x02,
+  };
+
   struct EncounterEObj
   {
     std::string name;
@@ -44,6 +51,7 @@ namespace Sapphire
     float scale;
     float rotation;
     uint8_t permissionInvisibility;
+    EncounterEntityRemoveFlag entityRemoveFlag;
   };
 
   struct EncounterBNpc
@@ -59,9 +67,11 @@ namespace Sapphire
   {
     std::string timelineName;
     std::vector< EncounterBNpc > bnpcSetupList;
-    std::vector< EncounterEObj > eobjSetupList;
+    std::vector< EncounterEObj > onInitEObjSetupList;
+    std::vector< EncounterEObj > onSuccessEObjSetupList;
     std::vector< EncounterEObj > lockoutEntrances;
     std::vector< EncounterEObj > lockoutExits;
+
     EncounterShape encounterShape;
     // for BOX shape, this would be m_position = min, m_position2 = max
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
@@ -182,9 +192,11 @@ namespace Sapphire
 
     Common::Vector3 m_position;
 
-    std::set< Entity::EventObjectPtr > m_eobjs;
-    std::set< Entity::EventObjectPtr > m_entranceEObjs;
-    std::set< Entity::EventObjectPtr > m_exitEObjs;
+    // <name, pEObj >
+    std::map< std::string, Entity::EventObjectPtr > m_eobjs;
+    std::map< std::string, Entity::EventObjectPtr > m_entranceEObjs;
+    std::map< std::string, Entity::EventObjectPtr > m_exitEObjs;
+    std::map< std::string, EncounterEObj > m_setupEObjs;
 
     std::set< Entity::GameObjectPtr > m_actorsInside;
     std::set< Entity::GameObjectPtr > m_boundActors;

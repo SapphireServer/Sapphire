@@ -154,6 +154,7 @@ void EventObject::spawn( PlayerPtr pTarget )
 void EventObject::despawn( PlayerPtr pTarget )
 {
   pTarget->freeObjSpawnIndexForActorId( getId() );
+  pTarget->freePlayerSpawnId( getId() );
 }
 
 const std::string& EventObject::getName() const
