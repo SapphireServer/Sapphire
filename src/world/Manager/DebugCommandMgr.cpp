@@ -65,6 +65,46 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
+namespace
+{
+  std::string extractCommandArgs( const char* data, const std::string& commandName )
+  {
+    if( data == nullptr )
+      return {};
+
+    const std::string fullCommand( data );
+
+    if( fullCommand.length() <= commandName.length() )
+      return {};
+
+    const std::size_t offset = commandName.length();
+    const std::size_t argsStart = fullCommand.find_first_not_of( ' ', offset );
+    if( argsStart == std::string::npos )
+      return {};
+
+    return fullCommand.substr( argsStart );
+  }
+
+  void splitSubCommand( const std::string& commandArgs, std::string& subCommand, std::string& params )
+  {
+    const auto pos = commandArgs.find_first_of( ' ' );
+    if( pos == std::string::npos )
+    {
+      subCommand = commandArgs;
+      params.clear();
+      return;
+    }
+
+    subCommand = commandArgs.substr( 0, pos );
+
+    const auto paramsPos = commandArgs.find_first_not_of( ' ', pos );
+    if( paramsPos == std::string::npos )
+      params.clear();
+    else
+      params = commandArgs.substr( paramsPos );
+  }
+}
+
 // instanciate and initialize commands
 DebugCommandMgr::DebugCommandMgr()
 {
@@ -175,22 +215,8 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   std::string subCommand;
   std::string params;
 
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -418,22 +444,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
   std::string subCommand;
   std::string params;
 
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                  "subCommand " + subCommand + " params: " + params );
@@ -691,22 +703,8 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
   std::string subCommand;
   std::string params;
 
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -753,19 +751,31 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
 void DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto packetData = extractCommandArgs( data, command->getName() );
+  if( packetData.empty() )
+  {
+    PlayerMgr::sendUrgent( player, "Usage: inject <packet-data>" );
+    return;
+  }
 
   auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
-    pSession->getZoneConnection()->injectPacket( data + 7, player );
+    pSession->getZoneConnection()->injectPacket( &packetData[ 0 ], player );
 }
 
 void DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto packetData = extractCommandArgs( data, command->getName() );
+  if( packetData.empty() )
+  {
+    PlayerMgr::sendUrgent( player, "Usage: injectc <packet-data>" );
+    return;
+  }
 
   auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
-    pSession->getChatConnection()->injectPacket( data + 8, player );
+    pSession->getChatConnection()->injectPacket( &packetData[ 0 ], player );
 }
 
 void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
@@ -775,22 +785,8 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
   std::string subCommand;
   std::string params;
 
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[" + std::to_string( player.getId() ) + "] " +
                  "subCommand " + subCommand + " params: " + params );
@@ -824,12 +820,7 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
 
 void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  std::string subCommand;
-
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t spos = tmpCommand.find_first_of( ' ' );
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
 
   auto& pos = player.getPos();
 
@@ -890,22 +881,8 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
   std::string subCommand;
   std::string params;
 
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    // command has parameters, grab the first part
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    // no subcommand given
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -976,18 +953,8 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand, params;
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1255,18 +1222,8 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand, params;
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
   
   if( subCommand == "create" || subCommand == "cr" )
   {
@@ -1447,21 +1404,9 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
 void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
-  std::string cmd( data ), params, subCommand;
-  auto cmdPos = cmd.find_first_of( ' ' );
-
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  std::string params, subCommand;
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
 //  if( subCommand == "permission" || subCommand == "perm" )
 //  {
@@ -1499,18 +1444,8 @@ void DebugCommandMgr::linkshell( char* data, Entity::Player& player, std::shared
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   std::string subCommand, params;
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-      subCommand = tmpCommand.substr( 0, pos );
-  else
-      subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-      params = tmpCommand.substr( pos + 1 );
-  else
-      params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
     
 
   if( subCommand != "" )
@@ -1533,18 +1468,8 @@ void DebugCommandMgr::contentFinder( char *data, Sapphire::Entity::Player &playe
   auto& cf = Common::Service< ContentFinder >::ref();
 
   std::string subCommand, params;
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-      subCommand = tmpCommand.substr( 0, pos );
-  else
-      subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-      params = tmpCommand.substr( pos + 1 );
-  else
-      params.clear();
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   if( subCommand == "pop" )
   {
@@ -1565,28 +1490,20 @@ void DebugCommandMgr::contentFinder( char *data, Sapphire::Entity::Player &playe
 void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
-  std::string params = "";
-
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  std::string params;
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& warpMgr = Common::Service< WarpMgr >::ref();
 
-  uint32_t contentFinderConditionId;
-  sscanf( params.c_str(), "%d", &contentFinderConditionId );
+  const std::string idParam = ( subCommand == "create" || subCommand == "cr" ) ? params : subCommand;
+  uint32_t contentFinderConditionId{};
+  if( idParam.empty() || sscanf( idParam.c_str(), "%u", &contentFinderConditionId ) != 1 )
+  {
+    PlayerMgr::sendDebug( player, "Usage: cbt <contentFinderConditionId>" );
+    return;
+  }
 
   auto instance = terriMgr.createInstanceContent( contentFinderConditionId );
   if( instance )
@@ -1617,22 +1534,9 @@ void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::sh
 void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
-  std::string params = "";
-
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  std::string params;
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -1664,22 +1568,9 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
 void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
-  std::string params = "";
-
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  std::string params;
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
@@ -1711,27 +1602,18 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
 void DebugCommandMgr::facing( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   std::string subCommand;
-  std::string params = "";
-
-  // check if the command has parameters
-  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
-
-  std::size_t pos = tmpCommand.find_first_of( ' ' );
-
-  if( pos != std::string::npos )
-    subCommand = tmpCommand.substr( 0, pos );
-  else
-    subCommand = tmpCommand;
-
-  if( pos != std::string::npos && pos + 1 < tmpCommand.length() )
-    params = tmpCommand.substr( pos + 1 );
-  else
-    params.clear();
+  std::string params;
+  const auto tmpCommand = extractCommandArgs( data, command->getName() );
+  splitSubCommand( tmpCommand, subCommand, params );
 
   Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
 
   float threshold = 0.95f;
-  sscanf( params.c_str(), "%f", &threshold );
+  if( !subCommand.empty() && sscanf( subCommand.c_str(), "%f", &threshold ) != 1 )
+  {
+    PlayerMgr::sendDebug( player, "Usage: facing <threshold>" );
+    return;
+  }
 
   if( player.getTargetId() != 0 )
   {
