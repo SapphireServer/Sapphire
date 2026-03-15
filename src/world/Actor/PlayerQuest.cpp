@@ -157,10 +157,12 @@ void Player::addQuestTracking( uint8_t idx )
 
 void Player::updateQuestsCompleted( uint32_t questId )
 {
-  uint8_t index = questId / 8;
-  uint8_t bitIndex = ( questId ) % 8;
+  size_t index = questId / 8;
+  uint8_t bitIndex = static_cast< uint8_t >( questId % 8 );
+  if( index >= m_questCompleteFlags.size() )
+    return;
 
-  uint8_t value = 0x80 >> bitIndex;
+  uint8_t value = static_cast< uint8_t >( 0x80 >> bitIndex );
 
   m_questCompleteFlags[ index ] |= value;
 
@@ -184,7 +186,7 @@ void Player::removeQuestsCompleted( uint32_t questId )
 
   uint8_t value = 0x80 >> bitIndex;
 
-  m_questCompleteFlags[ index ] ^= value;
+  m_questCompleteFlags[ index ] &= static_cast< uint8_t >( ~value );
 
   Common::Service< Manager::MapMgr >::ref().updateQuests( *this );
 }
@@ -201,8 +203,9 @@ std::array< World::Quest, 30 >& Player::getQuestArrayRef()
 
 int16_t Player::getQuestTracking( uint8_t index ) const
 {
-  if( index < 0 || index >= 5 )
+  if( index >= 5 )
     return -1;
+  
   return m_questTracking[ index ];
 }
 

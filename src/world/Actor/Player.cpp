@@ -369,6 +369,14 @@ void Player::calculateStats()
   setStatValue( BaseParam::WaterResistance, classInfo->data().Element[5] );
 
   auto weaponType = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand )->getCategory();
+  auto mainHand = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
+  if( !mainHand )
+  {
+    setStatValue( BaseParam::AttackPower, str );
+    return;
+  }
+
+  auto weaponType = mainHand->getCategory();
   if( weaponType == ItemUICategory::RoguesArm || weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm )
   {
     setStatValue( BaseParam::AttackPower, dex );
@@ -671,7 +679,7 @@ uint64_t Player::getModelSystemWeapon() const
 
 uint8_t Player::getAetheryteMaskAt( uint8_t index ) const
 {
-  if( index > sizeof( m_aetheryte ) )
+  if( index >= sizeof( m_aetheryte ) )
     return 0;
   return m_aetheryte[ index ];
 }
@@ -1038,8 +1046,10 @@ std::vector< CharaPtr > Player::getHateList()
   std::vector< CharaPtr > hateList = {};
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  for( auto entry : m_actorIdTohateSlotMap )
+  if( !pZone )
+    return hateList;
+  
+  for( const auto& entry : m_actorIdTohateSlotMap )
   {
     hateList.push_back( pZone->getActiveBNpcByEntityId( entry.first ) );
   }
