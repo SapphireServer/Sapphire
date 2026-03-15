@@ -51,6 +51,11 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !pZone )
+  {
+    Logger::error( "eventHandlerTalk: missing territory guid {}", player.getTerritoryId() );
+    return;
+  }
   if( auto instance = pZone->getAsInstanceContent() )
   {
     instance->onTalk( player, eventId, actorId );

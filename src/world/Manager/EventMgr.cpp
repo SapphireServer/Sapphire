@@ -78,6 +78,8 @@ std::string EventMgr::getEventName( uint32_t eventId )
     case Event::EventHandler::EventHandlerType::Aetheryte:
     {
       auto aetherInfo = exdData.getRow< Excel::Aetheryte >( eventId & 0xFFFF );
+      if( !aetherInfo )
+        return "unknownAetheryte";
       if( aetherInfo->data().Telepo )
         return "Aetheryte";
       return "Aethernet";
@@ -99,7 +101,8 @@ std::string EventMgr::getEventName( uint32_t eventId )
       std::string name = questInfo->getString( questInfo->data().Text.Name );
       std::string remove( ",â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
       Common::Util::eraseAllIn( name, remove );
-      name[ 0 ] = toupper( name[ 0 ] );
+      if( !name.empty() )
+        name[ 0 ] = static_cast< char >( toupper( static_cast< unsigned char >( name[ 0 ] ) ) );
       return name;
     }
 
@@ -739,8 +742,14 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
     pPacket = std::move( std::make_shared< EventResume64Packet >( player, eventId, scene, yieldId, values ) );
   else if( paramCount < 128 )
     pPacket = std::move( std::make_shared< EventResume128Packet >( player, eventId, scene, yieldId, values ) );
-  else if( paramCount < 255 )
+  else if( paramCount <= 255 )
     pPacket = std::move( std::make_shared< EventResume255Packet >( player, eventId, scene, yieldId, values ) );
+  
+  if( !pPacket )
+  {
+    Logger::error( "EventMgr::resumeScene failed to build packet for paramCount={}", paramCount );
+    return;
+  }
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );
@@ -854,7 +863,7 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
   else if( paramCount < 128 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 255 )
+  else if( paramCount <= 255 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   
@@ -911,8 +920,14 @@ void EventMgr::sendNotice( Entity::Player& player, uint32_t questId, int8_t noti
     pPacket = std::move( std::make_shared< EventNotice8Packet >( player, questId, noticeId, args ) );
   else if( paramCount < 16 )
     pPacket = std::move( std::make_shared< EventNotice16Packet >( player, questId, noticeId, args ) );
-  else if( paramCount < 32 )
+  else if( paramCount <= 32 )
     pPacket = std::move( std::make_shared< EventNotice32Packet >( player, questId, noticeId, args ) );
+
+  if( !pPacket )
+  {
+    Logger::error( "EventMgr::sendNotice failed to build packet for paramCount={}", paramCount );
+    return;
+  }
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );
