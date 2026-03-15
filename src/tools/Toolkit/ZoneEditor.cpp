@@ -4965,6 +4965,11 @@ void ZoneEditor::showNavmeshWindow()
         m_arenaSelectedCollisionIndices.insert( collisionIndex );
       else
         m_arenaSelectedCollisionIndices.erase( collisionIndex );
+
+        m_arenaResult = {};
+        m_arenaBarrierEdgeKeys.clear();
+        m_arenaBarrierEdges.clear();
+        m_arenaLastExportPath.clear();
     }
   }
   ImGui::EndChild();
@@ -5670,6 +5675,11 @@ void ZoneEditor::showMapWindow()
 
       if( m_arenaPickAnchorMode && ( ImGui::IsMouseClicked( ImGuiMouseButton_Left ) || ImGui::IsMouseClicked( ImGuiMouseButton_Right ) ) )
       {
+        m_arenaResult = {};
+        m_arenaBarrierEdgeKeys.clear();
+        m_arenaBarrierEdges.clear();
+        m_arenaLastExportPath.clear();
+
         if( m_pNaviProvider )
         {
           auto nearestPos = m_pNaviProvider->findNearestPosition( worldX, worldZ );
@@ -6149,10 +6159,10 @@ ZoneEditor::Ray ZoneEditor::screenToWorldRay( const ImVec2& screenPos, const ImV
 }
 
   // Ray-triangle intersection using Möller-Trumbore algorithm
-  bool ZoneEditor::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
-                       float& distance, glm::vec3& normal )
-  {
-    const float EPSILON = 0.0000001f;
+bool ZoneEditor::rayTriangleIntersect( const Ray& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+                        float& distance, glm::vec3& normal )
+{
+  const float EPSILON = 0.0000001f;
 
   glm::vec3 edge1 = v1 - v0;
   glm::vec3 edge2 = v2 - v0;
@@ -7110,9 +7120,17 @@ bool ZoneEditor::exportArenaGenerationJson( const ArenaGenerationResult& result 
   if( !result.ok || !m_selectedZone )
     return false;
 
+  std::error_code ec;
   std::filesystem::path outputDir = std::filesystem::path( "tools" ) / "arena_bounds" /
                                     std::to_string( m_selectedZone->id );
-  std::filesystem::create_directories( outputDir );
+  std::filesystem::create_directories( outputDir, ec );
+
+  if( ec )
+  {
+    printf( "[Arena] Failed to create export dir '%s': %s\n",
+            outputDir.string().c_str(), ec.message().c_str() );
+    return false;
+  }
 
   std::filesystem::path outputFile = outputDir /
                                      fmt::format( "{}_arena_bounds.json", m_selectedZone->name );
