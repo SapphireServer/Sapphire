@@ -39,8 +39,9 @@ Entity::CharaPtr ActionResult::getTarget() const
 
 void ActionResult::damage( uint32_t amount, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag, float aggroModifier )
 {
+  const auto clamped = std::min< uint32_t >( amount, static_cast< uint32_t >( std::numeric_limits< int16_t >::max() ) );
   m_result.Arg0 = hitEffect;
-  m_result.Value = static_cast< int16_t >( amount );
+  m_result.Value = static_cast< int16_t >( clamped );
   m_result.Flag = static_cast< uint8_t >( flag );
   m_result.Type = hitType;
   m_aggroModifier = aggroModifier;
@@ -48,8 +49,9 @@ void ActionResult::damage( uint32_t amount, CalcResultType hitType, uint8_t hitE
 
 void ActionResult::heal( uint32_t amount, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag, float aggroModifier )
 {
+  const auto clamped = std::min< uint32_t >( amount, static_cast< uint32_t >( std::numeric_limits< int16_t >::max() ) );
   m_result.Arg0 = hitEffect;
-  m_result.Value = static_cast< int16_t >( amount );
+  m_result.Value = static_cast< int16_t >( clamped );
   m_result.Flag = static_cast< uint8_t >( flag );
   m_result.Type = hitType;
   m_aggroModifier = aggroModifier;
@@ -57,7 +59,8 @@ void ActionResult::heal( uint32_t amount, CalcResultType hitType, uint8_t hitEff
 
 void ActionResult::restoreMP( uint32_t amount, ActionResultFlag flag )
 {
-  m_result.Value = static_cast< int16_t >( amount );
+  const auto clamped = std::min< uint32_t >( amount, static_cast< uint32_t >( std::numeric_limits< int16_t >::max() ) );
+  m_result.Value = static_cast< int16_t >( clamped );
   m_result.Flag = static_cast< uint8_t >( flag );
   m_result.Type = CalcResultType::TypeRecoverMp;
 }
@@ -284,6 +287,10 @@ void ActionResult::execute()
 void ActionResult::splitAggroApplication( float aggro )
 {
   auto hateList = m_target->getHateList();
+  // avoid division by 0
+  if( hateList.empty() )
+    return;
+
   aggro = aggro / hateList.size();
   for( auto entry : hateList )
   {

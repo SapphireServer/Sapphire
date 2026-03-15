@@ -77,7 +77,9 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     case Common::ActionKind::ACTION_KIND_EVENT_ITEM:
     {
       auto action = exdData.getRow< Excel::EventItem >( actionId );
-      assert( action );
+      if( !action )
+        return;
+      
       actionMgr.handleEventItemAction( player, actionId, action, requestId, targetId );
       break;
     }
@@ -85,7 +87,9 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     case Common::ActionKind::ACTION_KIND_MOUNT:
     {
       auto action = exdData.getRow< Excel::Action >( 4 );
-      assert( action );
+      if( !action )
+        return;
+
       actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, requestId );
       break;
     }
