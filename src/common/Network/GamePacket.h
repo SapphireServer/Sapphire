@@ -218,8 +218,15 @@ namespace Sapphire::Network::Packets
     FFXIVIpcPacket< T, T1 >( const FFXIVARR_PACKET_RAW& rawPacket )
     {
       auto ipcHdrSize = sizeof( FFXIVARR_IPC_HEADER );
-      auto copySize = std::min< size_t >( sizeof( T ), rawPacket.segHdr.size - ipcHdrSize );
+      if( rawPacket.data.size() < ipcHdrSize )
+        throw std::runtime_error( "short IPC payload" );
 
+      memset( &m_data, 0, sizeof( T ) );
+      
+      const auto payloadSize = rawPacket.data.size() - ipcHdrSize;
+      const auto copySize = std::min< size_t >( sizeof( T ), payloadSize );
+      
+      memcpy( &m_data, rawPacket.data.data() + ipcHdrSize, copySize );
       memcpy( &m_segHdr, &rawPacket.segHdr, sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) );
       memcpy( &m_data, &rawPacket.data[ 0 ] + ipcHdrSize, copySize );
 

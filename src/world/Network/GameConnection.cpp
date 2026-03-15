@@ -222,9 +222,10 @@ void GameConnection::onRecv( std::vector< uint8_t >& buffer )
     return;
   }
 
-  // Handle it
+  // consider multiple frames in single tcp recv
+  const auto consumed = static_cast< size_t >( packetHeader.size );
   handlePackets( packetHeader, packetList );
-  m_packets.clear();
+  m_packets.erase( m_packets.begin(), m_packets.begin() + consumed );
 }
 
 void GameConnection::onError( const asio::error_code& error )
@@ -388,10 +389,6 @@ void GameConnection::sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket )
 
 void GameConnection::injectPacket( const std::string& packetpath, Entity::Player& player )
 {
-
-  char packet[ 0x11570 ];
-  memset( packet, 0, 0x11570 );
-
   // get the packet name / path from the command arguments
   FILE* fp = nullptr;
   fp = fopen( packetpath.c_str(), "rb" );
@@ -405,13 +402,16 @@ void GameConnection::injectPacket( const std::string& packetpath, Entity::Player
   fseek( fp, 0, SEEK_END );
   auto size = static_cast< size_t >( ftell( fp ) );
   rewind( fp );
-  if( fread( packet, sizeof( char ), size, fp ) != size )
+  if( fread( packet.data(), sizeof( char ), size, fp ) != size )
   {
+    fclose( fp );
     PlayerMgr::sendDebug( player, "Packet {0} did not read full size: {1}", packetpath, size );
     return;
   }
+  // todo: ideally c++ RAII instead of raw C
   fclose( fp );
-
+  
+  std::vector< char > packet( size );
   // cycle through the packet entries and queue each one
   for( int32_t k = 0x18; k < size; )
   {
@@ -445,14 +445,27 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
   if( m_pSession )
     m_pSession->updateLastDataTime();
 
-  for( auto inPacket : packetData )
+  for( const auto& inPacket : packetData )
   {
     switch( inPacket.segHdr.type )
     {
       case SEGMENTTYPE_SESSIONINIT:
       {
-        char* id = reinterpret_cast< char* >( &( inPacket.data[ 4 ] ) );
-        uint32_t entityId = std::stoul( id );
+        if( inPacket.data.size() <= 4 )
+        { 
+          disconnect();
+          return;
+        }
+        std::string_view idView( reinterpret_cast< const char* >( inPacket.data.data() + 4 ),
+                                inPacket.data.size() - 4 );
+        uint32_t entityId = 0;
+        auto result = std::from_chars( idView.data(), idView.data() + idView.size(), entityId );
+        if( result.ec != std::errc{} )
+        {
+          disconnect();
+          return;
+        }
+        
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
@@ -529,8 +542,14 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
       }
       case SEGMENTTYPE_KEEPALIVE: // keep alive
       {
-        uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[ 0 ] );
-        uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[ 4 ] );
+        if( inPacket.data.size() < 8 )
+        { 
+          disconnect();
+          return;
+        }
+
+        uint32_t id = *reinterpret_cast< const uint32_t* >( inPacket.data.data() );
+        uint32_t timeStamp = *reinterpret_cast< const uint32_t* >( inPacket.data.data() + 4 );
 
         auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
         *reinterpret_cast< unsigned int* >( &pe4->data()[ 0 ] ) = id;

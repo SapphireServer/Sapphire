@@ -357,7 +357,12 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
-
+  if( !pCurrentZone )
+  {
+    Logger::error( "Invalid territory for player {}", player.getId() );
+    return; 
+  }
+  
   pCurrentZone->onFinishLoading( player );
 
   // player is done zoning

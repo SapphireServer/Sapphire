@@ -368,7 +368,6 @@ void Player::calculateStats()
   setStatValue( BaseParam::LightningResistance, classInfo->data().Element[4] );
   setStatValue( BaseParam::WaterResistance, classInfo->data().Element[5] );
 
-  auto weaponType = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand )->getCategory();
   auto mainHand = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
   if( !mainHand )
   {
