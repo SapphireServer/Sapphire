@@ -3,6 +3,7 @@
 #include <Util/Util.h>
 #include <Logging/Logger.h>
 #include <utility>
+#include <charconv>
 
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
@@ -401,6 +402,7 @@ void GameConnection::injectPacket( const std::string& packetpath, Entity::Player
   // read the packet into the buffer
   fseek( fp, 0, SEEK_END );
   auto size = static_cast< size_t >( ftell( fp ) );
+  std::vector< char > packet( size );
   rewind( fp );
   if( fread( packet.data(), sizeof( char ), size, fp ) != size )
   {
@@ -411,27 +413,26 @@ void GameConnection::injectPacket( const std::string& packetpath, Entity::Player
   // todo: ideally c++ RAII instead of raw C
   fclose( fp );
   
-  std::vector< char > packet( size );
   // cycle through the packet entries and queue each one
   for( int32_t k = 0x18; k < size; )
   {
     uint32_t tmpId = player.getId();
     // replace ids in the entryheader if needed
-    if( !memcmp( packet + k + 0x04, packet + k + 0x08, 4 ) )
+    if( !memcmp( packet.data() + k + 0x04, packet.data() + k + 0x08, 4 ) )
     {
-      memcpy( packet + k + 0x04, &tmpId, 4 );
-      memcpy( packet + k + 0x08, &tmpId, 4 );
+      memcpy( packet.data() + k + 0x04, &tmpId, 4 );
+      memcpy( packet.data() + k + 0x08, &tmpId, 4 );
     }
     else
-      memcpy( packet + k + 0x08, &tmpId, 4 );
+      memcpy( packet.data() + k + 0x08, &tmpId, 4 );
 
 
-    uint16_t pSize = *reinterpret_cast< uint16_t* >( packet + k );
+    uint16_t pSize = *reinterpret_cast< uint16_t* >( packet.data() + k );
     // queue packet to the session
     if( pSize == 0 )
       return;
 
-    queueOutPacket( std::make_shared< FFXIVRawPacket >( packet + k, pSize ) );
+    queueOutPacket( std::make_shared< FFXIVRawPacket >( packet.data() + k, pSize ) );
 
     k += ( pSize );
   }
@@ -473,7 +474,7 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
 
         if( !session )
         {
-          Logger::info( "[{0}] Session not registered, creating", id );
+          Logger::info( "[{0}] Session not registered, creating", entityId );
           // return;
           if( !server.createSession( entityId ) )
           {
@@ -485,7 +486,7 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
           //TODO: Catch more things in lobby and send real errors
         else if( !session->isValid() || ( session->getPlayer() && session->getLastPing() != 0 ) )
         {
-          Logger::error( "[{0}] Session INVALID, disconnecting", id );
+          Logger::error( "[{0}] Session INVALID, disconnecting", entityId );
           disconnect();
           return;
         }
@@ -514,7 +515,7 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
           //*reinterpret_cast< unsigned int* >( &pe1->data()[ 0x1C ] ) = Common::Util::getTimeSeconds();
           //*reinterpret_cast< unsigned int* >( &pe1->data()[ 0x18 ] ) = Common::Util::getTimeSeconds();
           sendSinglePacket( pe1 );
-          Logger::info( "[{0}] Setting session for world connection", id );
+          Logger::info( "[{0}] Setting session for world connection", entityId );
           session->setZoneConnection( pCon );
         }
           // chat connection, assinging it to the session
@@ -528,7 +529,7 @@ void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHe
           *reinterpret_cast< unsigned short* >( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
-          Logger::info( "[{0}] Setting session for chat connection", id );
+          Logger::info( "[{0}] Setting session for chat connection", entityId );
           session->setChatConnection( pCon );
         }
 
