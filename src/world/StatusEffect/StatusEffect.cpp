@@ -146,19 +146,38 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
         const auto& potency = pAreaObject->getActionPotency();
         if( Common::Util::distance( pos, pChara->getPos() ) <= m_groundAOE.radius + pChara->getRadius() )
         {
-          auto wepDmg = 1.f;
+          // We assume the correct stats based on role
+          // todo: Find out what we do with BNpcs. They use STR for now
+          auto wepDmg = m_sourceActor->getPhysicalWeaponDamage();
+          Common::BaseParam calcStat = Common::BaseParam::Strength;
 
-          // todo: 
           if( auto player = m_sourceActor->getAsPlayer() )
           {
-            auto item = player->getEquippedWeapon();
-            assert( item );
-
-            auto role = player->getRole();
-            if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-              wepDmg = item->getMagicalDmg();
-            else
-              wepDmg = item->getPhysicalDmg();
+            switch( Common::Role role = player->getRole() )
+            {
+              case Common::Role::Melee:
+              {
+                if(player->getClass() == Common::ClassJob::Rogue || player->getClass() == Common::ClassJob::Ninja)
+                {
+                  calcStat = Common::BaseParam::Dexterity;
+                }
+                break;
+              }
+              case Common::Role::RangedPhysical:
+              {
+                calcStat = Common::BaseParam::Dexterity;
+                break;
+              }
+              case Common::Role::RangedMagical:
+              case Common::Role::Healer:
+              {
+                wepDmg = player->getMagicalWeaponDamage();
+                calcStat = Common::BaseParam::Intelligence;
+                break;
+              }
+              default:
+                calcStat = Common::BaseParam::Strength;
+            }
           }
 
           switch( m_groundAOE.aoeType )
@@ -170,7 +189,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
                 pPartyFilter->isApplicable( m_sourceActor, pChara ) || m_sourceActor == pChara )
                 continue;
 
-              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, wepDmg );
+              auto dmg = Math::CalcStats::calcActionDamage( *m_sourceActor, potency, calcStat, wepDmg );
               float damageVal = dmg.first;
               Common::CalcResultType damageType = dmg.second;
 

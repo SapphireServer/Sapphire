@@ -32,7 +32,8 @@ public:
 
     auto pSource = effect.getSrcActor();
     auto pPlayer = pSource->getAsPlayer();
-    auto dmg = Math::CalcStats::calcActionDamage( *pSource, Potency, 1.0f );
+    auto weaponDamage = pSource->getPhysicalWeaponDamage();
+    auto dmg = Math::CalcStats::calcActionDamage( *pSource, Potency, Common::BaseParam::Dexterity, weaponDamage );
     float damageVal = dmg.first;
     Common::CalcResultType damageType = dmg.second;
 

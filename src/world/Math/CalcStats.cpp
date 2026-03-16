@@ -208,84 +208,24 @@ uint32_t CalcStats::calculateMaxMp( Entity::Player& player )
 
 uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
 {
-  auto level = chara.getLevel();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
+  if( !paramGrowthInfo )
+    return 0;
 
-  // each level range is 1-10, 11-20, 21-30, ... therefore:
-  // level 50 should be in the 4th group, not the 5t
-  // dividing by 10 on the border will break this unless we subtract 1
-  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
-
-  float cost = baseCost;
-
-  // thanks to andrew for helping me figure this shit out
-  // played with this some more and it seems to be accurate for everything i've tried
-  switch( levelGroup )
-  {
-    // level 1-10
-    case 0:
-    {
-      // r^2 = 0.9999
-      cost = 0.0952f * level + 0.9467f;
-      break;
-    }
-
-    // level 11-20
-    case 1:
-    {
-      // r^2 = 1
-      cost = 0.19f * level;
-      break;
-    }
-
-    // level 21-30
-    case 2:
-    {
-      // r^2 = 1
-      cost = 0.38f * level - 3.8f;
-      break;
-    }
-
-    // level 31-40
-    case 3:
-    {
-      // r^2 = 1
-      cost = 0.6652f * level - 12.358f;
-      break;
-    }
-
-    // level 41-50
-    case 4:
-    {
-      // r^2 = 1
-      cost = 1.2352f * level - 35.159f;
-      break;
-    }
-
-    // level 51-60
-    case 5:
-    {
-      // r^2 = 1
-      cost = 0.0654f * std::exp( 0.1201f * level );
-      break;
-    }
-
-    default:
-    {
-      return 0;
-    }
-  }
-
-  return static_cast< uint16_t >( std::round( cost * baseCost ) );
+  uint16_t mpMod = paramGrowthInfo->data().Mp;
+  return baseCost * mpMod / 100;
 }
 
 
-float CalcStats::blockProbability( const Chara& chara )
+uint16_t CalcStats::blockProbability( const Chara& chara )
 {
   auto level = chara.getLevel();
   auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  uint16_t blockMod = chara.getModifier( Common::ParamModifier::BlockRate );
 
-  return std::floor( ( 30 * blockRate ) / levelVal + 10 );
+  return std::floor( ( 30 * blockRate ) / levelVal + 10 ) + blockMod;
 }
 
 float CalcStats::criticalHitProbability( const Chara& chara )
@@ -322,26 +262,10 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
     aaPotency = RANGED_AUTO_ATTACK_POTENCY;
   }
 
-  float autoAttackDelay = 2.5f;
-  // fetch actual auto attack delay if its a player
-  if( chara.isPlayer() )
-  {
-    // todo: ew
-    auto pPlayer = const_cast< Entity::Chara& >( chara ).getAsPlayer();
-    assert( pPlayer );
-
-    auto pItem = pPlayer->getEquippedWeapon();
-    assert( pItem );
-
-    autoAttackDelay = pItem->getDelay() / 1000.f;
-  }
-
-  // factors in f(PTC) in order to not lose precision
-  //return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
   return aaPotency / 100.f;
 }
 
-float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
+float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float weaponDamage )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -356,7 +280,7 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weapo
   if( !classInfo )
     return 0.f;
 
-  switch( chara.getPrimaryStat() )
+  switch( calcStat )
   {
     case Common::BaseParam::Intelligence:
     {
@@ -402,24 +326,37 @@ float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t
 {
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
-  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return Common::Util::trunc( static_cast< float >( attackPower ) / divVal + ( 1.0f - mainVal / divVal ), 2 );
+  if( level <= 50 )
+  {
+    return Common::Util::trunc( 75 * ( static_cast< float >( attackPower ) - mainVal ) / mainVal, 2 ) + 100;
+  }
+  else if( level <= 70 )
+  {
+    return Common::Util::trunc( std::floor( ( level - 50 ) * 2.5f + 75 ) * ( static_cast< float >( attackPower ) - mainVal ) / mainVal, 2 ) + 100;
+  }
+  else
+  {
+    return Common::Util::trunc( 165 * ( static_cast< float >( attackPower ) - mainVal ) / mainVal, 2 ) + 100;
+  }
 }
 
-float CalcStats::getPrimaryAttackPower( const Sapphire::Entity::Chara& chara )
+float CalcStats::getPrimaryPower( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat )
 {
-  const auto& baseStats = chara.getStats();
-
-  switch( chara.getPrimaryStat() )
+  switch( calcStat )
   {
-    case Common::BaseParam::Mind:
+    case Common::BaseParam::Strength:
+    case Common::BaseParam::Dexterity:
     {
-      return healingMagicPower( chara );
+      return attackPower( chara );
     }
     case Common::BaseParam::Intelligence:
     {
       return magicAttackPower( chara );
+    }
+    case Common::BaseParam::Mind:
+    {
+      return healingMagicPower( chara );
     }
 
     default:
@@ -451,7 +388,7 @@ float CalcStats::determination( const Sapphire::Entity::Chara& chara )
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return Common::Util::trunc( 1.0f + ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal, 3 );
+  return Common::Util::trunc( 130.0f * ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal + 1000, 3 );
 }
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
@@ -485,7 +422,7 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
       speedVal = chara.getStatValue( Common::BaseParam::SkillSpeed );
   }
 
-  return std::floor( 130.f * ( speedVal - subVal ) / divVal + 1000.f ) / 1000.f;
+  return Common::Util::trunc( 130.f * ( speedVal - subVal ) / divVal + 1000.f, 3 );
 }
 
 float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
@@ -525,11 +462,10 @@ float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
   return std::floor( ( 30 * blockStrength ) / levelVal + 10 ) / 100.f;
 }
 
-float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
+float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float wepDmg )
 {
   // todo: default values for NPCs, not sure what we should have here
   float autoAttackDelay = 2.f;
-  float dmg = 10.f;
 
   // fetch actual auto attack delay if its a player
   if( chara.isPlayer() )
@@ -542,13 +478,12 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
     assert( pItem );
 
     autoAttackDelay = pItem->getDelay() / 1000.f;
-    dmg = pItem->getWeaponDmg();
   }
 
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  auto innerCalc = weaponDamage( chara, dmg );
+  auto innerCalc = weaponDamage( chara, calcStat, wepDmg );
 
   return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
 }
@@ -558,24 +493,24 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float wepDmg )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
 
   auto pot = autoAttackPotency( chara );
-  auto aa = autoAttack( chara );
-  auto ap = getPrimaryAttackPower( chara );
+  auto ap = attackPower( chara );
   auto det = determination( chara );
+  auto spd = speed( chara );
+  auto aa = autoAttack( chara, calcStat, wepDmg );
 
 
   // todo: everything after tenacity
-  auto factor = Common::Util::trunc( pot * aa * ap * det, 0 );
+  auto factor = std::floor( std::floor( pot * ap * det ) / 1000 );
+  factor = std::floor( std::floor( std::floor( std::floor( factor * spd ) / 1000 ) * aa ) / 100 );
   Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeDamageHp;
 
   // todo: traits
-
-  factor = std::floor( factor * speed( chara ) );
 
   if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
@@ -601,18 +536,19 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcAutoAttackDa
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
 
   auto pot = potency( static_cast< uint16_t >( ptc ) );
-  auto wd = weaponDamage( chara, wepDmg );
-  auto ap = getPrimaryAttackPower( chara );
+  auto ap = getPrimaryPower( chara, calcStat );
   auto det = determination( chara );
+  auto wd = weaponDamage( chara, calcStat, wepDmg );
   auto damageDealtMod = chara.getModifier( Common::ParamModifier::DamageDealtPercent );
 
-  auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
+  auto factor = std::floor( std::floor( pot * ap * det ) / 1000 );
+  factor = std::floor( std::floor( factor * wd ) / 100 ); // todo: add traits
   Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeDamageHp;
 
   if( criticalHitProbability( chara ) > getRandomNumber0To100() )

@@ -368,9 +368,21 @@ void Player::calculateStats()
   setStatValue( BaseParam::LightningResistance, classInfo->data().Element[4] );
   setStatValue( BaseParam::WaterResistance, classInfo->data().Element[5] );
 
-  setStatValue( BaseParam::AttackPower, str );
+  auto weaponType = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand )->getCategory();
+  if( weaponType == ItemUICategory::RoguesArm || weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm )
+  {
+    setStatValue( BaseParam::AttackPower, dex );
+    m_bonusStats[ static_cast< uint32_t >( BaseParam::AttackPower ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Dexterity ) ];
+  }
+  else
+  {
+    setStatValue( BaseParam::AttackPower, str );
+    m_bonusStats[ static_cast< uint32_t >( BaseParam::AttackPower ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Strength ) ];
+  }
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
+  m_bonusStats[ static_cast< uint32_t >( BaseParam::AttackMagicPotency ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Intelligence ) ];
+  m_bonusStats[ static_cast< uint32_t >( BaseParam::HealingMagicPotency ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Mind ) ];
 
   setStatValue( BaseParam::PiercingResistance, 0 );
 
@@ -385,6 +397,15 @@ void Player::calculateStats()
     m_hp = m_maxHp;
 }
 
+float Player::getPhysicalWeaponDamage()
+{
+  return getEquippedWeapon()->getPhysicalDmg();
+}
+
+float Player::getMagicalWeaponDamage()
+{
+  return getEquippedWeapon()->getMagicalDmg();
+}
 
 void Player::setAutoattack( bool mode )
 {
@@ -1203,7 +1224,7 @@ void Player::autoAttack( CharaPtr pTarget )
 
   auto weaponType = mainWeap->getCategory();
   uint32_t attackId = 7;
-  if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm)
+  if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm )
     attackId = 8;
 
   auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();

@@ -263,6 +263,11 @@ bool Action::Action::isWeaponskill() const
   return m_category == ActionCategory::Weaponskill;
 }
 
+bool Action::Action::isSpell() const
+{
+  return m_category == ActionCategory::Spell;
+}
+
 Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
@@ -463,7 +468,7 @@ void Action::Action::execute()
     if( m_pSource->getBoundEncounterId() != m_pTarget->getBoundEncounterId() )
       shouldInterrupt = true;
   }
-  
+
   if( shouldInterrupt )
   {
     interrupt();
@@ -511,27 +516,48 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     return std::make_pair( static_cast< uint32_t >( dmg.first ), dmg.second );
   };
 
-  // todo: what do for npcs?
-  auto wepDmg = 1.f;
+  Common::BaseParam calcStat = Common::BaseParam::Strength;
+  switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
+  {
+    case Common::ClassJob::Conjurer:
+    case Common::ClassJob::Thaumaturge:
+    case Common::ClassJob::Whitemage:
+    case Common::ClassJob::Blackmage:
+    case Common::ClassJob::Arcanist:
+    case Common::ClassJob::Summoner:
+    case Common::ClassJob::Scholar:
+    case Common::ClassJob::Astrologian:
+    {
+      if( isSpell() || isAbility() )
+      {
+        calcStat = Common::BaseParam::Intelligence;
+      }
+      break;
+    }
+    default:
+    {
+      calcStat = Common::BaseParam::Strength;
+    }
+  }
+  if( calcStat == Common::BaseParam::Strength && m_pSource->getPrimaryStat() == Common::BaseParam::Dexterity )
+    calcStat = Common::BaseParam::Dexterity;
 
+  auto wepDmg = m_pSource->getPhysicalWeaponDamage();
+  // We assume that the attack scales with magical weapon damage if the main stat of the attack is INT (probably for MND too but there shouldn't be any attacks that scale with MNDs)
+  if( calcStat == Common::BaseParam::Intelligence )
+    wepDmg = m_pSource->getMagicalWeaponDamage();
+
+
+  // todo: do we still need that player check for auto attacks?
   if( auto player = m_pSource->getAsPlayer() )
   {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-      wepDmg = item->getMagicalDmg();
-    else
-      wepDmg = item->getPhysicalDmg();
-
     // is auto attack
     if( getId() == 7 || getId() == 8 )
-      return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() ) );
+      return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg ) );
   }
 
-  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg ) );
-}
+  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg ) );
+  }
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
 {
@@ -769,7 +795,7 @@ void Action::Action::handleStatusEffects()
         if( status.groundAOE.aoeType == GroundAOEType::Damage )
           m_pSource->createAreaObject( getId(), m_lutEntry.potency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
         else
-          m_pSource->createAreaObject( getId(), m_lutEntry.curePotency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );     
+          m_pSource->createAreaObject( getId(), m_lutEntry.curePotency, status.groundAOE.vfxId, m_actionData->data().EffectRange, m_pos );
       }
       applyStatusEffect( true, m_pSource, m_pSource, status, true );
         // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
