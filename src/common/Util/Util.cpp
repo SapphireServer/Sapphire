@@ -23,7 +23,10 @@ std::string Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
 
 uint16_t Util::getOpCode( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& raw )
 {
-  return *reinterpret_cast< uint16_t* >( &raw.data[ 2 ] );
+  if( raw.data.size() < 4 )
+    throw std::runtime_error( "IPC packet too short for opcode" );
+  
+  return *reinterpret_cast< const uint16_t* >( raw.data.data() + 2 );
 }
 
 std::string Util::toLowerCopy( const std::string& inStr )

@@ -78,6 +78,12 @@ void Action::EventAction::execute()
     auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto pEvent = m_pSource->getAsPlayer()->getEvent( m_eventId );
 
+    if( !pEvent )
+    {
+      Logger::error( "EventAction::execute missing event {} for player {}", m_eventId, m_pSource->getId() );
+      return;
+    }
+    
     pEvent->setPlayedScene( false );
 
     if( m_onActionFinishClb )

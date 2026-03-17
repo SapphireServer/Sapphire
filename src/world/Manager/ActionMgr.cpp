@@ -59,11 +59,10 @@ void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t a
 {
   auto action = Action::make_ItemManipulationAction( player.getAsPlayer(), actionId, sequence, nullptr, 2500 );// todo: maybe the delay can be retrieved from data
 
-  player.setCurrentAction( action );
-
   if( !action->init() )
     return;
 
+  player.setCurrentAction( action );
   action->start();
 }
 
@@ -116,7 +115,8 @@ void ActionMgr::handlePlacedEventItemAction( Sapphire::Entity::Player& player, u
                                              uint32_t sequence, Common::Vector3 targetPos )
 {
   auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetPos, Common::CastType::Circle );
-  action->init();
+  if( !action->init() )
+    return;
 
   if( itemActionData->data().CastTime )
   {
@@ -183,6 +183,8 @@ bool ActionMgr::actionHasCastTime( uint32_t actionId )//TODO: Add logic for spec
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionInfoPtr = exdData.getRow< Excel::Action >( actionId );
+  if( !actionInfoPtr )
+    return false;
 
   if( actionInfoPtr->data().ComboContinue )
     return false;

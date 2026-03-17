@@ -507,7 +507,11 @@ Player::InvSlotPair Player::getFreeContainerSlot( uint32_t containerId )
 
 ItemPtr Player::getItemAt( uint16_t containerId, uint16_t slotId )
 {
-  return m_storageMap[ containerId ]->getItem( slotId );
+  auto it = m_storageMap.find( containerId );
+  if( it == m_storageMap.end() || !it->second )
+    return nullptr;
+  
+  return it->second->getItem( slotId );
 }
 
 bool Player::isValidInventoryContainer( uint16_t containerId ) const
@@ -914,7 +918,8 @@ void Player::mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
   return;
 
   uint32_t stackSize = fromItem->getStackSize() + toItem->getStackSize();
-  uint32_t stackOverflow = stackSize - std::min< uint32_t >( fromItem->getMaxStackSize(), stackSize );
+  uint32_t maxStack = fromItem->getMaxStackSize();
+  uint32_t stackOverflow = stackSize > maxStack ? ( stackSize - maxStack ) : 0;
 
   // we can destroy the original stack if there's no overflow
   if( stackOverflow == 0 )
@@ -930,7 +935,7 @@ void Player::mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t 
     updateContainer( fromInventoryId, fromSlotId, fromItem );
   }
 
-  toItem->setStackSize( stackSize );
+  toItem->setStackSize( std::min( stackSize, maxStack ) );
   writeItem( toItem );
 
   updateContainer( toInventoryId, toSlot, toItem );

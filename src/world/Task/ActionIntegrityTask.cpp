@@ -49,12 +49,19 @@ void ActionIntegrityTask::execute()
   int statusIdx = 0;
   for( auto& actionResult : m_results )
   {
-    if( actionResult && actionResult->getTarget() )
+    if( !actionResult )
+      continue;
+
+    if( actionResult->getTarget() )
       actionResult->execute();
 
     if( ( actionResult->getCalcResultParam().Type == Common::TypeSetStatus ) ||
         ( actionResult->getCalcResultParam().Type == Common::TypeSetStatusMe ) )
     {
+      // status is only init for 4 slots
+      if( statusIdx >= 4 )
+        break;
+
       auto& status = data.Status[ statusIdx++ ];
       auto pEffect = actionResult->getStatusEffect();
       status.Source = pEffect->getSrcActorId();
