@@ -367,9 +367,13 @@ void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) co
 
   for( const auto& actor : player.getInRangeActors() )
   {
-    if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
-      continue;
     auto chara = actor->getAsChara();
+
+    if( chara == nullptr )
+      continue;
+
+    if( actor->getId() != player.getTargetId() || !chara->isAlive() )
+      continue;
 
     // default autoattack range
     float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;

@@ -1,0 +1,354 @@
+{
+  "actors": [
+    {
+      "hp": 1000,
+      "id": 1,
+      "layoutId": 3978771,
+      "name": "Denn The Orcatoothed",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "onDeath",
+          "timepoints": [
+            {
+              "data": {
+                "idx": 0,
+                "opc": "set",
+                "val": 255
+              },
+              "description": "set directorvar",
+              "id": 1,
+              "startTime": 0,
+              "type": "directorVar"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 2,
+          "name": "onSpawn",
+          "timepoints": [
+            {
+              "data": {
+                "battleTalkId": 2504,
+                "kind": 2,
+                "length": 5000,
+                "nameId": 1206,
+                "params": [
+                  0
+                ],
+                "talkerActorName": "Denn The Orcatoothed"
+              },
+              "description": "",
+              "id": 1,
+              "startTime": 0,
+              "type": "battleTalk"
+            },
+            {
+              "data": {
+                "battleTalkId": 2505,
+                "kind": 2,
+                "length": 5000,
+                "nameId": 1206,
+                "params": [
+                  0
+                ],
+                "talkerActorName": "Denn The Orcatoothed"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 5000,
+              "type": "battleTalk"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 3,
+          "name": "Spawn Baleen Guard 1",
+          "timepoints": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "Bubbles begin forming on the water's surface",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "messageId": 2009,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 3,
+              "startTime": 20000,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "flags": 0,
+                "flagsMask": 4294963200,
+                "hateSource": {
+                  "hateType": "<to-be-defined>",
+                  "source": "<to-de-befined>"
+                },
+                "invulnType": null,
+                "spawnActor": "Baleen Guard 1"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 20000,
+              "type": "bNpcSpawn"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 4,
+          "name": "Spawn Baleen Guard 2",
+          "timepoints": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "Bubbles begin forming on the water's surface",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "messageId": 2009,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 3,
+              "startTime": 20000,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "flags": 0,
+                "flagsMask": 4294963200,
+                "hateSource": {
+                  "hateType": "<to-be-defined>",
+                  "source": "<to-de-befined>"
+                },
+                "invulnType": null,
+                "spawnActor": "Baleen Guard 2"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 20000,
+              "type": "bNpcSpawn"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 5,
+          "name": "Spawn Baleen Guard 3",
+          "timepoints": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "Bubbles begin forming on the water's surface",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "messageId": 2009,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 3,
+              "startTime": 20000,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "flags": 0,
+                "flagsMask": 4294963200,
+                "hateSource": {
+                  "hateType": "<to-be-defined>",
+                  "source": "<to-de-befined>"
+                },
+                "invulnType": null,
+                "spawnActor": "Baleen Guard 3"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 20000,
+              "type": "bNpcSpawn"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 6,
+          "name": "Spawn Baleen Guard 4",
+          "timepoints": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "Bubbles begin forming on the water's surface",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "messageId": 2009,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 3,
+              "startTime": 20000,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "flags": 0,
+                "flagsMask": 4294963200,
+                "hateSource": {
+                  "hateType": "<to-be-defined>",
+                  "source": "<to-de-befined>"
+                },
+                "invulnType": null,
+                "spawnActor": "Baleen Guard 4"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 20000,
+              "type": "bNpcSpawn"
+            }
+          ]
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 1000,
+      "id": 2,
+      "layoutId": 3978761,
+      "name": "Baleen Guard 1",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 1000,
+      "id": 3,
+      "layoutId": 3978770,
+      "name": "Baleen Guard 2",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 1000,
+      "id": 4,
+      "layoutId": 4064937,
+      "name": "Baleen Guard 3",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    },
+    {
+      "hp": 1000,
+      "id": 5,
+      "layoutId": 4064938,
+      "name": "Baleen Guard 4",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": []
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    }
+  ],
+  "conditions": [
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 1,
+      "loop": false,
+      "paramData": {
+        "combatState": 4,
+        "sourceActor": "Denn The Orcatoothed"
+      },
+      "targetActor": "Denn The Orcatoothed",
+      "targetSchedule": "onDeath"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 2,
+      "loop": false,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Denn The Orcatoothed"
+      },
+      "targetActor": "Denn The Orcatoothed",
+      "targetSchedule": "onSpawn"
+    }
+  ],
+  "name": "Brand new timeline",
+  "selectors": [],
+  "version": 21
+}

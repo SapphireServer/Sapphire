@@ -6,10 +6,19 @@
 #include "Actor/GameObject.h"
 #include "Actor/Player.h"
 
+#include "Logging/Logger.h"
+
 #include "Manager/PlayerMgr.h"
 
 #include "Util/UtilMath.h"
 #include "Util/Util.h"
+
+#include <nlohmann/json.hpp>
+#include <spdlog/fmt/fmt.h>
+
+#include <string>
+#include <fstream>
+#include <filesystem>
 
 namespace Sapphire
 {
@@ -51,6 +60,15 @@ namespace Sapphire
     m_finishTime = 0;
     m_placeName = m_setup.placeName;
 
+    if( !m_setup.polygonShapeFile.empty() )
+    {
+      if( !loadEncounterShape( m_setup.polygonShapeFile ) )
+      {
+        Logger::error( "Encounter::init failed to load encounter shape at {}", m_setup.polygonShapeFile );
+        return;
+      }
+    }
+
     // todo: probably add invisible untargetable BNpc for FATEs?
     for( const auto& actor : m_setup.bnpcSetupList )
     {
@@ -66,7 +84,7 @@ namespace Sapphire
         m_bossBnpcs.emplace( pBNpc->getId(), pBNpc );
     }
 
-    for( const auto& eobj : m_setup.eobjSetupList )
+    for( const auto& eobj : m_setup.onInitEObjSetupList )
     {
       auto pEObj = m_pTeri->getEObjByName( eobj.name );
 
@@ -83,8 +101,10 @@ namespace Sapphire
         pEObj->setScale( eobj.scale );
         pEObj->setState( eobj.state );
         pEObj->setPermissionInvisibility( eobj.permissionInvisibility );
+        pEObj->setCollisionEnabled( eobj.permissionInvisibility == 0 );
 
-        m_eobjs.emplace( pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), eobj );
       }
     }
 
@@ -106,9 +126,11 @@ namespace Sapphire
         pEObj->setScale( entrance.scale );
         pEObj->setState( entrance.state );
         pEObj->setPermissionInvisibility( entrance.permissionInvisibility );
+        pEObj->setCollisionEnabled( entrance.permissionInvisibility == 0 );
 
-        m_entranceEObjs.emplace( pEObj );
-        m_eobjs.emplace( pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), entrance );
+        m_entranceEObjs.emplace( pEObj->getName(), pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
       }
     }
 
@@ -130,9 +152,11 @@ namespace Sapphire
         pEObj->setScale( exit.scale );
         pEObj->setState( exit.state );
         pEObj->setPermissionInvisibility( exit.permissionInvisibility );
+        pEObj->setCollisionEnabled( exit.permissionInvisibility == 0 );
 
-        m_exitEObjs.emplace( pEObj );
-        m_eobjs.emplace( pEObj );
+        m_setupEObjs.emplace( pEObj->getName(), exit );
+        m_exitEObjs.emplace( pEObj->getName(), pEObj );
+        m_eobjs.emplace( pEObj->getName(), pEObj );
       }
     }
   }
@@ -164,24 +188,7 @@ namespace Sapphire
         if( pCell && pCell->getActorCount() > 0 )
           inRange = ( *pCell->begin() )->getInRangeActors( true );
 
-        for( auto& pActor : inRange )
-        {
-          // dont bind bnpcs that we didnt spawn
-          //if( pActor->isBattleNpc() && m_bnpcs.find( pActor->getAsBNpc()->getLayoutId() ) == m_bnpcs.end() )
-          //  continue;
-          // if( pActor->isPlayer() || pActor->isBattleNpc() )
-          {
-            if( pActor->getBoundEncounterId() != m_id && isPositionInside( pActor->getPos() ) )
-            {
-              onEnterRange( pActor );
-            }
-            else if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
-            {
-              onExitRange( pActor );
-            }
-          }
-        }
-        m_lastRangeTick = currTime;
+        handleInRangeActors( inRange );
       }
       else if( m_setup.encounterShape == EncounterShape::BOX )
       {
@@ -197,18 +204,21 @@ namespace Sapphire
         if( pCell && pCell->getActorCount() > 0 )
           inRange = ( *pCell->begin() )->getInRangeActors( true );
 
-        for( auto& pActor : inRange )
-        {
-          if( pActor->getBoundEncounterId() != m_id && isPositionInside( pActor->getPos() ) && m_actorsInside.count( pActor ) == 0 )
-          {
-            onEnterRange( pActor );
-          }
-          else if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) && m_actorsInside.count( pActor ) > 0 )
-          {
-            onExitRange( pActor );
-          }
-        }
-        m_lastRangeTick = currTime;
+        handleInRangeActors( inRange );
+      }
+      else if( m_setup.encounterShape == EncounterShape::POLYGON )
+      {
+        // use the anchor as centre of polygon
+        // todo: what do we do if an arena spans > 80 units?
+        const auto& pos = m_hull.anchor;
+
+        auto pCell = m_pTeri->getCellByCoords( pos.x, pos.z );
+        std::set< Entity::GameObjectPtr > inRange;
+
+        if( pCell && pCell->getActorCount() > 0 )
+          inRange = ( *pCell->begin() )->getInRangeActors( true );
+
+        handleInRangeActors( inRange );
       }
     }
     
@@ -491,6 +501,9 @@ namespace Sapphire
       // todo: despawn entrance eobjs?
       setEntranceEObjLocked( false );
       setExitEObjLocked( false );
+
+      // todo: this causes entrance eobj to not despawn
+      removeEObjs();
     }
     else if( newStatus == EncounterStatus::IDLE )
     {
@@ -541,8 +554,10 @@ namespace Sapphire
 
   void Encounter::setEntranceEObjLocked( bool locked )
   {
-    for( auto& pEObj : m_entranceEObjs )
+    for( auto& eobj : m_entranceEObjs )
     {
+      Entity::EventObjectPtr pEObj = eobj.second;
+
       if( pEObj )
       {
         if( locked )
@@ -561,8 +576,10 @@ namespace Sapphire
 
   void Encounter::setExitEObjLocked( bool locked )
   {
-    for( auto& pEObj : m_exitEObjs )
+    for( auto& eobj : m_exitEObjs )
     {
+      Entity::EventObjectPtr pEObj = eobj.second;
+
       if( pEObj )
       {
         if( locked )
@@ -577,6 +594,11 @@ namespace Sapphire
         }
       }
     }
+  }
+
+  static float cross2D( const Encounter::Point2D& a, const Encounter::Point2D& b, const Encounter::Point2D& c )
+  {
+    return ( b.x - a.x ) * ( c.z - a.z ) - ( b.z - a.z ) * ( c.x - a.x );
   }
 
   bool Encounter::isPositionInside( const Common::Vector3& pos ) const
@@ -604,6 +626,29 @@ namespace Sapphire
                ( pos.z >= min.z && pos.z <= max.z );
       }
       break;
+      case EncounterShape::POLYGON:
+      {
+        Point2D point = { pos.x, pos.z };
+        const auto& polygon = m_hull.points;
+        if( polygon.size() < 3 )
+          return false;
+
+        bool hasPos = false;
+        bool hasNeg = false;
+
+        for( size_t i = 0; i < polygon.size(); ++i )
+        {
+          const Point2D& a = polygon[ i ];
+          const Point2D& b = polygon[ ( i + 1 ) % polygon.size() ];
+          const float c = cross2D( a, b, point );
+          hasPos = hasPos || c > 0.0001f;
+          hasNeg = hasNeg || c < -0.0001f;
+          if( hasPos && hasNeg )
+            return false;
+        }
+        return pos.y >= m_hull.minY && pos.y <= m_hull.maxY;
+      }
+      break;
       default:
         break;
     }
@@ -612,40 +657,59 @@ namespace Sapphire
 
   Entity::EventObjectPtr Encounter::getEObjByBaseId( uint32_t baseId ) const
   {
-    for( const auto& pEObj : m_eobjs )
-      if( pEObj->getBaseId() == baseId )
-        return pEObj;
+    for( const auto& eobj : m_eobjs )
+      if( eobj.second->getBaseId() == baseId )
+        return eobj.second;
 
     return nullptr;
   }
 
   Entity::EventObjectPtr Encounter::getEObjByName( const std::string& name ) const
   {
-    for( const auto& pEObj : m_eobjs )
-      if( pEObj->getName() == name )
-        return pEObj;
+    auto it = m_eobjs.find( name );
+    if( it != m_eobjs.end() )
+      return it->second;
 
     return nullptr;
   }
 
   void Encounter::removeEObj( Entity::EventObjectPtr pEObj )
   {
-    m_entranceEObjs.erase( pEObj );
-    m_exitEObjs.erase( pEObj );
-    m_eobjs.erase( pEObj );
+    m_entranceEObjs.erase( pEObj->getName() );
+    m_exitEObjs.erase( pEObj->getName() );
+    m_eobjs.erase( pEObj->getName() );
 
     unbindActor( pEObj );
-    m_pTeri->removeActor( pEObj );
+
+    // todo: remove eobjs/reset their state?
+    /*
+    if( auto it = m_setupEObjs.find( pEObj->getName() ); it != m_setupEObjs.end() )
+    {
+      auto status = getStatus();
+      auto flag = static_cast< uint8_t >( it->second.entityRemoveFlag );
+      constexpr auto SuccessFlag = static_cast< uint8_t >( EncounterEntityRemoveFlag::OnSuccess );
+      constexpr auto FailFlag = static_cast< uint8_t >( EncounterEntityRemoveFlag::OnFail );
+
+      if( ( status == EncounterStatus::SUCCESS && flag & SuccessFlag ) || ( status == EncounterStatus::FAIL && flag & FailFlag ) )
+      {
+        pEObj->setPermissionInvisibility( it->second.permissionInvisibility );
+        // todo: this doesnt despawn eobjs client side?
+        // m_pTeri->removeActor( pEObj );
+      }
+    }
+    //*/
   }
 
   void Encounter::removeEObjs()
   {
-    std::set< Entity::EventObjectPtr > toRemove = m_eobjs;
-    for( auto& pEObj : toRemove )
+    std::map< std::string, Entity::EventObjectPtr > toRemove = m_eobjs;
+    
+    for( auto& eobj : toRemove )
     {
-      // todo: should these be removed from the teri?
+      auto pEObj = eobj.second;
+
       unbindActor( pEObj );
-      //removeEObj( pEObj );
+      removeEObj( pEObj );
     }
 
     m_entranceEObjs.clear();
@@ -707,5 +771,63 @@ namespace Sapphire
   bool Encounter::isActorBound( Entity::GameObjectPtr pActor ) const
   {
     return m_boundActors.find( pActor ) != m_boundActors.end();
+  }
+
+  void Encounter::handleInRangeActors( const std::set< Entity::GameObjectPtr >& inRange )
+  {
+    for( auto& pActor : inRange )
+    {
+      if( pActor->getBoundEncounterId() != m_id && isPositionInside( pActor->getPos() ) )
+      {
+        onEnterRange( pActor );
+      }
+    }
+
+    for( auto& pActor : m_actorsInside )
+    {
+      if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
+      {
+        onExitRange( pActor );
+      }
+    }
+
+    m_lastRangeTick = Common::Util::getTimeMs();
+  }
+
+  bool Encounter::loadEncounterShape( const std::string& path )
+  {
+    auto fmtPath = fmt::format( std::string( "data/encounterShapes/{}.json" ), path );
+    nlohmann::json json;
+    std::ifstream f( fmtPath );
+
+    if( f.good() )
+    {
+      json << f;
+      f.close();
+    }
+    else
+    {
+      Logger::error( "Encounter::loadEncounterShape: Unable to load encounter shape at {}", path );
+      return false;
+    }
+
+    const auto& clippedHull2DJson = json.at( "clippedHull2D" );
+    for( const auto& v : clippedHull2DJson )
+    {
+      auto point = v.get< std::vector< float > >();
+      m_hull.points.push_back( { point[ 0 ], point[ 1 ] } );
+    }
+
+    auto anchor = json.at( "anchor" ).get< std::vector< float > >();
+    m_hull.anchor.x = anchor[ 0 ];
+    m_hull.anchor.y = anchor[ 1 ];
+    m_hull.anchor.z = anchor[ 2 ];
+
+    const auto& yRangeJson = json.at( "yRange" );
+    auto yRange = yRangeJson.get< std::vector< float > >();
+    m_hull.minY = yRange[ 0 ];
+    m_hull.maxY = yRange[ 1 ];
+
+    return true;
   }
 }
