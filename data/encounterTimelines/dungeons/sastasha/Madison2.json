@@ -1,0 +1,53 @@
+{
+  "actors": [
+    {
+      "hp": 800,
+      "id": 1,
+      "layoutId": 4035056,
+      "name": "Captain Madison",
+      "schedules": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Initial Schedule",
+          "timepoints": [
+            {
+              "data": {
+                "messageId": 2038,
+                "params": [
+                  1382,
+                  1205
+                ]
+              },
+              "description": "<unk> releases <item>",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            }
+          ]
+        }
+      ],
+      "subactors": [],
+      "type": "BNPC"
+    }
+  ],
+  "conditions": [
+    {
+      "condition": "hpPctBetween",
+      "description": "",
+      "enabled": true,
+      "id": 1,
+      "loop": false,
+      "paramData": {
+        "hpMax": 50,
+        "hpMin": 0,
+        "sourceActor": "Captain Madison"
+      },
+      "targetActor": "Captain Madison",
+      "targetSchedule": "Initial Schedule"
+    }
+  ],
+  "name": "Brand new timeline",
+  "selectors": [],
+  "version": 21
+}

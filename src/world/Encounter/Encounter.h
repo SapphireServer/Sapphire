@@ -23,7 +23,8 @@ namespace Sapphire
   enum class EncounterShape
   {
     BOX,
-    CYLINDER
+    CYLINDER,
+    POLYGON
   };
 
   enum class EncounterLogMessage : uint32_t
@@ -77,6 +78,8 @@ namespace Sapphire
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
     Common::Vector3 position;
     Common::Vector3 position2;
+    std::string polygonShapeFile;
+
     uint64_t duration{ 0 };    // todo: implement this
     uint32_t placeName{ 0 };
 
@@ -99,6 +102,20 @@ namespace Sapphire
   class Encounter : public std::enable_shared_from_this< Encounter >
   {
   public:
+    struct Point2D
+    {
+      float x{ 0.f };
+      float z{ 0.f };
+    };
+
+    struct Polygon
+    {
+      std::vector< Point2D > points;
+      Common::Vector3 anchor;
+      float minY{ 0.f };
+      float maxY{ 0.f };
+    };
+
     Encounter( TerritoryPtr pInstance,
                Event::DirectorPtr pDirector,
                const std::string& timelineName );
@@ -180,6 +197,11 @@ namespace Sapphire
     bool isActorBound( Entity::GameObjectPtr pActor ) const;
 
   protected:
+
+    bool loadEncounterShape( const std::string& path );
+
+    virtual void handleInRangeActors( const std::set< Entity::GameObjectPtr >& inRange );
+
     uint32_t m_id{ 0 };
     uint64_t m_startTime{ 0 };
     uint64_t m_duration{ 0 }; // 0 for unlimited duration
@@ -191,6 +213,7 @@ namespace Sapphire
     uint32_t m_placeName{ 0 };
 
     Common::Vector3 m_position;
+    Polygon m_hull;
 
     // <name, pEObj >
     std::map< std::string, Entity::EventObjectPtr > m_eobjs;
