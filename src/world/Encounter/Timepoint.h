@@ -37,7 +37,7 @@ namespace Sapphire
     SetEObjState,
     SetBgm,
 
-    SetCondition,
+    SetTrigger,
 
     Snapshot,
     InterruptAction,
@@ -308,15 +308,18 @@ namespace Sapphire
     }
   };
 
-  struct TimepointDataCondition : public TimepointData
+  struct TimepointDataSetTrigger : public TimepointData
   {
-    // todo: rng?
-    uint32_t m_conditionId;
+    std::string m_actorRef;
+    uint32_t m_phaseId;
+    uint32_t m_triggerId;
     bool m_enabled;
 
-    TimepointDataCondition( uint32_t conditionId, bool enabled ) :
-      TimepointData( TimepointDataType::SetCondition ),
-      m_conditionId( conditionId ),
+    TimepointDataSetTrigger( const std::string& actorRef, uint32_t phaseId, uint32_t triggerId, bool enabled ) :
+      TimepointData( TimepointDataType::SetTrigger ),
+      m_actorRef( actorRef ),
+      m_phaseId( phaseId ),
+      m_triggerId( triggerId ),
       m_enabled( enabled )
     {
     }

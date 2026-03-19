@@ -62,7 +62,7 @@ namespace Sapphire
       { "setEObjState",        TimepointDataType::SetEObjState },
       { "setBGM",              TimepointDataType::SetBgm },
 
-      { "setCondition",        TimepointDataType::SetCondition },
+      { "setTrigger"  ,        TimepointDataType::SetTrigger },
       { "snapshot",            TimepointDataType::Snapshot },
       { "interruptAction",     TimepointDataType::InterruptAction },
       { "rollRNG",             TimepointDataType::RollRNG }
@@ -361,13 +361,15 @@ namespace Sapphire
         m_pData = std::make_shared< TimepointDataBGM >( bgmId );
       }
       break;
-      case TimepointDataType::SetCondition:
+      case TimepointDataType::SetTrigger:
       {
         auto& dataJ = json.at( "data" );
-        auto conditionId = dataJ.at( "conditionId" ).get< uint32_t >();
+        auto actorRef = dataJ.at( "actorRef" ).get< std::string >();
+        auto phaseId = dataJ.at( "phaseId" ).get< uint32_t >();
+        auto triggerId = dataJ.at( "triggerId" ).get< uint32_t >();
         auto enabled = dataJ.at( "enabled" ).get< bool >();
 
-        m_pData = std::make_shared< TimepointDataCondition >( conditionId, enabled );
+        m_pData = std::make_shared< TimepointDataSetTrigger >( actorRef, phaseId, triggerId, enabled );
       }
       break;
       case TimepointDataType::Snapshot:
@@ -727,6 +729,7 @@ namespace Sapphire
         uint32_t val = 0;
         uint32_t param = 0;
 
+        // todo: this doesnt call the instance/quest battle script onDirector[Var/Seq/Flag]Change
         // todo: expand for fates
         Event::DirectorPtr pDirector = pEncounter->getDirector();
 
@@ -795,23 +798,50 @@ namespace Sapphire
               break;
           }
 
+          // if instance/quest battle, call director events in scripts
+          auto pInstance = pTeri->getAsInstanceContent();
+          auto pQuestBattle = pTeri->getAsQuestBattle();
+
           switch( m_type )
           {
             case TimepointDataType::DirectorVar:
-              pDirector->setDirectorVar( pDirectorData->m_data.index, val );
-              break;
+            {
+              if( pInstance )
+                pInstance->setVar( pDirectorData->m_data.index, val );
+              else if( pQuestBattle )
+                pQuestBattle->setVar( pDirectorData->m_data.index, val );
+              else
+                pDirector->setDirectorVar( pDirectorData->m_data.index, val );
+            }
+            break;
             case TimepointDataType::DirectorFlags:
-              pDirector->setDirectorFlags( val );
-              break;
+            {
+              if( pInstance )
+                pInstance->setFlags( val );
+              else if( pQuestBattle )
+                pQuestBattle->setFlags( val );
+              else
+                pDirector->setDirectorFlags( val );
+            }
+            break;
             case TimepointDataType::DirectorSeq:
-              pDirector->setDirectorSequence( val );
-              break;
+            {
+              if( pInstance )
+                pInstance->setSequence( val );
+              else if( pQuestBattle )
+                pQuestBattle->setSequence( val );
+              else
+                pDirector->setDirectorSequence( val );
+            }
+            break;
             default:
               break;
           }
 
-          for( const auto& player : pTeri->getPlayers() )
-            pDirector->sendDirectorVars( *player.second );
+          // instance and quest battle resend vars on changing var/flag/seq, dont include them here
+          if( !pInstance && !pQuestBattle )
+            for( const auto& player : pTeri->getPlayers() )
+              pDirector->sendDirectorVars( *player.second );
         }
       }
       break;
@@ -914,13 +944,11 @@ namespace Sapphire
         }
       }
       break;
-      case TimepointDataType::SetCondition:
+      case TimepointDataType::SetTrigger:
       {
-        auto pConditionData = std::dynamic_pointer_cast< TimepointDataCondition, TimepointData >( m_pData );
+        auto pSetTriggerData = std::dynamic_pointer_cast< TimepointDataSetTrigger, TimepointData >( m_pData );
 
-        // todo: dont reset so things can resume? idk
-        pack.resetConditionState( pConditionData->m_conditionId );
-        pack.setConditionStateEnabled( pConditionData->m_conditionId, pConditionData->m_enabled );
+        pack.setTriggerEnabled( pSetTriggerData->m_actorRef, pSetTriggerData->m_phaseId, pSetTriggerData->m_triggerId, pSetTriggerData->m_enabled );
       }
       break;
       case TimepointDataType::Snapshot:

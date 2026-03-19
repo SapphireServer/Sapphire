@@ -1,4 +1,4 @@
-#include "ScheduleCondition.h"
+#include "TriggerCondition.h"
 
 #include "Encounter.h"
 #include "TimelinePack.h"
@@ -17,14 +17,12 @@
 
 namespace Sapphire
 {
-  bool ConditionHp::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionHp::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
     if( !pBNpc )
       return false;
-
-    // todo: check time elapsed
 
     switch( m_conditionType )
     {
@@ -41,7 +39,7 @@ namespace Sapphire
     return false;
   };
 
-  bool ConditionDirectorVar::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionDirectorVar::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pDirector = pEncounter->getDirector();
 
@@ -65,7 +63,7 @@ namespace Sapphire
     return false;
   }
 
-  bool ConditionCombatState::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionCombatState::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
@@ -87,7 +85,6 @@ namespace Sapphire
       case CombatStateType::Roaming:
         return pBNpc->getState() == Entity::BNpcState::Roaming;
       case CombatStateType::JustDied:
-        return pBNpc->getState() == Entity::BNpcState::JustDied;
       case CombatStateType::Dead:
         return pBNpc->getState() == Entity::BNpcState::Dead ||
                pBNpc->getState() == Entity::BNpcState::JustDied ||
@@ -98,21 +95,26 @@ namespace Sapphire
     return false;
   }
 
-  bool ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionEncounterTimeElapsed::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto elapsed = time - pack.getStartTime();
-    // todo: check encounter time
+    auto startTime = pEncounter->getStartTime();
+
+    if( startTime == 0 )
+      return false;
+
+    auto elapsed = time - startTime;
+
     return elapsed >= m_duration;
   }
 
-  bool ConditionBNpcFlags::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionBNpcFlags::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
     return pBNpc && pBNpc->hasFlag( m_flags );
   }
 
-  bool ConditionGetAction::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionGetAction::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
@@ -125,12 +127,12 @@ namespace Sapphire
     return false;
   }
 
-  bool ConditionScheduleActive::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionPhaseActive::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    return pack.isScheduleActive( m_actorName, m_scheduleName );
+    return pack.isPhaseActive( m_actorName, m_phaseId );
   }
 
-  bool ConditionInterruptedAction::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionInterruptedAction::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pTeri = pEncounter->getTeriPtr();
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
@@ -143,7 +145,7 @@ namespace Sapphire
     return false;
   }
 
-  bool ConditionVarEquals::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  bool ConditionVarEquals::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pDirector = pEncounter->getDirector();
 
@@ -172,10 +174,10 @@ namespace Sapphire
     return false;
   }
 
-  void ConditionHp::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionHp::from_json( nlohmann::json& json, ConditionType condition,
                                const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -200,10 +202,10 @@ namespace Sapphire
     }
   }
 
-  void ConditionDirectorVar::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionDirectorVar::from_json( nlohmann::json& json, ConditionType condition,
                                         const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
 
@@ -233,10 +235,10 @@ namespace Sapphire
     }
   }
 
-  void ConditionCombatState::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionCombatState::from_json( nlohmann::json& json, ConditionType condition,
                                         const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -250,10 +252,10 @@ namespace Sapphire
     m_combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
 
-  void ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, ConditionType condition,
                                                  const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto duration = paramData.at( "duration" ).get< uint64_t >();
@@ -261,10 +263,10 @@ namespace Sapphire
     m_duration = duration;
   }
 
-  void ConditionBNpcFlags::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionBNpcFlags::from_json( nlohmann::json& json, ConditionType condition,
                                       const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -279,10 +281,10 @@ namespace Sapphire
     // todo: BNpcHasFlags
   }
 
-  void ConditionGetAction::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionGetAction::from_json( nlohmann::json& json, ConditionType condition,
                                       const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -297,22 +299,22 @@ namespace Sapphire
     m_actionId = actionId;
   }
 
-  void ConditionScheduleActive::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition,
+  void ConditionPhaseActive::from_json( nlohmann::json& json, ConditionType condition,
                                         const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
-    auto scheduleName = paramData.at( "scheduleName" ).get< std::string >();
+    auto scheduleName = paramData.at( "phaseId" ).get< uint32_t >();
 
     m_actorName = actorRef;
-    m_scheduleName = scheduleName;
+    m_phaseId = scheduleName;
   }
 
-  void ConditionInterruptedAction::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
+  void ConditionInterruptedAction::from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -327,9 +329,9 @@ namespace Sapphire
     m_actionId = actionId;
   }
 
-  void ConditionVarEquals::from_json( nlohmann::json& json, Schedule& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
+  void ConditionVarEquals::from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    ScheduleCondition::from_json( json, phase, condition, actors );
+    TriggerCondition::from_json( json, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto index = paramData.at( "index" ).get< uint32_t >();
@@ -345,58 +347,6 @@ namespace Sapphire
 
     m_index = index;
     m_val = val;
-  }
-
-  // todo: i wrote this very sleep deprived, ensure it is actually sane
-
-  void Schedule::execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
-  {
-    if( state.m_startTime == 0 )
-    {
-      state.m_startTime = time;
-      self.spawnAllSubActors( pEncounter->getTeriPtr() );
-    }
-
-    if( state.m_scheduleInfo.m_startTime == 0 )
-      state.m_scheduleInfo.m_startTime = time;
-
-    if( state.m_scheduleInfo.m_lastTimepointTime == 0 )
-      state.m_scheduleInfo.m_lastTimepointTime = time;
-
-    for( auto i = state.m_scheduleInfo.m_lastTimepointIndex; i < m_timepoints.size();  )
-    {
-      auto elapsed = time - state.m_scheduleInfo.m_startTime;
-      const auto& timepoint = m_timepoints[ i ];
-
-      if( elapsed >= timepoint.m_offset )
-      {
-        // todo: stall the timeline while auto attack is queued
-        if( timepoint.execute( self, pack, pEncounter, time ) )
-        {
-          state.m_scheduleInfo.m_lastTimepointTime = time;
-          state.m_scheduleInfo.m_lastTimepointIndex = ++i;
-          continue;
-        }
-        else
-        {
-          state.m_scheduleInfo.m_pauseTime = time;
-        }
-      }
-      break;
-    }
-  }
-
-  void Schedule::reset( ConditionState& state ) const
-  {
-    state.m_scheduleInfo.m_startTime = 0;
-    state.m_scheduleInfo.m_pauseTime = 0;
-    state.m_scheduleInfo.m_lastTimepointIndex = 0;
-    state.m_scheduleInfo.m_lastTimepointTime = 0;
-  }
-
-  bool Schedule::completed( const ConditionState& state ) const
-  {
-    return state.m_scheduleInfo.m_lastTimepointIndex == m_timepoints.size();
   }
 
 }// namespace Sapphire

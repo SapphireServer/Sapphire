@@ -2,6 +2,10 @@
 
 #include "TimelinePack.h"
 
+#include "Phase.h"
+#include "Trigger.h"
+#include "TriggerCondition.h"
+
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
 
@@ -12,6 +16,14 @@
 
 namespace Sapphire
 {
+  void TimelineActor::addPhase( PhasePtr pPhase )
+  {
+    if( m_phases.find( pPhase->getId() ) != m_phases.end() )
+      throw std::runtime_error( "TimelineActor::addPhase duplicate Phase by ID " + std::to_string( pPhase->getId() ) );
+
+    m_phases.emplace( pPhase->getId(), pPhase );
+  }
+
   const std::string& TimelineActor::getName() const
   {
     return m_name;
@@ -22,23 +34,19 @@ namespace Sapphire
     return m_layoutId;
   }
 
-  bool TimelineActor::isScheduleActive( const std::string& name ) const
+  bool TimelineActor::isPhaseActive( uint32_t phaseId ) const
   {
-    for( const auto& condition : m_scheduleConditions )
-    {
-      const auto& pCondition = condition.second;
-      const auto& state = m_conditionStates.at( condition.first );
-      if( pCondition->inProgress( state ) && pCondition->getScheduleName() == name )
-        return true;
-    }
+    if( m_pPhase )
+      return m_pPhase->getId() == phaseId;
     return false;
   }
 
-  void TimelineActor::addPhaseCondition( ScheduleConditionPtr pCondition )
+  PhasePtr TimelineActor::getPhaseById( uint32_t phaseId )
   {
-    m_scheduleConditions.emplace( std::make_pair( pCondition->getId(), pCondition ) );
-    m_conditionStates[ pCondition->getId() ] = {};
-    m_conditionStates[ pCondition->getId() ].m_enabled = pCondition->isDefaultEnabled();
+    if( auto it = m_phases.find( phaseId ); it != m_phases.end() )
+      return it->second;
+
+    return nullptr;
   }
 
   // todo: make this sane
@@ -46,72 +54,53 @@ namespace Sapphire
   void TimelineActor::update(  EncounterPtr pEncounter, TimelinePack& pack, uint64_t time )
   {
     // todo: handle interrupts
-    for( const auto& condition : m_scheduleConditions )
+
+    if( !m_pPhase )
     {
-      const auto& pCondition = condition.second;
-      auto& state = m_conditionStates[ pCondition->getId() ];
+      auto& pPhase = m_phases.at( m_initialPhaseId );
 
-      // ignore if not enabled, unless overriden to enable
-      if( !pCondition->isStateEnabled( state ) )
-        continue;
+      transitionPhase( pEncounter, pack, time, m_phases.at( m_initialPhaseId ) );
+    }
 
-      if( pCondition->completed( state ) )
+    m_pPhase->update( *this, pack, m_state.m_phaseState, pEncounter, time );
+
+    const auto& triggers = m_pPhase->getTriggers();
+
+    for( const auto& [ id, trigger ] : triggers )
+    {
+      if( trigger.isEnabled( m_state.m_phaseState ) && trigger.isConditionMet( *this, pack, m_state.m_phaseState, pEncounter, time ) )
       {
-        if( pCondition->isLoopable() )
-        {
-          if( pCondition->loopReady( state, time ) )
-            pCondition->reset( state );
-        }
-      }
-      // update or execute
-      else if( pCondition->isConditionMet( state, pack, pEncounter, time ) )
-      {
-        if( pCondition->inProgress( state ) )
-        {
-          pCondition->update( state, *this, pack, pEncounter, time );
-        }
-        else
-        {
-          pCondition->execute( state, *this, pack, pEncounter, time );
-
-          if( pack.getStartTime() == 0 )
-            pack.setStartTime( state.m_startTime );
-        }
+        // trigger.execute may change the current phase, or fire a single timepoint
+        trigger.execute( *this, pack, m_state.m_phaseState, pEncounter, time );
+        break;
       }
     }
   }
 
-  bool TimelineActor::resetConditionState( uint32_t conditionId, bool toDefault )
+  void TimelineActor::transitionPhase( EncounterPtr pEncounter, TimelinePack& pack, uint64_t time, PhasePtr pPhase )
   {
-    if( auto it = m_scheduleConditions.find( conditionId ); it != m_scheduleConditions.end() )
-    {
-      auto& state = m_conditionStates.at( it->first );
-      it->second->reset( state, toDefault );
-      return true;
-    }
-    return false;
-  }
+    // clean up if we already have a phase active
+    if( m_pPhase )
+      m_pPhase->onExit( *this, pack, m_state.m_phaseState, pEncounter, time );
 
-  bool TimelineActor::setConditionStateEnabled( uint32_t conditionId, bool enabled )
-  {
-    if( auto it = m_conditionStates.find( conditionId ); it != m_conditionStates.end() )
-    {
-      auto& state = m_conditionStates.at( it->first );
-      state.m_enabled = enabled;
-      return true;
-    }
-    return false;
-  }
+    // set the new phase ptr
+    m_pPhase = pPhase;
 
-  void TimelineActor::resetAllConditionStates()
-  {
-    for( const auto& condition : m_scheduleConditions )
-    {
-      const auto& pCondition = condition.second;
-      auto& state = m_conditionStates.at( condition.first );
+    // set the new phase id
+    m_state.m_phaseId = pPhase->getId();
 
-      pCondition->reset( state, true );
-    }
+    // reset start time
+    m_state.m_phaseState.m_startTime = 0;
+    m_state.m_phaseState.m_scheduleInfo.clear();
+
+    // reset triggers
+    m_state.m_phaseState.m_triggerStates.clear();
+    // enable all triggers by default
+    for( const auto& trigger : pPhase->getTriggers() )
+      m_state.m_phaseState.m_triggerStates.emplace( trigger.first, true );
+
+    // run setup for new phase
+    m_pPhase->onEnter( *this, pack, m_state.m_phaseState, pEncounter, time );
   }
 
   void TimelineActor::spawnAllSubActors( TerritoryPtr pTeri )
@@ -155,6 +144,16 @@ namespace Sapphire
         pTeri->removeActor( subActor.second );
         subActor.second = nullptr;
       }
+    }
+  }
+
+  void TimelineActor::setTriggerEnabled( uint32_t phaseId, uint32_t triggerId, bool enabled )
+  {
+    // only fire if current phase is phaseId
+    if( m_pPhase->getId() == phaseId )
+    {
+      auto& trigger = m_pPhase->getTriggers().at( triggerId );
+      trigger.setEnabled( m_state.m_phaseState, enabled );
     }
   }
 

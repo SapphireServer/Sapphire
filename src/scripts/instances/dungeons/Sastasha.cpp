@@ -303,14 +303,6 @@ public:
         pEncounter->init();
       }
     }
-    /*
-    if( denn && !denn->isAlive() )
-    {
-      instance.setVar( 0, SeqFinish );
-      instance.sendDutyComplete();
-      denn = nullptr;
-    }
-    */
   }
 
   void onTalk( InstanceContent& instance, Entity::Player& player, Entity::EventObject& eobj, uint32_t eventId ) override
