@@ -348,7 +348,7 @@ namespace Sapphire::Common
     Melding = 0x07,
     SMachine = 0x08,
     Carry = 0x09,
-    EmoteMode = 0x0B
+    EmoteMode = 0x0B,
   };
 
   enum GearSetSlot : uint8_t
