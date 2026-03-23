@@ -364,8 +364,8 @@ namespace Sapphire
       case TimepointDataType::SetTrigger:
       {
         auto& dataJ = json.at( "data" );
-        auto actorRef = dataJ.at( "actorRef" ).get< std::string >();
-        auto phaseId = dataJ.at( "phaseId" ).get< uint32_t >();
+        auto actorRef = dataJ.at( "targetActor" ).get< std::string >();
+        auto phaseId = dataJ.at( "targetPhaseId" ).get< uint32_t >();
         auto triggerId = dataJ.at( "triggerId" ).get< uint32_t >();
         auto enabled = dataJ.at( "enabled" ).get< bool >();
 

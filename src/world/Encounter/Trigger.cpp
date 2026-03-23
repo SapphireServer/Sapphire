@@ -26,6 +26,16 @@ namespace Sapphire
     m_pCondition = pCondition;
   }
 
+  void Trigger::setDefaultEnabled( bool enabled )
+  {
+    m_enabled = enabled;
+  }
+
+  bool Trigger::getDefaultEnabled() const
+  {
+    return m_enabled;
+  }
+
   bool Trigger::isEnabled( PhaseState& state ) const
   {
     return state.m_triggerStates[ m_id ];

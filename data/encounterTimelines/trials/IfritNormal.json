@@ -35,6 +35,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 1,
               "paramData": {
                 "combatState": 1,
@@ -49,6 +50,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 4,
               "paramData": {
                 "combatState": 5,
@@ -171,6 +173,7 @@
               },
               "condition": "hpPctBetween",
               "description": "",
+              "enabled": true,
               "id": 2,
               "paramData": {
                 "hpMax": 71,
@@ -186,6 +189,7 @@
               },
               "condition": "hpPctBetween",
               "description": "",
+              "enabled": true,
               "id": 15,
               "paramData": {
                 "hpMax": 51,
@@ -201,6 +205,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 5,
               "paramData": {
                 "combatState": 5,
@@ -313,6 +318,7 @@
               },
               "condition": "hpPctBetween",
               "description": "",
+              "enabled": true,
               "id": 16,
               "paramData": {
                 "hpMax": 51,
@@ -328,6 +334,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 6,
               "paramData": {
                 "combatState": 5,
@@ -463,14 +470,16 @@
                 },
                 {
                   "data": {
-                    "idx": 0,
-                    "opc": "set",
-                    "val": 2
+                    "enabled": true,
+                    "targetActor": "Ifrit",
+                    "targetPhaseId": 4,
+                    "triggerId": 20,
+                    "triggerStr": "If Ifrit state is Combat, action transitionPhase -> Hellfire"
                   },
                   "description": "",
                   "id": 8,
                   "startTime": 40000,
-                  "type": "directorVar"
+                  "type": "setTrigger"
                 }
               ]
             }
@@ -484,6 +493,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 3,
               "paramData": {
                 "combatState": 5,
@@ -498,6 +508,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 7,
               "paramData": {
                 "combatState": 5,
@@ -506,17 +517,17 @@
             },
             {
               "action": {
-                "phaseId": 7,
+                "phaseId": 6,
                 "timepoint": null,
                 "type": "transitionPhase"
               },
-              "condition": "varEquals",
+              "condition": "combatState",
               "description": "",
+              "enabled": false,
               "id": 20,
               "paramData": {
-                "index": 0,
-                "type": "director",
-                "val": 2
+                "combatState": 1,
+                "sourceActor": "Ifrit"
               }
             }
           ]
@@ -548,6 +559,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 17,
               "paramData": {
                 "combatState": 1,
@@ -562,6 +574,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 8,
               "paramData": {
                 "combatState": 5,
@@ -597,6 +610,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 18,
               "paramData": {
                 "combatState": 1,
@@ -611,6 +625,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 9,
               "paramData": {
                 "combatState": 5,
@@ -768,6 +783,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 10,
               "paramData": {
                 "combatState": 5,
@@ -782,6 +798,7 @@
               },
               "condition": "varEquals",
               "description": "",
+              "enabled": true,
               "id": 19,
               "paramData": {
                 "index": 0,
@@ -893,6 +910,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 11,
               "paramData": {
                 "combatState": 5,
@@ -933,6 +951,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 21,
               "paramData": {
                 "combatState": 0,
@@ -967,6 +986,7 @@
               },
               "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 1,
               "paramData": {
                 "combatState": 1,
@@ -1009,6 +1029,7 @@
               },
               "condition": "getAction",
               "description": "",
+              "enabled": true,
               "id": 1,
               "paramData": {
                 "actionId": 455,
@@ -1023,6 +1044,7 @@
               },
               "condition": "getAction",
               "description": "",
+              "enabled": true,
               "id": 12,
               "paramData": {
                 "actionId": 456,
@@ -1091,6 +1113,7 @@
               },
               "condition": "getAction",
               "description": "",
+              "enabled": true,
               "id": 14,
               "paramData": {
                 "actionId": 456,
@@ -1101,7 +1124,7 @@
         },
         {
           "id": 3,
-          "name": "Plumes",
+          "name": "Plumes In",
           "onEnter": [],
           "onExit": [],
           "schedules": [
@@ -1254,6 +1277,68 @@
                 },
                 {
                   "data": {
+                    "enabled": true,
+                    "targetActor": "Ifrit (LID 4126284)",
+                    "targetPhaseId": 3,
+                    "triggerId": 22,
+                    "triggerStr": "If Ifrit casts Action#456, action transitionPhase -> Plumes Out"
+                  },
+                  "description": "",
+                  "id": 25,
+                  "startTime": 8000,
+                  "type": "setTrigger"
+                }
+              ]
+            }
+          ],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "getAction",
+              "description": "",
+              "enabled": true,
+              "id": 13,
+              "paramData": {
+                "actionId": 455,
+                "sourceActor": "Ifrit"
+              }
+            },
+            {
+              "action": {
+                "phaseId": 4,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "getAction",
+              "description": "",
+              "enabled": false,
+              "id": 22,
+              "paramData": {
+                "actionId": 456,
+                "sourceActor": "Ifrit"
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Plumes Out",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 3,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": [
+                {
+                  "data": {
                     "actorName": "Ifrit (LID 4126284) <subactor 1>",
                     "pos": [
                       0,
@@ -1268,8 +1353,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 9,
-                  "startTime": 8100,
+                  "id": 1,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1288,8 +1373,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 10,
-                  "startTime": 8100,
+                  "id": 2,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1308,8 +1393,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 11,
-                  "startTime": 8100,
+                  "id": 3,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1328,8 +1413,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 12,
-                  "startTime": 8100,
+                  "id": 4,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1348,8 +1433,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 13,
-                  "startTime": 8100,
+                  "id": 5,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1368,8 +1453,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 14,
-                  "startTime": 8100,
+                  "id": 6,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1388,8 +1473,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 15,
-                  "startTime": 8100,
+                  "id": 7,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1408,8 +1493,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 16,
-                  "startTime": 8100,
+                  "id": 8,
+                  "startTime": 0,
                   "type": "setPos"
                 },
                 {
@@ -1423,8 +1508,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 17,
-                  "startTime": 8100,
+                  "id": 9,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1438,8 +1523,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 18,
-                  "startTime": 8100,
+                  "id": 10,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1453,8 +1538,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 19,
-                  "startTime": 8100,
+                  "id": 11,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1468,8 +1553,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 20,
-                  "startTime": 8100,
+                  "id": 12,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1483,8 +1568,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 21,
-                  "startTime": 8100,
+                  "id": 13,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1498,8 +1583,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 22,
-                  "startTime": 8100,
+                  "id": 14,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1513,8 +1598,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 23,
-                  "startTime": 8100,
+                  "id": 15,
+                  "startTime": 100,
                   "type": "castAction"
                 },
                 {
@@ -1528,8 +1613,8 @@
                     "targetType": "self"
                   },
                   "description": "",
-                  "id": 24,
-                  "startTime": 8100,
+                  "id": 16,
+                  "startTime": 100,
                   "type": "castAction"
                 }
               ]
@@ -1544,7 +1629,8 @@
               },
               "condition": "getAction",
               "description": "",
-              "id": 13,
+              "enabled": true,
+              "id": 1,
               "paramData": {
                 "actionId": 455,
                 "sourceActor": "Ifrit"

@@ -200,8 +200,11 @@ namespace Sapphire
         // Triggers
         for( const auto& triggerJ : phaseJ.value().at( "triggers" ).items() )
         {
+          volatile auto triggerV = triggerJ.value();
+
           Trigger trigger;
           trigger.setId( triggerJ.value().at( "id" ).get< uint32_t >() );
+          trigger.setDefaultEnabled( triggerJ.value().at( "enabled" ).get< bool >() );
 
           // Action
           {

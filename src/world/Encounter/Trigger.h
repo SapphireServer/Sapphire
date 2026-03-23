@@ -40,6 +40,8 @@ namespace Sapphire
     void setId( uint32_t id );
     void setAction( const TriggerActionPtr& pAction );
     void setCondition( const TriggerConditionPtr& pCondition );
+    void setDefaultEnabled( bool enabled );
+    bool getDefaultEnabled() const;
 
     bool isEnabled( PhaseState& state ) const;
     bool isConditionMet( TimelineActor& self, TimelinePack& pack, PhaseState& state, EncounterPtr pEncounter, uint64_t time ) const;

@@ -95,9 +95,9 @@ namespace Sapphire
 
     // reset triggers
     m_state.m_phaseState.m_triggerStates.clear();
-    // enable all triggers by default
-    for( const auto& trigger : pPhase->getTriggers() )
-      m_state.m_phaseState.m_triggerStates.emplace( trigger.first, true );
+    // enable/disable triggers according to default value in timeline
+    for( const auto& [ id, trigger ] : pPhase->getTriggers() )
+      m_state.m_phaseState.m_triggerStates.emplace( id, trigger.getDefaultEnabled() );
 
     // run setup for new phase
     m_pPhase->onEnter( *this, pack, m_state.m_phaseState, pEncounter, time );
