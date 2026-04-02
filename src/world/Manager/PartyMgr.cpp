@@ -18,6 +18,11 @@
 
 #include "Network/PacketWrappers/PcPartyUpdatePacket.h"
 
+#include "StatusEffect/StatusEffect.h"
+
+#include <Util/Util.h>
+#include <Util/UtilMath.h>
+
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
@@ -374,6 +379,22 @@ void PartyMgr::sendPartyUpdate( Party& party )
     memberEntry.Valid = 1;
     memberEntry.Tp = member->getTp();
     memberEntry.Role = classJob->data().Role;
+
+    uint8_t statusIdx = 0;
+    for( const auto& status : member->getStatusEffectMap() )
+    {
+      // cant send anymore statuses in this packet
+      if( statusIdx == 30 )
+        break;
+
+      auto& pStatus = status.second;
+      memberEntry.Status[ statusIdx ].Id = pStatus->getId();
+      memberEntry.Status[ statusIdx ].Source = pStatus->getSrcActorId();
+      memberEntry.Status[ statusIdx ].SystemParam = pStatus->getParam();
+      memberEntry.Status[ statusIdx ].Time = pStatus->getDuration();
+
+      ++statusIdx;
+    }
     /*
     memberEntry.CharaId = member->getContentId();
     memberEntry.EntityId = member->getId();
