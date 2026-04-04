@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <cstdint>
 #include "MySqlResultSet.h"
 
 namespace Mysql
