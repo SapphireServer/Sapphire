@@ -1,8 +1,8 @@
-#include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <Actor/Player.h>
+#include <Action/Job/THM/AstralUmbral.h>
 
 
 using namespace Sapphire;
@@ -16,6 +16,15 @@ public:
   }
 
   static constexpr auto Potency = 180;
+
+  void onBeforeBootstrap( Sapphire::World::Action::Action& action ) override
+  {
+    auto pPlayer = action.getSourceChara()->getAsPlayer();
+    if(pPlayer->getStatusEffectById(ActionStatus::UmbralIceIIIStatus))
+    {
+      action.setCastTime(action.getCastTime()*THM::AstralUmbralCastTimeReduction);
+    }
+  }
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pPlayer = action.getSourceChara()->getAsPlayer();
@@ -24,10 +33,9 @@ public:
     auto pActionBuilder = action.getActionResultBuilder();
     if( !pActionBuilder )
       return;
-    action.calcDamage(Potency);
-
     auto dmg = action.calcDamage( Potency );
     pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
+    Sapphire::World::Action::THM::applyAstralFire( pSource, pActionBuilder );
   }
 };
 
