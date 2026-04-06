@@ -14,7 +14,7 @@ public:
   }
 
   static constexpr uint32_t Potency = 40;
-  
+
   void onApply( Sapphire::Entity::Chara& actor ) override
   {
   }
@@ -25,7 +25,6 @@ public:
       return;
 
     auto pSource = effect.getSrcActor();
-    auto pPlayer = pSource->getAsPlayer();
     auto weaponDamage = pSource->getMagicalWeaponDamage();
     auto dmg = Math::CalcStats::calcActionDamage( *pSource, Potency, Common::BaseParam::Intelligence, weaponDamage );
     float damageVal = dmg.first;

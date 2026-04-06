@@ -946,9 +946,8 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     case Common::ActionPrimaryCostType::MagicPoints:
     {
       auto curMp = m_pSource->getMp();
-
-      uint32_t cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
-      auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+      
+      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
 
       // Elemental aspect cost modifiers.
       // Modifier order is the same as the action aspect order, so we can just add the action aspect to the enum value of the first modifier to get the correct one.

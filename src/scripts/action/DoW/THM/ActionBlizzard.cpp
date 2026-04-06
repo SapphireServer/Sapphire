@@ -20,7 +20,7 @@ public:
   void onBeforeBootstrap( Sapphire::World::Action::Action& action ) override
   {
     auto pPlayer = action.getSourceChara()->getAsPlayer();
-    if( pPlayer->getStatusEffectById( ActionStatus::AstralFireIIIStatus ) )
+    if( pPlayer && pPlayer->getStatusEffectById( ActionStatus::AstralFireIIIStatus ) )
     {
       action.setCastTime( action.getCastTime()*THM::AstralUmbralCastTimeReduction );
     }

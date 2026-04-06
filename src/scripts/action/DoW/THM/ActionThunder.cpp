@@ -24,8 +24,7 @@ public:
     auto pActionBuilder = action.getActionResultBuilder();
     if( !pActionBuilder )
       return;
-    action.calcDamage(Potency);
-
+      
     auto dmg = action.calcDamage( Potency );
     pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
     pActionBuilder->applyStatusEffect( pTarget, ThunderStatus, 18000, 0, {}, static_cast< uint32_t >( Common::StatusEffectFlag::DebuffCategory ), false, true );

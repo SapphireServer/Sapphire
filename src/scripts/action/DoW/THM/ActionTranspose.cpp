@@ -19,10 +19,9 @@ public:
   {
     auto pSource = action.getSourceChara();
     auto pActionBuilder = action.getActionResultBuilder();
-
     if(!pActionBuilder)
       return;
-      
+
     if( auto pAstral = THM::getAstralFire( pSource ) )
     {
       THM::setUmbralIce( pSource, pActionBuilder, 1 );
