@@ -8,13 +8,13 @@ using namespace Sapphire::World::Action;
 class StatusEffectUmbralIceII : public Sapphire::ScriptAPI::StatusEffectScript
 {
 public:
-  static constexpr int32_t RefreshBonus = 1400;
-  static constexpr int32_t FireDamageModifier = -20;
-  static constexpr int32_t FireSpellMpCostMultiplier = -75;
-
   StatusEffectUmbralIceII() : Sapphire::ScriptAPI::StatusEffectScript( ActionStatus::UmbralIceIIStatus )
   {
   }
+
+  static constexpr int32_t RefreshBonus = 1400;
+  static constexpr int32_t FireDamageModifier = -20;
+  static constexpr int32_t FireSpellMpCostMultiplier = -75;
 
   void onApply( Sapphire::Entity::Chara& actor ) override
   {
@@ -23,8 +23,8 @@ public:
       return;
 
     pStatus->setModifier( Common::ParamModifier::MpRestRegenPercent, RefreshBonus );
-    pStatus->setModifier( Common::ParamModifier::ElementalFireDamagePercent, FireDamageModifier);
-    pStatus->setModifier( Common::ParamModifier::ElementalFireMpCostPercent, FireSpellMpCostMultiplier);
+    pStatus->setModifier( Common::ParamModifier::ElementalFireDamagePercent, FireDamageModifier );
+    pStatus->setModifier( Common::ParamModifier::ElementalFireMpCostPercent, FireSpellMpCostMultiplier );
   }
     
 };

@@ -20,14 +20,13 @@ public:
   void onBeforeBootstrap( Sapphire::World::Action::Action& action ) override
   {
     auto pPlayer = action.getSourceChara()->getAsPlayer();
-    if(pPlayer->getStatusEffectById(ActionStatus::UmbralIceIIIStatus))
+    if( pPlayer->getStatusEffectById( ActionStatus::UmbralIceIIIStatus ) )
     {
-      action.setCastTime(action.getCastTime()*THM::AstralUmbralCastTimeReduction);
+      action.setCastTime( action.getCastTime()*THM::AstralUmbralCastTimeReduction );
     }
   }
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto pPlayer = action.getSourceChara()->getAsPlayer();
     auto pSource = action.getSourceChara();
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();

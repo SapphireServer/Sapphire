@@ -8,15 +8,15 @@ using namespace Sapphire::World::Action;
 class StatusEffectAstralFire : public Sapphire::ScriptAPI::StatusEffectScript
 {
 public:
+  StatusEffectAstralFire() : Sapphire::ScriptAPI::StatusEffectScript( ActionStatus::AstralFireStatus )
+  {
+  }  
+
   static constexpr int32_t FireDamageModifier = 40;
   static constexpr int32_t IceDamageModifier = -10;
   static constexpr int32_t FireSpellMpCostMultiplier = 100;
   static constexpr int32_t IceSpellMpCostMultiplier = -50;
   static constexpr int32_t RegenSuppression = 1;
-
-  StatusEffectAstralFire() : Sapphire::ScriptAPI::StatusEffectScript( ActionStatus::AstralFireStatus )
-  {
-  }  
 
   void onApply( Sapphire::Entity::Chara& actor ) override
   {
@@ -25,10 +25,10 @@ public:
       return;
 
     pStatus->setModifier( Common::ParamModifier::MpRestRegenSuppressed, RegenSuppression );
-    pStatus->setModifier( Common::ParamModifier::ElementalFireDamagePercent, FireDamageModifier);
-    pStatus->setModifier( Common::ParamModifier::ElementalIceDamagePercent, IceDamageModifier);
-    pStatus->setModifier( Common::ParamModifier::ElementalFireMpCostPercent, FireSpellMpCostMultiplier);
-    pStatus->setModifier( Common::ParamModifier::ElementalIceMpCostPercent, IceSpellMpCostMultiplier);
+    pStatus->setModifier( Common::ParamModifier::ElementalFireDamagePercent, FireDamageModifier );
+    pStatus->setModifier( Common::ParamModifier::ElementalIceDamagePercent, IceDamageModifier );
+    pStatus->setModifier( Common::ParamModifier::ElementalFireMpCostPercent, FireSpellMpCostMultiplier );
+    pStatus->setModifier( Common::ParamModifier::ElementalIceMpCostPercent, IceSpellMpCostMultiplier );
   }
 };
 

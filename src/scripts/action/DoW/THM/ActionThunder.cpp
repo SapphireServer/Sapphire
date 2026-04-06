@@ -14,11 +14,11 @@ public:
   ActionThunder() : Sapphire::ScriptAPI::ActionScript( ActionSkill::Thunder )
   {
   }
+  
   static constexpr auto Potency = 40;
   
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto pPlayer = action.getSourceChara()->getAsPlayer();
     auto pSource = action.getSourceChara();
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();

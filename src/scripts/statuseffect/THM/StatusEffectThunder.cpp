@@ -11,8 +11,10 @@ class StatusEffectThunder : public Sapphire::ScriptAPI::StatusEffectScript
 public:
   StatusEffectThunder() : Sapphire::ScriptAPI::StatusEffectScript( ActionStatus::ThunderStatus )
   {
-  }  
+  }
+
   static constexpr uint32_t Potency = 40;
+  
   void onApply( Sapphire::Entity::Chara& actor ) override
   {
   }

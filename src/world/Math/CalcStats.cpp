@@ -563,7 +563,7 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage
   
   // Elemental aspect modifiers.
   // Modifier order is the same as the action aspect order, so we can just add the action aspect to the enum value of the first modifier to get the correct one.
-  if(actionAspect != 0 && actionAspect < 8)
+  if( actionAspect != 0 && actionAspect < 8 )
   {
     auto modifier = static_cast<Common::ParamModifier>( static_cast<uint16_t>( Common::ParamModifier::ElementalNoneDamagePercent ) + actionAspect );
     damageDealtMod *= chara.getModifier( modifier );

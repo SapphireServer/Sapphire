@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "Actor/Player.h"
-#include "StatusEffect/StatusEffect.h"
 
 #include "Territory/Territory.h"
 

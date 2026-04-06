@@ -952,17 +952,14 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
 
       // Elemental aspect cost modifiers.
       // Modifier order is the same as the action aspect order, so we can just add the action aspect to the enum value of the first modifier to get the correct one.
-      auto modifier = static_cast<Common::ParamModifier>( static_cast< uint16_t >( Common::ParamModifier::ElementalNoneMpCostPercent ) + static_cast< uint8_t >( m_aspect ) );
+      auto modifier = static_cast< Common::ParamModifier >( static_cast< uint16_t >( Common::ParamModifier::ElementalNoneMpCostPercent ) + static_cast< uint8_t >( m_aspect ) );
       cost *=  m_pSource->getModifier( modifier );
 
-      if(cost < 0 )
-        cost = 0;
-
-      if( curMp < cost )
+      if( curMp < static_cast< uint32_t >( cost ) )
         return false;
 
       if( subtractCosts )
-        m_pSource->setMp( curMp - cost );
+        m_pSource->setMp( curMp - static_cast< uint32_t >( cost ) );
 
       return true;
     }

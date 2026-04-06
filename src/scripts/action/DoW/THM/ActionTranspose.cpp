@@ -17,10 +17,12 @@ public:
     
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto pPlayer = action.getSourceChara()->getAsPlayer();
     auto pSource = action.getSourceChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
+    if(!pActionBuilder)
+      return;
+      
     if( auto pAstral = THM::getAstralFire( pSource ) )
     {
       THM::setUmbralIce( pSource, pActionBuilder, 1 );
