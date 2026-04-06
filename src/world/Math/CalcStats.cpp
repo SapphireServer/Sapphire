@@ -536,7 +536,7 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcAutoAttackDa
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg, uint8_t actionAspect )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
@@ -560,6 +560,14 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage
   factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   // todo: buffs
+  
+  // Elemental aspect modifiers.
+  // Modifier order is the same as the action aspect order, so we can just add the action aspect to the enum value of the first modifier to get the correct one.
+  if( actionAspect != 0 && actionAspect < 8 )
+  {
+    auto modifier = static_cast<Common::ParamModifier>( static_cast<uint16_t>( Common::ParamModifier::ElementalNoneDamagePercent ) + actionAspect );
+    damageDealtMod *= chara.getModifier( modifier );
+  }
 
   factor *= damageDealtMod;
 

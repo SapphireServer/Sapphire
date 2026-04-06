@@ -110,7 +110,7 @@ bool Action::Action::init()
   m_effectWidth = m_actionData->data().EffectWidth;
   m_category = static_cast< Common::ActionCategory >( m_actionData->data().Category );
   m_castType = static_cast< Common::CastType >( m_actionData->data().EffectType );
-  m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().AttackType );
+  m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().Element );
 
   // todo: move this to bitset
   m_canTargetSelf = m_actionData->data().SelectMyself;
@@ -555,9 +555,8 @@ std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32
     if( getId() == 7 || getId() == 8 )
       return truncate( Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer(), calcStat, wepDmg ) );
   }
-
-  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg ) );
-  }
+  return truncate( Math::CalcStats::calcActionDamage( *m_pSource, potency, calcStat, wepDmg, static_cast< uint8_t >( m_aspect ) ) );
+}
 
 std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
 {
@@ -947,8 +946,13 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     case Common::ActionPrimaryCostType::MagicPoints:
     {
       auto curMp = m_pSource->getMp();
-
+      
       auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
+
+      // Elemental aspect cost modifiers.
+      // Modifier order is the same as the action aspect order, so we can just add the action aspect to the enum value of the first modifier to get the correct one.
+      auto modifier = static_cast< Common::ParamModifier >( static_cast< uint16_t >( Common::ParamModifier::ElementalNoneMpCostPercent ) + static_cast< uint8_t >( m_aspect ) );
+      cost *=  m_pSource->getModifier( modifier );
 
       if( curMp < static_cast< uint32_t >( cost ) )
         return false;

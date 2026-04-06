@@ -89,6 +89,30 @@ bool Player::performResting()
     addTp = 60;
   }
 
+  if( hasModifier( Common::ParamModifier::MpRestRegenSuppressed ) )
+  {
+    addMp = 0;
+  }
+  else if( hasModifier( Common::ParamModifier::MpRestRegenPercent ) )
+  {
+    auto regenMultiplier = getModifier( Common::ParamModifier::MpRestRegenPercent );
+    if( regenMultiplier <= 0.0f )
+    {
+      addMp = 0;
+    }
+    else
+    {
+      //using combat regen as a base because i dont know how fast out of combat regen actually was and this seems reasonable
+      float adjustedAddMp = static_cast< float >( addMp ) + 
+      ( static_cast< float >( static_cast< uint32_t >( static_cast< float >( getMaxMp() ) * 0.02f + 1 ) ) * ( regenMultiplier - 1.0f ) );
+
+      if( adjustedAddMp <= 0.0f )
+        addMp = 0;
+      else
+        addMp = static_cast< uint32_t >( adjustedAddMp );
+    }
+  }
+
   if( m_hp < getMaxHp() )
   {
 
@@ -102,7 +126,6 @@ bool Player::performResting()
 
   if( m_mp < getMaxMp() )
   {
-
     if( m_mp + addMp < getMaxMp() )
       m_mp += addMp;
     else

@@ -993,6 +993,21 @@ void Chara::setStatValue( Common::BaseParam baseParam, uint32_t value )
   m_baseStats[ index ] = value;
 }
 
+// Putting this here as an alternative to getModifier for bool checks
+bool Chara::hasModifier( Common::ParamModifier paramModifier ) const
+{
+  for( const auto& [ key, status ] : m_statusEffectMap )
+  {
+    for( const auto& [ mod, val ] : status->getModifiers() )
+    {
+      if( mod == paramModifier )
+        return true;
+    }
+  }
+
+  return false;
+}
+
 float Chara::getModifier( Common::ParamModifier paramModifier ) const
 {
   auto result = paramModifier >= Common::ParamModifier::StrengthPercent ? 1.0f : 0;

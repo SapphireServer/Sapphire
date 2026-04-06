@@ -138,7 +138,7 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::CalcResultType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float wepDmg );
 
-    static std::pair< float, Common::CalcResultType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg );
+    static std::pair< float, Common::CalcResultType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, Common::BaseParam calcStat, float wepDmg, uint8_t actionAspect = 0 );
 
     static std::pair< float, Common::CalcResultType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 

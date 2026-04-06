@@ -209,6 +209,8 @@ namespace Sapphire::Entity
 
     void setStatValue( Common::BaseParam baseParam, uint32_t value );
 
+    bool hasModifier( Common::ParamModifier paramModifier ) const;
+    
     float getModifier( Common::ParamModifier paramModifier ) const;
 
     virtual float getPhysicalWeaponDamage();
