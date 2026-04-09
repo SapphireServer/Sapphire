@@ -10,6 +10,7 @@
 #include "Manager/HousingMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/AchievementMgr.h"
+#include "Manager/FishingMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -659,6 +660,20 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::CANCEL_QUEST:
     {
       player.removeQuest( static_cast< uint16_t >( data.Arg0 ) );
+      break;
+    }
+    case PacketCommand::FISHING:
+    {
+      auto& fishingMgr = Service< FishingMgr >::ref();
+      auto fishingState = static_cast< uint8_t >( data.Arg0 );
+      if( fishingState == 0 )
+        fishingMgr.startFishing( player );
+      else if( fishingState == 1 )
+        fishingMgr.quitFishing( player );
+      else
+        Logger::debug( "[PacketCommandHandler] Unknown fishing state {} from player {}", fishingState,
+                       player.getCharacterId() );
+
       break;
     }
     case PacketCommand::HOUSING_LOCK_LAND_BY_BUILD:
