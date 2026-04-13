@@ -27,7 +27,8 @@ bool AchievementMgr::cacheAchievements()
     // verify if achievement type has subtype
     if( achvType == Common::Achievement::Type::General ||
         achvType == Common::Achievement::Type::Classjob ||
-        achvType == Common::Achievement::Type::InstanceContent )
+        achvType == Common::Achievement::Type::InstanceContent ||
+        achvType == Common::Achievement::Type::MapDiscovery )
     {
       int32_t subtype = achvExdData->data().ConditionArg[ 0 ];
       if( subtype != 0 )
@@ -94,23 +95,50 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto achvDataList = player.getAchievementData().progressData;
-  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId )->data();
-  auto achvType = static_cast< Common::Achievement::Type >( achvExd.ConditionType );
+  auto achv = player.getAchievementData();
+  auto achvDataList = achv.progressData;
+  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId );
+  auto achvData = achvExd->_data;
+  auto achvType = static_cast< Common::Achievement::Type>(achvData.ConditionType);
 
   // get paired type:subtype key for stored data
-  auto dataKey = getKeyFromType( achvType, achvExd.ConditionArg[ 0 ] );
+  auto dataKey = getKeyFromType( achvType, achvData.ConditionArg[ 0 ] );
+  
+  if( !achvDataList.count( dataKey.u32 ) )
+  {
+    switch(achvType)
+    {
+      case Common::Achievement::Type::Classjob:
+      {
+        progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+        break;
+      }
+      case Common::Achievement::Type::MapDiscovery:
+      {
+        retrieveProgressAchievementByType< Common::Achievement::Type::MapDiscovery >( player, achvData.ConditionArg[0] );
+        break;
+      }
+      case Common::Achievement::Type::General:
+      {
+        //retrieveProgressAchievementByType< Common::Achievement::Type::General >( player, achvData.ConditionArg[ 0 ] );
+        break;
+      }
+    }
+
+    achvDataList = player.getAchievementData().progressData;
+  }
 
   // get achievement progress data, if it exists (otherwise pass 0)
   uint32_t currProg = 0;
+  auto check = achvDataList.count( dataKey.u32 );
   if( achvDataList.count( dataKey.u32 ) )
     currProg = achvDataList[ dataKey.u32 ];
 
   // get maximum progress for given achievement, as required by client
-  uint32_t maxProg = static_cast< uint32_t >( achvExd.ConditionArg[ 1 ] );
+  uint32_t maxProg = static_cast< uint32_t >( achvData.ConditionArg[ 1 ] );
 
   // cap maximum progress display to maximum progress
-  return { std::min( currProg, maxProg ), maxProg };
+  return { std::min( currProg, maxProg > 0 ? maxProg : 1 ), maxProg > 0 ? maxProg : 1 };
 }
 
 void AchievementMgr::handleLinkedAchievementsForId( Entity::Player& player, uint32_t achievementId )
@@ -177,6 +205,8 @@ std::vector< uint32_t > AchievementMgr::getAchievementIdByType( Common::Achievem
 {
   return getAchievementIdByType( static_cast< uint32_t >( type ) );
 }
+
+//uint32_t AchievementMgr::getAchievementConditionByCategory( Common::Achievement::GeneralSubtype )
 
 std::vector< uint32_t > AchievementMgr::getAchievementIdByType( uint32_t type ) const
 {
