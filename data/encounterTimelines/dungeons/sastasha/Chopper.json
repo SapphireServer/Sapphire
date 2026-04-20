@@ -3,52 +3,73 @@
     {
       "hp": 65300,
       "id": 1,
+      "initialPhaseId": 1,
       "layoutId": 4035011,
       "name": "Chopper",
-      "schedules": [
+      "phases": [
         {
-          "description": "",
           "id": 1,
-          "name": "Phase 1",
-          "timepoints": [
+          "name": "Setup Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
             {
-              "data": {
-                "actionId": 351,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Chopper",
-                "targetType": "self"
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
               },
+              "condition": "combatState",
               "description": "",
+              "enabled": true,
               "id": 1,
-              "startTime": 16000,
-              "type": "castAction"
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Chopper"
+              }
             }
           ]
+        },
+        {
+          "id": 2,
+          "name": "Combat Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 1,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": [
+                {
+                  "data": {
+                    "actionId": 351,
+                    "selectorIndex": 0,
+                    "selectorName": "<unset>",
+                    "snapshot": false,
+                    "snapshotTime": 0,
+                    "sourceActor": "Chopper",
+                    "targetType": "self"
+                  },
+                  "description": "",
+                  "id": 1,
+                  "startTime": 16000,
+                  "type": "castAction"
+                }
+              ]
+            }
+          ],
+          "triggers": []
         }
       ],
       "subactors": [],
-      "type": "BNPC"
-    }
-  ],
-  "conditions": [
-    {
-      "condition": "combatState",
-      "description": "",
-      "enabled": true,
-      "id": 3,
-      "loop": true,
-      "paramData": {
-        "combatState": 1,
-        "sourceActor": "Chopper"
-      },
-      "targetActor": "Chopper",
-      "targetSchedule": "Phase 1"
+      "type": "bnpc"
     }
   ],
   "name": "Brand new timeline",
   "selectors": [],
-  "version": 21
+  "version": 30
 }
