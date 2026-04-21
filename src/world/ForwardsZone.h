@@ -167,6 +167,8 @@ TYPE_FORWARD( ContentFinder );
 
 namespace Scripting
 {
+class IScriptRuntime;
+class LuaScriptRuntime;
 class NativeScriptMgr;
 }
 

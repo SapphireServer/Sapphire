@@ -1,10 +1,16 @@
 [Scripts]
+; which script runtime to prefer: native, lua, or hybrid
+Backend = native
 ; where compiled script modules are located
 Path = ./compiledscripts/
 ; relative to Path, where we copy and load modules from
 CachePath = ./cache/
 ; whether we should detect changes to script modules and reload them
 HotSwap = true
+; where experimental Lua content scripts live
+LuaPath = ./scripts/
+; whether we should watch Lua content scripts for changes once the runtime is implemented
+LuaHotReload = false
 
 [Network]
 ListenIp = 0.0.0.0

@@ -162,9 +162,12 @@ bool WorldServer::loadSettings( int32_t argc, char *argv[ ] )
   }
 
   // load world specific config
+  m_config.scripts.backend = configMgr.getValue< std::string >( "Scripts", "Backend", "native" );
   m_config.scripts.hotSwap = configMgr.getValue( "Scripts", "HotSwap", true );
   m_config.scripts.path = configMgr.getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
   m_config.scripts.cachePath = configMgr.getValue< std::string >( "Scripts", "CachePath", "./cache/" );
+  m_config.scripts.luaPath = configMgr.getValue< std::string >( "Scripts", "LuaPath", "./scripts/" );
+  m_config.scripts.luaHotReload = configMgr.getValue( "Scripts", "LuaHotReload", false );
 
   m_config.navigation.meshPath = configMgr.getValue< std::string >( "Navigation", "MeshPath", "navi" );
   m_config.map.eagerENpcEObjCache = configMgr.getValue( "Map", "EagerENpcEObjCache", true );

@@ -54,9 +54,12 @@ namespace Sapphire::Common::Config
 
     struct Scripts
     {
+      std::string backend;
       std::string path;
       std::string cachePath;
+      std::string luaPath;
       bool hotSwap;
+      bool luaHotReload;
     } scripts;
 
     struct Navigation

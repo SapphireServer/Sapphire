@@ -6,6 +6,7 @@
 #include <set>
 
 #include <Common.h>
+#include "IScriptRuntime.h"
 #include "Forwards.h"
 #include "Territory/InstanceContent.h"
 
@@ -15,9 +16,29 @@ namespace Sapphire::Scripting
   {
   private:
     /*!
-     * @brief A shared ptr to NativeScriptMgr, used for accessing and managing the native script system.
+     * @brief Active script runtime used by ScriptMgr dispatch.
+     *
+     * This is intentionally abstract so we can introduce Lua or hybrid backends without
+     * rewriting the event dispatch surface all at once.
      */
-    std::shared_ptr< NativeScriptMgr > m_nativeScriptMgr;
+    std::shared_ptr< IScriptRuntime > m_nativeScriptMgr;
+
+    /*!
+     * @brief Back-compat handle for native-only admin/debug flows.
+     *
+     * Existing callers outside ScriptMgr still reach for NativeScriptMgr directly.
+     * Keep this until those surfaces are moved onto runtime-agnostic APIs.
+     */
+    std::shared_ptr< NativeScriptMgr > m_nativeScriptHandler;
+
+    /*!
+     * @brief Placeholder Lua runtime used to stage the migration surface.
+     *
+     * Keep the runtime alive so staged Lua content can be validated, looked up according to
+     * the active backend preference, and checked for Lua/native collisions during startup.
+     */
+    std::shared_ptr< IScriptRuntime > m_luaScriptRuntime;
+    bool m_preferLuaScripts{ false };
 
     std::function< std::string( Entity::Player& ) > m_onFirstEnterWorld;
 
@@ -25,7 +46,34 @@ namespace Sapphire::Scripting
      * @brief Used to ignore the first change notification that Watchdog emits.
      * Because reasons, it likes to emit an initial notification with all the files that match the filter, we don't want that so we ignore it.
      */
-    bool m_firstScriptChangeNotificiation;
+    bool loadRuntimeScripts( IScriptRuntime& runtime, const std::string& dirname, const std::string& runtimeName,
+                             bool requireScripts, bool failOnPartialLoad );
+
+    void watchRuntimeDirectory( const std::shared_ptr< IScriptRuntime >& runtime, const std::string& dirname,
+                                bool hotReload, const std::string& runtimeName );
+
+    void reportLuaShadowedNativeScripts();
+
+    template< typename T >
+    T* getScript( uint32_t scriptId )
+    {
+      if( m_preferLuaScripts && m_luaScriptRuntime )
+      {
+        if( auto script = m_luaScriptRuntime->getScript< T >( scriptId ) )
+          return script;
+      }
+
+      if( m_nativeScriptMgr )
+      {
+        if( auto script = m_nativeScriptMgr->getScript< T >( scriptId ) )
+          return script;
+      }
+
+      if( !m_preferLuaScripts && m_luaScriptRuntime )
+        return m_luaScriptRuntime->getScript< T >( scriptId );
+
+      return nullptr;
+    }
 
   public:
     ScriptMgr();
@@ -152,6 +200,9 @@ namespace Sapphire::Scripting
 
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 
+    Event::EventHandler::QuestAvailability getQuestAvailability( Entity::Player& player, uint32_t questId );
+
+    IScriptRuntime& getScriptRuntime();
     NativeScriptMgr& getNativeScriptHandler();
   };
 }

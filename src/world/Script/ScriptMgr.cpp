@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cctype>
+
 #include <Logging/Logger.h>
 #include <Exd/ExdData.h>
 
@@ -24,6 +27,7 @@
 
 #include "Script/ScriptMgr.h"
 
+#include "LuaScriptRuntime.h"
 #include "NativeScriptMgr.h"
 #include "WorldServer.h"
 
@@ -35,12 +39,102 @@ using namespace Sapphire::World::Manager;
 
 namespace fs = std::filesystem;
 
-Sapphire::Scripting::ScriptMgr::ScriptMgr() :
-  m_firstScriptChangeNotificiation( false )
+namespace
 {
-  // Get cache path from WorldServer config in the EXE and pass it explicitly
+  std::string normalizeScriptBackend( std::string backend )
+  {
+    std::transform( backend.begin(), backend.end(), backend.begin(),
+                    []( unsigned char ch )
+                    {
+                      return static_cast< char >( std::tolower( ch ) );
+                    } );
+
+    if( backend.empty() )
+      return "native";
+
+    return backend;
+  }
+
+  std::vector< std::string > collectRuntimeDirectories( const std::string& rootDir )
+  {
+    std::vector< std::string > directories;
+    if( !fs::exists( rootDir ) )
+      return directories;
+
+    directories.push_back( rootDir );
+
+    for( const auto& entry : fs::recursive_directory_iterator( rootDir ) )
+    {
+      if( entry.is_directory() )
+        directories.push_back( entry.path().string() );
+    }
+
+    return directories;
+  }
+
+  std::string buildWatchPattern( const std::string& dirname, const std::string& extension )
+  {
+    return ( fs::path( dirname ) / ( "*" + extension ) ).string();
+  }
+
+  std::string describeScriptType( const std::size_t type )
+  {
+    if( type == typeid( Sapphire::ScriptAPI::EventScript ).hash_code() )
+      return "event";
+    if( type == typeid( Sapphire::ScriptAPI::QuestScript ).hash_code() )
+      return "quest";
+    if( type == typeid( Sapphire::ScriptAPI::ActionScript ).hash_code() )
+      return "action";
+    if( type == typeid( Sapphire::ScriptAPI::StatusEffectScript ).hash_code() )
+      return "status";
+    if( type == typeid( Sapphire::ScriptAPI::EventObjectScript ).hash_code() )
+      return "event_object";
+    if( type == typeid( Sapphire::ScriptAPI::ZoneScript ).hash_code() )
+      return "zone";
+    if( type == typeid( Sapphire::ScriptAPI::InstanceContentScript ).hash_code() )
+      return "instance";
+    if( type == typeid( Sapphire::ScriptAPI::QuestBattleScript ).hash_code() )
+      return "quest_battle";
+
+    return "type#" + std::to_string( type );
+  }
+}
+
+Sapphire::Scripting::ScriptMgr::ScriptMgr()
+{
   auto& server = Common::Service< World::WorldServer >::ref();
-  m_nativeScriptMgr = createNativeScriptMgr( server.getConfig().scripts.cachePath );
+  const auto& scriptConfig = server.getConfig().scripts;
+  const auto backend = normalizeScriptBackend( scriptConfig.backend );
+
+  m_nativeScriptHandler = createNativeScriptMgr( scriptConfig.cachePath );
+  m_nativeScriptMgr = m_nativeScriptHandler;
+
+  if( backend == "native" )
+  {
+    Logger::info( "ScriptMgr: using native runtime with modules at {0}", scriptConfig.path );
+  }
+  else if( backend == "lua" )
+  {
+    m_luaScriptRuntime = createLuaScriptRuntime( scriptConfig.luaPath, scriptConfig.luaHotReload );
+    m_preferLuaScripts = true;
+    Logger::warn(
+      "ScriptMgr: Scripts.Backend=lua is configured. Script lookups now check Lua first. "
+      "Only declarative Lua event talk plus quest talk/item/ground-item/emote/object-hit/territory/range/kill handlers are supported in this slice, so other hooks still fall back to native modules at {0} while staging content under {1}.",
+      scriptConfig.path, scriptConfig.luaPath );
+  }
+  else if( backend == "hybrid" )
+  {
+    m_luaScriptRuntime = createLuaScriptRuntime( scriptConfig.luaPath, scriptConfig.luaHotReload );
+    Logger::warn(
+      "ScriptMgr: Scripts.Backend=hybrid is configured. Native scripts remain authoritative while Lua modules are loaded and validated from {0}. "
+      "This slice only supports declarative Lua event talk plus quest talk/item/ground-item/emote/object-hit/territory/range/kill handlers.",
+      scriptConfig.luaPath );
+  }
+  else
+  {
+    Logger::warn( "ScriptMgr: unknown Scripts.Backend value '{0}', defaulting to native modules at {1}.",
+                  scriptConfig.backend, scriptConfig.path );
+  }
 }
 
 Sapphire::Scripting::ScriptMgr::~ScriptMgr()
@@ -57,43 +151,45 @@ void Sapphire::Scripting::ScriptMgr::shutdown()
   {
     m_nativeScriptMgr->unloadAll();
   }
-  // Reset flag so next init ignores the first Watchdog burst again
-  m_firstScriptChangeNotificiation = false;
+
+  if( m_luaScriptRuntime )
+  {
+    m_luaScriptRuntime->unloadAll();
+  }
 }
 
 void Sapphire::Scripting::ScriptMgr::update()
 {
   m_nativeScriptMgr->processLoadQueue();
+
+  if( m_luaScriptRuntime )
+  {
+    m_luaScriptRuntime->processLoadQueue();
+  }
 }
 
 bool Sapphire::Scripting::ScriptMgr::init()
 {
-  std::set< std::string > files;
   auto& server = Common::Service< World::WorldServer >::ref();
+  const auto& scriptConfig = server.getConfig().scripts;
+  const auto backend = normalizeScriptBackend( scriptConfig.backend );
 
-  auto status = loadDir( server.getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
-
-  if( !status )
+  if( !loadRuntimeScripts( *m_nativeScriptMgr, scriptConfig.path, "native", true, false ) )
   {
     Logger::error(
       "ScriptMgr: failed to load modules, the server will not function correctly without scripts loaded." );
     return false;
   }
 
-  uint32_t scriptsFound = 0;
-  uint32_t scriptsLoaded = 0;
-
-  for( auto itr = files.begin(); itr != files.end(); ++itr )
+  if( m_luaScriptRuntime &&
+      !loadRuntimeScripts( *m_luaScriptRuntime, scriptConfig.luaPath, "lua", false, true ) )
   {
-    auto& path = *itr;
-
-    scriptsFound++;
-
-    if( m_nativeScriptMgr->loadScript( path ) )
-      scriptsLoaded++;
+    Logger::error( "ScriptMgr: failed to stage Lua modules from {0}.", scriptConfig.luaPath );
+    return false;
   }
 
-  Logger::info( "ScriptMgr: Loaded {0}/{1} modules", scriptsLoaded, scriptsFound );
+  if( m_luaScriptRuntime && backend != "native" )
+    reportLuaShadowedNativeScripts();
 
   watchDirectories();
 
@@ -103,38 +199,14 @@ bool Sapphire::Scripting::ScriptMgr::init()
 void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto shouldWatch = server.getConfig().scripts.hotSwap;
-  if( !shouldWatch )
-    return;
+  const auto& scriptConfig = server.getConfig().scripts;
 
-  Watchdog::watchMany( server.getConfig().scripts.path + "*" +
-                       m_nativeScriptMgr->getModuleExtension(),
-                       [ this ]( const std::vector< ci::fs::path >& paths )
-                       {
-                         if( !m_firstScriptChangeNotificiation )
-                         {
-                           // for whatever reason, the first time this runs, it detects every file as changed
-                           // so we're always going to ignore the first notification
-                           m_firstScriptChangeNotificiation = true;
-                           return;
-                         }
+  watchRuntimeDirectory( m_nativeScriptMgr, scriptConfig.path, scriptConfig.hotSwap, "native" );
 
-                         for( const auto& path : paths )
-                         {
-                           if( m_nativeScriptMgr->isModuleLoaded( path.stem().string() ) )
-                           {
-                             Logger::debug( "Reloading changed script: {0}", path.stem().string() );
-
-                             m_nativeScriptMgr->queueScriptReload( path.stem().string() );
-                           }
-                           else
-                           {
-                             Logger::debug( "Loading new script: {0}", path.stem().string() );
-
-                             m_nativeScriptMgr->loadScript( path.string() );
-                           }
-                         }
-                       } );
+  if( m_luaScriptRuntime )
+  {
+    watchRuntimeDirectory( m_luaScriptRuntime, scriptConfig.luaPath, scriptConfig.luaHotReload, "lua" );
+  }
 }
 
 bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
@@ -169,6 +241,171 @@ bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::s
   }
 }
 
+bool Sapphire::Scripting::ScriptMgr::loadRuntimeScripts( IScriptRuntime& runtime, const std::string& dirname,
+                                                         const std::string& runtimeName, bool requireScripts,
+                                                         bool failOnPartialLoad )
+{
+  std::set< std::string > files;
+
+  Logger::info( "ScriptMgr: loading {0} scripts from: {1}", runtimeName, dirname );
+
+  if( !fs::exists( dirname ) )
+  {
+    if( requireScripts )
+    {
+      Logger::error( "ScriptMgr: {0} scripts directory doesn't exist", runtimeName );
+      return false;
+    }
+
+    Logger::info( "ScriptMgr: skipping {0} scripts because the directory does not exist yet.", runtimeName );
+    return true;
+  }
+
+  fs::path targetDir( dirname );
+  fs::recursive_directory_iterator iter( targetDir );
+
+  for( const auto& i : iter )
+  {
+    if( fs::is_regular_file( i ) && fs::path( i ).extension() == runtime.getModuleExtension() )
+      files.insert( fs::path( i ).string() );
+  }
+
+  if( files.empty() )
+  {
+    if( requireScripts )
+    {
+      Logger::error( "ScriptMgr: couldn't find any {0} script modules", runtimeName );
+      return false;
+    }
+
+    Logger::info( "ScriptMgr: no {0} script modules found in {1}", runtimeName, dirname );
+    return true;
+  }
+
+  uint32_t scriptsFound = 0;
+  uint32_t scriptsLoaded = 0;
+  std::vector< std::string > failedScripts;
+
+  for( const auto& path : files )
+  {
+    scriptsFound++;
+
+    if( runtime.loadScript( path ) )
+      scriptsLoaded++;
+    else
+      failedScripts.push_back( path );
+  }
+
+  if( failedScripts.empty() )
+  {
+    Logger::info( "ScriptMgr: Loaded {0}/{1} {2} modules", scriptsLoaded, scriptsFound, runtimeName );
+    return true;
+  }
+
+  Logger::error( "ScriptMgr: Loaded {0}/{1} {2} modules. {3} failed to load.", scriptsLoaded, scriptsFound,
+                 runtimeName, failedScripts.size() );
+
+  for( const auto& path : failedScripts )
+    Logger::error( "ScriptMgr: {0} module failed to load: {1}", runtimeName, path );
+
+  if( failOnPartialLoad )
+    return false;
+
+  return true;
+}
+
+void Sapphire::Scripting::ScriptMgr::reportLuaShadowedNativeScripts()
+{
+  if( !m_luaScriptRuntime || !m_nativeScriptMgr )
+    return;
+
+  const auto luaRuntime = std::dynamic_pointer_cast< LuaScriptRuntime >( m_luaScriptRuntime );
+  if( !luaRuntime )
+    return;
+
+  const auto descriptors = luaRuntime->getLoadedScriptDescriptors();
+  std::vector< LuaScriptRuntime::LoadedScriptDescriptor > overlaps;
+  overlaps.reserve( descriptors.size() );
+
+  for( const auto& descriptor : descriptors )
+  {
+    if( m_nativeScriptMgr->getScriptObject( descriptor.type, descriptor.id ) )
+      overlaps.push_back( descriptor );
+  }
+
+  if( overlaps.empty() )
+    return;
+
+  const char* precedenceOwner = m_preferLuaScripts ? "Lua" : "Native";
+  const char* precedenceVerb = m_preferLuaScripts ? "shadow" : "overlap";
+  Logger::warn(
+    "ScriptMgr: detected {0} Lua script(s) that {1} an existing native script. {2} remains authoritative for these ids.",
+    overlaps.size(), precedenceVerb, precedenceOwner );
+
+  constexpr std::size_t MaxLoggedOverlaps = 10;
+  const auto overlapsToLog = std::min( overlaps.size(), MaxLoggedOverlaps );
+
+  for( std::size_t i = 0; i < overlapsToLog; ++i )
+  {
+    const auto& overlap = overlaps[i];
+    Logger::warn(
+      "ScriptMgr: Lua {0} script id {1} from module {2} overlaps a native script with the same id. {3} remains authoritative.",
+      describeScriptType( overlap.type ), overlap.id, overlap.moduleName, precedenceOwner );
+  }
+
+  if( overlaps.size() > MaxLoggedOverlaps )
+  {
+    Logger::warn( "ScriptMgr: ... plus {0} additional Lua/native script overlap(s).",
+                  overlaps.size() - MaxLoggedOverlaps );
+  }
+}
+
+void Sapphire::Scripting::ScriptMgr::watchRuntimeDirectory( const std::shared_ptr< IScriptRuntime >& runtime,
+                                                            const std::string& dirname, bool hotReload,
+                                                            const std::string& runtimeName )
+{
+  if( !hotReload || !runtime )
+    return;
+
+  if( !fs::exists( dirname ) )
+  {
+    Logger::info( "ScriptMgr: skipping {0} script watch because the directory does not exist: {1}", runtimeName,
+                  dirname );
+    return;
+  }
+
+  for( const auto& watchDir : collectRuntimeDirectories( dirname ) )
+  {
+    auto ignoreInitialNotification = std::make_shared< bool >( true );
+    Watchdog::watchMany( buildWatchPattern( watchDir, runtime->getModuleExtension() ),
+                         [ runtime, ignoreInitialNotification, runtimeName ]( const std::vector< ci::fs::path >& paths )
+                         {
+                           if( *ignoreInitialNotification )
+                           {
+                             // Watchdog emits an initial burst for all matching files. Ignore that for each watcher.
+                             *ignoreInitialNotification = false;
+                             return;
+                           }
+
+                           for( const auto& path : paths )
+                           {
+                             const auto moduleName = runtime->getModuleNameForPath( path.string() );
+
+                             if( runtime->isModuleLoaded( moduleName ) )
+                             {
+                               Logger::debug( "Reloading changed {0} script: {1}", runtimeName, moduleName );
+                               runtime->queueScriptReload( moduleName );
+                             }
+                             else
+                             {
+                               Logger::debug( "Loading new {0} script: {1}", runtimeName, moduleName );
+                               runtime->loadScript( path.string() );
+                             }
+                           }
+                         } );
+  }
+}
+
 void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player )
 {
   //   try
@@ -187,7 +424,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   auto& exdData = Common::Service< Data::ExdData >::ref();
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
     {
       auto questInfo = exdData.getRow< Excel::Quest >( eventId );
@@ -228,7 +465,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( auto eobj = zone ? zone->getEObj( static_cast< uint32_t >( actorId ) ) : nullptr )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getBaseId() );
+    auto script = getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getBaseId() );
     if( script )
     {
       script->onTalk( eventId, player, *eobj );
@@ -237,7 +474,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     if( auto instance = zone->getAsInstanceContent() )
     {
-      auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >(
+      auto instanceScript = getScript< Sapphire::ScriptAPI::InstanceContentScript >(
         instance->getDirectorId() );
       if( instanceScript )
       {
@@ -248,13 +485,13 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   }
 
   // check for a direct eventid match first, otherwise default to base type
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     script->onTalk( eventId, player, actorId );
     return true;
   }
-  script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+  script = getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
   if( script )
   {
     script->onTalk( eventId, player, actorId );
@@ -264,7 +501,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   // todo: this zone check might fumbling it. need testing
   if( auto instance = zone ? zone->getAsInstanceContent() : nullptr )
   {
-    auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
+    auto instanceScript = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
     if( instanceScript )
     {
       instanceScript->onTalk( *instance, player, eventId, actorId );
@@ -288,7 +525,7 @@ bool Sapphire::Scripting::ScriptMgr::onYield( Entity::Player& player, uint32_t e
   }
 
   // check for a direct eventid match first, otherwise default to base type
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     script->onYield( eventId, sceneId, resumeId, player, resultString, resultInt );
@@ -296,7 +533,7 @@ bool Sapphire::Scripting::ScriptMgr::onYield( Entity::Player& player, uint32_t e
   }
   else
   {
-    script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+    script = getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
     if( !script )
       return false;
 
@@ -312,7 +549,7 @@ bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, u
 
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
       return false;
     if( player.hasQuest( eventId ) )
@@ -324,7 +561,7 @@ bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, u
   }
   else
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
     if( !script )
       return false;
     script->onEnterTerritory( player, eventId, param1, param2 );
@@ -341,7 +578,7 @@ bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint
 
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
       return false;
     if( player.hasQuest( eventId ) )
@@ -354,11 +591,11 @@ bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint
         player.updateQuest( quest );
     }
   }
-  else if( auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId ) )
+  else if( auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId ) )
   {
     script->onWithinRange( player, eventId, param1, x, y, z );
   }
-  else if( auto script = m_nativeScriptMgr->getScript<
+  else if( auto script = getScript<
     Sapphire::ScriptAPI::ZoneScript >( player.getTerritoryTypeId() ) )
   {
     script->onWithinRange( player, eventId, param1, x, y, z );
@@ -379,7 +616,7 @@ bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uin
 
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
       return false;
     if( player.hasQuest( eventId ) )
@@ -394,7 +631,7 @@ bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uin
   }
   else
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
     if( !script )
       return false;
     script->onOutsideRange( player, eventId, param1, x, y, z );
@@ -412,7 +649,7 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
   auto actor = pEventMgr.getActorBaseId( static_cast< uint32_t >( actorId ) );
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
       return false;
     if( player.hasQuest( eventId ) )
@@ -427,7 +664,7 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
   }
   else
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
     if( !script )
       return false;
     script->onEmote( actor, eventId, emoteId, player );
@@ -446,7 +683,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventHandlerReturn( Entity::Player& playe
 bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId,
                                                                 uint16_t subEvent, uint16_t param, uint32_t catalogId )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  auto script = getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
     script->onEventHandlerTradeReturn( player, eventId, subEvent, param, catalogId );
@@ -471,7 +708,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   auto& exdData = Common::Service< Data::ExdData >::ref();
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( script )
     {
       auto questId = static_cast< uint16_t >( eventId );
@@ -506,7 +743,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventGroundItem( Entity::Player& player, 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( script )
     {
       auto questId = static_cast< uint16_t >( eventId );
@@ -540,7 +777,7 @@ void Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& play
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       std::string objName = eventMgr.getEventName( questId );
@@ -568,7 +805,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, Entity:
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       std::string objName = eventMgr.getEventName( questId );
@@ -599,7 +836,7 @@ bool Sapphire::Scripting::ScriptMgr::onPlayerDeath( Entity::Player& player )
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       std::string objName = eventMgr.getEventName( questId );
@@ -632,7 +869,7 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       didCallScript = true;
@@ -652,7 +889,7 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
 
 bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
@@ -664,7 +901,7 @@ bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
 
 bool Sapphire::Scripting::ScriptMgr::onAfterBuildEffect( World::Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
@@ -676,7 +913,7 @@ bool Sapphire::Scripting::ScriptMgr::onAfterBuildEffect( World::Action::Action& 
 
 bool Sapphire::Scripting::ScriptMgr::onInterrupt( World::Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
@@ -694,7 +931,7 @@ bool Sapphire::Scripting::ScriptMgr::onBeforeBootstrap( World::Action::Action& a
     return false;
   }
 
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
@@ -707,7 +944,7 @@ bool Sapphire::Scripting::ScriptMgr::onBeforeBootstrap( World::Action::Action& a
 
 bool Sapphire::Scripting::ScriptMgr::onStart( World::Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
@@ -720,7 +957,7 @@ bool Sapphire::Scripting::ScriptMgr::onStart( World::Action::Action& action )
 
 bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
+  auto script = getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
 
   if( script )
   {
@@ -737,7 +974,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, u
 bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pActor,
                                                    Sapphire::StatusEffect::StatusEffect& effect )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
     script->onTick( *pActor, effect );
@@ -749,7 +986,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pActor,
 
 bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
+  auto script = getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
   if( script )
   {
     if( pChara->isPlayer() )
@@ -765,7 +1002,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
 bool Sapphire::Scripting::ScriptMgr::onPlayerHit( Entity::CharaPtr& pHitChara,
                                                   Sapphire::StatusEffect::StatusEffect& effect )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
+  auto script = getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
     script->onPlayerHit( *pHitChara, effect );
@@ -777,7 +1014,7 @@ bool Sapphire::Scripting::ScriptMgr::onPlayerHit( Entity::CharaPtr& pHitChara,
 
 bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( zone.getTerritoryTypeId() );
+  auto script = getScript< Sapphire::ScriptAPI::ZoneScript >( zone.getTerritoryTypeId() );
   if( script )
   {
     script->onZoneInit();
@@ -790,7 +1027,7 @@ bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
 bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
 {
   auto instId = instance.getDirectorId();
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -805,7 +1042,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
 bool Sapphire::Scripting::ScriptMgr::onInstanceReset( InstanceContent& instance )
 {
   auto instId = instance.getDirectorId();
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -819,7 +1056,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceReset( InstanceContent& instance 
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance, uint64_t tickCount )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -836,7 +1073,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceStateChange( Sapphire::InstanceCo
                                                             Sapphire::InstanceContentState oldState,
                                                             Sapphire::InstanceContentState newState )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -852,7 +1089,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceStateChange( Sapphire::InstanceCo
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player,
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onEnterTerritory( instance, player, eventId, param1, param2 );
@@ -864,7 +1101,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& 
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onLeaveTerritory( instance, player );
@@ -876,7 +1113,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceLeaveTerritory( InstanceContent& 
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorSeqChange( InstanceContent& instance, uint8_t seq )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onDirectorSeqChange( instance, seq );
@@ -888,7 +1125,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorSeqChange( InstanceConten
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagChange( InstanceContent& instance, uint8_t flag )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onDirectorFlagChange( instance, flag );
@@ -900,7 +1137,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagChange( InstanceConte
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onDirectorVarChange( instance, var, val );
@@ -912,7 +1149,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarChange( InstanceConten
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onCustomVarChange( instance, var, val );
@@ -924,7 +1161,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent&
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceActorDeath( InstanceContent& instance, Entity::Chara& chara )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
   if( script )
   {
     script->onActorDeath( instance, chara );
@@ -936,7 +1173,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceActorDeath( InstanceContent& inst
 
 bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( QuestBattle& instance, Entity::Player& player )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
   if( script )
   {
     script->onPlayerSetup( instance, player );
@@ -948,7 +1185,7 @@ bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( QuestBattle& instance, Entit
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceInit( QuestBattle& instance )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
   if( script )
   {
     script->onInit( instance );
@@ -960,7 +1197,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( QuestBattle& instance )
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattle& instance, uint64_t tickCount )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -973,7 +1210,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattle& instance, ui
 
 bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
 
   if( script )
   {
@@ -987,7 +1224,7 @@ bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Enti
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( QuestBattle& instance, Entity::Player& player,
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
   if( script )
   {
     script->onEnterTerritory( instance, player, eventId, param1, param2 );
@@ -999,13 +1236,27 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( QuestBattle& inst
 
 Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeScriptHandler()
 {
+  return *m_nativeScriptHandler;
+}
+
+Sapphire::Event::EventHandler::QuestAvailability
+Sapphire::Scripting::ScriptMgr::getQuestAvailability( Entity::Player& player, uint32_t questId )
+{
+  if( auto script = getScript< Sapphire::ScriptAPI::QuestScript >( questId ) )
+    return script->getQuestAvailability( player, questId );
+
+  return Event::EventHandler::QuestAvailability::Invisible;
+}
+
+Sapphire::Scripting::IScriptRuntime& Sapphire::Scripting::ScriptMgr::getScriptRuntime()
+{
   return *m_nativeScriptMgr;
 }
 
 bool
 Sapphire::Scripting::ScriptMgr::onDutyComplete( QuestBattle& instance, Sapphire::Entity::Player& player )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+  auto script = getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
   if( script )
   {
     World::Quest preQ;
@@ -1029,7 +1280,7 @@ bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, ui
   auto& exdData = Common::Service< Data::ExdData >::ref();
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    auto script = getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
     {
       auto questInfo = exdData.getRow< Excel::Quest >( eventId );

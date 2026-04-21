@@ -1,6 +1,9 @@
 #include "NativeScriptMgr.h"
 
 #include <Crypt/md5.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace Sapphire::Scripting
 {
@@ -44,11 +47,33 @@ namespace Sapphire::Scripting
     return true;
   }
 
-  const std::string NativeScriptMgr::getModuleExtension()
+  std::string NativeScriptMgr::getModuleExtension()
   {
     std::scoped_lock lock( m_mutex );
 
     return m_loader.getModuleExtension();
+  }
+
+  std::string NativeScriptMgr::getModuleNameForPath( const std::string& path )
+  {
+    std::scoped_lock lock( m_mutex );
+
+    return fs::path( path ).stem().string();
+  }
+
+  Sapphire::ScriptAPI::ScriptObject* NativeScriptMgr::getScriptObject( std::size_t type, uint32_t scriptId )
+  {
+    std::scoped_lock lock( m_mutex );
+
+    auto typeIt = m_scripts.find( type );
+    if( typeIt == m_scripts.end() )
+      return nullptr;
+
+    auto scriptIt = typeIt->second.find( scriptId );
+    if( scriptIt == typeIt->second.end() )
+      return nullptr;
+
+    return scriptIt->second;
   }
 
   bool NativeScriptMgr::unloadScript( const std::string& name )
@@ -162,5 +187,10 @@ namespace Sapphire::Scripting
   std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( const std::string& cachePath )
   {
     return std::make_shared< NativeScriptMgr >( cachePath );
+  }
+
+  IScriptRuntimePtr createNativeScriptRuntime( const std::string& cachePath )
+  {
+    return createNativeScriptMgr( cachePath );
   }
 }

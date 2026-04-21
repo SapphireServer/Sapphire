@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 
+#include "IScriptRuntime.h"
 #include "ScriptLoader.h"
 
 namespace Sapphire::Scripting
@@ -14,7 +15,7 @@ namespace Sapphire::Scripting
   /*!
    * @brief Contains all the functionality for easily loading, unloading, reloading and generally accessing scripts.
    */
-  class NativeScriptMgr
+  class NativeScriptMgr : public IScriptRuntime
   {
   protected:
     /*!
@@ -46,7 +47,7 @@ namespace Sapphire::Scripting
     explicit NativeScriptMgr( const std::string& cachePath );
 
     // Unload all loaded scripts and clear internal state for a clean restart
-    void unloadAll();
+    void unloadAll() override;
 
     /*!
      * @brief Loads a script from a path
@@ -56,7 +57,7 @@ namespace Sapphire::Scripting
      * @param path The path to the module to load
      * @return true if successful, false if not
      */
-    bool loadScript( const std::string& path );
+    bool loadScript( const std::string& path ) override;
 
     /*!
      * @brief Unloads a script
@@ -64,7 +65,7 @@ namespace Sapphire::Scripting
      * @param name The module name of the script to unload
      * @return true if successful
      */
-    bool unloadScript( const std::string& name );
+    bool unloadScript( const std::string& name ) override;
 
     /*!
      * @brief Queues a script module to be reloaded
@@ -74,7 +75,7 @@ namespace Sapphire::Scripting
      *
      * @param name The name of the module to be reloaded.
      */
-    void queueScriptReload( const std::string& name );
+    void queueScriptReload( const std::string& name ) override;
 
     /*!
      * @brief Case-insensitive search for modules, useful for debug commands
@@ -82,19 +83,21 @@ namespace Sapphire::Scripting
      * @param scripts a set of ScriptInfo ptrs
      * @param search the search term
      */
-    void findScripts( std::set< Sapphire::Scripting::ScriptInfo * >& scripts, const std::string& search );
+    void findScripts( std::set< Sapphire::Scripting::ScriptInfo * >& scripts, const std::string& search ) override;
 
     /*!
      * @brief Called on a regular interval, allows for scripts to be loaded from the internal load queue.
      */
-    void processLoadQueue();
+    void processLoadQueue() override;
 
     /*!
      * @brief Gets the module file extention for the current platform (windows, linux, osx)
      *
      * @return The file extension for the current platform
      */
-    const std::string getModuleExtension();
+    std::string getModuleExtension() override;
+
+    std::string getModuleNameForPath( const std::string& path ) override;
 
     /*!
      * @brief Checks to see if a module with the specified name exists
@@ -102,7 +105,9 @@ namespace Sapphire::Scripting
      * @param name The module name to lookup
      * @return true if loaded, false if not
      */
-    bool isModuleLoaded( const std::string& name );
+    bool isModuleLoaded( const std::string& name ) override;
+
+    ScriptAPI::ScriptObject* getScriptObject( std::size_t type, uint32_t scriptId ) override;
 
     /*!
      * @brief Get a specific script from the internal table
@@ -114,13 +119,7 @@ namespace Sapphire::Scripting
     template< typename T >
     T *getScript( uint32_t scriptId )
     {
-      auto type = typeid( T ).hash_code();
-
-      auto script = m_scripts[ type ].find( scriptId );
-      if( script == m_scripts[ type ].end() )
-        return nullptr;
-
-      return dynamic_cast< T * >( script->second );
+      return dynamic_cast< T* >( getScriptObject( typeid( T ).hash_code(), scriptId ) );
     }
   };
 
@@ -131,6 +130,8 @@ namespace Sapphire::Scripting
    * @return a std::shared_ptr to NativeScriptMgr
    */
   std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( const std::string& cachePath );
+
+  IScriptRuntimePtr createNativeScriptRuntime( const std::string& cachePath );
 }
 
 #endif
