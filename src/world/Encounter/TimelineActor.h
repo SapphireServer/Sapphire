@@ -62,6 +62,8 @@ namespace Sapphire
 
     PhasePtr getPhaseById( uint32_t phaseId );
 
+    uint64_t getPhaseElapsed() const;
+
     // todo: make this sane
     void update( EncounterPtr pEncounter, TimelinePack& pack, uint64_t time );
 

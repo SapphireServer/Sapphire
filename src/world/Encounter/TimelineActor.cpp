@@ -49,12 +49,22 @@ namespace Sapphire
     return nullptr;
   }
 
-  // todo: make this sane
+  uint64_t TimelineActor::getPhaseElapsed() const
+  {
+    auto startTime = m_state.m_phaseState.m_startTime;
+    if( startTime == 0 )
+      startTime = Common::Util::getTimeMs();
+
+    auto elapsed = Common::Util::getTimeMs() - startTime;
+
+    return elapsed;
+  }
 
   void TimelineActor::update(  EncounterPtr pEncounter, TimelinePack& pack, uint64_t time )
   {
     // todo: handle interrupts
 
+    // set the initial phase according to timeline
     if( !m_pPhase )
     {
       auto& pPhase = m_phases.at( m_initialPhaseId );
@@ -62,10 +72,11 @@ namespace Sapphire
       transitionPhase( pEncounter, pack, time, m_phases.at( m_initialPhaseId ) );
     }
 
+    // update phase and schedules
     m_pPhase->update( *this, pack, m_state.m_phaseState, pEncounter, time );
 
+    // fire any enabled triggers
     const auto& triggers = m_pPhase->getTriggers();
-
     for( const auto& [ id, trigger ] : triggers )
     {
       if( trigger.isEnabled( m_state.m_phaseState ) && trigger.isConditionMet( *this, pack, m_state.m_phaseState, pEncounter, time ) )

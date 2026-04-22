@@ -40,6 +40,7 @@ namespace Sapphire
     BNpcHasFlags,
 
     GetAction,
+    // todo: condition for phase time elapsed?
     PhaseActive,
     InterruptedAction,
 

@@ -277,7 +277,7 @@ namespace Sapphire
     else
       throw std::runtime_error( fmt::format( std::string( "ConditionBNpcFlags::from_json unable to find actor by name: %s" ), actorRef ) );
 
-    m_flags = json.at( "flags" ).get< uint32_t >();
+    m_flags = paramData.at( "flags" ).get< uint32_t >();
     // todo: BNpcHasFlags
   }
 

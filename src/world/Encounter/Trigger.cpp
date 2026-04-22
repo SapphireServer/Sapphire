@@ -4,6 +4,9 @@
 #include "Timepoint.h"
 #include "TimelineActor.h"
 
+#include "Logging/Logger.h"
+#include "spdlog/fmt/fmt.h"
+
 namespace Sapphire
 {
   uint32_t Trigger::getId() const
@@ -52,7 +55,17 @@ namespace Sapphire
     {
       case TriggerAction::Type::TransitionPhase:
       {
-        self.transitionPhase( pEncounter, pack, time, self.getPhaseById( m_pAction->m_phaseId ) );
+        auto pPhase = self.getPhaseById( m_pAction->m_phaseId );
+        // make sure the phase exists, die if not so we don't miss this bug
+        if( !pPhase )
+        {
+          auto msg = std::string( "Trigger::execute: Invalid Phase ID {0} for LayoutId {1}" );
+          msg = fmt::format( msg, m_pAction->m_phaseId, self.getLayoutId() );
+          Logger::error( msg );
+          throw std::runtime_error( msg );
+        }
+
+        self.transitionPhase( pEncounter, pack, time, pPhase );
       }
       break;
       case TriggerAction::Type::FireTimepoint:
@@ -60,6 +73,8 @@ namespace Sapphire
         m_pAction->m_timepoint.execute( self, pack, pEncounter, time );
       }
       break;
+      default:
+        break;
     }
     // only fire once
     setEnabled( state, false );
