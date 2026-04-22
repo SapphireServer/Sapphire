@@ -76,17 +76,17 @@ namespace Sapphire
 
     void reset( EncounterPtr pEncounter );
 
+    void spawnAllSubActors( EncounterPtr pEncounter );
+
     void setStartTime( uint64_t time );
 
     uint64_t getStartTime() const;
 
     void update( uint64_t time );
 
-    bool isScheduleActive( const std::string& actorRef, const std::string& scheduleName );
+    bool isPhaseActive( const std::string& actorRef, uint32_t phaseId );
 
-    void resetConditionState( uint32_t id, bool toDefault = false );
-
-    void setConditionStateEnabled( uint32_t id, bool enabled );
+    void setTriggerEnabled( const std::string& actorRef, uint32_t phaseId, uint32_t triggerId, bool enabled );
 
     bool valid();
 

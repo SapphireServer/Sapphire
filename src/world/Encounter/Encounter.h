@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <set>
 #include <stack>
@@ -135,6 +137,8 @@ namespace Sapphire
     void reset();
 
     void removeBNpcs( bool removeBoss = false );
+
+    uint64_t getStartTime() const;
 
     void setStartTime( uint64_t startTime );
 

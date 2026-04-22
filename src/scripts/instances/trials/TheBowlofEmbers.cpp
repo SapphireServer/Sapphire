@@ -61,7 +61,7 @@ public:
       pEncounter->update( tickCount );
 
       // Fight end condition
-      if( pEncounter->getStatus() == EncounterStatus::ACTIVE )
+      if( pEncounter->getStatus() != EncounterStatus::SUCCESS )
       {
         if( ifrit && ( !ifrit->isAlive() ) )
         {

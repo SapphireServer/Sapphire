@@ -291,6 +291,11 @@ namespace Sapphire
     }
   }
 
+  uint64_t Encounter::getStartTime() const
+  {
+    return m_startTime;
+  }
+
   void Encounter::setStartTime( uint64_t startTime )
   {
     m_startTime = startTime;

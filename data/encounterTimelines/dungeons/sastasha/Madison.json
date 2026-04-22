@@ -3,77 +3,184 @@
     {
       "hp": 600,
       "id": 1,
+      "initialPhaseId": 1,
       "layoutId": 3988325,
       "name": "Captain Madison",
-      "schedules": [
+      "phases": [
         {
-          "description": "",
           "id": 1,
-          "name": "Initial Schedule",
-          "timepoints": [
+          "name": "Setup Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
             {
-              "data": {},
-              "description": "todo: movepath on hp < 50%",
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
               "id": 1,
-              "startTime": 0,
-              "type": "idle"
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Captain Madison"
+              }
+            },
+            {
+              "action": {
+                "phaseId": 3,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "hpPctBetween",
+              "description": "",
+              "enabled": true,
+              "id": 2,
+              "paramData": {
+                "hpMax": 50,
+                "hpMin": 0,
+                "sourceActor": "Captain Madison"
+              }
             }
           ]
+        },
+        {
+          "id": 2,
+          "name": "Combat Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 1,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": []
+            }
+          ],
+          "triggers": []
+        },
+        {
+          "id": 3,
+          "name": "Run Away",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 2,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": [
+                {
+                  "data": {},
+                  "description": "todo: disengage, movepath/server path, talk",
+                  "id": 1,
+                  "startTime": 0,
+                  "type": "idle"
+                }
+              ]
+            }
+          ],
+          "triggers": []
         }
       ],
       "subactors": [],
-      "type": "BNPC"
+      "type": "bnpc"
     },
     {
       "hp": 65300,
       "id": 2,
+      "initialPhaseId": 1,
       "layoutId": 3981887,
       "name": "Shallowtail Reaver",
-      "schedules": [
+      "phases": [
         {
-          "description": "",
           "id": 1,
-          "name": "Initial Schedule",
-          "timepoints": []
+          "name": "Setup Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 1,
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Shallowtail Reaver"
+              }
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Combat Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": []
         }
       ],
       "subactors": [],
-      "type": "BNPC"
+      "type": "bnpc"
     },
     {
       "hp": 65300,
       "id": 3,
+      "initialPhaseId": 1,
       "layoutId": 3981888,
-      "name": "Shallowtail Reaver",
-      "schedules": [
+      "name": "Shallowtail Reaver (LID 3981888)",
+      "phases": [
         {
-          "description": "",
           "id": 1,
-          "name": "Initial Schedule",
-          "timepoints": []
+          "name": "Setup Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 1,
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Shallowtail Reaver (LID 3981888)"
+              }
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Combat Phase",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": []
         }
       ],
       "subactors": [],
-      "type": "BNPC"
-    }
-  ],
-  "conditions": [
-    {
-      "condition": "hpPctBetween",
-      "description": "",
-      "enabled": true,
-      "id": 1,
-      "loop": false,
-      "paramData": {
-        "hpMax": 50,
-        "hpMin": 0,
-        "sourceActor": "Captain Madison"
-      },
-      "targetActor": "Captain Madison",
-      "targetSchedule": "Initial Schedule"
+      "type": "bnpc"
     }
   ],
   "name": "Brand new timeline",
   "selectors": [],
-  "version": 21
+  "version": 30
 }
