@@ -311,6 +311,19 @@ void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& stat
   Network::Util::Packet::sendOnlineStatus( *this );
 }
 
+int8_t DeityElements[ 11 ][ 6 ] = {
+        { 50, 54, 53, 52, 52, 52 },
+        { 50, 54, 53, 52, 52, 52 },
+        { 52, 52, 52, 53, 50, 54 },
+        { 52, 52, 52, 53, 50, 54 },
+        { 53, 50, 54, 52, 52, 52 },
+        { 53, 50, 54, 52, 52, 52 },
+        { 52, 52, 52, 50, 54, 53 },
+        { 52, 52, 52, 50, 54, 53 },
+        { 54, 53, 50, 52, 52, 52 },
+        { 54, 53, 50, 52, 52, 52 },
+        { 52, 52, 52, 54, 53, 50 } };
+
 void Player::calculateStats()
 {
   calculateBonusStats();
@@ -349,6 +362,7 @@ void Player::calculateStats()
   auto accuracy = paramGrowthInfo->data().ParamBase;
   auto critHitRate = paramGrowthInfo->data().ParamBase;
   auto parry = paramGrowthInfo->data().ParamBase;
+  auto elementDefense = getElementalLevelMod();
 
   setStatValue( BaseParam::Determination, determination );
   setStatValue( BaseParam::SkillSpeed, skillSpeed );
@@ -361,12 +375,12 @@ void Player::calculateStats()
   setStatValue( BaseParam::Defense, 0 );
   setStatValue( BaseParam::MagicDefense, 0 );
 
-  setStatValue( BaseParam::FireResistance, classInfo->data().Element[0] );
-  setStatValue( BaseParam::IceResistance, classInfo->data().Element[1] );
-  setStatValue( BaseParam::WindResistance, classInfo->data().Element[2] );
-  setStatValue( BaseParam::EarthResistance, classInfo->data().Element[3] );
-  setStatValue( BaseParam::LightningResistance, classInfo->data().Element[4] );
-  setStatValue( BaseParam::WaterResistance, classInfo->data().Element[5] );
+  setStatValue( BaseParam::FireResistance, DeityElements[deity][0] + elementDefense );
+  setStatValue( BaseParam::IceResistance, DeityElements[deity][1] + elementDefense );
+  setStatValue( BaseParam::WindResistance, DeityElements[deity][2] + elementDefense );
+  setStatValue( BaseParam::EarthResistance, DeityElements[deity][3] + elementDefense );
+  setStatValue( BaseParam::LightningResistance, DeityElements[deity][4] + elementDefense );
+  setStatValue( BaseParam::WaterResistance, DeityElements[deity][5] + elementDefense );
 
   auto mainHand = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
   if( !mainHand )
@@ -391,10 +405,11 @@ void Player::calculateStats()
   m_bonusStats[ static_cast< uint32_t >( BaseParam::AttackMagicPotency ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Intelligence ) ];
   m_bonusStats[ static_cast< uint32_t >( BaseParam::HealingMagicPotency ) ] = m_bonusStats[ static_cast< uint32_t >( BaseParam::Mind ) ];
 
-  setStatValue( BaseParam::PiercingResistance, 0 );
+  setStatValue( BaseParam::SlashingResistance, 100 );
+  setStatValue( BaseParam::PiercingResistance, 100 );
+  setStatValue( BaseParam::BluntResistance, 100 );
 
   m_maxMp = Math::CalcStats::calculateMaxMp( *this );
-
   m_maxHp = Math::CalcStats::calculateMaxHp( *this );
 
   if( m_mp > m_maxMp )
@@ -432,6 +447,22 @@ uint32_t Player::getPlayTime() const
 uint8_t Player::getRace() const
 {
   return getLookAt( CharaLook::Race );
+}
+
+uint8_t Player::getElementalLevelMod()
+{
+  auto level = getLevel() - 1;
+
+  if( level < 49 )
+  {
+    return round( 0.083 * pow( level, 2 ) + 1.2 * level );
+  }
+  else if( level >= 50 )
+  {
+    return round( 220 + 1.4 * ( level - 50 ) );
+  }
+
+  return 0;
 }
 
 uint8_t Player::getGender() const
