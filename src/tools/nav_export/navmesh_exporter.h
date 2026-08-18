@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 class NavmeshExporter
 {
 public:
-  static void exportZone( const ExportedZone& zone )
+  static void exportZone( const ExportedZone& zone, int jobs )
   {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -35,7 +35,7 @@ public:
 
     TiledNavmeshGenerator gen;
 
-    if( !gen.init( objPath.string() ) )
+    if( !gen.init( objPath.string(), jobs ) )
     {
       printf( "[Navmesh] failed to init TiledNavmeshGenerator for file '%s'\n", zone.name.c_str() );
       return;

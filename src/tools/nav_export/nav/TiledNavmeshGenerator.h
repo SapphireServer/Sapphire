@@ -23,6 +23,8 @@
 #include <recastnavigation/RecastDemo/Include/Sample.h>
 #include <recastnavigation/RecastDemo/Include/InputGeom.h>
 
+#include "../threadpool.h"
+
 // todo: this no worky
 struct PrintContext : rcContext {
   explicit PrintContext( bool state = true ) : rcContext( state ) {}
@@ -180,7 +182,7 @@ public:
   TiledNavmeshGenerator() = default;
   ~TiledNavmeshGenerator();
 
-  bool init( const std::string& path );
+  bool init( const std::string& path, int jobs = 1 );
   unsigned char* buildTileMesh( const int tx, const int ty, const float* bmin, const float* bmax, int& dataSize );
   bool buildNavmesh();
   bool buildTiledCache();
@@ -194,10 +196,12 @@ public:
   void saveNavmesh( const std::string& name );
 
 private:
+  ThreadPool m_threadpool;
+
   rcConfig m_cfg;
 
-  rcMeshLoaderObj* m_mesh;
-  rcChunkyTriMesh* m_chunkyMesh;
+  rcMeshLoaderObj* m_mesh{ nullptr };
+  rcChunkyTriMesh* m_chunkyMesh{ nullptr };
 
   rcContext* m_ctx{ nullptr };
   dtTileCache* m_tileCache{ nullptr };

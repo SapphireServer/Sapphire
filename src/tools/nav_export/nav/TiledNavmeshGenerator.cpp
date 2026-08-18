@@ -171,7 +171,7 @@ void MeshProcess::process( struct dtNavMeshCreateParams* params,
   }
 }
 
-bool TiledNavmeshGenerator::init( const std::string& path )
+bool TiledNavmeshGenerator::init( const std::string& path, int jobs )
 {
   if( !fs::exists( path ) )
     throw std::runtime_error( "what" );
@@ -187,25 +187,9 @@ bool TiledNavmeshGenerator::init( const std::string& path )
     return false;
   }
 
-  m_mesh = new rcMeshLoaderObj;
-  assert( m_mesh );
+  rcCalcBounds( m_geom->mesh.verts.data(), m_geom->mesh.getVertCount(), m_meshBMin, m_meshBMax );
 
-  if( !m_mesh->load( path ) )
-  {
-    printf( "[Navmesh] Failed to allocate rcMeshLoaderObj\n" );
-    return false;
-  }
-
-  rcCalcBounds( m_mesh->getVerts(), m_mesh->getVertCount(), m_meshBMin, m_meshBMax );
-
-  m_chunkyMesh = new rcChunkyTriMesh;
-  assert( m_chunkyMesh );
-
-  if( !rcCreateChunkyTriMesh( m_mesh->getVerts(), m_mesh->getTris(), m_mesh->getTriCount(), 256, m_chunkyMesh ) )
-  {
-    printf( "[Navmesh] buildTiledNavigation: Failed to build chunky mesh.\n" );
-    return false;
-  }
+  m_threadpool.addWorkers( jobs );
 
   // todo: load some bullshit settings from exd
 
@@ -738,23 +722,43 @@ bool TiledNavmeshGenerator::buildTiledCache()
   */
   // Preprocess tiles.
 
-  for( int y = 0; y < th; ++y )
-  {
-    for( int x = 0; x < tw; ++x )
-    {
-      TileCacheData tiles[ MAX_LAYERS ] = {};
-      int ntiles = rasterizeTileLayers( x, y, cfg, tiles, MAX_LAYERS );
+  const std::size_t cellCount = static_cast< std::size_t >( tw ) * static_cast< std::size_t >( th );
 
-      for( int i = 0; i < ntiles; ++i )
+  std::vector< TileCacheData > allTiles( cellCount * MAX_LAYERS );
+  std::vector< int > tileCounts( cellCount, 0 );
+
+  //*/
+  m_threadpool.parallelise_loop( 0, tw * th, [ this, tw, &cfg, &allTiles, &tileCounts ]( int begin, int end ) {
+    for( std::size_t cell = begin; cell < end; ++cell )
+    {
+      const int y = static_cast< int >( cell / static_cast< std::size_t >( tw ) );
+      const int x = static_cast< int >( cell % static_cast< std::size_t >( tw ) );
+
+      TileCacheData* tiles = allTiles.data() + cell * MAX_LAYERS;
+      const int ntiles = rasterizeTileLayers( x, y, cfg, tiles, MAX_LAYERS );
+      tileCounts[ cell ] = ntiles;
+    }
+  } );
+  //*/
+
+  m_threadpool.waitForAllTasks();
+
+  for( std::size_t cell = 0; cell < cellCount; ++cell )
+  {
+    TileCacheData* tiles = allTiles.data() + cell * MAX_LAYERS;
+    const int ntiles = tileCounts[ cell ];
+
+    for( int i = 0; i < ntiles; ++i )
+    {
+      TileCacheData& tile = tiles[ i ];
+      dtStatus status = m_tileCache->addTile( tile.data, tile.dataSize, DT_COMPRESSEDTILE_FREE_DATA, 0 );
+
+      if( dtStatusFailed( status ) )
       {
-        TileCacheData* tile = &tiles[ i ];
-        status = m_tileCache->addTile( tile->data, tile->dataSize, DT_COMPRESSEDTILE_FREE_DATA, 0 );
-        if( dtStatusFailed( status ) )
-        {
-          dtFree( tile->data );
-          tile->data = 0;
-          continue;
-        }
+        dtFree( tile.data );
+
+        tile.data = nullptr;
+        tile.dataSize = 0;
       }
     }
   }
