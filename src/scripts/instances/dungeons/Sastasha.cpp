@@ -14,6 +14,8 @@
 #include <Network/GameConnection.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
+#include <nlohmann/json.hpp>
+
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets;
@@ -38,7 +40,9 @@ private:
     UnnaturalRipples = 2,
     UnnaturalRipples2 = 3,
     UnnaturalRipples3 = 4,
-    UnnaturalRipples4 = 5
+    UnnaturalRipples4 = 5,
+
+    CurrEncounterId = 6
   };
 
   enum Sequence : uint8_t
@@ -87,6 +91,125 @@ public:
   Sastasha() :
     Sapphire::ScriptAPI::InstanceContentScript( 4 )
   { }
+
+  static World::Encounter::EncounterDefinition makeChopperEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Chopper";
+    def.timeline = "dungeons/sastasha/Chopper";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Chopper";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.exits = { {} };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_CATTERY;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeMadisonEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Madison";
+    def.timeline = "dungeons/sastasha/Madison";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Madison";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.exits = {
+      { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, EncounterEntityRemoveFlag::None }
+    };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_RAMBADE;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeMadison2EncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Madison2";
+    def.timeline = "dungeons/sastasha/Madison2";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Madison2";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_MADISON_2, HP_MADISON_2, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.onInitEObjList = {
+      { "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, EncounterEntityRemoveFlag::None }
+    };
+    def.exits = {
+      { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, EncounterEntityRemoveFlag::None }
+    };
+    def.hasLockout = true;
+    def.placeName = PLACENAME_RAMBADE_2;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeDennEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Denn";
+    def.timeline = "dungeons/sastasha/Denn";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Denn";
+
+    //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_DENN, HP_DENN, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.onInitEObjList = {
+            { "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None }
+    };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_SULTANAS_LAP;
+    def.bgmInCombat = BGM_ENCOUNTER_FINAL_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
 
   void onInit( InstanceContent& instance ) override
   {
@@ -223,11 +346,36 @@ public:
 
     pEObj = instance.addEObj( "sgpl_s1d1_sghit_ctrl", 2000223, 4200832, 4200772, 4, { -24.018980f, 18.475060f, 111.404900f }, 1.000000f, 0.000000f, 0 ); 
     pEObj->addCollisionBox( { -11.414590, 22.215639, 108.525803 }, 0.000000, 18.736109, 6.194796, 0.527770 );
+
+
+    // set up encounters
+    instance.registerEncounterDefinition( makeChopperEncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeMadisonEncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeMadison2EncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeDennEncounterDef(), instance.getAsInstanceContent() );
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
   {
-    auto pEncounter = instance.getEncounter();
+    World::Encounter::EncounterPtr pEncounter = nullptr;
+    auto encounterId = instance.getCustomVar( Variables::CurrEncounterId );
+
+    switch( encounterId )
+    {
+      case ENCOUNTER_CHOPPER:
+        pEncounter = instance.getEncounter( "Chopper" );
+        break;
+      case ENCOUNTER_RAMBADE:
+        pEncounter = instance.getEncounter( "Madison" );
+        break;
+      case ENCOUNTER_RAMBADE_2:
+        pEncounter = instance.getEncounter( "Madison2" );
+        break;
+      case ENCOUNTER_DENN:
+        pEncounter = instance.getEncounter( "Denn" );
+        break;
+    }
+
     if( pEncounter )
     {
       pEncounter->update( tickCount );
@@ -271,37 +419,9 @@ public:
       // todo: find a better place to put this?
       // todo: retail only spawns the encounter after passing the boss entrance/wall/line
       // enable the final encounter (probably make an onEnterRange and play this after event?)
-      if( pEncounter->getId() == ENCOUNTER_RAMBADE_2 && pEncounter->getStatus() == EncounterStatus::SUCCESS )
+      if( pEncounter->getId() == ENCOUNTER_RAMBADE_2 && pEncounter->getStatus() == EncounterStatus::SUCCESS && instance.getCustomVar( Variables::CurrEncounterId ) != ENCOUNTER_DENN )
       {
-        auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-        auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-        auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Denn" );
-        EncounterSetup setup;
-        setup.timelineName = "dungeons/sastasha/Denn";
-
-        setup.encounterShape = EncounterShape::POLYGON;
-        setup.polygonShapeFile = "dungeons/sastasha/Denn";
-
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-        setup.bnpcSetupList = { { BOSS_DENN, HP_DENN, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-        setup.lockoutEntrances = { { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-        setup.onInitEObjSetupList = {
-          { "Unnaturalripples",   2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None }
-        };
-
-        setup.hasLockout = true;
-        setup.placeName = PLACENAME_SULTANAS_LAP;
-        setup.bgmInCombat = BGM_ENCOUNTER_FINAL_BOSS;
-        setup.bgmToRestore = BGM_NORMAL;
-
-        pEncounter->setEncounterSetup( setup );
-        instance.setEncounter( pEncounter );
-        pEncounter->init();
+        instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_DENN );
       }
     }
   }
@@ -349,37 +469,11 @@ public:
     // spawn chopper
     else if( eobj.getName() == "Inconspicuousswitch" )
     {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
+      auto pEncounter = instance.getEncounter( "Chopper" );
 
-      std::shared_ptr< Encounter > pEncounter = instance.getEncounter();
-      // set up chopper encounter
-      if( pEncounter == nullptr || pEncounter->getId() < ENCOUNTER_CHOPPER )
-      {
-        pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Chopper" );
-        EncounterSetup setup;
-        setup.timelineName = "dungeons/sastasha/Chopper";
-
-        setup.encounterShape = EncounterShape::POLYGON;
-        setup.polygonShapeFile = "dungeons/sastasha/Chopper";
-
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-        setup.bnpcSetupList = { { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-        setup.lockoutEntrances = { { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-        setup.lockoutExits = { {} };
-        setup.hasLockout = true;
-        setup.placeName = PLACENAME_CATTERY;
-        setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-        setup.bgmToRestore = BGM_NORMAL;
-
-        pEncounter->setEncounterSetup( setup );
-        instance.setEncounter( pEncounter );
-        pEncounter->init();
-      }
-      // chopper encounter is successful, set up the next encounter
-      else if( pEncounter && pEncounter->getId() == ENCOUNTER_CHOPPER && pEncounter->getStatus() == EncounterStatus::SUCCESS )
-      {
+      if( pEncounter->getStatus() == EncounterStatus::UNINITIALIZED )
+        instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_CHOPPER );
+      else if( pEncounter->getStatus() == EncounterStatus::SUCCESS )
         eventMgr().eventActionStart( player, getId(), EventActionTouch, [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                                       eobj.setPermissionInvisibility( 1 );
 
@@ -388,9 +482,8 @@ public:
                                       pDoor->setCollisionEnabled( false );
 
                                       instance.setVar( 0, Seq2 );
-                                      instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } );
-        }, nullptr, getId() );
-      }
+                                      instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_RAMBADE );
+                                      instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } ); }, nullptr, getId() );
     }
     // Pick up key and progress duty
     else if( eobj.getName() == "Captainsquarterskey" )
@@ -400,6 +493,7 @@ public:
                                   {
                                     eobj.setPermissionInvisibility( 1 );
                                     instance.setVar( 0, Seq4 );
+                                    instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_RAMBADE_2 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000512 } );
                                   },
                                   nullptr, getId() );
@@ -442,24 +536,29 @@ public:
                             } );
     }
 
-    auto pEncounter = instance.getEncounter();
-    if( pEncounter && pEncounter->getId() == ENCOUNTER_DENN )
+    auto pEncounter = instance.getEncounter( "Denn" );
+    if( pEncounter && pEncounter->getStatus() == EncounterStatus::ACTIVE )
     {
       const auto& name = eobj.getName();
       if( name == "Unnaturalripples" )
       {
-        
+        auto args = nlohmann::json{ "eobjId", eobj.getId() };
+        pEncounter->callMechanic( "ripples", "onTalk", args );
       }
       else if( name == "Unnaturalripples_1" )
       {
+        auto args = nlohmann::json{ "eobjId", eobj.getId() };
+        pEncounter->callMechanic( "ripples", "onTalk", args );
       }
       else if( name == "Unnaturalripples_2" )
       {
-
+        auto args = nlohmann::json{ "eobjId", eobj.getId() };
+        pEncounter->callMechanic( "ripples", "onTalk", args );
       }
       else if( name == "Unnaturalripples_3" )
       {
-
+        auto args = nlohmann::json{ "eobjId", eobj.getId() };
+        pEncounter->callMechanic( "ripples", "onTalk", args );
       }
     }
   }
@@ -470,65 +569,25 @@ public:
 
   }
 
+  void onCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val ) override
+  {
+    if( var == Variables::CurrEncounterId )
+    {
+      if( val == ENCOUNTER_CHOPPER )
+        instance.getEncounter( "Chopper" )->init();
+      else if( val == ENCOUNTER_RAMBADE )
+        instance.getEncounter( "Madison" )->init();
+      else if( val == ENCOUNTER_RAMBADE_2 )
+        instance.getEncounter( "Madison2" )->init();
+      else if( val == ENCOUNTER_DENN )
+        instance.getEncounter( "Denn" )->init();
+    }
+  }
+
   void onDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val ) override
   {
-    // spawn madison
-    if( var == 0 && val == Seq2 )
+    if( var == 0 && val == SeqFinish )
     {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-      auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison" );
-      EncounterSetup setup;
-      setup.timelineName = "dungeons/sastasha/Madison";
-
-      setup.encounterShape = EncounterShape::POLYGON;
-      setup.polygonShapeFile = "dungeons/sastasha/Madison";
-
-      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-      setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-      setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-      setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, EncounterEntityRemoveFlag::None } };
-      setup.hasLockout = true;
-      setup.placeName = PLACENAME_RAMBADE;
-      setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-      setup.bgmToRestore = BGM_NORMAL;
-
-      pEncounter->setEncounterSetup( setup );
-      instance.setEncounter( pEncounter );
-      pEncounter->init();
-    }
-    else if( var == 0 && val == Seq5 )
-    {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-      auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison2" );
-      EncounterSetup setup;
-      setup.timelineName = "dungeons/sastasha/Madison2";
-
-      setup.encounterShape = EncounterShape::POLYGON;
-      setup.polygonShapeFile = "dungeons/sastasha/Madison2";
-
-      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-      setup.bnpcSetupList = { { BOSS_MADISON_2, HP_MADISON_2, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-      setup.lockoutEntrances = { { "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-      setup.onInitEObjSetupList = { { "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, EncounterEntityRemoveFlag::None } };
-      setup.lockoutExits = { { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, EncounterEntityRemoveFlag::None } };
-      setup.hasLockout = true;
-      setup.placeName = PLACENAME_RAMBADE_2;
-      setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-      setup.bgmToRestore = BGM_NORMAL;
-
-      pEncounter->setEncounterSetup( setup );
-      instance.setEncounter( pEncounter );
-      pEncounter->init();
-    }
-    else if( var == 0 && val == SeqFinish )
-    {
-
       instance.sendDutyComplete();
     }
   }

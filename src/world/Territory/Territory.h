@@ -8,6 +8,7 @@
 #include "CellHandler.h"
 
 #include "ForwardsZone.h"
+#include "Encounter/Forwards.h"
 
 #include <set>
 #include <map>
@@ -74,6 +75,8 @@ namespace Sapphire
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
     uint32_t m_nextEncounterId{ 1 };
+
+    std::unordered_map< std::string, World::Encounter::EncounterPtr > m_encounters;
 
     std::vector< SpawnInfo > m_spawnInfo;
 
@@ -218,6 +221,12 @@ namespace Sapphire
     uint32_t getNextActionResultId();
 
     uint32_t getNextEncounterId();
+
+    World::Encounter::EncounterPtr registerEncounterDefinition( const World::Encounter::EncounterDefinition& def, Event::DirectorPtr pDirector );
+
+    void addEncounter( const std::string& name, World::Encounter::EncounterPtr pEncounter );
+
+    World::Encounter::EncounterPtr getEncounter( const std::string& name );
 
     std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };

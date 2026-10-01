@@ -186,7 +186,12 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       if( m_instanceResetFinishTime == 0 )
       {
         m_instanceResetFinishTime = tickCount + 5000;
-        m_pEncounter->reset();
+
+        for( auto& [ name, pEncounter ] : m_encounters )
+          pEncounter->reset();
+
+        if( m_pControllerEncounter )
+          m_pControllerEncounter->reset();
 
         std::vector< Entity::PlayerPtr > playerList;
 
@@ -267,10 +272,13 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       {
         sendDutyComplete();
         m_instanceResetTime = tickCount + 3000;
-        if( m_pEncounter )
-        {
-          m_pEncounter->removeBNpcs();
-        }
+
+        for( auto& [ name, pEncounter ] : m_encounters )
+          if( pEncounter)
+            pEncounter->removeBNpcs();
+
+        if( m_pControllerEncounter )
+          m_pControllerEncounter->removeBNpcs();
 
         return;
       }
@@ -639,13 +647,21 @@ Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByName( const
   return it->second;
 }
 
+Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByBaseId( uint32_t baseId )
+{
+  for( auto& eobj : m_eventObjectMap )
+    if( eobj.second->getBaseId() == baseId )
+      return eobj.second;
+
+  return nullptr;
+}
+
+
 Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjById( uint32_t eobjId )
 {
-  Entity::EventObjectPtr pEObj = nullptr;
-
   for( auto& eobj : m_eventIdToObjectMap )
-    if( eobj.second->getBaseId() == eobjId )
-      return pEObj;
+    if( eobj.second->getId() == eobjId )
+      return eobj.second;
 
   return nullptr;
 }
@@ -840,13 +856,12 @@ std::set< uint32_t > Sapphire::InstanceContent::getSpawnedPlayerIds() const
   return m_spawnedPlayers;
 }
 
-void Sapphire::InstanceContent::setEncounter( Sapphire::World::Encounter::EncounterPtr pEncounter )
+void Sapphire::InstanceContent::setControllerEncounter( World::Encounter::EncounterPtr pEncounter )
 {
-  m_pEncounter = pEncounter;
+  m_pControllerEncounter = pEncounter;
 }
 
-Sapphire::World::Encounter::EncounterPtr Sapphire::InstanceContent::getEncounter()
+Sapphire::World::Encounter::EncounterPtr Sapphire::InstanceContent::getControllerEncounter()
 {
-  return m_pEncounter;
+  return m_pControllerEncounter;
 }
-

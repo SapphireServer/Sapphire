@@ -950,7 +950,7 @@ namespace Sapphire::World::Encounter
 
         if( pInstance )
         {
-          auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
+          auto pEObj = pInstance->getEObjByBaseId( pEObjData->m_eobjId );
           if( pEObj )
           {
             pEObj->setState( pEObjData->m_state );

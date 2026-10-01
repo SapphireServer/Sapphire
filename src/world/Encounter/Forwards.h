@@ -20,6 +20,8 @@ namespace Sapphire::World::Encounter
   using TriggerActionPtr = std::shared_ptr< TriggerAction >;
   using TriggerConditionPtr = std::shared_ptr< TriggerCondition >;
 
+  struct EncounterDefinition;
+
   class Encounter;
   class TimelinePack;
 

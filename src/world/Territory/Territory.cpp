@@ -33,6 +33,8 @@
 
 #include "AI/Controller/Controller.h"
 
+#include <Encounter/Encounter.h>
+
 #include "Network/GameConnection.h"
 
 #include "Script/ScriptMgr.h"
@@ -1014,6 +1016,29 @@ uint32_t Territory::getNextActionResultId()
 uint32_t Territory::getNextEncounterId()
 {
   return m_nextEncounterId++;
+}
+
+World::Encounter::EncounterPtr Territory::registerEncounterDefinition( const World::Encounter::EncounterDefinition& def, Event::DirectorPtr pDirector )
+{
+  auto pEncounter = std::make_shared< World::Encounter::Encounter >( shared_from_this(), pDirector, def );
+  addEncounter( def.key, pEncounter );
+  return pEncounter;
+}
+
+void Territory::addEncounter( const std::string& name, World::Encounter::EncounterPtr pEncounter )
+{
+  // todo: override option?
+  if( m_encounters.find( name ) != m_encounters.end() )
+    Logger::debug( "Territory::addEncounter: Replacing counter by name {}", name );
+
+  m_encounters[ name ] = pEncounter;
+}
+
+World::Encounter::EncounterPtr Territory::getEncounter( const std::string& name )
+{
+  if( auto it = m_encounters.find( name ); it != m_encounters.end() )
+    return it->second;
+  return nullptr;
 }
 
 Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,

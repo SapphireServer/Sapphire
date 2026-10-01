@@ -826,6 +826,41 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
 
     PlayerMgr::sendServerNotice( player, "Facing: {0} NaviLos: {1}\n", los ? "true" : "false", naviLos ? "true" : "false" );
   }
+  else if( subCommand == "eobj" )
+  {
+    char targetStr[ 20 ] = { 0 };
+    int paramCount = sscanf( params.c_str(), "%19s", &targetStr[ 0 ] );
+
+    auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+    auto inRange = player.getInRangeActors();
+    auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+    float dist = std::numeric_limits< float >::max();
+    Entity::GameObjectPtr pFound;
+
+    for( auto& pActor : inRange )
+    {
+      float currDist = Common::Util::distance( pActor->getPos(), player.getPos() );
+      if( pActor->isEventObj() && currDist < dist )
+      {
+        dist = currDist;
+        pFound = pActor;
+      }
+    }
+
+    if( pFound )
+    {
+      auto pEObj = pFound->getAsEventObj();
+      PlayerMgr::sendDebug( player, "Found EObj ID {} BaseId {} Pos {} {} {} {}", pEObj->getId(), pEObj->getBaseId(), pEObj->getPos().x, pEObj->getPos().y, pEObj->getPos().z, pEObj->getRot() );
+      /*
+      if( targetStr[ 0 ] == 'd' )
+      {
+        PlayerMgr::sendDebug( player, "Deleted EObj ID {} BaseId {} Pos {} {} {} {}", pEObj->getId(), pEObj->getBaseId(), pEObj->getPos().x, pEObj->getPos().y, pEObj->getPos().z, pEObj->getRot() );
+        pTeri->removeActor( pFound );
+      }
+      */
+    }
+  }
   else
   {
     PlayerMgr::sendUrgent( player, "{0} is not a valid GET command.", subCommand );

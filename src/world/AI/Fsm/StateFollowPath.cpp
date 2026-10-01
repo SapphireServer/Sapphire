@@ -126,15 +126,15 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
 
       const auto currPoint = path.m_currPointIndex;
 
-      Logger::debug( "FollowPath: Pre-adjustment targetPos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
+      //Logger::debug( "FollowPath: Pre-adjustment targetPos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
       targetPos = path.m_points[ currPoint ];
 
-      Logger::debug( "FollowPath: Post-adjustment targetPos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
+      //Logger::debug( "FollowPath: Post-adjustment targetPos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
       reachedTarget = ignoreNavmesh ? moveDirectly( targetPos ) : pBNpc->moveTo( targetPos, path.m_targetReachedDist );
       if( reachedTarget )
       {
-        Logger::debug( "FollowPath: Arrived at pos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
-        Logger::debug( "FollowPath: currPoint {} pathSize {}", currPoint, pathSize );
+        //Logger::debug( "FollowPath: Arrived at pos {} {} {}", targetPos.x, targetPos.y, targetPos.z );
+        //Logger::debug( "FollowPath: currPoint {} pathSize {}", currPoint, pathSize );
 
         if( m_onPointReachCb && path.m_prevPointIndex != currPoint )
           m_onPointReachCb( path.m_points[ currPoint ] );
@@ -148,7 +148,7 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
           {
             path.m_isReversePath = true;
             path.m_currPointIndex = static_cast< uint32_t >( pathSize - 2 );
-            Logger::debug( "FollowPath: Reversing path" );
+            //Logger::debug( "FollowPath: Reversing path" );
           }
           else
           {
@@ -156,7 +156,7 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
             path.m_active = false;
             if( m_onDestReachCb )
               m_onDestReachCb();
-            Logger::debug( "FollowPath: Reached destination" );
+            //Logger::debug( "FollowPath: Reached destination" );
             m_lastTick = now;
             return;
           }

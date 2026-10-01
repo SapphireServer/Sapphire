@@ -25,13 +25,13 @@
 namespace Sapphire::World::Encounter
 {
   Encounter::Encounter( TerritoryPtr pInstance, Event::DirectorPtr pDirector,
-                        const std::string& timelineName ) :
+                        const EncounterDefinition& definition ) :
     m_pTeri( pInstance ),
     m_pDirector( pDirector ),
     m_status( EncounterStatus::UNINITIALIZED )
   {
-    m_position = { 0, 0, 0 };
-    m_setup.timelineName = timelineName;
+    m_position = definition.position;
+    m_definition = definition;
     m_id = m_pTeri->getNextEncounterId();
   }
 
@@ -50,30 +50,30 @@ namespace Sapphire::World::Encounter
 
   void Encounter::init()
   {
-    m_pTimeline = TimelinePack::createTimelinePack( m_setup.timelineName );
+    m_pTimeline = TimelinePack::createTimelinePack( m_definition.timeline );
     m_pTimeline->setEncounter( shared_from_this() );
     m_status = EncounterStatus::IDLE;
     m_startTime = 0;
-    m_duration = m_setup.duration;
-    m_position = m_setup.position;
+    m_duration = m_definition.duration;
+    m_position = m_definition.position;
     m_lastTick = 0;
     m_lockoutTime = 0;
     m_failTime = 0;
     m_finishTime = 0;
-    m_placeName = m_setup.placeName;
+    m_placeName = m_definition.placeName;
     m_lastRangeTick = 0;
 
-    if( !m_setup.polygonShapeFile.empty() )
+    if( !m_definition.shapeFileName.empty() )
     {
-      if( !loadEncounterShape( m_setup.polygonShapeFile ) )
+      if( !loadEncounterShape( m_definition.shapeFileName ) )
       {
-        Logger::error( "Encounter::init failed to load encounter shape at {}", m_setup.polygonShapeFile );
+        Logger::error( "Encounter::init failed to load encounter shape at {}", m_definition.shapeFileName );
         return;
       }
     }
 
     // todo: probably add invisible untargetable BNpc for FATEs?
-    for( const auto& actor : m_setup.bnpcSetupList )
+    for( const auto& actor : m_definition.participants )
     {
       auto pBNpc = m_pTeri->getActiveBNpcByLayoutId( actor.layoutId );
       if( !pBNpc )
@@ -82,12 +82,9 @@ namespace Sapphire::World::Encounter
       pBNpc->resetFlags( actor.flags );
       pBNpc->init();
       addBNpc( pBNpc );
-
-      if( actor.isBoss )
-        m_bossBnpcs.emplace( pBNpc->getId(), pBNpc );
     }
 
-    for( const auto& eobj : m_setup.onInitEObjSetupList )
+    for( const auto& eobj : m_definition.onInitEObjList )
     {
       auto pEObj = m_pTeri->getEObjByName( eobj.name );
 
@@ -112,7 +109,7 @@ namespace Sapphire::World::Encounter
     }
 
     // setup entrance eobjs
-    for( const auto& entrance : m_setup.lockoutEntrances )
+    for( const auto& entrance : m_definition.entrances )
     {
       auto pEObj = m_pTeri->getEObjByName( entrance.name );
 
@@ -138,7 +135,7 @@ namespace Sapphire::World::Encounter
     }
 
     // setup exit eobjs
-    for( const auto& exit : m_setup.lockoutExits )
+    for( const auto& exit : m_definition.exits )
     {
       auto pEObj = m_pTeri->getEObjByName( exit.name );
 
@@ -164,9 +161,9 @@ namespace Sapphire::World::Encounter
     }
   }
 
-  void Encounter::setEncounterSetup( const EncounterSetup& setup )
+  void Encounter::setDefinition( const EncounterDefinition& definition )
   {
-    m_setup = setup;
+    m_definition = definition;
   }
 
   void Encounter::start()
@@ -182,7 +179,7 @@ namespace Sapphire::World::Encounter
 
     if( dtRange >= 1000 )
     {
-      if( m_setup.encounterShape == EncounterShape::CYLINDER )
+      if( m_definition.shape == EncounterShape::CYLINDER )
       {
         // todo: this is hacky, ideally we'd have an actor at m_position coords 
         auto pCell = m_pTeri->getCellByCoords( m_position.x, m_position.z );
@@ -193,10 +190,10 @@ namespace Sapphire::World::Encounter
 
         handleInRangeActors( inRange );
       }
-      else if( m_setup.encounterShape == EncounterShape::BOX )
+      else if( m_definition.shape == EncounterShape::BOX )
       {
-        auto min = m_setup.position;
-        auto max = m_setup.position2;
+        auto min = m_definition.position;
+        auto max = m_definition.position2;
 
         // find centre of arena
         auto pos = ( min + max ) / 2.f ;
@@ -209,7 +206,7 @@ namespace Sapphire::World::Encounter
 
         handleInRangeActors( inRange );
       }
-      else if( m_setup.encounterShape == EncounterShape::POLYGON )
+      else if( m_definition.shape == EncounterShape::POLYGON )
       {
         // use the anchor as centre of polygon
         // todo: what do we do if an arena spans > 80 units?
@@ -243,7 +240,7 @@ namespace Sapphire::World::Encounter
     if( m_status == EncounterStatus::ACTIVE && ( m_playerList.empty() && m_playersInside.empty() ) )
       setStatus( EncounterStatus::IDLE );
 
-    if( m_status == EncounterStatus::ACTIVE && m_setup.hasLockout && !isLocked() && canBindActors() )
+    if( m_status == EncounterStatus::ACTIVE && m_definition.hasLockout && !isLocked() && canBindActors() )
     {
       onLockout();
     }
@@ -398,11 +395,6 @@ namespace Sapphire::World::Encounter
     return m_pDirector;
   }
 
-  EncounterSetup& Encounter::getSetup()
-  {
-    return m_setup;
-  }
-
   uint64_t Encounter::getLockoutTime() const
   {
     return m_lockoutTime;
@@ -431,7 +423,7 @@ namespace Sapphire::World::Encounter
       m_playersInside.emplace( pPlayer );
 
       // todo: (FATE) some FATEs change the bgm for the player on entering, handle this
-      if( m_setup.bgmOnEnterRange != 0 )
+      if( m_definition.bgmOnEnterRange != 0 )
       {
 
       }
@@ -472,15 +464,15 @@ namespace Sapphire::World::Encounter
       // todo: FATEs should just despawn rather than reset
 
       // send no longer sealed message
-      if( m_setup.placeName != 0 && isLocked() )
+      if( m_definition.placeName != 0 && isLocked() )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
-            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_definition.placeName } );
 
       // send bgm reset
-      if( m_setup.bgmToRestore != 0 )
+      if( m_definition.bgmToRestore != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmToRestore );
+          pInstance->setCurrentBGM( m_definition.bgmToRestore );
 
       reset();
     }
@@ -489,13 +481,13 @@ namespace Sapphire::World::Encounter
       unbindActors();
 
       // send no longer sealed message
-      if( m_setup.placeName != 0 && isLocked() )
+      if( m_definition.placeName != 0 && isLocked() )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
-            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_definition.placeName } );
 
 
-      auto bgmToRestore = m_setup.bgmOnFinishTeri != 0 ? m_setup.bgmOnFinishTeri : m_setup.bgmToRestore;
+      auto bgmToRestore = m_definition.bgmOnFinishTeri != 0 ? m_definition.bgmOnFinishTeri : m_definition.bgmToRestore;
       // send bgm
       if( bgmToRestore != 0 )
       {
@@ -516,15 +508,15 @@ namespace Sapphire::World::Encounter
     else if( newStatus == EncounterStatus::IDLE )
     {
       // send no longer sealed message
-      if( m_setup.placeName != 0 && isLocked() )
+      if( m_definition.placeName != 0 && isLocked() )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
-            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_setup.placeName } );
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsNoLongerSealed ), { m_definition.placeName } );
 
       // send bgm reset
-      if( m_setup.bgmToRestore != 0 )
+      if( m_definition.bgmToRestore != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmToRestore );
+          pInstance->setCurrentBGM( m_definition.bgmToRestore );
 
       reset();
     }
@@ -532,14 +524,14 @@ namespace Sapphire::World::Encounter
     {
       m_startTime = Common::Util::getTimeMs();
 
-      if( m_setup.placeName != 0 )
+      if( m_definition.placeName != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
           for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
-            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::WillBeSealed ), { m_setup.placeName } );
+            pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::WillBeSealed ), { m_definition.placeName } );
 
-      if( m_setup.bgmInCombat != 0 )
+      if( m_definition.bgmInCombat != 0 )
         if( auto pInstance = m_pTeri->getAsInstanceContent() )
-          pInstance->setCurrentBGM( m_setup.bgmInCombat );
+          pInstance->setCurrentBGM( m_definition.bgmInCombat );
     }
   }
 
@@ -550,10 +542,10 @@ namespace Sapphire::World::Encounter
     for( auto& pActor : m_actorsInside )
       bindActor( pActor );
 
-    if( m_setup.placeName != 0 )
+    if( m_definition.placeName != 0 )
       if( auto pInstance = m_pTeri->getAsInstanceContent() )
        for( auto [ id, pPlayer ] : m_pTeri->getPlayers() )
-          pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsSealed ), { m_setup.placeName } );
+          pInstance->sendEventLogMessage( *pPlayer, *pInstance, static_cast< uint32_t >( EncounterLogMessage::IsSealed ), { m_definition.placeName } );
 
     setEntranceEObjLocked( true );
     setExitEObjLocked( true );
@@ -611,12 +603,12 @@ namespace Sapphire::World::Encounter
 
   bool Encounter::isPositionInside( const Common::Vector3& pos ) const
   {
-    switch( m_setup.encounterShape )
+    switch( m_definition.shape )
     {
       case EncounterShape::CYLINDER:
       {
-        auto radius = m_setup.position2.x;
-        auto height = m_setup.position2.y;
+        auto radius = m_definition.position2.x;
+        auto height = m_definition.position2.y;
 
         auto distance = Common::Util::distance2D( m_position.x, m_position.z, pos.x, pos.z );
         auto dY = std::fabs( m_position.y - pos.y );
@@ -626,8 +618,8 @@ namespace Sapphire::World::Encounter
       break;
       case EncounterShape::BOX:
       {
-        auto min = m_setup.position;
-        auto max = m_setup.position2;
+        auto min = m_definition.position;
+        auto max = m_definition.position2;
 
         return ( pos.x >= min.x && pos.x <= max.x ) &&
                ( pos.y >= min.y && pos.y <= max.y ) &&
@@ -729,7 +721,7 @@ namespace Sapphire::World::Encounter
   {
     auto elapsed = Common::Util::getTimeMs() - m_startTime;
 
-    return ( m_status == EncounterStatus::ACTIVE && m_startTime > 0 && m_setup.hasLockout && elapsed >= 15000 );
+    return ( m_status == EncounterStatus::ACTIVE && m_startTime > 0 && m_definition.hasLockout && elapsed >= 15000 );
   }
 
   void Encounter::bindActor( Entity::GameObjectPtr pActor )
@@ -781,6 +773,21 @@ namespace Sapphire::World::Encounter
     return m_boundActors.find( pActor ) != m_boundActors.end();
   }
 
+  bool Encounter::callMechanic( const std::string& name, const std::string& func, nlohmann::json& args )
+  {
+    return m_pTimeline && m_pTimeline->callMechanic( name, func, args );
+  }
+
+  void Encounter::setPos( const Common::Vector3& pos )
+  {
+    m_position = pos;
+  }
+
+  Common::Vector3 Encounter::getPos() const
+  {
+    return m_position;
+  }
+
   void Encounter::handleInRangeActors( const std::set< Entity::GameObjectPtr >& inRange )
   {
     for( auto& pActor : inRange )
@@ -791,7 +798,8 @@ namespace Sapphire::World::Encounter
       }
     }
 
-    for( auto& pActor : m_actorsInside )
+    auto tmpActorsInside = m_actorsInside;
+    for( auto& pActor : tmpActorsInside )
     {
       if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
       {

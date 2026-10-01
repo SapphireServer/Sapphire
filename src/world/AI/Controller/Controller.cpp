@@ -91,9 +91,9 @@ namespace Sapphire::World::AI::Controller
 
     if( !( flags & PathFlags::IgnoreNavmesh ) )
     {
-      Logger::debug( "Pre-adjustment TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
+      //Logger::debug( "Pre-adjustment TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
       m_path.m_targetPos = pNavi->findNearestPosition( pos.x, pos.y, pos.z );
-      Logger::debug( "TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
+      //Logger::debug( "TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
     }
 
     auto pCurrState = m_stateMachine.getCurrentState();
@@ -139,7 +139,7 @@ namespace Sapphire::World::AI::Controller
     m_path.m_points = path;
     m_path.m_active = true;
 
-    Logger::debug( "BNpc {} X:{} Y:{} Z:{}", m_owner.getId(), m_owner.getPos().x, m_owner.getPos().y, m_owner.getPos().z );
+    //Logger::debug( "BNpc {} X:{} Y:{} Z:{}", m_owner.getId(), m_owner.getPos().x, m_owner.getPos().y, m_owner.getPos().z );
 
     float radius = m_owner.isBattleNpc() ? m_owner.getAsBNpc()->getRadius() : 1.f;
 
@@ -148,20 +148,20 @@ namespace Sapphire::World::AI::Controller
       for( auto& pos : m_path.m_points )
       {
 
-        Logger::debug( "Pre-adjustment pos: X:{} Y:{} Z:{}", pos.x, pos.y, pos.z );
+        //Logger::debug( "Pre-adjustment pos: X:{} Y:{} Z:{}", pos.x, pos.y, pos.z );
         auto pos2 = pNavi->findNearestPosition( pos.x, pos.y, pos.z );
         auto calculatedPath = pNavi->findFollowPath( m_owner.getPos(), pos, radius );
         if( !calculatedPath.empty() )
         {
           const auto& pathEnd = calculatedPath.back();
-          Logger::debug( "FindFollowPath {} {} {}", pathEnd.x, pathEnd.y, pathEnd.z );
+          //Logger::debug( "FindFollowPath {} {} {}", pathEnd.x, pathEnd.y, pathEnd.z );
         }
-        Logger::debug( "Post-adjustment pos: X:{} Y:{} Z:{}", pos2.x, pos2.y, pos2.z );
+        //Logger::debug( "Post-adjustment pos: X:{} Y:{} Z:{}", pos2.x, pos2.y, pos2.z );
         pos = pos2;
       }
       m_path.m_targetPos = m_path.m_points[ m_path.m_points.size() - 1 ];
 
-      Logger::info( "TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
+      //Logger::info( "TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
     }
 
     auto pCurrState = m_stateMachine.getCurrentState();

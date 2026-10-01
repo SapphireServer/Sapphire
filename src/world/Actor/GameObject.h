@@ -52,9 +52,9 @@ namespace Sapphire::Entity
 
     virtual ~GameObject() {};
 
-    virtual void spawn( PlayerPtr pTarget ) {}
+    virtual void spawn( PlayerPtr pTarget );
 
-    virtual void despawn( PlayerPtr pTarget ) {}
+    virtual void despawn( PlayerPtr pTarget );
 
     uint32_t getId() const;
 

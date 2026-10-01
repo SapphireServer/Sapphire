@@ -11,6 +11,8 @@
 
 #include <Territory/InstanceContent.h>
 
+#include <nlohmann/json.hpp>
+
 namespace Sapphire::World::Encounter
 {
   enum class EncounterStatus
@@ -43,6 +45,17 @@ namespace Sapphire::World::Encounter
     OnSuccess = 0x02,
   };
 
+  enum class EncounterBNpcCompletionRole : uint8_t
+  {
+    None,
+    Required
+  };
+
+  enum class EncounterCompletionCondition : uint8_t
+  {
+    AllRequiredParticipantsDefeated
+  };
+
   struct EncounterEObj
   {
     std::string name;
@@ -63,40 +76,45 @@ namespace Sapphire::World::Encounter
     uint32_t hp;
     Common::BNpcType type;
     uint32_t flags;
-    bool isBoss{ false };
+    EncounterBNpcCompletionRole completionRole;
   };
 
-  struct EncounterSetup
+  struct EncounterDefinition
   {
-    std::string timelineName;
-    std::vector< EncounterBNpc > bnpcSetupList;
-    std::vector< EncounterEObj > onInitEObjSetupList;
-    std::vector< EncounterEObj > onSuccessEObjSetupList;
-    std::vector< EncounterEObj > lockoutEntrances;
-    std::vector< EncounterEObj > lockoutExits;
+    std::string key;
+    std::string timeline;
 
-    EncounterShape encounterShape;
     // for BOX shape, this would be m_position = min, m_position2 = max
     // for CYLINDER m_position = center, m_position2.x radius, position2.y height
     Common::Vector3 position;
     Common::Vector3 position2;
-    std::string polygonShapeFile;
 
-    uint64_t duration{ 0 };    // todo: implement this
+    std::vector< EncounterBNpc > participants;
+    EncounterCompletionCondition completionCondition;
+
+    EncounterShape shape;
+    std::string shapeFileName;
+
+    std::vector< EncounterEObj > entrances;
+    std::vector< EncounterEObj > exits;
+    std::vector< EncounterEObj > onInitEObjList;
+    std::vector< EncounterEObj > onSuccessEObjList;
+
+    uint64_t duration{ 0 };// todo: implement this
     uint32_t placeName{ 0 };
 
     // todo: all FATEs need bgm handling too, currently only instances are handled
-    uint16_t bgmOnEnterRange{ 0 };          // todo: (FATE) implement this in onEnterRange, FATEs change bgm for player on entering
-    uint16_t bgmOnExitRangeTeri{ 0 };       // todo: (FATE) implement this in onExitRange
-    uint16_t bgmOnExitRangeTeriCombat{ 0 }; // todo: (FATE) implement this in onExitRange
+    uint16_t bgmOnEnterRange{ 0 };         // todo: (FATE) implement this in onEnterRange, FATEs change bgm for player on entering
+    uint16_t bgmOnExitRangeTeri{ 0 };      // todo: (FATE) implement this in onExitRange
+    uint16_t bgmOnExitRangeTeriCombat{ 0 };// todo: (FATE) implement this in onExitRange
 
-    uint16_t bgmInCombat{ 0 };              // bgm when encounter is active
+    uint16_t bgmInCombat{ 0 };// bgm when encounter is active
 
-    uint16_t bgmToRestore{ 0 };             // default teri bgm, set when encounter has failed
-    uint16_t bgmToRestoreCombat{ 0 };       // default teri combat bgm, set when encounter has failed
+    uint16_t bgmToRestore{ 0 };      // default teri bgm, set when encounter has failed
+    uint16_t bgmToRestoreCombat{ 0 };// default teri combat bgm, set when encounter has failed
 
-    uint16_t bgmOnFinishTeri{ 0 };          // new teri bgm after encounter success
-    uint16_t bgmOnFinishTeriCombat{ 0 };    // new teri bgm in combat after encounter success // todo: implement this, sastasha uses different combat bgm for trash after first boss
+    uint16_t bgmOnFinishTeri{ 0 };      // new teri bgm after encounter success
+    uint16_t bgmOnFinishTeriCombat{ 0 };// new teri bgm in combat after encounter success // todo: implement this, sastasha uses different combat bgm for trash after first boss
 
     bool hasLockout{ false };
   };
@@ -120,7 +138,7 @@ namespace Sapphire::World::Encounter
 
     Encounter( TerritoryPtr pInstance,
                Event::DirectorPtr pDirector,
-               const std::string& timelineName );
+               const EncounterDefinition& definition );
 
     virtual ~Encounter();
 
@@ -128,7 +146,7 @@ namespace Sapphire::World::Encounter
 
     void init();
 
-    void setEncounterSetup( const EncounterSetup& setup );
+    void setDefinition( const EncounterDefinition& definition );
 
     virtual void start();
 
@@ -168,8 +186,6 @@ namespace Sapphire::World::Encounter
 
     Event::DirectorPtr getDirector();
 
-    EncounterSetup& getSetup();
-
     uint64_t getLockoutTime() const;
 
     bool isLocked() const;
@@ -199,6 +215,11 @@ namespace Sapphire::World::Encounter
     void unbindActor( Entity::GameObjectPtr pActor );
     void unbindActors();
     bool isActorBound( Entity::GameObjectPtr pActor ) const;
+
+    bool callMechanic( const std::string& instanceName, const std::string& func, nlohmann::json& args );
+
+    void setPos( const Common::Vector3& pos );
+    Common::Vector3 getPos() const;
 
   protected:
 
@@ -236,8 +257,7 @@ namespace Sapphire::World::Encounter
     TerritoryPtr m_pTeri;
     std::shared_ptr< TimelinePack > m_pTimeline;
 
-    // encountersetup
-    EncounterSetup m_setup;
+    EncounterDefinition m_definition;
 
   };
 
