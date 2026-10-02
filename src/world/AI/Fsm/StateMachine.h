@@ -28,11 +28,6 @@ namespace Sapphire::World::AI::Fsm
     void setCurrentState( StatePtr state );
     void reset();
 
-    void forceChangeState( StatePtr pState )
-    {
-      m_stateStack.emplace_front( pState );
-    }
-
     virtual void update( uint64_t tickCount );
 
     template< typename T, typename = std::enable_if_t< std::is_base_of< State, T >::value > >
@@ -40,6 +35,14 @@ namespace Sapphire::World::AI::Fsm
     {
       return m_pCurrentState && dynamic_cast< T* >( m_pCurrentState.get() );
     }
+
+    template< typename T, typename = std::enable_if_t< std::is_base_of< State, T >::value > >
+    bool isPrevState()
+    {
+      return m_pPrevState && dynamic_cast< T* >( m_pPrevState.get() );
+    }
+
+
 
     const StatePtr getPrevState() const
     {

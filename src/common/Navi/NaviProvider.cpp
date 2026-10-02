@@ -997,3 +997,42 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
 
   return true;// Both checks passed
 }
+
+bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos )
+{
+  if( !m_naviMeshQuery )
+  {
+    Logger::error( "[Navmesh] isPointReachable: m_naviMeshQuery is null. Returning true." );
+    return true;
+  }
+
+  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+  dtPolyRef startRef{ 0 }, endRef{ 0 };
+  float startNearest[ 3 ], endNearest[ 3 ];
+  dtQueryFilter filter;
+  float extents[ 3 ] = { 1.0f, 3.0f, 1.0f };
+
+  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest );
+  m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest );
+
+  // todo: this is probably way too large but hopefully should prevent partial paths
+  std::vector< dtPolyRef > pathCorridor( MAX_SMOOTH );
+  int pathCount = 0;
+  dtStatus status = m_naviMeshQuery->findPath( startRef, endRef, fstartPos, fendPos, &filter, pathCorridor.data(), &pathCount, static_cast< int >( pathCorridor.size() ) );
+
+  if( dtStatusSucceed( status ) && pathCount > 0 )
+  {
+    // final poly matches endRef
+    if( pathCorridor[ pathCount - 1 ] == endRef )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  return false;
+}

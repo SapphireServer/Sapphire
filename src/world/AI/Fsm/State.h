@@ -62,6 +62,12 @@ namespace Sapphire::World::AI::Fsm
       return ret;
     }
 
+    template< typename T, typename = std::enable_if_t< std::is_base_of< State, T >::value > >
+    bool is()
+    {
+      return dynamic_cast< T* >( this );
+    }
+
     TransitionPtr getTriggeredTransition( Entity::GameObjectPtr& pObject )
     {
       for( auto& transition : m_transitions )

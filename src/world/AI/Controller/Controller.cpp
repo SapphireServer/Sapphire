@@ -81,14 +81,6 @@ namespace Sapphire::World::AI::Controller
       return;
     }
 
-    m_path.reset();
-
-    m_path.m_type = PathType::FixedPos;
-    m_path.m_targetPos = pos;
-    m_path.m_flags = flags;
-    m_path.m_targetReachedDist = targetReachedDist;
-    m_path.m_active = true;
-
     if( !( flags & PathFlags::IgnoreNavmesh ) )
     {
       //Logger::debug( "Pre-adjustment TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
@@ -107,7 +99,16 @@ namespace Sapphire::World::AI::Controller
     {
       pPathState->addTransition( std::make_shared< Fsm::Transition >( pCurrState, std::make_shared< Fsm::HateListHasEntriesCondition >() ) );
     }
+
     m_stateMachine.setCurrentState( pPathState );
+
+    m_path.reset();
+
+    m_path.m_type = PathType::FixedPos;
+    m_path.m_targetPos = pos;
+    m_path.m_flags = flags;
+    m_path.m_targetReachedDist = targetReachedDist;
+    m_path.m_active = true;
   }
 
   void Controller::followPath( const std::vector< Common::Vector3 >& path, PathFlags flags, const std::function< void( Common::Vector3 ) >& onReachPoint, const std::function< void() >& onReachDestination )
@@ -130,6 +131,20 @@ namespace Sapphire::World::AI::Controller
       // todo:
       return;
     }
+
+    auto pCurrState = m_stateMachine.getCurrentState();
+    auto pPathState = std::make_shared< Fsm::StateFollowPath >( onReachPoint, onReachDestination );
+
+    // transition back to current state on reaching destination
+    auto pTransition = std::make_shared< Fsm::Transition >( pCurrState, std::make_shared< Fsm::PathDestinationReachedCondition >() );
+    pPathState->addTransition( pTransition );
+
+    if( flags & PathFlags::Interruptible )
+    {
+      pPathState->addTransition( std::make_shared< Fsm::Transition >( pCurrState, std::make_shared< Fsm::HateListHasEntriesCondition >() ) );
+    }
+
+    m_stateMachine.setCurrentState( pPathState );
 
     m_path.reset();
 
@@ -163,20 +178,6 @@ namespace Sapphire::World::AI::Controller
 
       //Logger::info( "TargetPos: {} {} {}", m_path.m_targetPos.x, m_path.m_targetPos.y, m_path.m_targetPos.z );
     }
-
-    auto pCurrState = m_stateMachine.getCurrentState();
-    auto pPathState = std::make_shared< Fsm::StateFollowPath >( onReachPoint, onReachDestination );
-
-    // transition back to current state on reaching destination
-    auto pTransition = std::make_shared< Fsm::Transition >( pCurrState, std::make_shared< Fsm::PathDestinationReachedCondition >() );
-    pPathState->addTransition( pTransition );
-
-    if( flags & PathFlags::Interruptible )
-    {
-      pPathState->addTransition( std::make_shared< Fsm::Transition >( pCurrState, std::make_shared< Fsm::HateListHasEntriesCondition >() ) );
-    }
-
-    m_stateMachine.setCurrentState( pPathState );
   }
 
   void Controller::followTarget( uint32_t targetId, bool followDuringCombat )
@@ -191,6 +192,42 @@ namespace Sapphire::World::AI::Controller
     m_owner.resetFollowTargetId();
     m_followTargetActive = false;
     m_followTargetDuringCombat = false;
+  }
+
+  void Controller::followServerPath( uint32_t serverPathId, PathFlags flags, const std::function< void( Common::Vector3 ) >& onReachPoint, const std::function< void() >& onReachDestination )
+  {
+    // todo: make this make sense
+    if( auto pBNpc = m_owner.getAsBNpc() )
+    {
+      auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+
+      auto pTeri = teriMgr.getTerritoryByGuId( pBNpc->getTerritoryId() );
+      if( !pTeri )
+        return;
+
+      {
+        auto pOwner = m_owner.shared_from_this();
+        auto pCurrState = m_stateMachine.getCurrentState();
+
+        {
+          auto pFollowPathState = std::make_shared< Fsm::StateFollowPath >( onReachPoint, onReachDestination );
+
+          auto pTransition = Fsm::make_Transition( pCurrState, std::make_shared< Fsm::PathDestinationReachedCondition >() );
+          pFollowPathState->addTransition( pTransition );
+
+          if( flags & PathFlags::Interruptible )
+            pFollowPathState->addTransition( Fsm::make_Transition( pCurrState, std::make_shared< Fsm::HateListHasEntriesCondition >() ) );
+
+          m_stateMachine.setCurrentState( pFollowPathState );
+        }
+      }
+
+      m_path.reset();
+      m_path.m_type = PathType::ServerPath;
+      m_path.m_active = true;
+      m_path.m_serverPathId = serverPathId;
+      m_path.m_flags = flags;
+    }
   }
 
   void Controller::updateFollowTarget( uint64_t )

@@ -78,7 +78,7 @@ void AI::Fsm::StateResumePath::onEnter( Entity::GameObjectPtr& pEntity )
 
     path.m_currPointIndex = closestPointIndex;
 
-    if( !path.m_points.empty() )
+    if( path.m_points.size() > path.m_currPointIndex )
       bnpc.setRoamTargetPos( path.m_points[ path.m_currPointIndex ] );
 
     /*

@@ -36,24 +36,30 @@ namespace Sapphire::World::AI::Controller
       RecalculatePerTick = 0x10,
       IgnoreActorCollision = 0x20,
       // todo:
-      PathToExactPos = 0x40
+      PathToExactPos = 0x40,
+      RestoreDefaultPathOnExit = 0x80
     };
 
     struct Path
     {
-      PathType m_type;
-      PathFlags m_flags;
+      PathType m_type{ PathType::None };
+      PathType m_defaultType{ PathType::None };
+      PathFlags m_flags{ 0 };
+      PathFlags m_defaultFlags{ 0 };
       bool m_active{ false };
       uint32_t m_targetId{ 0xE0000000 };
       Common::Vector3 m_targetPos;
       uint32_t m_currPointIndex{ 0 };
       uint32_t m_prevPointIndex{ 0 };
+      uint32_t m_serverPathId{ 0 };
+      uint32_t m_defaultServerPathId{ 0 };
       std::vector< Common::Vector3 > m_points;
       std::vector< std::vector< Common::Vector3 > > m_calcPoints;
       uint32_t m_maxLoops{ 0 };
       uint32_t m_loopCount{ 0 };
       bool m_isReversePath{ false };
       float m_targetReachedDist;
+      bool m_restoreDefaultPathOnExit{ true };
 
       Path()
       {
@@ -97,6 +103,7 @@ namespace Sapphire::World::AI::Controller
     virtual void followPath( const std::vector< Common::Vector3 >& path, PathFlags flags, const std::function< void( Common::Vector3 ) >& onReachPoint = {}, const std::function< void() >& onReachDestination = {} );
     virtual void followTarget( uint32_t targetId, bool followDuringCombat = false );
     virtual void stopFollowingTarget();
+    virtual void followServerPath( uint32_t serverPathId, PathFlags flags, const std::function< void( Common::Vector3 ) >& onReachPoint = {}, const std::function< void() >& onReachDestination = {} );
 
     // todo: process gambits here instead of through BNpc::processGambit in StateCombat?
     virtual void processGambits( uint64_t tick );

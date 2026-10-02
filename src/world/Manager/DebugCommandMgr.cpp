@@ -751,6 +751,15 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     {
       pBNpc->getController()->followTarget( player.getId() );
     }
+    // follow server path
+    else if( targetStr[ 0 ] == 's' && targetStr[ 1 ] == 'p' )
+    {
+      pBNpc->getController()->followServerPath( pBNpc->getInstanceObjectInfo()->ServerPathId,
+        AI::Controller::Controller::PathFlags::RestoreDefaultPathOnExit,
+        pointCb,
+        destCb
+      );
+    }
     // homing bnpc
     else if( targetStr[ 0 ] == 'h' )
     {

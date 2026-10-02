@@ -100,12 +100,13 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
 
       reachedTarget = ignoreNavmesh ? moveDirectly( targetPos ) : pBNpc->moveTo( targetPos, path.m_targetReachedDist );
 
+      /*
       Logger::debug( "FollowPath (FixedPos): BNpc {} NaviTargetDist {} Radius {} Distance {} dXZ {} dY {} Pos {} {} {} TargetPos {} {} {}",
                     pBNpc->getId(), pBNpc->getNaviTargetReachedDistance(), pBNpc->getRadius(),
                     distance, distXZ, distY,
                     pBNpc->getPos().x, pBNpc->getPos().y, pBNpc->getPos().z,
                     targetPos.x, targetPos.y, targetPos.z );
-
+      */
       if( reachedTarget )
       {
         path.m_active = false;
@@ -119,7 +120,9 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
       const auto pathSize = path.m_points.size();
       if( pathSize == 0 || path.m_currPointIndex >= pathSize )
       {
-        path.m_active = false;
+        if( !path.m_flags & Controller::Controller::PathFlags::CanReversePath )
+          path.m_active = false;
+
         path.m_currPointIndex = static_cast< uint32_t >( pathSize );
         return;
       }
@@ -261,9 +264,6 @@ void AI::Fsm::StateFollowPath::onEnter( Entity::GameObjectPtr& pEntity )
   if( !pController )
     return;
 
-  if( m_initialPathType == static_cast< uint32_t >( Controller::Controller::PathType::None ) )
-    m_initialPathType = static_cast< uint32_t >( pController->getPath().m_type );
-
   if( auto pBNpc = pEntity->getAsBNpc() )
   {
     auto& bnpc = *pBNpc;
@@ -290,6 +290,8 @@ void AI::Fsm::StateFollowPath::onEnter( Entity::GameObjectPtr& pEntity )
       pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), true );
     }
 
+    path.m_restoreDefaultPathOnExit = ( path.m_flags & Controller::Controller::PathFlags::RestoreDefaultPathOnExit );
+
     if( bnpc.getEnemyType() == Common::Friendly )
     {
       /*
@@ -302,32 +304,56 @@ void AI::Fsm::StateFollowPath::onEnter( Entity::GameObjectPtr& pEntity )
       bnpc.setRoamTargetPos( bnpc.getSpawnPos() );
       */
     }
-    if( auto serverPath = pZone->getServerPath( pBNpc->getInstanceObjectInfo()->ServerPathId ) )
+
+    // todo: restore server path if transitioning from combat?
+    if( path.m_type == AI::Controller::Controller::PathType::ServerPath )
     {
-      if( path.m_type != Controller::Controller::PathType::ServerPath )
-        return;
+      if( auto serverPath = pZone->getServerPath( path.m_serverPathId ) )
+      {
+        auto serverPathId = path.m_serverPathId;
 
-      // restore server path
-      if( serverPath->points.empty() )
-        return;
+        // restore server path
+        if( serverPath->points.empty() )
+          return;
 
-      path.reset();
+        path.m_active = true;
+        path.m_targetPos = { serverPath->position.x + serverPath->points[ 0 ].Translation.x,
+                             serverPath->position.y + serverPath->points[ 0 ].Translation.y,
+                             serverPath->position.z + serverPath->points[ 0 ].Translation.z };
 
-      path.m_active = true;
-      path.m_type = AI::Controller::Controller::PathType::ServerPath;
-      path.m_targetPos = { serverPath->position.x + serverPath->points[ 0 ].Translation.x,
-                           serverPath->position.y + serverPath->points[ 0 ].Translation.y,
-                           serverPath->position.z + serverPath->points[ 0 ].Translation.z
-      };
+        path.m_points.clear();
+        for( const auto& p : serverPath->points )
+          path.m_points.push_back( { serverPath->position.x + p.Translation.x,
+                                     serverPath->position.y + p.Translation.y,
+                                     serverPath->position.z + p.Translation.z } );
 
-      for( const auto& p : serverPath->points )
-        path.m_points.push_back( {
-                serverPath->position.x + p.Translation.x,
-                serverPath->position.y + p.Translation.y,
-                serverPath->position.z + p.Translation.z
-        } );
+        auto currentPos = pBNpc->getPos();
 
-      bnpc.setRoamTargetPos( path.m_targetPos );
+        uint8_t closestPointIndex = path.m_currPointIndex;
+        float closestDistance = std::numeric_limits< float >::max();
+
+        for( auto i = closestPointIndex; i < path.m_points.size(); ++i )
+        {
+          const auto& pointPos = path.m_points[ i ];
+          float distance = std::sqrt(
+                  std::pow( currentPos.x - pointPos.x, 2 ) +
+                  std::pow( currentPos.y - pointPos.y, 2 ) +
+                  std::pow( currentPos.z - pointPos.z, 2 ) );
+
+          if( distance < closestDistance )
+          {
+            closestDistance = distance;
+            closestPointIndex = i;
+          }
+        }
+
+        path.m_currPointIndex = closestPointIndex;
+
+        if( closestPointIndex < path.m_points.size() )
+          path.m_targetPos = path.m_points[ path.m_currPointIndex ];
+
+        bnpc.setRoamTargetPos( path.m_targetPos );
+      }
     }
   }
 }
@@ -343,12 +369,6 @@ void AI::Fsm::StateFollowPath::onExit( Entity::GameObjectPtr& pEntity )
     {
       auto& path = pController->getPath();
 
-      // path.reset();
-
-      // todo: this is a dumb hacky workaround to restore server path..
-      if( static_cast< Controller::Controller::PathType >( m_initialPathType ) == Controller::Controller::PathType::ServerPath )
-        path.m_type = static_cast< Controller::Controller::PathType >( m_initialPathType );
-
       auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
       auto pZone = teriMgr.getTerritoryByGuId( pBNpc->getTerritoryId() );
       if( !pZone )
@@ -359,6 +379,17 @@ void AI::Fsm::StateFollowPath::onExit( Entity::GameObjectPtr& pEntity )
       // allow agent-agent collision again if it was unset for this request
       if( pNaviProvider )
         pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), false );
+
+      // restore default server path if specified
+      if( path.m_restoreDefaultPathOnExit )
+      {
+        path.reset();
+
+        path.m_active = true;
+        path.m_type = path.m_defaultType;
+        path.m_serverPathId = path.m_defaultServerPathId;
+        path.m_flags = path.m_defaultFlags;
+      }
     }
   }
 }

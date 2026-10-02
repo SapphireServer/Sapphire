@@ -149,6 +149,8 @@ namespace Sapphire::Common::Navi
     void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
     bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
 
+    bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos );
+
   protected:
     std::string m_internalName;
     std::string m_naviPath;

@@ -19,7 +19,9 @@ void AI::Fsm::StateCombat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t ti
 
   if( !pZone )
   {
-    Logger::debug( "Territory not found for BNPC" );
+    auto pos = pEntity->getPos();
+    Logger::debug( "[StateCombat] onUpdate: Territory {} not found for BNpc {} Pos {} {} {}", pEntity->getTerritoryId(), pEntity->getId(),
+                   pos.x, pos.y, pos.z);
     return;
   }
   auto pNaviProvider = pZone->getNaviProvider();
@@ -46,7 +48,9 @@ void AI::Fsm::StateCombat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t ti
 
     auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );
 
-    if( !pHatedActor->isAlive() || bnpc.getTerritoryId() != pHatedActor->getTerritoryId() )
+    // deaggro if target is dead, not in zone, or unreachable
+    if( !pHatedActor->isAlive() || bnpc.getTerritoryId() != pHatedActor->getTerritoryId() ||
+      ( pNaviProvider && !pNaviProvider->isPointReachable( bnpc.getPos(), pHatedActor->getPos() ) && !bnpc.hasFlag( Entity::NoDeaggro ) )  )
     {
       bnpc.deaggro( pHatedActor );
       pHatedActor = bnpc.hateListGetHighest();

@@ -71,9 +71,14 @@ namespace Sapphire::World::AI::Controller
         m_path.m_flags = PathFlags::CanReversePath;
         m_path.m_active = true;
         m_path.m_points = points;
+        m_path.m_serverPathId = pBNpcInfo->ServerPathId;
+
+        m_path.m_defaultServerPathId = m_path.m_serverPathId;
+        m_path.m_defaultType = m_path.m_type;
+        m_path.m_defaultFlags = m_path.m_flags;
       }
 
-      Logger::info( "Setting server path for BNpc {} Teri {} Pos {} {} {}", bnpc.getId(), bnpc.getTerritoryId(), bnpc.getPos().x, bnpc.getPos().y, bnpc.getPos().z );
+      Logger::info( "Setting server path {} for BNpc {} Teri {} Pos {} {} {}", pBNpcInfo->ServerPathId, bnpc.getId(), bnpc.getTerritoryId(), bnpc.getPos().x, bnpc.getPos().y, bnpc.getPos().z );
     }
     else
     {

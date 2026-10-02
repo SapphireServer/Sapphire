@@ -20,6 +20,7 @@
 #include <Territory/Territory.h>
 #include <Territory/InstanceContent.h>
 
+#include <Logging/Logger.h>
 
 namespace Sapphire::World::AI::Fsm
 {
@@ -96,11 +97,19 @@ namespace Sapphire::World::AI::Fsm
         return true;
 
       const auto& path = pController->getPath();
-      if( ( path.m_type == Controller::Controller::PathType::PointList || path.m_type == Controller::Controller::PathType::ServerPath ) && path.m_currPointIndex >= path.m_points.size() )
+      // todo: this doesnt seem to work when using Controller::followServerPath with 
+      if( ( path.m_type == Controller::Controller::PathType::PointList || path.m_type == Controller::Controller::PathType::ServerPath ) &&
+        path.m_currPointIndex >= path.m_points.size() )
+      {
+        Logger::debug( "BNpc {} at Pos {} {} {} CurrPoint {} PathSize {}",
+          pBNpc->getId(), pBNpc->getPos().x, pBNpc->getPos().y, pBNpc->getPos().z, path.m_currPointIndex, path.m_points.size() );
         return true;
-      else if( path.m_type != Controller::Controller::PathType::PointList && path.m_type != Controller::Controller::PathType::ServerPath
-              && Common::Util::distance( pEntity->getPos(), path.m_targetPos ) <= path.m_targetReachedDist )
+      }
+      else if( path.m_type != Controller::Controller::PathType::PointList && path.m_type != Controller::Controller::PathType::ServerPath &&
+        Common::Util::distance( pEntity->getPos(), path.m_targetPos ) <= path.m_targetReachedDist )
+      {
         return true;
+      }
     }
 
     return false;
