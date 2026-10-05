@@ -31,7 +31,7 @@ std::string datLocation( "C:\\Data\\Dev\\ffxiv3.35\\game\\sqpack" );
 
 bool invalidChar( char c )
 {
-  return !( c >= 0 && c < 128 );
+  return static_cast< unsigned char >( c ) >= 128;
 }
 
 void stripUnicode( std::string& str )

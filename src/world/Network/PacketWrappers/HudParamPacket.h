@@ -5,7 +5,7 @@
 #include <Util/Util.h>
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {

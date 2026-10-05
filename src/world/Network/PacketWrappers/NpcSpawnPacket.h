@@ -6,7 +6,7 @@
 #include <Common.h>
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 

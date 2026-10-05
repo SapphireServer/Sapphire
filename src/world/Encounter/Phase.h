@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 
-#include "Encounter/Forwards.h"
+#include "ForwardsEncounter.h"
 
 #include "TimelineActorState.h"
 

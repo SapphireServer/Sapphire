@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
-#include "../ForwardsZone.h"
+#include <ForwardsZone.h>
 
 namespace Sapphire::World
 {

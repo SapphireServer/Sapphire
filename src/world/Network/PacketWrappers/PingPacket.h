@@ -2,7 +2,7 @@
 
 #include <Network/GamePacket.h>
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {

@@ -1229,7 +1229,11 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   {
     uint32_t questId;
     uint16_t questBattleId;
-    sscanf( params.c_str(), "%d %d", &questId, &questBattleId );
+    if( sscanf( params.c_str(), "%" SCNu32 " %" SCNu16, &questId, &questBattleId ) != 2 )
+    {
+      PlayerMgr::sendDebug( player, "Usage: {} create <quest id> <quest battle id>", command->getName() );
+      return;
+    }
 
     auto instance = terriMgr.createQuestBattle( questId, questBattleId );
     if( instance )

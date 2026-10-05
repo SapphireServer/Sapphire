@@ -2,7 +2,7 @@
 
 #include <Common.h>
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Chara.h"
 #include <set>
 #include <map>

@@ -42,7 +42,7 @@
 
 #include "Session.h"
 #include "WorldServer.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "DatCategories/InstanceObjectParser.h"
 
 using namespace Sapphire::Common;

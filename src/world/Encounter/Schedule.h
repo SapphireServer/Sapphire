@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-#include "Encounter/Forwards.h"
+#include "ForwardsEncounter.h"
 
 #include "TimelineActorState.h"
 

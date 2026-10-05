@@ -524,13 +524,17 @@ void HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint1
         break;
 
       case Common::LandType::Private:
+      {
         entry.status |= Common::WardlandFlags::IsEstateOwned;
-         //Disabled. No more name in Info
+        // Disabled. No more name in Info
         auto owner = land->getOwnerId();
 
         auto playerName = playerMgr().getPlayerNameFromDb( owner );
         memcpy( &entry.name, playerName.c_str(), playerName.size() );
 
+        break;
+      }
+      default:
         break;
     }
 

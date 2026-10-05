@@ -4,7 +4,7 @@
 #include <Actor/Player.h>
 #include <Event/EventHandler.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {

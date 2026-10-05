@@ -389,6 +389,8 @@ void World::ContentFinder::accept( Entity::Player& player )
     case Role::RangedPhysical:
       ++queuedContent->m_dpsAccepted;
       break;
+    default:
+      break;
   }
 
   Logger::info( "[{2}][ContentFinder] Content accepted, contentId#{0} registerId#{1}",

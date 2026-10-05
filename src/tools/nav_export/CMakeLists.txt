@@ -6,6 +6,7 @@ file( GLOB_RECURSE SOURCES
 add_executable( nav_export ${SOURCES} )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_link_libraries( nav_export PRIVATE common Recast DetourTileCache )
+target_include_directories( nav_export PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 # NOTE: This is for #include <datReader/xxx>
 target_include_directories( nav_export PUBLIC 

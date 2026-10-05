@@ -161,6 +161,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
                   m_eventRangeCache.insert( 0, pEventRange );
                   break;
                 }
+                default:
+                  break;
               }
             }
           }
@@ -230,6 +232,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
               m_eventRangeCache.insert( 0, pEventRange );
               break;
             }
+            default:
+              break;
           }
         }
       }

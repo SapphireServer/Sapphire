@@ -1,6 +1,12 @@
 #pragma once
 
-#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "fatal", "off" }
+#define SPDLOG_LEVEL_NAMES                                                       \
+  {                                                                              \
+    spdlog::string_view_t( "trace", 5 ), spdlog::string_view_t( "debug", 5 ),   \
+    spdlog::string_view_t( "info", 4 ), spdlog::string_view_t( "warn", 4 ),     \
+    spdlog::string_view_t( "error", 5 ), spdlog::string_view_t( "fatal", 5 ),   \
+    spdlog::string_view_t( "off", 3 )                                            \
+  }
 
 #include <string>
 #include <vector>

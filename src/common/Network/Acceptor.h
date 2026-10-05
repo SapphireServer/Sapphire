@@ -2,7 +2,7 @@
 
 #include <asio.hpp>
 #include <atomic>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <condition_variable>
 #include <deque>
 #include <memory>

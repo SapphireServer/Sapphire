@@ -3,7 +3,7 @@
 
 #include "Territory.h"
 #include "Event/Director.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <Exd/Structs.h>
 #include <memory>
 

@@ -6,7 +6,7 @@
 #include <Territory/InstanceContent.h>
 #include <Logging/Logger.h>
 #include <Actor/BNpc.h>
-#include <Encounter/Forwards.h>
+#include "ForwardsEncounter.h"
 
 #include "Network/PacketDef/ServerIpcs.h"
 

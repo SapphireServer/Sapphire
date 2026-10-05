@@ -1,5 +1,4 @@
-#ifndef _FORWARDS_H
-#define _FORWARDS_H
+#pragma once
 
 #include <utility>
 #include <memory>
@@ -172,5 +171,4 @@ class NativeScriptMgr;
 
 }
 
-
-#endif
+#undef TYPE_FORWARD

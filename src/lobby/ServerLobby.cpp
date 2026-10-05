@@ -14,8 +14,8 @@
 
 #include "GameConnection.h"
 #include "RestConnector.h"
-#include "Forwards.h"
-#include <Forwards.h>
+#include "ForwardsLobby.h"
+#include <ForwardsCommon.h>
 
 #include <thread>
 

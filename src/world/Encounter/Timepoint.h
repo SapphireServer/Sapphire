@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TimelineActorState.h"
-#include "Forwards.h"
+#include "ForwardsEncounter.h"
 
 #include <cstdint>
 #include <string>

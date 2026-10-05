@@ -3,7 +3,7 @@
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Util/UtilMath.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <string>
 #include <cstring>
 #include <cassert>

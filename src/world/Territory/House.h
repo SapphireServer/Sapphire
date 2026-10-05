@@ -1,5 +1,5 @@
 #pragma once
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <Common.h>
 #include <set>
 #include <unordered_map>

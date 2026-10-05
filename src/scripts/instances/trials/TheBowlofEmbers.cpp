@@ -95,7 +95,10 @@ public:
       case InstanceContentState::DutyFinished:
       {
         instance.addEObj( "Exit", 2000139, 0, 4177870, 4, { 16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0 );
+        break;
       }
+      default:
+        break;
     }
   }
 

@@ -8,7 +8,7 @@
 #include <Network/CommonNetwork.h>
 #include <Util/Util.h>
 
-#include "Forwards.h"
+#include "ForwardsLobby.h"
 
 namespace Sapphire::Network::Packets
 {

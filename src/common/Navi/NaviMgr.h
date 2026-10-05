@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Forwards.h>
+#include <ForwardsCommon.h>
 
 #include <string>
 #include <unordered_map>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Territory.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 #include <array>
 

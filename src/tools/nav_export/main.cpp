@@ -317,6 +317,8 @@ void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, E
             exportSgbModel( sharedGroup->AssetPath, &newinstance, exportgroup );
             break;
           }
+          default:
+            break;
         }
 
       }
@@ -616,7 +618,7 @@ int main( int argc, char *argv[ ] )
 
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
 
-      printf( "Export completed for %s in %lu seconds \n",
+      printf( "Export completed for %s in %lld seconds \n",
               zoneName.c_str(),
               std::chrono::duration_cast< std::chrono::seconds >(
                 std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
@@ -631,7 +633,7 @@ int main( int argc, char *argv[ ] )
 
   std::cout << "\n\n\n";
 
-  printf( "Finished all tasks in %lu seconds\n",
+  printf( "Finished all tasks in %lld seconds\n",
           std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).
           count() );
 

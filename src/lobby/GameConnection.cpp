@@ -20,7 +20,7 @@
 #include "RestConnector.h"
 #include "LobbySession.h"
 
-#include "Forwards.h"
+#include "ForwardsLobby.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -312,7 +312,7 @@ bool Lobby::GameConnection::charaMake( FFXIVARR_PACKET_RAW& packet, uint32_t tmp
   uint32_t clientTimeValue = charaMakePacket.data().clientTimeValue;
   Client::CharacterOperation characterOperation = charaMakePacket.data().operation;
   //Logger::info( "requestNumber [{0}]", requestNumber );
-  Logger::info( "Character Operation [{0}]", characterOperation );
+  Logger::info( "Character Operation [{0}]", static_cast< uint32_t >( characterOperation ) );
 
   uint64_t characterId = charaMakePacket.data().characterId;
   uint64_t playerId = charaMakePacket.data().playerId;
@@ -418,7 +418,8 @@ bool Lobby::GameConnection::charaMake( FFXIVARR_PACKET_RAW& packet, uint32_t tmp
   }
   else
   {
-    Logger::error( "[accountId#{0}] Unhandled Character Operation: {1}", m_pSession->getAccountID(), characterOperation );
+    Logger::error( "[accountId#{0}] Unhandled Character Operation: {1}", m_pSession->getAccountID(),
+                   static_cast< uint32_t >( characterOperation ) );
   }
   return false;
 }

@@ -51,7 +51,7 @@ public:
 
 
     auto end = std::chrono::high_resolution_clock::now();
-    printf( "[Navmesh] Finished exporting %s in %lu ms\n", zone.name.c_str(),
+    printf( "[Navmesh] Finished exporting %s in %lld ms\n", zone.name.c_str(),
             std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
   }
 

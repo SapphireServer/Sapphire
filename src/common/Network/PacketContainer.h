@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "CommonNetwork.h"
 #include "GamePacket.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Packets
 {

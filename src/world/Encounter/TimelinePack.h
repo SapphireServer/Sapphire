@@ -14,12 +14,12 @@
 
 #include <AI/TargetHelper.h>
 #include <Common.h>
-#include <Forwards.h>
+#include <ForwardsCommon.h>
 
 #include "TimelineActor.h"
 
 #include "Selector.h"
-#include "Forwards.h"
+#include "ForwardsEncounter.h"
 
 namespace Sapphire
 {

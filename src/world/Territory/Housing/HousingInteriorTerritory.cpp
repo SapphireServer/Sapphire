@@ -21,7 +21,7 @@
 #include "Inventory/ItemContainer.h"
 #include "Inventory/HousingItem.h"
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "HousingInteriorTerritory.h"
 
 using namespace Sapphire::Common;
@@ -107,6 +107,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
       server.queueForPlayer( player.getCharacterId(), objectInitPacket );
       break;
     }
+    default:
+      break;
   }
 
   if( isFcHouse )

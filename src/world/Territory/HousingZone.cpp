@@ -19,7 +19,7 @@
 #include "Inventory/ItemContainer.h"
 #include "WorldServer.h"
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
 #include "InstanceObjectCache.h"

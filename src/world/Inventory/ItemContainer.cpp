@@ -6,7 +6,7 @@
 #include "Actor/Player.h"
 
 #include "Item.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "ItemContainer.h"
 
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,

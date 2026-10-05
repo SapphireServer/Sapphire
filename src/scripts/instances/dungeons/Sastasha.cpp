@@ -538,17 +538,21 @@ public:
       return;
 
     if( auto quest = player.getQuest( 66211 ) )
+    {
       if( quest->getSeq() == 3 )
       {
         quest->setSeq( 255 );
         player.updateQuest( quest.value() );
       }
+    }
     else if( auto quest = player.getQuest( 65781 ) )
+    {
       if( quest->getSeq() == 3 )
       {
         quest->setSeq( 255 );
         player.updateQuest( quest.value() );
       }
+    }
   }
 
 };

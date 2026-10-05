@@ -79,6 +79,7 @@ public:
       case Eobject0:
       {
         if( quest.getSeq() == Seq1 )
+        {
           if( quest.getUI8AL() < 3 )
             Scene00003( quest, player );
           else
@@ -88,6 +89,7 @@ public:
                       Scene00004( quest, player );
                     },
                     nullptr, 0 );
+        }
         break;
       }
       case Eobject2:

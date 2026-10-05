@@ -128,7 +128,7 @@ void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
 
 bool invalidChar( char c )
 {
-  return !( c >= 0 && c < 128 );
+  return static_cast< unsigned char >( c ) >= 128;
 }
 
 void stripUnicode( std::string& str )

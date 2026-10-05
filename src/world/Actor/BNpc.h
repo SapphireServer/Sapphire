@@ -3,7 +3,7 @@
 #include <Common.h>
 
 #include "Chara.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "ForwardsZone.h"
 #include "Npc.h"
 #include <map>

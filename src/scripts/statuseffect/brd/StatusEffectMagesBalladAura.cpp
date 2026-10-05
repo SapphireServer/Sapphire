@@ -30,7 +30,7 @@ public:
   static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
                                     static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
 
-  void onApply( Entity::Chara& actor )
+  void onApply( Entity::Chara& actor ) override
   {
     actor.removeSingleStatusEffectById( MagesBalladStatus );
     actor.removeSingleStatusEffectById( ArmysPaeonAura );

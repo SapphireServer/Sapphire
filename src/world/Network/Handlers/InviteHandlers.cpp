@@ -23,7 +23,7 @@
 #include "Action/Action.h"
 
 #include "WorldServer.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
