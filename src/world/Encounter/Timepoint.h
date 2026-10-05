@@ -288,13 +288,17 @@ namespace Sapphire::World::Encounter
 
   struct TimepointDataEObjState : public TimepointData
   {
-    uint32_t m_eobjId{ 0xE0000000 };
+    std::string m_eobjName;
     uint32_t m_state{ 0 };
+    uint32_t m_animation{ 0 };
+    uint32_t m_permissionInvisibility{ 0 };
 
-    TimepointDataEObjState( uint32_t eobjId, uint32_t state ) :
+    TimepointDataEObjState( const std::string& name, uint32_t state, uint32_t animation, uint32_t permissionInvisibilty ) :
       TimepointData( TimepointDataType::SetEObjState ),
-      m_eobjId( eobjId ),
-      m_state( state )
+      m_eobjName( name ),
+      m_state( state ),
+      m_animation( animation ),
+      m_permissionInvisibility( permissionInvisibilty )
     {
     }
   };

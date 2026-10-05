@@ -44,7 +44,9 @@ namespace Sapphire::World::Encounter
     PhaseActive,
     InterruptedAction,
 
-    VarEquals
+    VarEquals,
+
+    EObjAnimation
   };
 
   class TriggerCondition : public std::enable_shared_from_this< TriggerCondition >
@@ -187,6 +189,16 @@ namespace Sapphire::World::Encounter
     uint32_t m_val;
 
     VarType m_type;
+
+    void from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;
+  };
+
+  class ConditionEObjAnimation : public TriggerCondition
+  {
+  public:
+    std::string m_eobjName;
+    uint32_t m_animation;
 
     void from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;

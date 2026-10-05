@@ -67,6 +67,7 @@ namespace Sapphire::World::Encounter
     float scale;
     float rotation;
     uint8_t permissionInvisibility;
+    uint32_t animation{ 0 };
     EncounterEntityRemoveFlag entityRemoveFlag;
   };
 

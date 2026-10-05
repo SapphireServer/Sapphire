@@ -860,7 +860,8 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
     if( pFound )
     {
       auto pEObj = pFound->getAsEventObj();
-      PlayerMgr::sendDebug( player, "Found EObj ID {} BaseId {} Pos {} {} {} {}", pEObj->getId(), pEObj->getBaseId(), pEObj->getPos().x, pEObj->getPos().y, pEObj->getPos().z, pEObj->getRot() );
+      PlayerMgr::sendDebug( player, "Found EObj ID {} Name {} BaseId {} Pos {} {} {} {}",
+        pEObj->getId(), pEObj->getName(), pEObj->getBaseId(), pEObj->getPos().x, pEObj->getPos().y, pEObj->getPos().z, pEObj->getRot() );
       /*
       if( targetStr[ 0 ] == 'd' )
       {
@@ -1270,7 +1271,8 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
       return;
     }
 
-    obj->playSharedGroupTimeline( state1, state2 );
+    obj->setAnimation( state2 );
+    //obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {
@@ -1463,7 +1465,8 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
       return;
     }
 
-    obj->playSharedGroupTimeline( state1, state2 );
+    obj->setAnimation( state2 );
+    //obj->playSharedGroupTimeline( state1, state2 );
   }
   else if( subCommand == "seq" )
   {

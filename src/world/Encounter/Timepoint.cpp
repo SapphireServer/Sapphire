@@ -356,7 +356,12 @@ namespace Sapphire::World::Encounter
       {
         auto& dataJ = json.at( "data" );
 
-        // todo: SetEObjState
+        auto eobjName = dataJ.at( "eobjName" ).get< std::string >();
+        auto state = dataJ.at( "state" ).get< uint32_t >();
+        auto animation = dataJ.at( "animation" ).get< uint32_t >();
+        auto permissionInvisibility = dataJ.at( "permissionInvisibility" ).get< uint32_t >();
+
+        m_pData = std::make_shared< TimepointDataEObjState >( eobjName, state, animation, permissionInvisibility );
       }
       break;
       case TimepointDataType::SetBgm:
@@ -950,11 +955,12 @@ namespace Sapphire::World::Encounter
 
         if( pInstance )
         {
-          auto pEObj = pInstance->getEObjByBaseId( pEObjData->m_eobjId );
+          auto pEObj = pEncounter->getEObjByName( pEObjData->m_eobjName );
           if( pEObj )
           {
             pEObj->setState( pEObjData->m_state );
-            // todo: resend the eobj spawn packet?
+            pEObj->setAnimation( pEObjData->m_animation );
+            pEObj->setPermissionInvisibility( pEObjData->m_permissionInvisibility );
           }
         }
       }

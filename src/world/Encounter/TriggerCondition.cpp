@@ -7,8 +7,9 @@
 
 #include <Action/Action.h>
 
-#include <Actor/Chara.h>
 #include <Actor/BNpc.h>
+#include <Actor/Chara.h>
+#include <Actor/EventObject.h>
 #include <Actor/Player.h>
 
 #include <Territory/Territory.h>
@@ -172,6 +173,12 @@ namespace Sapphire::World::Encounter
         break;
     }
     return false;
+  }
+
+  bool ConditionEObjAnimation::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
+  {
+    auto pEObj = pEncounter->getEObjByName( m_eobjName );
+    return pEObj && pEObj->getAnimation() == m_animation;
   }
 
   void ConditionHp::from_json( nlohmann::json& json, ConditionType condition,
@@ -347,6 +354,15 @@ namespace Sapphire::World::Encounter
 
     m_index = index;
     m_val = val;
+  }
+
+  void ConditionEObjAnimation::from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    TriggerCondition::from_json( json, condition, actors );
+
+    auto& paramData = json.at( "paramData" );
+    m_eobjName = paramData.at( "eobjName" ).get< std::string >();
+    m_animation = paramData.at( "animation" ).get< uint32_t >();
   }
 
 }// namespace Sapphire

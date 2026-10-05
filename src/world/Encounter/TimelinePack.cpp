@@ -53,7 +53,6 @@ namespace Sapphire::World::Encounter
       { "hpPctLessThan",            ConditionType::HpPctLessThan },
       { "hpPctBetween",             ConditionType::HpPctBetween },
 
-      { "varEquals",                ConditionType::VarEquals },
       { "directorVarGreaterThan",   ConditionType::DirectorVarGreaterThan },
 
       { "directorSeqEquals",        ConditionType::DirectorSeqEquals },
@@ -70,6 +69,9 @@ namespace Sapphire::World::Encounter
       { "getAction",                ConditionType::GetAction },
       { "phaseActive",              ConditionType::PhaseActive },
       { "interruptedAction",        ConditionType::InterruptedAction },
+
+      { "varEquals",                ConditionType::VarEquals },
+      { "eobjAnimation",            ConditionType::EObjAnimation }
     };
 
     const static std::unordered_map< std::string, TriggerAction::Type > triggerActionMap =
@@ -317,6 +319,11 @@ namespace Sapphire::World::Encounter
                 pCondition->from_json( conditionJ, condition, actorNameMap );
               }
               break;
+              case ConditionType::EObjAnimation:
+              {
+                pCondition = std::make_shared< ConditionEObjAnimation >();
+                pCondition->from_json( conditionJ, condition, actorNameMap );
+              }
               default:
                 break;
             }
