@@ -8,7 +8,7 @@
 #include "CellHandler.h"
 
 #include "ForwardsZone.h"
-#include "Encounter/Forwards.h"
+#include "Encounter/ForwardsEncounter.h"
 
 #include <set>
 #include <map>

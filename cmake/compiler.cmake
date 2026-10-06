@@ -66,6 +66,9 @@ elseif( WIN32 )
   add_compile_definitions( _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING )
 
   if( MSVC )
+    # Modern fmt requires UTF-8 source and execution character sets on MSVC.
+    add_compile_options( /utf-8 )
+
     # Disable warning about nodiscard for boost asio
     add_compile_options( /wd4834 )
 

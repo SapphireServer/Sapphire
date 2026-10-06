@@ -15,7 +15,7 @@
 #include "GameConnection.h"
 #include "WorldServer.h"
 #include "Session.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 #include "Manager/PlayerMgr.h"
 

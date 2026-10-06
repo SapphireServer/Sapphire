@@ -23,7 +23,7 @@
 
 #include "Session.h"
 #include "WorldServer.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <Service.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/PlayerMgr.h>

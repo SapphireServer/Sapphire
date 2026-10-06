@@ -51,7 +51,7 @@ public:
 
     auto end = std::chrono::high_resolution_clock::now();
 
-    printf( "[Obj] Finished exporting %s in %lu ms\n",
+    printf( "[Obj] Finished exporting %s in %lld ms\n",
             std::filesystem::relative( filePath, exportPath ).string().c_str(),
             std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
     return filePath.string();
@@ -89,7 +89,7 @@ public:
     }
 
     auto end = std::chrono::high_resolution_clock::now();
-    printf( "[Obj] Finished exporting %s in %lu ms\n",
+    printf( "[Obj] Finished exporting %s in %lld ms\n",
             std::filesystem::relative( filePath, exportPath ).string().c_str(),
             std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
     

@@ -162,9 +162,10 @@ void loadAllInstanceContentEntries()
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
     
-    std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
+    std::string remove = ",_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
     Common::Util::eraseAllIn( name, remove );
-    name[ 0 ] = toupper( name[ 0 ] );
+    if( !name.empty() && static_cast< unsigned char >( name[ 0 ] ) < 0x80 )
+      name[ 0 ] = static_cast< char >( std::toupper( static_cast< unsigned char >( name[ 0 ] ) ) );
     contentList.push_back( { contentId, name, tt->getString( tt->data().Name ), type } );
   }
 
@@ -189,21 +190,73 @@ void loadAllInstanceContentEntries()
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
 
-    std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:\"";
+    std::string remove = ",_ '()[]-\x1a\x1\x2\x1f\x1\x3.:\"";
     Common::Util::eraseAllIn( name, remove );
-    name[ 0 ] = toupper( name[ 0 ] );
+    if( !name.empty() && static_cast< unsigned char >( name[ 0 ] ) < 0x80 )
+      name[ 0 ] = static_cast< char >( std::toupper( static_cast< unsigned char >( name[ 0 ] ) ) );
 
     contentList.push_back( { qbId, name, fmt::format( "e0{:03d}", qbId + 1 ), type } );
 
   }
 }
 
-bool non_ascii(unsigned char c) {
-    return c > 127;
-}
+std::string escapeCppString( const std::string& value )
+{
+  constexpr char hex[] = "0123456789ABCDEF";
+  std::string escaped;
+  escaped.reserve( value.size() );
+  bool previousWasHexEscape = false;
 
-void stripUnicode(std::string& s) {
-    s.erase(std::remove_if(s.begin(), s.end(), non_ascii), s.end());
+  for( const unsigned char c : value )
+  {
+    switch( c )
+    {
+      case '\\':
+        escaped += "\\\\";
+        previousWasHexEscape = false;
+        break;
+      case '"':
+        escaped += "\\\"";
+        previousWasHexEscape = false;
+        break;
+      case '\n':
+        escaped += "\\n";
+        previousWasHexEscape = false;
+        break;
+      case '\r':
+        escaped += "\\r";
+        previousWasHexEscape = false;
+        break;
+      case '\t':
+        escaped += "\\t";
+        previousWasHexEscape = false;
+        break;
+      default:
+        if( c >= 0x20 && c <= 0x7e )
+        {
+          const bool isHexDigit = ( c >= '0' && c <= '9' ) ||
+                                  ( c >= 'A' && c <= 'F' ) ||
+                                  ( c >= 'a' && c <= 'f' );
+          if( previousWasHexEscape && isHexDigit )
+            escaped += "\"\"";
+
+          escaped += static_cast< char >( c );
+          previousWasHexEscape = false;
+        }
+        else
+        {
+          // A following escape starts with a backslash and therefore ends this
+          // escape. A separator is needed only before a literal hex digit.
+          escaped += "\\x";
+          escaped += hex[ c >> 4 ];
+          escaped += hex[ c & 0x0f ];
+          previousWasHexEscape = true;
+        }
+        break;
+    }
+  }
+
+  return escaped;
 }
 
 // todo: i don't trust the overloads enough
@@ -435,10 +488,11 @@ int main( int argc, char* argv[] )
               if( eobjNameMap.find( id ) != eobjNameMap.end() )
               {
                 name = eobjNameMap[ id ];
-                stripUnicode( name );
-                std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
+                // eraseAllIn is byte-oriented, so keep this set ASCII-only.
+                std::string remove = ",_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
                 Common::Util::eraseAllIn( name, remove );
-                name[ 0 ] = toupper( name[ 0 ] );
+                if( !name.empty() && static_cast< unsigned char >( name[ 0 ] ) < 0x80 )
+                  name[ 0 ] = static_cast< char >( std::toupper( static_cast< unsigned char >( name[ 0 ] ) ) );
               }
               if( name.empty() )
                 name = "unknown_" + std::to_string( count++ );
@@ -464,13 +518,13 @@ int main( int argc, char* argv[] )
                 name = name + "_" + std::to_string( count1 );
 
               std::string eobjLine;
-              eobjLine += "    pEObj = instance.addEObj( \"" + name + "\", " + std::to_string( id ) +
+              eobjLine += "    pEObj = instance.addEObj( \"" + escapeCppString( name ) + "\", " + std::to_string( id ) +
                           ", " + std::to_string( eobjlevelHierachyId ) +
                           ", " + std::to_string( instanceId ) + ", " + std::to_string( state ) +
                           ", " + "{ " + std::to_string( pObj->header.Transformation.Translation.x ) + "f, " + std::to_string( pObj->header.Transformation.Translation.y ) + "f, " + std::to_string( pObj->header.Transformation.Translation.z ) + "f }, " + std::to_string( pObj->header.Transformation.Scale.x ) + "f, "
 
                           // the rotation inside the sgbs is the inverse of what the game uses
-                          + std::to_string( toGameYaw( pObj->header.Transformation.Rotation.y ) ) + "f" + ", " + std::to_string( permissionInv ) + " ); \n" + states;
+                          + std::to_string( toGameYaw( pObj->header.Transformation.Rotation.y ) ) + "f" + ", " + std::to_string( permissionInv ) + " );\n" + states;
 
               m_eventObjectStrings.emplace( instanceId, eobjLine );
               m_eventObjectMap.emplace( instanceId, pEobj );

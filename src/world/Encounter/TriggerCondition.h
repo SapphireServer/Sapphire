@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Encounter/Forwards.h"
+#include "ForwardsEncounter.h"
 
 #include "Encounter/Encounter.h"
 

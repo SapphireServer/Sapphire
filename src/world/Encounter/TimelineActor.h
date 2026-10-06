@@ -5,7 +5,7 @@
 #include <map>
 #include <unordered_map>
 
-#include "Encounter/Forwards.h"
+#include "ForwardsEncounter.h"
 #include "Actor/BNpc.h"
 
 #include "Phase.h"

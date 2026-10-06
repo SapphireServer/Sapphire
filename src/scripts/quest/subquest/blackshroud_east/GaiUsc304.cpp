@@ -72,6 +72,7 @@ public:
       case Actor1:
       {
         if( quest.getSeq() == Seq1 )
+        {
           if( quest.getUI8AL() < 1 )
             Scene00003( quest, player );
           else
@@ -81,6 +82,7 @@ public:
                       Scene00004( quest, player );
                     },
                     nullptr, 0 );
+        }
         break;
       }
       case Actor2:

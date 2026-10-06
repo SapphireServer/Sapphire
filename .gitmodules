@@ -26,3 +26,6 @@
 [submodule "deps/FastLZ"]
 	path = deps/FastLZ
 	url = https://github.com/ariya/FastLZ
+[submodule "deps/zlib"]
+	path = deps/zlib
+	url = https://github.com/madler/zlib.git

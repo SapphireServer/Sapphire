@@ -2,7 +2,7 @@
 
 #include <Network/GamePacket.h>
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Common.h>

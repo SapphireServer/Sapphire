@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <Config/ConfigDef.h>
-#include "Forwards.h"
+#include "ForwardsLobby.h"
 
 const std::string LOBBY_VERSION = "0.0.5";
 

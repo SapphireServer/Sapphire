@@ -17,7 +17,7 @@
 
 #include "Manager/ItemMgr.h"
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Land.h"
 #include "House.h"
 

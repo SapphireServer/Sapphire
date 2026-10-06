@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "Encounter/Forwards.h"
+#include "ForwardsEncounter.h"
 
 #include "TriggerCondition.h"
 #include "TimelineActorState.h"

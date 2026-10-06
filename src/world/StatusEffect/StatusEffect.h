@@ -1,7 +1,7 @@
 #ifndef _STATUSEFFECT_H_
 #define _STATUSEFFECT_H_
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "ForwardsZone.h"
 #include "Action/ActionLut.h"
 

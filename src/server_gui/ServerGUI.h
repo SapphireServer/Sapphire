@@ -16,7 +16,7 @@
 #include "imgui.h"
 #include "datReader/DatCategories/bg/lgb.h"
 
-#include <../src/world/WorldServer.h>
+#include <WorldServer.h>
 
 class ServerGUI
 {

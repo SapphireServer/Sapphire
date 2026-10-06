@@ -4,7 +4,7 @@
 #include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include "Actor/Player.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
 

@@ -3,7 +3,7 @@
 #include <Network/GamePacket.h>
 #include <Actor/Player.h>
 #include <Event/EventHandler.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {

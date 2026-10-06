@@ -1,5 +1,4 @@
-#ifndef _FORWARDS_H
-#define _FORWARDS_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -36,4 +35,4 @@ namespace Sapphire::Network::Packets
   TYPE_FORWARD( FFXIVPacketBase );
 }
 
-#endif
+#undef TYPE_FORWARD

@@ -3,7 +3,7 @@
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Actor/Player.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 namespace Sapphire::Network::Util::Packet
 {

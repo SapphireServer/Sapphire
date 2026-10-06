@@ -833,6 +833,8 @@ void Action::Action::handleJobAction()
         Bard::onAction( *pPlayer, *this );
         break;
       }
+      default:
+        break;
     }
   }
 }

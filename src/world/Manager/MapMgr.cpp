@@ -211,6 +211,8 @@ void MapMgr::updateAll( Entity::Player& player )
           }
           break;
         }
+        default:
+          break;
       }
     }
   }
@@ -445,13 +447,19 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   {
     uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) )->data().WorkIndex;
     if( quest.ClassJobUnlockFlag == 3 )
+    {
       if( classJobIndex != quest.ClassJobUnlock )
         return false;
+    }
     else if( quest.ClassJobUnlockFlag == 4 )
-      if ( static_cast< uint8_t >( player.getClass() ) == quest.ClassJobUnlock )
+    {
+      if( static_cast< uint8_t >( player.getClass() ) == quest.ClassJobUnlock )
         return false;
+    }
     else
+    {
       return false;
+    }
   }
 
   // Was this really ever used?

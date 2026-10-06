@@ -5,7 +5,7 @@
 #include <stack>
 
 #include <Actor/BNpc.h>
-#include <Encounter/Forwards.h>
+#include "ForwardsEncounter.h"
 
 #include <Logging/Logger.h>
 

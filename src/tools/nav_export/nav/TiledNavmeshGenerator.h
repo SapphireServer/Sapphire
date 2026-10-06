@@ -23,7 +23,7 @@
 #include <recastnavigation/RecastDemo/Include/Sample.h>
 #include <recastnavigation/RecastDemo/Include/InputGeom.h>
 
-#include "../threadpool.h"
+#include <threadpool.h>
 
 // todo: this no worky
 struct PrintContext : rcContext {

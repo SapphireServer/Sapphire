@@ -5,7 +5,7 @@
 #include <map>
 
 #include "client_http.hpp"
-#include "Forwards.h"
+#include "ForwardsLobby.h"
 
 using HttpClient = SimpleWeb::Client< SimpleWeb::HTTP >;
 using HttpResponse = std::shared_ptr< SimpleWeb::ClientBase< SimpleWeb::HTTP >::Response >;

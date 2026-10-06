@@ -92,6 +92,8 @@ void EventItemAction::execute()
       eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
       break;
     }
+    default:
+      break;
   }
   
 }

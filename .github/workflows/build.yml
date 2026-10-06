@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     - name: install deps
@@ -46,11 +46,36 @@ jobs:
     runs-on: windows-2025
       
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
-    - name: Enable Developer Command Prompt
-      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+    - name: Visual Studio Development Environment
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $installationPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if (-not $installationPath) {
+          throw "Could not find a Visual Studio installation with the C++ toolchain"
+        }
+
+        $devCmd = Join-Path $installationPath "Common7\Tools\VsDevCmd.bat"
+        $before = @{}
+        Get-ChildItem Env: | ForEach-Object { $before[$_.Name] = $_.Value }
+        $environment = & cmd.exe /s /c "`"$devCmd`" -arch=x64 -host_arch=x64 >nul && set"
+        if ($LASTEXITCODE -ne 0) {
+          throw "VsDevCmd.bat failed with exit code $LASTEXITCODE"
+        }
+
+        foreach ($line in $environment) {
+          $separator = $line.IndexOf('=')
+          if ($separator -le 0) { continue }
+          $name = $line.Substring(0, $separator)
+          $value = $line.Substring($separator + 1)
+          if (-not $before.ContainsKey($name) -or $before[$name] -ne $value) {
+            "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+        }
     - name: build
       run: |
         cmake -B build -G Ninja ${{ matrix.cmakeArgs }}

@@ -121,7 +121,10 @@ void WarpMgr::finishWarp( Entity::Player& player )
         player.resetMp();
         player.setStatus( Common::ActorStatus::Idle );
       }
+      break;
     }
+    default:
+      break;
   }
 
   auto warpFinishAnim = warpType - 1;

@@ -48,10 +48,10 @@
 #include "imgui_internal.h"
 #include "Util/Paths.h"
 
-#include <../src/world/WorldServer.h>
-#include <../src/world/Session.h>
-#include <../src/world/Actor/Player.h>
-#include <../src/world/Script/ScriptMgr.h>
+#include <WorldServer.h>
+#include <Session.h>
+#include <Actor/Player.h>
+#include <Script/ScriptMgr.h>
 
 #include <Util/CrashHandler.h>
 #include <Service.h>
@@ -335,7 +335,7 @@ void ServerGUI::showConsole()
       else if( logLevel == "fatal" )
         color = ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ); // Red
 
-      ImGui::TextColored( color, message.c_str() );
+      ImGui::TextColored( color, "%s", message.c_str() );
       shouldScrollToBottom = true;
     }
 

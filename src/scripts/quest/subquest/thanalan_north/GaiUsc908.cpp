@@ -128,10 +128,12 @@ public:
       case Actor0:
       {
         if( quest.getSeq() == SeqFinish )
+        {
           if( emoteId == 30 )
             Scene00034( quest, player );
           else
             Scene00035( quest, player );
+        }
         break;
       }
       case Actor7:

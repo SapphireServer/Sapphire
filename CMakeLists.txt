@@ -89,7 +89,43 @@ endif()
 set( CMAKE_FOLDER "deps" )
 add_library( fastlz STATIC "deps/FastLZ/fastlz.c" )
 target_include_directories( fastlz PUBLIC "${CMAKE_SOURCE_DIR}/deps" )
-add_subdirectory( "deps/zlib" )
+
+# Build only the static zlib library from the submodule. Avoid adding zlib's
+# own CMake project, which also creates install, package, and utility targets.
+add_library( zlib STATIC
+  deps/zlib/adler32.c
+  deps/zlib/compress.c
+  deps/zlib/crc32.c
+  deps/zlib/deflate.c
+  deps/zlib/gzclose.c
+  deps/zlib/gzlib.c
+  deps/zlib/gzread.c
+  deps/zlib/gzwrite.c
+  deps/zlib/infback.c
+  deps/zlib/inffast.c
+  deps/zlib/inflate.c
+  deps/zlib/inftrees.c
+  deps/zlib/trees.c
+  deps/zlib/uncompr.c
+  deps/zlib/zutil.c
+)
+target_include_directories( zlib PUBLIC "${CMAKE_SOURCE_DIR}/deps/zlib" )
+target_compile_definitions( zlib PRIVATE ZLIB_BUILD )
+if( UNIX )
+  # Normally written into zconf.h by zlib's configure step. We deliberately
+  # do not load zlib's CMake project, so publish these header configuration
+  # values to zlib and its consumers instead.
+  target_compile_definitions( zlib PUBLIC
+    HAVE_STDARG_H=1
+    HAVE_UNISTD_H=1
+  )
+elseif( WIN32 )
+  target_compile_definitions( zlib PRIVATE
+    NO_FSEEKO
+    _CRT_SECURE_NO_DEPRECATE
+    _CRT_NONSTDC_NO_DEPRECATE
+  )
+endif()
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/datReaderPs3" )

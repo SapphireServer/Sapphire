@@ -12,7 +12,7 @@
 #include <map>
 #include "LobbyPacketContainer.h"
 
-#include "Forwards.h"
+#include "ForwardsLobby.h"
 
 #define DECLARE_HANDLER( x ) void x( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer )
 

@@ -3,7 +3,7 @@
 #include <Common.h>
 #include "Action/ActionLut.h"
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "GameObject.h"
 #include "AreaObject.h"
 #include <set>

@@ -2,7 +2,7 @@
 
 #include <Network/GamePacket.h>
 #include <Actor/Chara.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 

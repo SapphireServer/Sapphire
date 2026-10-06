@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Actor/Player.h"
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>

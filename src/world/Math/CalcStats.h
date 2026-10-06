@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Common.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include <Random/RNGMgr.h>
 
 namespace Sapphire::Math

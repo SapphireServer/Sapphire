@@ -7,7 +7,7 @@
 #include <Network/PacketWrappers/EffectPacket1.h>
 #include <Logging/Logger.h>
 
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Action/Action.h"
 
 #include "Territory/Territory.h"

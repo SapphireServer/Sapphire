@@ -181,7 +181,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     for( const auto& entry : zoneInfoMap )
     {
-      if( found = Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( entry.second.name ) )
+      if( ( found = Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( entry.second.name ) ) )
       {
         path = entry.second.path;
         zoneId = entry.second.id;

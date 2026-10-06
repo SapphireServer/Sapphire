@@ -1,7 +1,7 @@
 #include "Cell.h"
 
 #include "Actor/Chara.h"
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Territory.h"
 #include <Logging/Logger.h>
 

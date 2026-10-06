@@ -6,7 +6,7 @@
 #include <set>
 
 #include <Common.h>
-#include "Forwards.h"
+#include <ForwardsCommon.h>
 #include "Territory/InstanceContent.h"
 
 namespace Sapphire::Scripting
