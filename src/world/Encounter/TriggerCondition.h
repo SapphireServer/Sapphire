@@ -10,7 +10,7 @@
 #include "TimelineActorState.h"
 #include "Timepoint.h"
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   // todo: just use the actual combat state return type
   enum class CombatStateType
@@ -44,7 +44,9 @@ namespace Sapphire
     PhaseActive,
     InterruptedAction,
 
-    VarEquals
+    VarEquals,
+
+    EObjAnimation
   };
 
   class TriggerCondition : public std::enable_shared_from_this< TriggerCondition >
@@ -187,6 +189,16 @@ namespace Sapphire
     uint32_t m_val;
 
     VarType m_type;
+
+    void from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;
+  };
+
+  class ConditionEObjAnimation : public TriggerCondition
+  {
+  public:
+    std::string m_eobjName;
+    uint32_t m_animation;
 
     void from_json( nlohmann::json& json, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const override;

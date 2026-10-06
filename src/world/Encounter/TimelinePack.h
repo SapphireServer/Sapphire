@@ -21,7 +21,12 @@
 #include "Selector.h"
 #include "ForwardsEncounter.h"
 
-namespace Sapphire
+namespace Sapphire::ScriptAPI
+{
+  class MechanicScript;
+}
+
+namespace Sapphire::World::Encounter
 {
   enum class TimelinePackType : uint32_t
   {
@@ -43,6 +48,9 @@ namespace Sapphire
     std::shared_ptr< Encounter > m_pEncounter;
     std::map< uint32_t, uint64_t > m_vars;
 
+    std::unordered_map< std::string, std::string > m_mechanicDefinitions;
+    std::unordered_map< std::string, std::shared_ptr< ScriptAPI::MechanicScript > > m_mechanics;
+
   public:
     TimelinePack() {}
     TimelinePack( const TimelinePack& rhs ) :
@@ -50,6 +58,7 @@ namespace Sapphire
       m_name( rhs.m_name ),
       m_timelineActors( rhs.m_timelineActors ),
       m_selectors( rhs.m_selectors ),
+      m_mechanicDefinitions( rhs.m_mechanicDefinitions ),
       m_startTime( 0 )
     {
       for( auto& selector : m_selectors )
@@ -92,9 +101,14 @@ namespace Sapphire
 
     void setEncounter( std::shared_ptr< Encounter > pEncounter );
 
-    uint32_t getVar( uint32_t index ) const;
+    uint64_t getVar( uint32_t index ) const;
 
-    void setVar( uint32_t index, uint32_t val );
+    void setVar( uint32_t index, uint64_t val );
+
+    void addMechanicDefinition( const std::string& instanceName, const std::string& scriptName );
+
+    bool callMechanic( const std::string& instanceName, const std::string& function,
+                       const nlohmann::json& args );
 
     static TimeLinePackPtr createTimelinePack( const std::string& name );
   };

@@ -10,6 +10,11 @@
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>
 
+#include <AI/Controller/Controller.h>
+#include <AI/Controller/BNpcHomingController.h>
+#include <AI/Controller/BNpcOverworldController.h>
+#include <AI/Controller/BNpcSubActorController.h>
+
 #include <Event/Director.h>
 
 #include <Manager/ActionMgr.h>
@@ -26,7 +31,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   const TimepointDataPtr Timepoint::getData() const
   {
@@ -65,7 +70,8 @@ namespace Sapphire
       { "setTrigger"  ,        TimepointDataType::SetTrigger },
       { "snapshot",            TimepointDataType::Snapshot },
       { "interruptAction",     TimepointDataType::InterruptAction },
-      { "rollRNG",             TimepointDataType::RollRNG }
+      { "rollRNG",             TimepointDataType::RollRNG },
+      { "mechanic",            TimepointDataType::Mechanic }
     };
 
     const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
@@ -350,7 +356,12 @@ namespace Sapphire
       {
         auto& dataJ = json.at( "data" );
 
-        // todo: SetEObjState
+        auto eobjName = dataJ.at( "eobjName" ).get< std::string >();
+        auto state = dataJ.at( "state" ).get< uint32_t >();
+        auto animation = dataJ.at( "animation" ).get< uint32_t >();
+        auto permissionInvisibility = dataJ.at( "permissionInvisibility" ).get< uint32_t >();
+
+        m_pData = std::make_shared< TimepointDataEObjState >( eobjName, state, animation, permissionInvisibility );
       }
       break;
       case TimepointDataType::SetBgm:
@@ -403,6 +414,17 @@ namespace Sapphire
         m_pData = std::make_shared< TimepointDataRollRNG >( min, max, type, idx );
       }
       break;
+      case TimepointDataType::Mechanic:
+      {
+        const auto& dataJ = json.at( "data" );
+        auto instance = dataJ.at( "instance" ).get< std::string >();
+        auto function = dataJ.at( "function" ).get< std::string >();
+        auto args = dataJ.value( "args", nlohmann::json::object() );
+
+        m_pData = std::make_shared< TimepointDataMechanic >( std::move( instance ), std::move( function ),
+                                                             std::move( args ) );
+      }
+      break;
       default:
         break;
     }
@@ -437,6 +459,17 @@ namespace Sapphire
       case TimepointDataType::Idle:
       {
         // just wait up the duration of this timepoint
+      }
+      break;
+      case TimepointDataType::Mechanic:
+      {
+        auto pMechanicData = std::dynamic_pointer_cast< TimepointDataMechanic, TimepointData >( m_pData );
+        if( !pMechanicData )
+          return false;
+
+        pack.callMechanic( pMechanicData->m_instance, pMechanicData->m_function,
+                           pMechanicData->m_args );
+        return true;
       }
       break;
       case TimepointDataType::CastAction:
@@ -503,7 +536,7 @@ namespace Sapphire
                   if( distance >= 3.f + pBNpc->getRadius() + pTargetChara->getRadius() )
                   {
                     // pause at this timepoint
-                    return false;
+                    // return false;
                   }
                 }
               }
@@ -922,11 +955,12 @@ namespace Sapphire
 
         if( pInstance )
         {
-          auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
+          auto pEObj = pEncounter->getEObjByName( pEObjData->m_eobjName );
           if( pEObj )
           {
             pEObj->setState( pEObjData->m_state );
-            // todo: resend the eobj spawn packet?
+            pEObj->setAnimation( pEObjData->m_animation );
+            pEObj->setPermissionInvisibility( pEObjData->m_permissionInvisibility );
           }
         }
       }

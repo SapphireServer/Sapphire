@@ -8,6 +8,7 @@
 #include "CellHandler.h"
 
 #include "ForwardsZone.h"
+#include "Encounter/ForwardsEncounter.h"
 
 #include <set>
 #include <map>
@@ -17,6 +18,8 @@
 #include <cstring>
 #include <Exd/Structs.h>
 #include <Navi/NaviProvider.h>
+
+#include <AI/Controller/Controller.h>
 
 namespace Sapphire
 {
@@ -72,6 +75,8 @@ namespace Sapphire
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
     uint32_t m_nextEncounterId{ 1 };
+
+    std::unordered_map< std::string, World::Encounter::EncounterPtr > m_encounters;
 
     std::vector< SpawnInfo > m_spawnInfo;
 
@@ -186,8 +191,8 @@ namespace Sapphire
 
     void addEObj( Entity::EventObjectPtr object );
 
-    Entity::BNpcPtr createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
-    Entity::BNpcPtr createBNpcFromLayoutIdNoPush( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
+    Entity::BNpcPtr createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0, World::AI::Controller::ControllerUPtr pController = nullptr );
+    Entity::BNpcPtr createBNpcFromLayoutIdNoPush( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0, World::AI::Controller::ControllerUPtr pController = nullptr );
 
     Entity::GameObjectPtr getEntityById( uint32_t entityId );
 
@@ -216,6 +221,12 @@ namespace Sapphire
     uint32_t getNextActionResultId();
 
     uint32_t getNextEncounterId();
+
+    World::Encounter::EncounterPtr registerEncounterDefinition( const World::Encounter::EncounterDefinition& def, Event::DirectorPtr pDirector );
+
+    void addEncounter( const std::string& name, World::Encounter::EncounterPtr pEncounter );
+
+    World::Encounter::EncounterPtr getEncounter( const std::string& name );
 
     std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };

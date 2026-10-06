@@ -4,17 +4,18 @@
 
 using namespace Sapphire::World;
 
-void AI::Fsm::StateIdle::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
+void AI::Fsm::StateIdle::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t tickCount )
 {
-  bool hasQueuedAction = bnpc.hasAction();
+  // bool hasQueuedAction = bnpc.hasAction();
 }
 
-void AI::Fsm::StateIdle::onEnter( Entity::BNpc& bnpc )
+void AI::Fsm::StateIdle::onEnter( Entity::GameObjectPtr& pEntity )
 {
-  bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+  if( auto pBNpc = pEntity->getAsBNpc() )
+    pBNpc->setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
 }
 
-void AI::Fsm::StateIdle::onExit( Entity::BNpc& bnpc )
+void AI::Fsm::StateIdle::onExit( Entity::GameObjectPtr& pEntity )
 {
 }
 

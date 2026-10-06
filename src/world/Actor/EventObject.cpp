@@ -144,7 +144,7 @@ void EventObject::spawn( PlayerPtr pTarget )
   eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().PermissionInvisibility = getPermissionInvisibility();
   eobjStatePacket->data().Args = 0xE0;
-  eobjStatePacket->data().Args2 = 0; // initial animation state
+  eobjStatePacket->data().Args2 = getAnimation(); // initial animation state
   eobjStatePacket->data().Args3 = getHousingLink();
 
   server.queueForPlayer( pTarget->getCharacterId(), eobjStatePacket );
@@ -257,4 +257,16 @@ void EventObject::addCollisionSphere( Common::Vector3 pos, float radius )
 const std::vector< EventObjectCollision >& EventObject::getCollisionData() const
 {
   return m_collision;
+}
+
+void EventObject::setAnimation( uint32_t animation )
+{
+  m_animation = animation;
+  // todo: first parameter doesn't seem to affect anything?
+  playSharedGroupTimeline( 0, animation );
+}
+
+uint32_t EventObject::getAnimation() const
+{
+  return m_animation;
 }

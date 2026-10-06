@@ -10,7 +10,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   class Schedule : public std::enable_shared_from_this< Schedule >
   {

@@ -12,9 +12,9 @@ namespace Sapphire::World::AI::Fsm
   public:
     virtual ~StateRetreat() = default;
 
-    void onUpdate( Entity::BNpc& bnpc, uint64_t tickCount );
-    void onEnter( Entity::BNpc& bnpc );
-    void onExit( Entity::BNpc& bnpc );
+    void onUpdate( Entity::GameObjectPtr& pEntity, uint64_t tickCount );
+    void onEnter( Entity::GameObjectPtr& pEntity );
+    void onExit( Entity::GameObjectPtr& pEntity );
 
   };
 }

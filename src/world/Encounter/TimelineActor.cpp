@@ -9,12 +9,17 @@
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
 
+#include <AI/Controller/Controller.h>
+#include <AI/Controller/BNpcHomingController.h>
+#include <AI/Controller/BNpcOverworldController.h>
+#include <AI/Controller/BNpcSubActorController.h>
+
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
 #include <Territory/Territory.h>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   void TimelineActor::addPhase( PhasePtr pPhase )
   {
@@ -181,9 +186,20 @@ namespace Sapphire
     {
       auto pParent = pTeri->getActiveBNpcByLayoutId( m_layoutId );
       Common::BNpcType type = pParent ? pParent->getBNpcType() : Common::BNpcType::Enemy;
-      
+
       pActor = pTeri->createBNpcFromLayoutIdNoPush( m_layoutId, 1000, type );
       m_subActors[ name ] = pActor;
+
+      // detach current controller so we can set a new one
+      pActor->detachController();
+
+      auto pSubActorController = std::make_unique< AI::Controller::BNpcSubActorController >( *pActor );
+
+      if( !pActor->setController( std::move( pSubActorController ) ) )
+      {
+        Logger::debug( "TimelineActor::spawnSubActor: Unable to setController for subactor {}", pActor->getId() );
+        return nullptr;
+      }
 
       pActor->setInvincibilityType( Common::InvincibilityIgnoreDamage );
       pActor->setFlag( flags );

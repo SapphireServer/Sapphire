@@ -1,8 +1,9 @@
+#pragma once
+
 #include <cstdint>
 #include <ForwardsZone.h>
 #include <Actor/BNpc.h>
-
-#pragma once
+#include <Actor/Chara.h>
 
 namespace Sapphire::World::AI
 {

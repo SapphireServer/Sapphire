@@ -7,7 +7,7 @@
 #include "Logging/Logger.h"
 #include "spdlog/fmt/fmt.h"
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   uint32_t Trigger::getId() const
   {

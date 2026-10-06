@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   struct TimepointState
   {

@@ -323,12 +323,15 @@ Sapphire::Common::Vector3
   filter.setIncludeFlags( 0xffff );
   filter.setExcludeFlags( 0 );
 
-  dtPolyRef startRef;
+  dtPolyRef startRef{ 0 };
 
   status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
 
-  if( dtStatusFailed( status ) )
+  if( dtStatusFailed( status ) || startRef == 0 )
   {
+    if( dtStatusFailed( status ) )
+      Logger::error( "findNearestPosition: dtStatusFailed for pos {} {}", x, z );
+
     // Key improvement 3: Try with larger search radius if first attempt fails
     polyPickExt[ 0 ] = 0.1f;
     polyPickExt[ 1 ] = 500.0f;
@@ -336,8 +339,10 @@ Sapphire::Common::Vector3
 
     status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
 
-    if( dtStatusFailed( status ) )
+    if( dtStatusFailed( status ) || startRef == 0 )
     {
+      if( dtStatusFailed( status ) )
+        Logger::error( "findNearestPosition: dtStatusFailed for pos {} {}", x, z );
       return {};
     }
   }
@@ -345,15 +350,77 @@ Sapphire::Common::Vector3
 
   if( !m_naviMesh->isValidPolyRef( startRef ) )
   {
+    Logger::error( "findNearestPosition: Invalid poly ref {} {} {}", startRef, x, z );
     return {};
   }
+
+  bool posOverPoly{ false };
+
+  status = m_naviMeshQuery->closestPointOnPoly( startRef, spos, snearest, &posOverPoly );
+
+  return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
+}
+
+Sapphire::Common::Vector3
+Sapphire::Common::Navi::NaviProvider::findNearestPosition( float x, float y, float z )
+{
+  dtStatus status;
+
+  float spos[ 3 ] = { x, y, z };
+
+  float polyPickExt[ 3 ];
+  polyPickExt[ 0 ] = 0.1f;
+  polyPickExt[ 1 ] = 0.1f;
+  polyPickExt[ 2 ] = 0.1f;
+  float snearest[ 3 ];
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
+
+  dtPolyRef startRef{ 0 };
+
+  status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+  if( dtStatusFailed( status ) || startRef == 0 )
+  {
+    if( dtStatusFailed( status ) )
+      Logger::error( "findNearestPosition: dtStatusFailed for pos {} {} {}", x, y, z );
+
+    // Key improvement 3: Try with larger search radius if first attempt fails
+    polyPickExt[ 0 ] = 10.0f;
+    polyPickExt[ 1 ] = 500.0f;
+    polyPickExt[ 2 ] = 10.0f;
+
+    status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+    if( dtStatusFailed( status ) || startRef == 0 )
+    {
+      if( dtStatusFailed( status ) )
+        Logger::error( "findNearestPosition: dtStatusFailed for pos {} {} {}", x, y, z );
+
+      return {};
+    }
+  }
+
+
+  if( !m_naviMesh->isValidPolyRef( startRef ) )
+  {
+    Logger::error( "findNearestPosition: Invalid polyref {} {} {} {}", startRef, x, y, z );
+    return {};
+  }
+
+  bool posOverPoly{ false };
+
+  status = m_naviMeshQuery->closestPointOnPoly( startRef, spos, snearest, &posOverPoly );
 
   return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
 }
 
 std::vector< Sapphire::Common::Vector3 >
   Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::Vector3& startPos,
-                                                       const Common::Vector3& endPos )
+                                                        const Common::Vector3& endPos,
+                                                        float radius )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::runtime_error( "No navimesh loaded" );
@@ -397,7 +464,7 @@ std::vector< Sapphire::Common::Vector3 >
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
     // todo: adjust these for the actor radius
-    const float STEP_SIZE = 0.5f;
+    const float STEP_SIZE = radius >= 0 ? radius / 2.f : 0.5f;
     const float SLOP = 0.15f;
 
     int32_t numSmoothPath = 0;
@@ -698,7 +765,7 @@ int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& p
   return m_pCrowd->addAgent( position, &params );
 }
 
-void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed )
+void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision )
 {
   if( naviAgentId == -1 )
     return;
@@ -717,6 +784,11 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
                     DT_CROWD_OBSTACLE_AVOIDANCE;
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
+
+  if( ignoreAgentCollision )
+  {
+    // todo:
+  }
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
 }
 
@@ -924,4 +996,43 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
   }
 
   return true;// Both checks passed
+}
+
+bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos )
+{
+  if( !m_naviMeshQuery )
+  {
+    Logger::error( "[Navmesh] isPointReachable: m_naviMeshQuery is null. Returning true." );
+    return true;
+  }
+
+  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+  dtPolyRef startRef{ 0 }, endRef{ 0 };
+  float startNearest[ 3 ], endNearest[ 3 ];
+  dtQueryFilter filter;
+  float extents[ 3 ] = { 1.0f, 3.0f, 1.0f };
+
+  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest );
+  m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest );
+
+  // todo: this is probably way too large but hopefully should prevent partial paths
+  std::vector< dtPolyRef > pathCorridor( MAX_SMOOTH );
+  int pathCount = 0;
+  dtStatus status = m_naviMeshQuery->findPath( startRef, endRef, fstartPos, fendPos, &filter, pathCorridor.data(), &pathCount, static_cast< int >( pathCorridor.size() ) );
+
+  if( dtStatusSucceed( status ) && pathCount > 0 )
+  {
+    // final poly matches endRef
+    if( pathCorridor[ pathCount - 1 ] == endRef )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  return false;
 }

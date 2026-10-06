@@ -7,6 +7,8 @@
 #include <Exd/Structs.h>
 #include <memory>
 
+#include <Encounter/ForwardsEncounter.h>
+
 namespace Sapphire
 {
   enum InstanceContentState
@@ -186,6 +188,8 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId );
+
     Entity::EventObjectPtr getEObjById( uint32_t eobjId );
 
     /*! binds a player to the instance */
@@ -218,8 +222,8 @@ namespace Sapphire
 
     void movePlayerToEntrance( Entity::Player& player );
 
-    void setEncounter( EncounterPtr pEncounter );
-    EncounterPtr getEncounter();
+    void setControllerEncounter( World::Encounter::EncounterPtr pEncounter );
+    World::Encounter::EncounterPtr getControllerEncounter();
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > m_contentFinderCondition;
@@ -246,7 +250,7 @@ namespace Sapphire
     // the players which are bound to the instance, regardless of inside or offline
     std::set< uint32_t > m_boundPlayerIds;
 
-    EncounterPtr m_pEncounter;
+    World::Encounter::EncounterPtr m_pControllerEncounter;
   };
 
 }

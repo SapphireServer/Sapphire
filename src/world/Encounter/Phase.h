@@ -3,7 +3,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <map>
 #include <vector>
 
 #include "ForwardsEncounter.h"
@@ -12,7 +11,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   class Phase : public std::enable_shared_from_this< Phase >
   {

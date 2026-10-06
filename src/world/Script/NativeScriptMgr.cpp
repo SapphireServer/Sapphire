@@ -1,6 +1,7 @@
 #include "NativeScriptMgr.h"
 
 #include <Crypt/md5.h>
+#include <Logging/Logger.h>
 
 namespace Sapphire::Scripting
 {
@@ -28,6 +29,17 @@ namespace Sapphire::Scripting
         break;
 
       auto script = scripts[ i ];
+
+      if( auto pMechanicDefinition = dynamic_cast< Sapphire::ScriptAPI::MechanicScriptDefinition* >( script ) )
+      {
+        if( !m_mechanicRegistry.registerDefinition( *pMechanicDefinition ) )
+        {
+          Logger::error( "Duplicate mechanic script definition: {}", pMechanicDefinition->getName() );
+          delete script;
+          continue;
+        }
+      }
+
       module->scripts.push_back( script );
 
       m_scripts[ script->getType() ][ script->getId() ] = script;
@@ -69,6 +81,9 @@ namespace Sapphire::Scripting
     for( auto& script : info->scripts )
     {
       m_scripts[ script->getType() ].erase( script->getId() );
+
+      if( auto pMechanicDefinition = dynamic_cast< Sapphire::ScriptAPI::MechanicScriptDefinition* >( script ) )
+        m_mechanicRegistry.unregisterDefinition( *pMechanicDefinition );
 
       delete script;
     }
@@ -131,6 +146,11 @@ namespace Sapphire::Scripting
     return m_loader.isModuleLoaded( name );
   }
 
+  const MechanicRegistry& NativeScriptMgr::getMechanicRegistry() const
+  {
+    return m_mechanicRegistry;
+  }
+
   NativeScriptMgr::NativeScriptMgr( const std::string& cachePath )
   {
     m_loader.setCachePath( cachePath );
@@ -153,6 +173,7 @@ namespace Sapphire::Scripting
 
     // Clear any leftover type->id map entries (should be empty after unloadScript loop, but ensure)
     m_scripts.clear();
+    m_mechanicRegistry.clear();
 
     // Clear pending reload queue
     while( !m_scriptLoadQueue.empty() ) m_scriptLoadQueue.pop();

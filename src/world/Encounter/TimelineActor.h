@@ -14,7 +14,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   enum class TimelineActorType : uint32_t
   {

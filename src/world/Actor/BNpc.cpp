@@ -62,6 +62,9 @@
 #include <AI/Fsm/StateResumePath.h>
 #include <AI/TargetHelper.h>
 
+#include <AI/Controller/Controller.h>
+#include <AI/Controller/BNpcOverworldController.h>
+
 using namespace Sapphire;
 using namespace Sapphire::World;
 using namespace Sapphire::Common;
@@ -307,7 +310,33 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
   calculateStats();
 }
 
-BNpc::~BNpc() = default;
+BNpc::~BNpc()
+{
+  detachController();
+}
+
+World::AI::Controller::Controller* BNpc::getController()
+{
+  return m_pController.get();
+}
+
+bool BNpc::setController( World::AI::Controller::ControllerUPtr pController )
+{
+  if( m_controllerInitialized || !pController )
+    return false;
+
+  m_pController = std::move( pController );
+  return true;
+}
+
+void BNpc::detachController()
+{
+  if( m_pController && m_controllerInitialized )
+    m_pController->onDetach();
+
+  m_controllerInitialized = false;
+  m_pController.reset();
+}
 
 uint8_t BNpc::getAggressionMode() const
 {
@@ -415,7 +444,7 @@ float BNpc::getCurrentSpeed() const
   return isRunning ? getRunSpeed() : getWalkSpeed();
 }
 
-bool BNpc::moveTo( const Vector3& pos )
+bool BNpc::moveTo( const Vector3& pos, float targetReachedDist )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -428,10 +457,19 @@ bool BNpc::moveTo( const Vector3& pos )
     return false;
   }
 
+  if( targetReachedDist == std::numeric_limits< float >::max() )
+    targetReachedDist = getNaviTargetReachedDistance();
+
   auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
+
+  auto dY = std::fabs( pos.y - pos1.y );
+  auto dXZ = Common::Util::distance2D( pos1.x, pos1.z, pos.x, pos.z );
+  // todo: find the real y diff retail uses to determine if we should move
+  auto yThreshold = 2.5f;
+
   auto distance = Common::Util::distance( pos1, pos );
 
-  if( distance <= getNaviTargetReachedDistance() )
+  if( dXZ <= targetReachedDist && dY <= yThreshold )
   {
     // Reached destination
     face( pos );
@@ -457,9 +495,9 @@ bool BNpc::moveTo( const Vector3& pos )
   return false;
 }
 
-bool BNpc::moveTo( const Chara& targetChara )
+bool BNpc::moveTo( const Chara& targetChara, float targetReachedDist )
 {
-  return moveTo( targetChara.getPos() );
+  return moveTo( targetChara.getPos(), targetReachedDist );
 }
 
 float mapSpeedToRange( float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f )
@@ -795,12 +833,11 @@ void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
 
-  checkAggro();
+  if( m_pController )
+    m_pController->update( tickCount );
   // removed check for now, replaced by position check to last position
   //if( m_dirtyFlag & DirtyFlag::Position )
   sendPositionUpdate( tickCount );
-
-  m_fsm->update( *this, tickCount );
 }
 
 void BNpc::restHp()
@@ -1318,6 +1355,8 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  std::shared_ptr< AI::GambitPack > pGambitPack{ nullptr };
+
   /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
@@ -1339,64 +1378,22 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
   */
-  initFsm();
+  if( !m_pController )
+    m_pController = std::make_unique< AI::Controller::BNpcOverworldController >( *this );
+
+  m_pController->setGambitPack( pGambitPack );
+  m_pController->initialize();
+  m_controllerInitialized = true;
 }
 
 void BNpc::initFsm()
 {
-  using namespace AI::Fsm;
-  m_fsm = make_StateMachine();
-  auto stateIdle = make_StateIdle();
-  auto stateCombat = make_StateCombat();
-  auto stateDead = make_StateDead();
-
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  if( m_pInfo->ServerPathId != 0 && pZone && pZone->getServerPath( m_pInfo->ServerPathId ) )
-  {
-    auto statePath = make_StateFollowPath();
-    auto stateResumePath = make_StateResumePath();
-    statePath->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    statePath->addTransition( stateDead, make_IsDeadCondition() );
-
-    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-    stateCombat->addTransition( stateResumePath, make_HateListEmptyCondition() );
-    stateResumePath->addTransition( statePath, make_RoamTargetReachedCondition() );
-
-    m_fsm->addState( statePath );
-
-    m_fsm->setCurrentState( statePath );
-  }
-  else
-  {
-    if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
-    {
-      auto stateRoam = make_StateRoam();
-      stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
-      stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-      stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-      stateRoam->addTransition( stateDead, make_IsDeadCondition() );
-      m_fsm->addState( stateRoam );
-    }
-    stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    //stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
-    stateIdle->addTransition( stateDead, make_IsDeadCondition() );
-    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-    m_fsm->addState( stateIdle );
-    if( !hasFlag( NoDeaggro ) )
-    {
-      auto stateRetreat = make_StateRetreat();
-      stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
-      stateCombat->addTransition( stateRetreat, make_HateListEmptyCondition() );
-      stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-    }
-    m_fsm->setCurrentState( stateIdle );
-  }
+  // todo: assign controller based on mob type
 }
 
 void BNpc::processGambits( uint64_t tickCount )
 {
+  // todo: should this be handled by Controller instead of BNpc?
   m_tp = 1000;
   if( m_pGambitPack )
     m_pGambitPack->update( *this, tickCount );
