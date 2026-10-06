@@ -42,6 +42,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
+#include "Manager/FishingMgr.h"
 
 #include "Manager/ActionMgr.h"
 #include "Manager/ChatChannelMgr.h"
@@ -421,6 +422,7 @@ void WorldServer::init( int32_t argc, char *argv[ ] )
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
   auto pEventMgr = std::make_shared< Manager::EventMgr >();
+  auto pFishingMgr = std::make_shared< Manager::FishingMgr >();
   auto pItemMgr = std::make_shared< Manager::ItemMgr >();
   auto pQuestMgr = std::make_shared< Manager::QuestMgr >();
   auto pPartyMgr = std::make_shared< Manager::PartyMgr >();
@@ -434,6 +436,7 @@ void WorldServer::init( int32_t argc, char *argv[ ] )
   Common::Service< Manager::ShopMgr >::set( pShopMgr );
   Common::Service< Manager::InventoryMgr >::set( pInventoryMgr );
   Common::Service< Manager::EventMgr >::set( pEventMgr );
+  Common::Service< Manager::FishingMgr >::set( pFishingMgr );
   Common::Service< Manager::ItemMgr >::set( pItemMgr );
   Common::Service< Manager::QuestMgr >::set( pQuestMgr );
   Common::Service< Manager::PartyMgr >::set( pPartyMgr );
