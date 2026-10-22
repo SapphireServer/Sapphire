@@ -68,6 +68,7 @@ namespace Sapphire::World::Encounter
     float rotation;
     uint8_t permissionInvisibility;
     uint32_t animation{ 0 };
+    bool collisionDefaultEnabled;
     EncounterEntityRemoveFlag entityRemoveFlag;
   };
 
@@ -221,6 +222,8 @@ namespace Sapphire::World::Encounter
 
     void setPos( const Common::Vector3& pos );
     Common::Vector3 getPos() const;
+
+    TimelinePackPtr getTimelinePack();
 
   protected:
 

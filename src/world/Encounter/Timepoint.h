@@ -43,7 +43,8 @@ namespace Sapphire::World::Encounter
     Snapshot,
     InterruptAction,
     RollRNG, // todo: make this save to director var idx
-    Mechanic
+    Mechanic,
+    SetVar
   };
 
   enum class ActionTargetType : uint32_t
@@ -77,7 +78,7 @@ namespace Sapphire::World::Encounter
     SelectorTarget
   };
 
-  enum class DirectorOpId
+  enum class VarOpId
   {
     Set,// idx = val
     Add,// idx += val
@@ -211,7 +212,7 @@ namespace Sapphire::World::Encounter
 
   struct TimepointDataDirector : public TimepointData
   {
-    DirectorOpId m_directorOp{ 0 };
+    VarOpId m_directorOp{ 0 };
     union
     {
       struct
@@ -230,7 +231,7 @@ namespace Sapphire::World::Encounter
       uint8_t flags;
     } m_data{ 0 };
 
-    TimepointDataDirector( TimepointDataType type, DirectorOpId op ) :
+    TimepointDataDirector( TimepointDataType type, VarOpId op ) :
       TimepointData( type ),
       m_directorOp( op )
     {
@@ -292,13 +293,15 @@ namespace Sapphire::World::Encounter
     uint32_t m_state{ 0 };
     uint32_t m_animation{ 0 };
     uint32_t m_permissionInvisibility{ 0 };
+    bool m_collision{ false };
 
-    TimepointDataEObjState( const std::string& name, uint32_t state, uint32_t animation, uint32_t permissionInvisibilty ) :
+    TimepointDataEObjState( const std::string& name, uint32_t state, uint32_t animation, uint32_t permissionInvisibilty, bool collision ) :
       TimepointData( TimepointDataType::SetEObjState ),
       m_eobjName( name ),
       m_state( state ),
       m_animation( animation ),
-      m_permissionInvisibility( permissionInvisibilty )
+      m_permissionInvisibility( permissionInvisibilty ),
+      m_collision( collision )
     {
     }
   };
@@ -388,6 +391,23 @@ namespace Sapphire::World::Encounter
       m_instance( std::move( instance ) ),
       m_function( std::move( function ) ),
       m_args( std::move( args ) )
+    {
+    }
+  };
+
+  struct TimepointDataSetVar : public TimepointData
+  {
+    VarType m_type;
+    VarOpId m_op;
+    uint64_t m_index;
+    uint64_t m_val;
+
+    TimepointDataSetVar( VarType type, VarOpId op, uint64_t index, uint64_t val ) :
+      TimepointData( TimepointDataType::SetVar ),
+      m_type( type ),
+      m_op( op ),
+      m_index( index ),
+      m_val( val )
     {
     }
   };

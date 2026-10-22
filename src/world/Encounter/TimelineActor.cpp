@@ -21,6 +21,25 @@
 
 namespace Sapphire::World::Encounter
 {
+  void TimelineActor::setTypeEObj( const std::string& eobjName )
+  {
+    m_type = TimelineActorType::EventObject;
+    m_name = eobjName;
+    m_layoutId = Common::INVALID_GAME_OBJECT_ID;
+  }
+
+  void TimelineActor::setTypeBNpc( const std::string& name, uint32_t layoutId )
+  {
+    m_type = TimelineActorType::BattleNpc;
+    m_name = name;
+    m_layoutId = layoutId;
+  }
+
+  TimelineActorType TimelineActor::getType() const
+  {
+    return m_type;
+  }
+
   void TimelineActor::addPhase( PhasePtr pPhase )
   {
     if( m_phases.find( pPhase->getId() ) != m_phases.end() )

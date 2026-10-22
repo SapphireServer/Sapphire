@@ -110,6 +110,8 @@ namespace Sapphire::World::Encounter
     bool callMechanic( const std::string& instanceName, const std::string& function,
                        const nlohmann::json& args );
 
+    void requestPhaseTransition( const std::string& actorRef, uint32_t phaseId );
+
     static TimeLinePackPtr createTimelinePack( const std::string& name );
   };
 

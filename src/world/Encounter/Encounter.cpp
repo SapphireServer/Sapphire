@@ -101,7 +101,8 @@ namespace Sapphire::World::Encounter
         pEObj->setScale( eobj.scale );
         pEObj->setState( eobj.state );
         pEObj->setPermissionInvisibility( eobj.permissionInvisibility );
-        pEObj->setCollisionEnabled( eobj.permissionInvisibility == 0 );
+        pEObj->setCollisionEnabled( eobj.collisionDefaultEnabled );
+        pEObj->setAnimation( eobj.animation );
 
         m_eobjs.emplace( pEObj->getName(), pEObj );
         m_setupEObjs.emplace( pEObj->getName(), eobj );
@@ -126,7 +127,8 @@ namespace Sapphire::World::Encounter
         pEObj->setScale( entrance.scale );
         pEObj->setState( entrance.state );
         pEObj->setPermissionInvisibility( entrance.permissionInvisibility );
-        pEObj->setCollisionEnabled( entrance.permissionInvisibility == 0 );
+        pEObj->setCollisionEnabled( entrance.collisionDefaultEnabled );
+        pEObj->setAnimation( entrance.animation );
 
         m_setupEObjs.emplace( pEObj->getName(), entrance );
         m_entranceEObjs.emplace( pEObj->getName(), pEObj );
@@ -152,7 +154,8 @@ namespace Sapphire::World::Encounter
         pEObj->setScale( exit.scale );
         pEObj->setState( exit.state );
         pEObj->setPermissionInvisibility( exit.permissionInvisibility );
-        pEObj->setCollisionEnabled( exit.permissionInvisibility == 0 );
+        pEObj->setCollisionEnabled( exit.collisionDefaultEnabled );
+        pEObj->setAnimation( exit.animation );
 
         m_setupEObjs.emplace( pEObj->getName(), exit );
         m_exitEObjs.emplace( pEObj->getName(), pEObj );
@@ -788,6 +791,11 @@ namespace Sapphire::World::Encounter
     return m_position;
   }
 
+  TimelinePackPtr Encounter::getTimelinePack()
+  {
+    return m_pTimeline;
+  }
+
   void Encounter::handleInRangeActors( const std::set< Entity::GameObjectPtr >& inRange )
   {
     for( auto& pActor : inRange )
@@ -801,7 +809,7 @@ namespace Sapphire::World::Encounter
     auto tmpActorsInside = m_actorsInside;
     for( auto& pActor : tmpActorsInside )
     {
-      if( pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
+      if( pActor->getTerritoryId() != m_pTeri->getGuId() || pActor->getBoundEncounterId() == m_id && !isPositionInside( pActor->getPos() ) )
       {
         onExitRange( pActor );
       }

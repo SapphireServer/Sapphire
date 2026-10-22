@@ -7,6 +7,7 @@
 #include <Actor/BNpc.h>
 
 #include <Encounter/Encounter.h>
+#include <Encounter/TimelinePack.h>
 
 #include <WorldServer.h>
 
@@ -105,9 +106,10 @@ public:
     def.participants = {
       { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
     };
-    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, uint32_t animation, EncounterEntityRemoveFlag removeFlag } }
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
     def.entrances = {
-      { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, 0, EncounterEntityRemoveFlag::OnSuccess }
+      { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
     };
     def.exits = { {} };
 
@@ -132,12 +134,13 @@ public:
     def.participants = {
       { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
     };
-    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, uint32_t animation, EncounterEntityRemoveFlag removeFlag } }
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
     def.entrances = {
-      { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, 0, EncounterEntityRemoveFlag::OnSuccess }
+      { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
     };
     def.exits = {
-      { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, 0, EncounterEntityRemoveFlag::None }
+      { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, 0, true, EncounterEntityRemoveFlag::None }
     };
 
     def.hasLockout = true;
@@ -161,15 +164,16 @@ public:
     def.participants = {
       { BOSS_MADISON_2, HP_MADISON_2, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
     };
-    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, uint32_t animation, EncounterEntityRemoveFlag removeFlag } }
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
     def.entrances = {
-      { "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, 0, EncounterEntityRemoveFlag::OnSuccess }
+      { "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
     };
     def.onInitEObjList = {
-      { "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, 0, EncounterEntityRemoveFlag::None }
+      { "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, 0, false, EncounterEntityRemoveFlag::None }
     };
     def.exits = {
-      { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, 0, EncounterEntityRemoveFlag::None }
+      { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, 0, true, EncounterEntityRemoveFlag::None }
     };
     def.hasLockout = true;
     def.placeName = PLACENAME_RAMBADE_2;
@@ -192,15 +196,16 @@ public:
     def.participants = {
       { BOSS_DENN, HP_DENN, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
     };
-    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, uint32_t animation, EncounterEntityRemoveFlag removeFlag } }
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
     def.entrances = {
-      { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, 0, EncounterEntityRemoveFlag::OnSuccess }
+      { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
     };
     def.onInitEObjList = {
-            { "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, 0, EncounterEntityRemoveFlag::None },
-            { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, 0, EncounterEntityRemoveFlag::None },
-            { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, 0, EncounterEntityRemoveFlag::None },
-            { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, 0, EncounterEntityRemoveFlag::None }
+            { "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, 0, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, 0, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, 0, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, 0, false, EncounterEntityRemoveFlag::None }
     };
 
     def.hasLockout = true;
@@ -525,6 +530,7 @@ public:
                                 eventMgr().eventActionStart( player, getId(), EventActionTouch,
                                                       [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                                       {
+                                                        eobj.setCollisionEnabled( false );
                                                         eobj.setPermissionInvisibility( 1 );
                                                         if( eobj.getName() == "Captainsquarters" )
                                                           instance.sendEventLogMessage( player, instance, 2059, { 668 } );
@@ -547,21 +553,42 @@ public:
 
       auto anim = eobj.getAnimation();
 
+      constexpr uint32_t GRATE_PHASE_BUBBLE = 3;
+      constexpr uint32_t GRATE_PHASE_STOP_BUBBLE = 4;
+
       constexpr uint32_t ANIMFLAG_OPEN_GRATE = 0x01;
       constexpr uint32_t ANIMFLAG_CLOSE_GRATE = 0x02;
       constexpr uint32_t ANIMFLAG_BUBBLE = 0x04;
       constexpr uint32_t ANIMFLAG_STOP_BUBBLE = 0x08;
 
-      if( anim & ANIMFLAG_BUBBLE )
+      auto pTimeline = pEncounter->getTimelinePack();
+      // todo: map the correct eobj to the guard bnpc
+      if( name == "Unnaturalripples" )
       {
-        eobj.setAnimation( ANIMFLAG_STOP_BUBBLE );
-        for( auto& pPlayer : pEncounter->getPlayers() )
-          playerMgr().sendLogMessage( *pPlayer, 2041 ); // The evil presence has gone.
+        if( anim & ANIMFLAG_BUBBLE )
+          pTimeline->requestPhaseTransition( "Baleen Guard", GRATE_PHASE_STOP_BUBBLE );
       }
-      else if( anim == 0 || anim & ANIMFLAG_CLOSE_GRATE )
+      else if( name == "Unnaturalripples_1" )
+      {
+        if( anim & ANIMFLAG_BUBBLE )
+          pTimeline->requestPhaseTransition( "Baleen Guard (LID 3978761)", GRATE_PHASE_STOP_BUBBLE );
+      }
+      else if( name == "Unnaturalripples_2" )
+      {
+        if( anim & ANIMFLAG_BUBBLE )
+          pTimeline->requestPhaseTransition( "Baleen Guard (LID 4064937)", GRATE_PHASE_STOP_BUBBLE );
+      }
+      else if( name == "Unnaturalripples_3" )
+      {
+        if( anim & ANIMFLAG_BUBBLE )
+          pTimeline->requestPhaseTransition( "Baleen Guard (LID 4064938)", GRATE_PHASE_STOP_BUBBLE );
+      }
+      
+      if( anim == 0 || anim & ANIMFLAG_STOP_BUBBLE )
       {
         playerMgr().sendLogMessage( player, 2039 ); // There is nothing out of the ordinary.
       }
+      
     }
   }
 

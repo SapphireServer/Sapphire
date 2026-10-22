@@ -1235,7 +1235,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
     }
     instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
   }
-  else if( subCommand == "objstate" )
+  else if( subCommand == "permissionInvisibility" )
   {
     char objName[128];
     uint8_t state;
@@ -1273,6 +1273,23 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
 
     obj->setAnimation( state2 );
     //obj->playSharedGroupTimeline( state1, state2 );
+  }
+  else if( subCommand == "objstate" )
+  {
+    char objName[ 128 ];
+    uint8_t state;
+
+    sscanf( params.c_str(), "%127s %hhu", objName, &state );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+      return;
+
+    obj->setState( state );
   }
   else if( subCommand == "seq" )
   {

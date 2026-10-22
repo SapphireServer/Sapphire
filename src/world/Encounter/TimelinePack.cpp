@@ -48,6 +48,12 @@ namespace Sapphire::World::Encounter
 
   std::shared_ptr< TimelinePack > TimelinePack::createTimelinePack( const std::string& name )
   {
+    const static std::unordered_map< std::string, TimelineActorType > actorTypeMap =
+    {
+      { "bnpc", TimelineActorType::BattleNpc },
+      { "eobj", TimelineActorType::EventObject }
+    };
+
     const static std::unordered_map< std::string, ConditionType > conditionMap =
     {
       { "hpPctLessThan",            ConditionType::HpPctLessThan },
@@ -118,6 +124,16 @@ namespace Sapphire::World::Encounter
       actor.m_layoutId = actorV.at( "layoutId" ).get< uint32_t >();
       actor.m_name = actorV.at( "name" ).get< std::string >();
       actor.m_initialPhaseId = actorV.at( "initialPhaseId" ).get< uint32_t >();
+
+      auto actorType = actorTypeMap.at( actorV.at( "type" ).get< std::string >() );
+      if( actorType == TimelineActorType::BattleNpc )
+      {
+        actor.setTypeBNpc( actor.m_name, actor.m_layoutId );
+      }
+      else if( actorType == TimelineActorType::EventObject )
+      {
+        actor.setTypeEObj( actor.m_name );
+      }
 
       auto& subActorsJ = actorV.at( "subactors" );
 
@@ -203,7 +219,7 @@ namespace Sapphire::World::Encounter
           }
 
           if( scheduleNameMap.find( scheduleName ) != scheduleNameMap.end() )
-            throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::createTimelinePack - duplicate scheduke by name: {}" ), scheduleName ) );
+            throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::createTimelinePack - duplicate schedule by name: {}" ), scheduleName ) );
 
           scheduleNameMap.emplace( std::make_pair( scheduleName, sched ) );
 
@@ -324,6 +340,7 @@ namespace Sapphire::World::Encounter
                 pCondition = std::make_shared< ConditionEObjAnimation >();
                 pCondition->from_json( conditionJ, condition, actorNameMap );
               }
+              break;
               default:
                 break;
             }
@@ -528,5 +545,25 @@ namespace Sapphire::World::Encounter
     }
 
     return true;
+  }
+
+  void TimelinePack::requestPhaseTransition( const std::string& actorRef, uint32_t phaseId )
+  {
+    for( auto& actor : m_timelineActors )
+    {
+      if( actor.getName() == actorRef )
+      {
+        auto pPhase = actor.getPhaseById( phaseId );
+        if( pPhase )
+        {
+          actor.transitionPhase( m_pEncounter, *this, Common::Util::getTimeMs(), pPhase );
+        }
+        else
+        {
+          Logger::error( "[TimelinePack] requestPhaseTransition: Unable to find Phase: {} for Actor: {}", phaseId, actor.getName() );
+        }
+        return;
+      }
+    }
   }
 }// namespace Sapphire::Encounter

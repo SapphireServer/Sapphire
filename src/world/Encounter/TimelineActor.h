@@ -34,13 +34,15 @@ namespace Sapphire::World::Encounter
     TimelineActorState m_state;
 
   public:
-    uint32_t m_layoutId{ 0 };
+    TimelineActorType m_type;
+    uint32_t m_layoutId{ 0xE0000000 };
     uint32_t m_hp{ 0 };
     std::string m_name;
     uint32_t m_initialPhaseId{ 1 };
 
-    TimelineActor() {}
+    TimelineActor() : m_type( TimelineActorType::BattleNpc ) {}
     TimelineActor( const TimelineActor& rhs ) :
+      m_type( rhs.m_type ),
       m_layoutId( rhs.m_layoutId ),
       m_hp( rhs.m_hp ),
       m_name( rhs.m_name )
@@ -51,6 +53,12 @@ namespace Sapphire::World::Encounter
 
       m_phases = rhs.m_phases;
     }
+
+    void setTypeEObj( const std::string& eobjName );
+
+    void setTypeBNpc( const std::string& name, uint32_t layoutId );
+
+    TimelineActorType getType() const;
 
     void addPhase( PhasePtr pPhase );
 

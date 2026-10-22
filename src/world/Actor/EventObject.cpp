@@ -16,6 +16,7 @@
 #include "Session.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/TerritoryMgr.h"
+#include <Network/PacketWrappers/MoveActorPacket.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -94,6 +95,7 @@ uint8_t EventObject::getState() const
 void EventObject::setState( uint8_t state )
 {
   m_state = state;
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetSharedGroupTimelineState, state, getId() );
 }
 
 void EventObject::playSharedGroupTimeline( uint32_t flag, uint32_t animationFlag )
@@ -181,7 +183,9 @@ uint32_t EventObject::getOwnerId() const
 void EventObject::setCollisionEnabled( bool enabled )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  
+
+  m_collisionEnabled = enabled;
+
   if( auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() ) )
   {
     if( auto pNavi = pTeri->getNaviProvider() )
@@ -269,4 +273,37 @@ void EventObject::setAnimation( uint32_t animation )
 uint32_t EventObject::getAnimation() const
 {
   return m_animation;
+}
+
+bool EventObject::isCollisionEnabled() const
+{
+  return m_collisionEnabled;
+}
+
+void EventObject::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( !pZone )
+  {
+    Logger::error( "BNpc::sendPositionUpdate: No zone for id: {}", getTerritoryId() );
+    return;
+  }
+
+  uint8_t dirS1 = Common::Util::floatToUInt8Rot( getRot() );
+
+  auto movePacket = std::make_shared< MoveActorPacket >( *this, 0x3A, 0, 0, dirS1 );
+  server().queueForPlayers( getInRangePlayerIds(), movePacket );
+
+  // update collision boxes if moved
+  if( m_collisionEnabled )
+  {
+    setCollisionEnabled( true );
+  }
+}
+
+void EventObject::setPos( const Common::Vector3& pos, bool broadcastUpdate )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
 }

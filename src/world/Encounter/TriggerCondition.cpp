@@ -178,7 +178,7 @@ namespace Sapphire::World::Encounter
   bool ConditionEObjAnimation::isConditionMet( PhaseState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto pEObj = pEncounter->getEObjByName( m_eobjName );
-    return pEObj && pEObj->getAnimation() == m_animation;
+    return pEObj && pEObj->getAnimation() & m_animation;
   }
 
   void ConditionHp::from_json( nlohmann::json& json, ConditionType condition,

@@ -61,21 +61,6 @@
                 "combatState": 1,
                 "sourceActor": "Denn The Orcatoothed"
               }
-            },
-            {
-              "action": {
-                "phaseId": 3,
-                "timepoint": null,
-                "type": "transitionPhase"
-              },
-              "condition": "combatState",
-              "description": "",
-              "enabled": true,
-              "id": 2,
-              "paramData": {
-                "combatState": 5,
-                "sourceActor": "Denn The Orcatoothed"
-              }
             }
           ]
         },
@@ -122,6 +107,14 @@
           "onExit": [],
           "schedules": [],
           "triggers": []
+        },
+        {
+          "id": 4,
+          "name": "Grate 1",
+          "onEnter": [],
+          "onExit": [],
+          "schedules": [],
+          "triggers": []
         }
       ],
       "subactors": [],
@@ -139,7 +132,16 @@
           "name": "Setup Phase",
           "onEnter": [],
           "onExit": [],
-          "schedules": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 2,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": []
+            }
+          ],
           "triggers": [
             {
               "action": {
@@ -155,6 +157,21 @@
                 "combatState": 1,
                 "sourceActor": "Baleen Guard"
               }
+            },
+            {
+              "action": {
+                "phaseId": 3,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "eobjAnimation",
+              "description": "",
+              "enabled": true,
+              "id": 7,
+              "paramData": {
+                "animation": 4,
+                "eobjName": "Unnaturalripples"
+              }
             }
           ]
         },
@@ -165,6 +182,210 @@
           "onExit": [],
           "schedules": [],
           "triggers": []
+        },
+        {
+          "id": 3,
+          "name": "Bubbles",
+          "onEnter": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 4,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "animation": 4,
+                "collision": false,
+                "eobjName": "Unnaturalripples",
+                "permissionInvisibility": 0,
+                "state": 4
+              },
+              "description": "",
+              "id": 6,
+              "startTime": 0,
+              "type": "setEObjState"
+            }
+          ],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 1,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": [
+                {
+                  "data": {
+                    "messageId": 2042,
+                    "params": [
+                      1207
+                    ]
+                  },
+                  "description": "",
+                  "id": 9,
+                  "startTime": 7000,
+                  "type": "logMessage"
+                },
+                {
+                  "data": {
+                    "animation": 8,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples",
+                    "permissionInvisibility": 0,
+                    "state": 8
+                  },
+                  "description": "",
+                  "id": 5,
+                  "startTime": 7000,
+                  "type": "setEObjState"
+                },
+                {
+                  "data": {
+                    "flags": 320,
+                    "flagsMask": 4294967295,
+                    "hateSource": {
+                      "hateType": "<to-be-defined>",
+                      "source": "<to-de-befined>"
+                    },
+                    "invulnType": null,
+                    "spawnActor": "Baleen Guard"
+                  },
+                  "description": "",
+                  "id": 2,
+                  "startTime": 8000,
+                  "type": "bNpcSpawn"
+                },
+                {
+                  "data": {
+                    "actionId": 835,
+                    "selectorIndex": 0,
+                    "selectorName": "<unset>",
+                    "snapshot": false,
+                    "snapshotTime": 0,
+                    "sourceActor": "Baleen Guard",
+                    "targetType": "self"
+                  },
+                  "description": "",
+                  "id": 1,
+                  "startTime": 8000,
+                  "type": "castAction"
+                },
+                {
+                  "data": {
+                    "animation": 9,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples",
+                    "permissionInvisibility": 0,
+                    "state": 9
+                  },
+                  "description": "",
+                  "id": 7,
+                  "startTime": 9000,
+                  "type": "setEObjState"
+                },
+                {
+                  "data": {
+                    "flags": 0,
+                    "flagsMask": null,
+                    "invulnType": null,
+                    "targetActor": ""
+                  },
+                  "description": "",
+                  "id": 3,
+                  "startTime": 9000,
+                  "type": "bNpcFlags"
+                },
+                {
+                  "data": {
+                    "animation": 10,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples",
+                    "permissionInvisibility": 0,
+                    "state": 10
+                  },
+                  "description": "",
+                  "id": 8,
+                  "startTime": 10000,
+                  "type": "setEObjState"
+                }
+              ]
+            }
+          ],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 8,
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Baleen Guard"
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Stop Bubbles",
+          "onEnter": [
+            {
+              "data": {
+                "messageId": 2041,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "animation": 10,
+                "collision": false,
+                "eobjName": "Unnaturalripples",
+                "permissionInvisibility": 0,
+                "state": 10
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 0,
+              "type": "setEObjState"
+            }
+          ],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 1,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 9,
+              "paramData": {
+                "combatState": 0,
+                "sourceActor": "Baleen Guard"
+              }
+            }
+          ]
         }
       ],
       "subactors": [],
@@ -182,7 +403,16 @@
           "name": "Setup Phase",
           "onEnter": [],
           "onExit": [],
-          "schedules": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 2,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": []
+            }
+          ],
           "triggers": [
             {
               "action": {
@@ -196,7 +426,23 @@
               "id": 1,
               "paramData": {
                 "combatState": 1,
-                "sourceActor": "Baleen Guard (LID 3978761)"
+                "sourceActor": "Baleen Guard"
+              }
+            },
+            {
+              "action": {
+                "phaseId": 3,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "hpPctBetween",
+              "description": "",
+              "enabled": true,
+              "id": 7,
+              "paramData": {
+                "hpMax": 75,
+                "hpMin": 0,
+                "sourceActor": "Denn The Orcatoothed"
               }
             }
           ]
@@ -208,6 +454,210 @@
           "onExit": [],
           "schedules": [],
           "triggers": []
+        },
+        {
+          "id": 3,
+          "name": "Bubbles",
+          "onEnter": [
+            {
+              "data": {
+                "messageId": 2040,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 4,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "animation": 4,
+                "collision": false,
+                "eobjName": "Unnaturalripples_1",
+                "permissionInvisibility": 0,
+                "state": 4
+              },
+              "description": "",
+              "id": 6,
+              "startTime": 0,
+              "type": "setEObjState"
+            }
+          ],
+          "onExit": [],
+          "schedules": [
+            {
+              "description": "",
+              "id": 1,
+              "loopCount": 1,
+              "loopType": "none",
+              "name": "Schedule 1",
+              "timepoints": [
+                {
+                  "data": {
+                    "messageId": 2042,
+                    "params": [
+                      1207
+                    ]
+                  },
+                  "description": "",
+                  "id": 9,
+                  "startTime": 7000,
+                  "type": "logMessage"
+                },
+                {
+                  "data": {
+                    "animation": 8,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples_1",
+                    "permissionInvisibility": 0,
+                    "state": 8
+                  },
+                  "description": "",
+                  "id": 5,
+                  "startTime": 7000,
+                  "type": "setEObjState"
+                },
+                {
+                  "data": {
+                    "flags": 352,
+                    "flagsMask": 4294967295,
+                    "hateSource": {
+                      "hateType": "<to-be-defined>",
+                      "source": "<to-de-befined>"
+                    },
+                    "invulnType": null,
+                    "spawnActor": "Baleen Guard (LID 3978761)"
+                  },
+                  "description": "",
+                  "id": 2,
+                  "startTime": 8000,
+                  "type": "bNpcSpawn"
+                },
+                {
+                  "data": {
+                    "actionId": 835,
+                    "selectorIndex": 0,
+                    "selectorName": "<unset>",
+                    "snapshot": false,
+                    "snapshotTime": 0,
+                    "sourceActor": "Baleen Guard (LID 3978761)",
+                    "targetType": "self"
+                  },
+                  "description": "",
+                  "id": 1,
+                  "startTime": 8000,
+                  "type": "castAction"
+                },
+                {
+                  "data": {
+                    "animation": 9,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples_1",
+                    "permissionInvisibility": 0,
+                    "state": 9
+                  },
+                  "description": "",
+                  "id": 7,
+                  "startTime": 9000,
+                  "type": "setEObjState"
+                },
+                {
+                  "data": {
+                    "flags": 0,
+                    "flagsMask": null,
+                    "invulnType": null,
+                    "targetActor": ""
+                  },
+                  "description": "",
+                  "id": 3,
+                  "startTime": 9000,
+                  "type": "bNpcFlags"
+                },
+                {
+                  "data": {
+                    "animation": 10,
+                    "collision": false,
+                    "eobjName": "Unnaturalripples_1",
+                    "permissionInvisibility": 0,
+                    "state": 10
+                  },
+                  "description": "",
+                  "id": 8,
+                  "startTime": 10000,
+                  "type": "setEObjState"
+                }
+              ]
+            }
+          ],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 2,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 8,
+              "paramData": {
+                "combatState": 1,
+                "sourceActor": "Baleen Guard"
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Stop Bubbles",
+          "onEnter": [
+            {
+              "data": {
+                "messageId": 2041,
+                "params": [
+                  0
+                ]
+              },
+              "description": "",
+              "id": 1,
+              "startTime": 0,
+              "type": "logMessage"
+            },
+            {
+              "data": {
+                "animation": 10,
+                "collision": false,
+                "eobjName": "Unnaturalripples_1",
+                "permissionInvisibility": 0,
+                "state": 10
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 0,
+              "type": "setEObjState"
+            }
+          ],
+          "onExit": [],
+          "schedules": [],
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 1,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "combatState",
+              "description": "",
+              "enabled": true,
+              "id": 9,
+              "paramData": {
+                "combatState": 0,
+                "sourceActor": "Baleen Guard"
+              }
+            }
+          ]
         }
       ],
       "subactors": [],

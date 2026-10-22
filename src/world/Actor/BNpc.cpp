@@ -538,7 +538,7 @@ void BNpc::sendPositionUpdate( uint64_t tickCount )
     float s1 = mapSpeedToRange( getCurrentSpeed(), 0, 25.5f );
     uint8_t dirS1 = Common::Util::floatToUInt8Rot( s1 );
 
-    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, dirS1 );
+    auto movePacket = std::make_shared< MoveActorPacket >( *this, 0x3A, animationType, 0, dirS1 );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;

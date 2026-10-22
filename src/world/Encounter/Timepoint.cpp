@@ -71,23 +71,24 @@ namespace Sapphire::World::Encounter
       { "snapshot",            TimepointDataType::Snapshot },
       { "interruptAction",     TimepointDataType::InterruptAction },
       { "rollRNG",             TimepointDataType::RollRNG },
-      { "mechanic",            TimepointDataType::Mechanic }
+      { "mechanic",            TimepointDataType::Mechanic },
+      { "setVar",              TimepointDataType::SetVar }
     };
 
-    const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
+    const static std::unordered_map< std::string, VarOpId > opMap =
     {
-      { "set", DirectorOpId::Set },
-      { "add", DirectorOpId::Add },
-      { "sub", DirectorOpId::Sub },
-      { "mul", DirectorOpId::Mul },
-      { "div", DirectorOpId::Div },
-      { "mod", DirectorOpId::Mod },
-      { "sll", DirectorOpId::Sll },
-      { "srl", DirectorOpId::Srl },
-      { "or",  DirectorOpId::Or },
-      { "xor", DirectorOpId::Xor },
-      { "nor", DirectorOpId::Nor },
-      { "and", DirectorOpId::And }
+      { "set", VarOpId::Set },
+      { "add", VarOpId::Add },
+      { "sub", VarOpId::Sub },
+      { "mul", VarOpId::Mul },
+      { "div", VarOpId::Div },
+      { "mod", VarOpId::Mod },
+      { "sll", VarOpId::Sll },
+      { "srl", VarOpId::Srl },
+      { "or",  VarOpId::Or },
+      { "xor", VarOpId::Xor },
+      { "nor", VarOpId::Nor },
+      { "and", VarOpId::And }
     };
 
     const static std::unordered_map< std::string, Common::BNpcType > bnpcTypeMap =
@@ -217,7 +218,7 @@ namespace Sapphire::World::Encounter
         auto index = dataJ.at( "idx" ).get< uint32_t >();
         auto val = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.at( opStr );
+        VarOpId op = opMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
@@ -233,7 +234,7 @@ namespace Sapphire::World::Encounter
         auto left = dataJ.at( "left" ).get< uint32_t >();
         auto right = dataJ.at( "right" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.at( opStr );
+        VarOpId op = opMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
@@ -248,7 +249,7 @@ namespace Sapphire::World::Encounter
         auto& dataJ = json.at( "data" );
         auto seq = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.at( opStr );
+        VarOpId op = opMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.seq = seq;
@@ -261,7 +262,7 @@ namespace Sapphire::World::Encounter
         auto& dataJ = json.at( "data" );
         auto flags = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.at( opStr );
+        VarOpId op = opMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.flags = flags;
@@ -360,8 +361,9 @@ namespace Sapphire::World::Encounter
         auto state = dataJ.at( "state" ).get< uint32_t >();
         auto animation = dataJ.at( "animation" ).get< uint32_t >();
         auto permissionInvisibility = dataJ.at( "permissionInvisibility" ).get< uint32_t >();
+        auto collision = dataJ.at( "collision" ).get< bool >();
 
-        m_pData = std::make_shared< TimepointDataEObjState >( eobjName, state, animation, permissionInvisibility );
+        m_pData = std::make_shared< TimepointDataEObjState >( eobjName, state, animation, permissionInvisibility, collision );
       }
       break;
       case TimepointDataType::SetBgm:
@@ -423,6 +425,17 @@ namespace Sapphire::World::Encounter
 
         m_pData = std::make_shared< TimepointDataMechanic >( std::move( instance ), std::move( function ),
                                                              std::move( args ) );
+      }
+      break;
+      case TimepointDataType::SetVar:
+      {
+        const auto& dataJ = json.at( "data" );
+        auto type = varTypeMap.at( dataJ.at( "type" ).get< std::string >() );
+        auto op = opMap.at( dataJ.at( "opc" ).get< std::string >() );
+        auto idx = dataJ.at( "idx" ).get< uint64_t >();
+        auto val = dataJ.at( "val" ).get< uint64_t >();
+
+        m_pData = std::make_shared< TimepointDataSetVar >( type, op, idx, val );
       }
       break;
       default:
@@ -561,16 +574,27 @@ namespace Sapphire::World::Encounter
       {
         auto pSetPosData = std::dynamic_pointer_cast< TimepointDataSetPos, TimepointData >( m_pData );
         auto pBNpc = pack.getBNpcByRef( pSetPosData->m_actorRef, pEncounter );
+        auto pEObj = pEncounter->getEObjByName( pSetPosData->m_actorRef );
 
+        Entity::GameObjectPtr pActorSelf = nullptr;
         if( pBNpc )
+          pActorSelf = pBNpc;
+        else if( pEObj )
+          pActorSelf = pEObj;
+
+        if( pActorSelf )
         {
-          auto pos = pBNpc->getPos();
+          auto pos = pActorSelf->getPos();
           float rot = 0.f;
           switch( pSetPosData->m_targetType )
           {
             case SetPosTargetType::Target:
             {
-              auto inRange = pBNpc->getInRangeActors();
+              // todo: should eobj have targets?
+              if( !pBNpc )
+                break;
+
+              auto inRange = pActorSelf->getInRangeActors();
               for( const auto& pActor : inRange )
               {
                 if( pActor->getId() == pBNpc->getTargetId() )
@@ -600,7 +624,7 @@ namespace Sapphire::World::Encounter
               {
                 // find the target by id and copy their pos
                 auto targetId = results[ pSetPosData->m_selectorIndex ].m_entityId;
-                for( const auto& pActor : pBNpc->getInRangeActors() )
+                for( const auto& pActor : pActorSelf->getInRangeActors() )
                 {
                   if( pActor->getId() == targetId )
                   {
@@ -623,8 +647,8 @@ namespace Sapphire::World::Encounter
               // dont use absolute pos for selector, just use the selector pos
               if( pSetPosData->m_targetType == SetPosTargetType::SelectorPos || pSetPosData->m_targetType == SetPosTargetType::SelectorTarget )
               {
-                pBNpc->setRot( rot );
-                pBNpc->setPos( pos, true );
+                pActorSelf->setRot( rot );
+                pActorSelf->setPos( pos, true );
               }
               else
               {
@@ -643,15 +667,25 @@ namespace Sapphire::World::Encounter
               break;
           }
 
-          // todo: handling agent should really be somewhere else
-          if( pBNpc->getAgentId() != -1 )
+          auto pNavi = pTeri->getNaviProvider();
+          if( pBNpc )
           {
-            auto pNavi = pTeri->getNaviProvider();
-            if( pNavi )
-              pBNpc->setAgentId( pNavi->updateAgentPosition( pBNpc->getAgentId(), pos, pBNpc->getRadius(), pNavi->getAgentSpeed( pBNpc->getAgentId() ) ) );
+            // todo: handling agent should really be somewhere else
+            if( pBNpc->getAgentId() != -1 )
+            {
+              if( pNavi )
+                pBNpc->setAgentId( pNavi->updateAgentPosition( pBNpc->getAgentId(), pos, pBNpc->getRadius(), pNavi->getAgentSpeed( pBNpc->getAgentId() ) ) );
+            }
+            pBNpc->setRot( rot );
+            pBNpc->setPos( pos, true );
           }
-          pBNpc->setRot( rot );
-          pBNpc->setPos( pos, true );
+          else if( pEObj )
+          {
+            // todo: update navi with this eobj? eobj collision shapes are updated by setPos
+            // but the eobj itself has no agent associated with it directly, only sub collision entries
+            pEObj->setRot( rot );
+            pEObj->setPos( pos, true );
+          }
         }
       }
       break;
@@ -708,9 +742,8 @@ namespace Sapphire::World::Encounter
 
         {
           auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-          for( auto& player : pTeri->getPlayers() )
+          for( auto& pPlayer : pEncounter->getPlayers() )
           {
-            auto& pPlayer = player.second;
             if( pPlayer )
               playerMgr.sendLogMessage( *pPlayer.get(), pLogMessage->m_messageId,
                                         params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ], params[ 4 ] );
@@ -791,40 +824,40 @@ namespace Sapphire::World::Encounter
 
           switch( pDirectorData->m_directorOp )
           {
-            case DirectorOpId::Set:
+            case VarOpId::Set:
               val = param;
               break;
-            case DirectorOpId::Add:
+            case VarOpId::Add:
               val += param;
               break;
-            case DirectorOpId::Sub:
+            case VarOpId::Sub:
               val -= param;
               break;
-            case DirectorOpId::Mul:
+            case VarOpId::Mul:
               val *= param;
               break;
-            case DirectorOpId::Div:
+            case VarOpId::Div:
               val /= param;
               break;
-            case DirectorOpId::Mod:
+            case VarOpId::Mod:
               val %= param;
               break;
-            case DirectorOpId::Sll:
+            case VarOpId::Sll:
               val = val << param;
               break;
-            case DirectorOpId::Srl:
+            case VarOpId::Srl:
               val = val >> param;
               break;
-            case DirectorOpId::Or:
+            case VarOpId::Or:
               val |= param;
               break;
-            case DirectorOpId::Xor:
+            case VarOpId::Xor:
               val ^= param;
               break;
-            case DirectorOpId::Nor:
+            case VarOpId::Nor:
               val = ~( val | param );
               break;
-            case DirectorOpId::And:
+            case VarOpId::And:
               val &= param;
               break;
             default:
@@ -947,13 +980,6 @@ namespace Sapphire::World::Encounter
       {
         auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( m_pData );
 
-        auto pInstance = pTeri->getAsInstanceContent();
-        auto pQBattle = pTeri->getAsQuestBattle();
-
-        // todo: event objects on quest battles
-        // todo: SetEObjAnimationFlag?
-
-        if( pInstance )
         {
           auto pEObj = pEncounter->getEObjByName( pEObjData->m_eobjName );
           if( pEObj )
@@ -961,6 +987,7 @@ namespace Sapphire::World::Encounter
             pEObj->setState( pEObjData->m_state );
             pEObj->setAnimation( pEObjData->m_animation );
             pEObj->setPermissionInvisibility( pEObjData->m_permissionInvisibility );
+            pEObj->setCollisionEnabled( pEObjData->m_collision );
           }
         }
       }
@@ -975,6 +1002,10 @@ namespace Sapphire::World::Encounter
         if( pInstance )
         {
           pInstance->setCurrentBGM( pBgmData->m_bgmId );
+        }
+        else if (pQBattle)
+        {
+          // todo:
         }
       }
       break;
@@ -1020,28 +1051,157 @@ namespace Sapphire::World::Encounter
         auto& rngMgr = Common::Service< Common::Random::RNGMgr >::ref();
         auto val = rngMgr.getRandGenerator( pRNGData->m_min, pRNGData->m_max ).next();
 
+        // if instance/quest battle, call director events in scripts
+        auto pInstance = pTeri->getAsInstanceContent();
+        auto pQuestBattle = pTeri->getAsQuestBattle();
+
         switch( pRNGData->m_type )
         {
           case VarType::Director:
           {
             auto pDirector = pEncounter->getDirector();
-            if( pDirector)
+
+            if( pInstance )
+              pInstance->setVar( pRNGData->m_idx, val );
+            else if( pQuestBattle )
+              pQuestBattle->setVar( pRNGData->m_idx, val );
+            else if( pDirector )
               pDirector->setDirectorVar( pRNGData->m_idx, val );
           }
           break;
           case VarType::Custom:
           {
             auto pDirector = pEncounter->getDirector();
-            if( pDirector )
-              pDirector->setCustomVar( pRNGData->m_idx, val );
+
+            if( pInstance )
+              pInstance->setVar( pRNGData->m_idx, val );
+            else if( pQuestBattle )
+              pQuestBattle->setVar( pRNGData->m_idx, val );
+            else if( pDirector )
+              pDirector->setDirectorVar( pRNGData->m_idx, val );
           }
           break;
           case VarType::Pack:
           {
-            // todo: probably get rid of this?
             pack.setVar( pRNGData->m_idx, val );
           }
           break;
+        }
+      }
+      break;
+      case TimepointDataType::SetVar:
+      {
+        auto pSetVarData = std::dynamic_pointer_cast< TimepointDataSetVar, TimepointData >( m_pData );
+
+        auto type = pSetVarData->m_type;
+        auto opc = pSetVarData->m_op;
+        auto idx = pSetVarData->m_index;
+        uint64_t val = 0;
+
+        // if instance/quest battle, call director events in scripts
+        auto pInstance = pTeri->getAsInstanceContent();
+        auto pQuestBattle = pTeri->getAsQuestBattle();
+
+        switch( type )
+        {
+          case VarType::Director:
+          {
+            auto pDirector = pEncounter->getDirector();
+            if( pDirector )
+              val = pDirector->getDirectorVar( idx );
+          }
+          break;
+          case VarType::Custom:
+          {
+            auto pDirector = pEncounter->getDirector();
+            if( pDirector )
+              val = pDirector->getCustomVar( idx );
+          }
+          break;
+          case VarType::Pack:
+          {
+            val = pack.getVar( idx );
+          }
+          break;
+          default:
+            break;
+        }
+
+        auto param = pSetVarData->m_val;
+
+        switch( opc )
+        {
+          case VarOpId::Set:
+            val = param;
+            break;
+          case VarOpId::Add:
+            val += param;
+            break;
+          case VarOpId::Sub:
+            val -= param;
+            break;
+          case VarOpId::Mul:
+            val *= param;
+            break;
+          case VarOpId::Div:
+            val /= param;
+            break;
+          case VarOpId::Mod:
+            val %= param;
+            break;
+          case VarOpId::Sll:
+            val = val << param;
+            break;
+          case VarOpId::Srl:
+            val = val >> param;
+            break;
+          case VarOpId::Or:
+            val |= param;
+            break;
+          case VarOpId::Xor:
+            val ^= param;
+            break;
+          case VarOpId::Nor:
+            val = ~( val | param );
+            break;
+          case VarOpId::And:
+            val &= param;
+            break;
+          default:
+            break;
+        }
+
+        auto pDirector = pEncounter->getDirector();
+
+        switch( type )
+        {
+          case VarType::Director:
+          {
+            if( pInstance )
+              pInstance->setVar( idx, val );
+            else if( pQuestBattle )
+              pQuestBattle->setVar( idx, val );
+            else if( pDirector )
+              pDirector->setDirectorVar( idx, val );
+          }
+          break;
+          case VarType::Custom:
+          {
+            if( pInstance )
+              pInstance->setCustomVar( idx, val );
+            else if( pQuestBattle )
+              pQuestBattle->setCustomVar( idx, val );
+            else if( pDirector )
+              pDirector->setDirectorVar( idx, val );
+          }
+          break;
+          case VarType::Pack:
+          {
+            pack.setVar( idx, val );
+          }
+          break;
+          default:
+            break;
         }
       }
       break;
