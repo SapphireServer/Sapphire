@@ -369,7 +369,7 @@ int main( int argc, char* argv[] )
     achievementTypeMap[ Common::Achievement::Type::Unknown_5 ] = "Unknown_5";
     achievementTypeMap[ Common::Achievement::Type::Quest ] = "Quest";
     achievementTypeMap[ Common::Achievement::Type::Unknown_7 ] = "Unknown_7";
-    achievementTypeMap[ Common::Achievement::Type::Unknown_8 ] = "Unknown_8";
+    achievementTypeMap[ Common::Achievement::Type::MapDiscovery ] = "MapDiscovery";
     achievementTypeMap[ Common::Achievement::Type::QuestAny ] = "QuestAny";
     achievementTypeMap[ Common::Achievement::Type::ChocoboRank ] = "ChocoboRank";
     achievementTypeMap[ Common::Achievement::Type::PvPRank ] = "PvPRank";
