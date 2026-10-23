@@ -1,10 +1,17 @@
+#pragma once
+
 #include <cstdint>
-#include "ForwardsZone.h"
-#include "Actor/BNpc.h"
+
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 
-#pragma once
+#include "ForwardsZone.h"
+
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
+#include <Actor/Player.h>
+
+//#include <AI/Controller/Controller.h>
 
 namespace Sapphire::World::AI::Fsm
 {
@@ -14,10 +21,10 @@ namespace Sapphire::World::AI::Fsm
     Condition() = default;
     virtual ~Condition() = default;
 
-    virtual bool isConditionMet( Sapphire::Entity::BNpc& src ) const = 0;
-    virtual bool update( Sapphire::Entity::BNpc& src, float time )
+    virtual bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const = 0;
+    virtual bool update( Sapphire::Entity::GameObjectPtr& pEntity, float time )
     {
-      if( isConditionMet( src ) )
+      if( isConditionMet( pEntity ) )
         return true;
       return false;
     };
@@ -26,70 +33,48 @@ namespace Sapphire::World::AI::Fsm
   class RoamNextTimeReachedCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      if( ( Common::Util::getTimeSeconds() - src.getLastRoamTargetReachedTime() ) > 20 )
-        return true;
-      return false;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
   class RoamTargetReachedCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      if( src.isRoamTargetReached() )
-        return true;
-      return false;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
   class HateListEmptyCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      if( src.hateListGetHighest() )
-        return false;
-      return true;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
   class HateListHasEntriesCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      if( src.hateListGetHighest() )
-        return true;
-      return false;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
   class SpawnPointDistanceGtMaxDistanceCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      auto distanceOrig = Common::Util::distance( src.getPos(), src.getSpawnPos() );
-      if( distanceOrig > 40 )
-        return true;
-
-      return false;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
   class IsDeadCondition : public Condition
   {
   public:
-    bool isConditionMet( Sapphire::Entity::BNpc& src ) const override
-    {
-      if( !src.isAlive() )
-        return true;
-
-      return false;
-    }
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
   };
 
+  class PathDestinationReachedCondition : public Condition
+  {
+  public:
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
+  };
+
+  class FollowTargetInvalidCondition : public Condition
+  {
+  public:
+    bool isConditionMet( Sapphire::Entity::GameObjectPtr& pEntity ) const override;
+  };
 }

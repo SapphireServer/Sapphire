@@ -110,6 +110,16 @@ namespace Sapphire::Entity
 
     const std::vector< EventObjectCollision >& getCollisionData() const;
 
+    void setAnimation( uint32_t animation );
+
+    uint32_t getAnimation() const;
+
+    bool isCollisionEnabled() const;
+
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
+
+    void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+
 
   protected:
     EventObjectType m_eobjType;
@@ -124,6 +134,7 @@ namespace Sapphire::Entity
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
     std::vector< EventObjectCollision > m_collision;
-
+    uint32_t m_animation{ 0 };
+    bool m_collisionEnabled{ false };
   };
 }

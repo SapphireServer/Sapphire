@@ -102,6 +102,21 @@
               "name": "Schedule 1",
               "timepoints": [
                 {
+                  "id": 1,
+                  "type": "mechanic",
+                  "startTime": 0,
+                  "description": "Arm test mechanic",
+                  "data": {
+                    "instance": "ifritTest",
+                    "function": "arm",
+                    "args": {
+                      "actor": "Ifrit",
+                      "intervalMs": 1000,
+                      "maxUpdates": 3
+                    }
+                  }
+                },
+                {
                   "data": {
                     "actionId": 453,
                     "selectorIndex": 0,
@@ -1652,6 +1667,9 @@
       "type": "bnpc"
     }
   ],
+  "mechanics": {
+    "ifritTest": "TimelineMechanicPoc"
+  },
   "name": "Brand new timeline",
   "selectors": [
     {

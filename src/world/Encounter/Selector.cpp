@@ -2,7 +2,7 @@
 
 #include <Actor/Chara.h>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   void Selector::from_json( const nlohmann::json& json )
   {

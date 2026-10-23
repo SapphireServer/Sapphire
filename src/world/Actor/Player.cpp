@@ -1037,7 +1037,7 @@ void Player::hateListRemove( const BNpc& bnpc )
 bool Player::hateListHasEntry( const BNpc& bnpc )
 {
   return std::any_of( m_actorIdTohateSlotMap.begin(), m_actorIdTohateSlotMap.end(),
-                     [ bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
+                     [ &bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
 }
 
 std::vector< CharaPtr > Player::getHateList()

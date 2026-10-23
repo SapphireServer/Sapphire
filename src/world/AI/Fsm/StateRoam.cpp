@@ -9,57 +9,71 @@
 
 using namespace Sapphire::World;
 
-void AI::Fsm::StateRoam::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
+void AI::Fsm::StateRoam::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t tickCount )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
+  auto pZone = teriMgr.getTerritoryByGuId( pEntity->getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
-  if( bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) || !bnpc.pathingActive() )
+  if( auto pBNpc = pEntity->getAsBNpc() )
   {
-    bnpc.setRoamTargetReached( true );
-    return;
+    auto& bnpc = *pBNpc;
+
+    if( bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) || !bnpc.pathingActive() )
+    {
+      bnpc.setRoamTargetReached( true );
+      return;
+    }
+
+    if( pNaviProvider )
+      pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getRoamTargetPos() );
+
+    if( bnpc.moveTo( bnpc.getRoamTargetPos() ) )
+    {
+      bnpc.setRoamTargetReached( true );
+      bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+
+      if( bnpc.getEnemyType() == Common::Friendly )
+        bnpc.setRot( bnpc.getSpawnRot() );
+    }
   }
+}
 
-  if( pNaviProvider )
-    pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getRoamTargetPos() );
+void AI::Fsm::StateRoam::onEnter( Entity::GameObjectPtr& pEntity )
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( pEntity->getTerritoryId() );
+  auto pNaviProvider = pZone->getNaviProvider();
 
-  if( bnpc.moveTo( bnpc.getRoamTargetPos() ) )
+  if( auto pBNpc = pEntity->getAsBNpc() )
   {
-    bnpc.setRoamTargetReached( true );
-    bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+    auto& bnpc = *pBNpc;
+
+    if( !pNaviProvider || bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) )
+    {
+      bnpc.setRoamTargetReached( true );
+      return;
+    }
 
     if( bnpc.getEnemyType() == Common::Friendly )
-      bnpc.setRot( bnpc.getSpawnRot() );
-  }
-
-}
-
-void AI::Fsm::StateRoam::onEnter( Entity::BNpc& bnpc )
-{
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
-  auto pNaviProvider = pZone->getNaviProvider();
-
-  if( !pNaviProvider || bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) )
-  {
-    bnpc.setRoamTargetReached( true );
-    return;
-  }
-
-  if( bnpc.getEnemyType() == Common::Friendly )
-  {
-    bnpc.setRoamTargetPos( bnpc.getSpawnPos() );
-  }
-  else
-  {
-    auto pos = pNaviProvider->findRandomPositionInCircle( bnpc.getSpawnPos(), bnpc.getInstanceObjectInfo()->WanderingRange );
-    bnpc.setRoamTargetPos( pos );
+    {
+      bnpc.setRoamTargetPos( bnpc.getSpawnPos() );
+    }
+    else
+    {
+      auto pos = pNaviProvider->findRandomPositionInCircle( bnpc.getSpawnPos(), bnpc.getInstanceObjectInfo()->WanderingRange );
+      bnpc.setRoamTargetPos( pos );
+    }
   }
 }
 
-void AI::Fsm::StateRoam::onExit( Entity::BNpc& bnpc )
+void AI::Fsm::StateRoam::onExit( Entity::GameObjectPtr& pEntity )
 {
-  bnpc.setRoamTargetReached( false );
+  if( auto pBNpc = pEntity->getAsBNpc() )
+  {
+    auto& bnpc = *pBNpc;
+
+    bnpc.setRoamTargetReached( false );
+  }
 }
 

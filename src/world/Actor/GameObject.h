@@ -45,14 +45,16 @@ namespace Sapphire::Entity
     /*! Parent cell in the zone */
     Common::CellId m_cellId;
 
+    uint32_t m_followTargetId{ Common::INVALID_GAME_OBJECT_ID };
+
   public:
     explicit GameObject( Common::ObjKind type );
 
     virtual ~GameObject() {};
 
-    virtual void spawn( PlayerPtr pTarget ) {}
+    virtual void spawn( PlayerPtr pTarget );
 
-    virtual void despawn( PlayerPtr pTarget ) {}
+    virtual void despawn( PlayerPtr pTarget );
 
     uint32_t getId() const;
 
@@ -153,6 +155,12 @@ namespace Sapphire::Entity
     // set the current cell
     void setCellId( Common::CellId cellId );
 
+
+    virtual World::AI::Controller::Controller* getController();
+
+    uint32_t getFollowTargetId() const;
+    void setFollowTargetId( uint32_t id );
+    void resetFollowTargetId();
   };
 
 }

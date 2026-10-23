@@ -5,13 +5,14 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ForwardsZone.h>
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   enum class TimepointDataType : uint32_t
   {
@@ -41,7 +42,9 @@ namespace Sapphire
 
     Snapshot,
     InterruptAction,
-    RollRNG // todo: make this save to director var idx
+    RollRNG, // todo: make this save to director var idx
+    Mechanic,
+    SetVar
   };
 
   enum class ActionTargetType : uint32_t
@@ -75,7 +78,7 @@ namespace Sapphire
     SelectorTarget
   };
 
-  enum class DirectorOpId
+  enum class VarOpId
   {
     Set,// idx = val
     Add,// idx += val
@@ -209,7 +212,7 @@ namespace Sapphire
 
   struct TimepointDataDirector : public TimepointData
   {
-    DirectorOpId m_directorOp{ 0 };
+    VarOpId m_directorOp{ 0 };
     union
     {
       struct
@@ -228,7 +231,7 @@ namespace Sapphire
       uint8_t flags;
     } m_data{ 0 };
 
-    TimepointDataDirector( TimepointDataType type, DirectorOpId op ) :
+    TimepointDataDirector( TimepointDataType type, VarOpId op ) :
       TimepointData( type ),
       m_directorOp( op )
     {
@@ -286,13 +289,19 @@ namespace Sapphire
 
   struct TimepointDataEObjState : public TimepointData
   {
-    uint32_t m_eobjId{ 0xE0000000 };
+    std::string m_eobjName;
     uint32_t m_state{ 0 };
+    uint32_t m_animation{ 0 };
+    uint32_t m_permissionInvisibility{ 0 };
+    bool m_collision{ false };
 
-    TimepointDataEObjState( uint32_t eobjId, uint32_t state ) :
+    TimepointDataEObjState( const std::string& name, uint32_t state, uint32_t animation, uint32_t permissionInvisibilty, bool collision ) :
       TimepointData( TimepointDataType::SetEObjState ),
-      m_eobjId( eobjId ),
-      m_state( state )
+      m_eobjName( name ),
+      m_state( state ),
+      m_animation( animation ),
+      m_permissionInvisibility( permissionInvisibilty ),
+      m_collision( collision )
     {
     }
   };
@@ -356,17 +365,49 @@ namespace Sapphire
 
   struct TimepointDataRollRNG : public TimepointData
   {
-    uint32_t m_min;
-    uint32_t m_max;
+    uint64_t m_min;
+    uint64_t m_max;
     VarType m_type;
     uint32_t m_idx;
 
-    TimepointDataRollRNG( uint32_t min, uint32_t max, VarType type, uint32_t varIdx ) :
+    TimepointDataRollRNG( uint64_t min, uint64_t max, VarType type, uint32_t varIdx ) :
       TimepointData( TimepointDataType::RollRNG ),
       m_min( min ),
       m_max( max ),
       m_type( type ),
       m_idx( varIdx )
+    {
+    }
+  };
+
+  struct TimepointDataMechanic : public TimepointData
+  {
+    std::string m_instance;
+    std::string m_function;
+    nlohmann::json m_args;
+
+    TimepointDataMechanic( std::string instance, std::string function, nlohmann::json args ) :
+      TimepointData( TimepointDataType::Mechanic ),
+      m_instance( std::move( instance ) ),
+      m_function( std::move( function ) ),
+      m_args( std::move( args ) )
+    {
+    }
+  };
+
+  struct TimepointDataSetVar : public TimepointData
+  {
+    VarType m_type;
+    VarOpId m_op;
+    uint64_t m_index;
+    uint64_t m_val;
+
+    TimepointDataSetVar( VarType type, VarOpId op, uint64_t index, uint64_t val ) :
+      TimepointData( TimepointDataType::SetVar ),
+      m_type( type ),
+      m_op( op ),
+      m_index( index ),
+      m_val( val )
     {
     }
   };

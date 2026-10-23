@@ -9,13 +9,37 @@
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
 
+#include <AI/Controller/Controller.h>
+#include <AI/Controller/BNpcHomingController.h>
+#include <AI/Controller/BNpcOverworldController.h>
+#include <AI/Controller/BNpcSubActorController.h>
+
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
 #include <Territory/Territory.h>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
+  void TimelineActor::setTypeEObj( const std::string& eobjName )
+  {
+    m_type = TimelineActorType::EventObject;
+    m_name = eobjName;
+    m_layoutId = Common::INVALID_GAME_OBJECT_ID;
+  }
+
+  void TimelineActor::setTypeBNpc( const std::string& name, uint32_t layoutId )
+  {
+    m_type = TimelineActorType::BattleNpc;
+    m_name = name;
+    m_layoutId = layoutId;
+  }
+
+  TimelineActorType TimelineActor::getType() const
+  {
+    return m_type;
+  }
+
   void TimelineActor::addPhase( PhasePtr pPhase )
   {
     if( m_phases.find( pPhase->getId() ) != m_phases.end() )
@@ -41,10 +65,26 @@ namespace Sapphire
     return false;
   }
 
+  bool TimelineActor::isPhaseActive( const std::string& phaseName ) const
+  {
+    if( m_pPhase )
+      return m_pPhase->getName() == phaseName;
+    return false;
+  }
+
   PhasePtr TimelineActor::getPhaseById( uint32_t phaseId )
   {
     if( auto it = m_phases.find( phaseId ); it != m_phases.end() )
       return it->second;
+
+    return nullptr;
+  }
+
+  PhasePtr TimelineActor::getPhaseByName( const std::string& phaseName )
+  {
+    for( const auto& [ id, pPhase ] : m_phases )
+      if( pPhase->getName() == phaseName )
+        return pPhase;
 
     return nullptr;
   }
@@ -181,9 +221,20 @@ namespace Sapphire
     {
       auto pParent = pTeri->getActiveBNpcByLayoutId( m_layoutId );
       Common::BNpcType type = pParent ? pParent->getBNpcType() : Common::BNpcType::Enemy;
-      
+
       pActor = pTeri->createBNpcFromLayoutIdNoPush( m_layoutId, 1000, type );
       m_subActors[ name ] = pActor;
+
+      // detach current controller so we can set a new one
+      pActor->detachController();
+
+      auto pSubActorController = std::make_unique< AI::Controller::BNpcSubActorController >( *pActor );
+
+      if( !pActor->setController( std::move( pSubActorController ) ) )
+      {
+        Logger::debug( "TimelineActor::spawnSubActor: Unable to setController for subactor {}", pActor->getId() );
+        return nullptr;
+      }
 
       pActor->setInvincibilityType( Common::InvincibilityIgnoreDamage );
       pActor->setFlag( flags );

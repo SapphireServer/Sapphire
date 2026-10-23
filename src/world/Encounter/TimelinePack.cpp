@@ -27,6 +27,12 @@
 
 #include <Service.h>
 
+#include <Script/NativeScriptApi.h>
+#include <Script/NativeScriptMgr.h>
+#include <Script/ScriptMgr.h>
+
+#include <Logging/Logger.h>
+
 #include <Territory/QuestBattle.h>
 #include <Territory/InstanceContent.h>
 #include <Util/UtilMath.h>
@@ -34,7 +40,7 @@
 
 #include <filesystem>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   //
   // parsing stuff below
@@ -42,12 +48,17 @@ namespace Sapphire
 
   std::shared_ptr< TimelinePack > TimelinePack::createTimelinePack( const std::string& name )
   {
+    const static std::unordered_map< std::string, TimelineActorType > actorTypeMap =
+    {
+      { "bnpc", TimelineActorType::BattleNpc },
+      { "eobj", TimelineActorType::EventObject }
+    };
+
     const static std::unordered_map< std::string, ConditionType > conditionMap =
     {
       { "hpPctLessThan",            ConditionType::HpPctLessThan },
       { "hpPctBetween",             ConditionType::HpPctBetween },
 
-      { "varEquals",                ConditionType::VarEquals },
       { "directorVarGreaterThan",   ConditionType::DirectorVarGreaterThan },
 
       { "directorSeqEquals",        ConditionType::DirectorSeqEquals },
@@ -64,6 +75,9 @@ namespace Sapphire
       { "getAction",                ConditionType::GetAction },
       { "phaseActive",              ConditionType::PhaseActive },
       { "interruptedAction",        ConditionType::InterruptedAction },
+
+      { "varEquals",                ConditionType::VarEquals },
+      { "eobjAnimation",            ConditionType::EObjAnimation }
     };
 
     const static std::unordered_map< std::string, TriggerAction::Type > triggerActionMap =
@@ -81,6 +95,12 @@ namespace Sapphire
       return nullptr;
 
     auto json = nlohmann::json::parse( f );
+
+    if( auto mechanicsIt = json.find( "mechanics" ); mechanicsIt != json.end() && mechanicsIt->is_object() )
+    {
+      for( const auto& [ instanceName, scriptValue ] : mechanicsIt->items() )
+        pack->addMechanicDefinition( instanceName, scriptValue.get< std::string >() );
+    }
 
     std::unordered_map< std::string, TimelineActor > actorNameMap;
     std::unordered_map< std::string, std::map< uint32_t, PhasePtr > > actorNamePhaseMap;
@@ -104,6 +124,16 @@ namespace Sapphire
       actor.m_layoutId = actorV.at( "layoutId" ).get< uint32_t >();
       actor.m_name = actorV.at( "name" ).get< std::string >();
       actor.m_initialPhaseId = actorV.at( "initialPhaseId" ).get< uint32_t >();
+
+      auto actorType = actorTypeMap.at( actorV.at( "type" ).get< std::string >() );
+      if( actorType == TimelineActorType::BattleNpc )
+      {
+        actor.setTypeBNpc( actor.m_name, actor.m_layoutId );
+      }
+      else if( actorType == TimelineActorType::EventObject )
+      {
+        actor.setTypeEObj( actor.m_name );
+      }
 
       auto& subActorsJ = actorV.at( "subactors" );
 
@@ -189,7 +219,7 @@ namespace Sapphire
           }
 
           if( scheduleNameMap.find( scheduleName ) != scheduleNameMap.end() )
-            throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::createTimelinePack - duplicate scheduke by name: {}" ), scheduleName ) );
+            throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::createTimelinePack - duplicate schedule by name: {}" ), scheduleName ) );
 
           scheduleNameMap.emplace( std::make_pair( scheduleName, sched ) );
 
@@ -305,6 +335,12 @@ namespace Sapphire
                 pCondition->from_json( conditionJ, condition, actorNameMap );
               }
               break;
+              case ConditionType::EObjAnimation:
+              {
+                pCondition = std::make_shared< ConditionEObjAnimation >();
+                pCondition->from_json( conditionJ, condition, actorNameMap );
+              }
+              break;
               default:
                 break;
             }
@@ -378,6 +414,8 @@ namespace Sapphire
 
   void TimelinePack::reset( EncounterPtr pEncounter )
   {
+    m_mechanics.clear();
+
     for( auto& actor : m_timelineActors )
     {
       actor.resetAllSubActors( pEncounter->getTeriPtr() );
@@ -405,16 +443,34 @@ namespace Sapphire
 
   void TimelinePack::update( uint64_t time )
   {
-    auto now = Common::Util::getTimeMs(); 
+    auto now = Common::Util::getTimeMs();
     for( auto& actor : m_timelineActors )
       actor.update( m_pEncounter, *this, now );
+
+    std::vector< std::shared_ptr< ScriptAPI::MechanicScript > > mechanics;
+    mechanics.reserve( m_mechanics.size() );
+    for( const auto& [ instanceName, pMechanic ] : m_mechanics )
+      mechanics.emplace_back( pMechanic );
+
+    for( const auto& pMechanic : mechanics )
+      pMechanic->update( now, *this, m_pEncounter );
   }
 
-  bool TimelinePack::isPhaseActive( const std::string& actorName, uint32_t phaseId )
+  bool TimelinePack::isPhaseActive( const std::string& actorRef, uint32_t phaseId )
   {
     for( const auto& actor : m_timelineActors )
-      if( actor.getName() == actorName )
+      if( actor.getName() == actorRef )
         return actor.isPhaseActive( phaseId );
+    return false;
+  }
+
+  bool TimelinePack::isPhaseActive( const std::string& actorRef, const std::string& phaseName )
+  {
+    for( const auto& actor : m_timelineActors )
+      if( actor.getName() == actorRef )
+        if( actor.isPhaseActive( phaseName ) )
+          return true;
+
     return false;
   }
 
@@ -440,7 +496,7 @@ namespace Sapphire
     m_pEncounter = pEncounter;
   }
 
-  uint32_t TimelinePack::getVar( uint32_t index ) const
+  uint64_t TimelinePack::getVar( uint32_t index ) const
   {
     auto it = m_vars.find( index );
     if( it != m_vars.end() )
@@ -448,8 +504,96 @@ namespace Sapphire
     return 0;
   }
 
-  void TimelinePack::setVar( uint32_t index, uint32_t val )
+  void TimelinePack::setVar( uint32_t index, uint64_t val )
   {
     m_vars[ index ] = val;
+  }
+
+  void TimelinePack::addMechanicDefinition( const std::string& instanceName, const std::string& scriptName )
+  {
+    m_mechanicDefinitions[ instanceName ] = scriptName;
+  }
+
+  bool TimelinePack::callMechanic( const std::string& instanceName, const std::string& function,
+                                   const nlohmann::json& args )
+  {
+    auto definitionIt = m_mechanicDefinitions.find( instanceName );
+    if( definitionIt == m_mechanicDefinitions.end() )
+    {
+      Logger::error( "TimelinePack '{}': unknown mechanic instance '{}'", m_name, instanceName );
+      return false;
+    }
+
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    auto& registry = scriptMgr.getNativeScriptHandler().getMechanicRegistry();
+
+    auto instanceIt = m_mechanics.find( instanceName );
+    if( instanceIt == m_mechanics.end() )
+    {
+      if( !registry.contains( definitionIt->second ) )
+      {
+        Logger::error( "TimelinePack '{}': mechanic script '{}' is not loaded", m_name, definitionIt->second );
+        return false;
+      }
+
+      auto pInstance = registry.create( definitionIt->second );
+      if( !pInstance )
+      {
+        Logger::error( "TimelinePack '{}': mechanic script '{}' failed to create instance '{}'",
+                       m_name, definitionIt->second, instanceName );
+        return false;
+      }
+
+      instanceIt = m_mechanics.emplace( instanceName, std::move( pInstance ) ).first;
+    }
+
+    if( !registry.invoke( definitionIt->second, *instanceIt->second, function, args, *this, m_pEncounter ) )
+    {
+      Logger::error( "TimelinePack '{}': mechanic instance '{}' rejected function '{}'",
+                     m_name, instanceName, function );
+      return false;
+    }
+
+    return true;
+  }
+
+  void TimelinePack::requestPhaseTransition( const std::string& actorRef, uint32_t phaseId )
+  {
+    for( auto& actor : m_timelineActors )
+    {
+      if( actor.getName() == actorRef )
+      {
+        auto pPhase = actor.getPhaseById( phaseId );
+        if( pPhase )
+        {
+          actor.transitionPhase( m_pEncounter, *this, Common::Util::getTimeMs(), pPhase );
+        }
+        else
+        {
+          Logger::error( "[TimelinePack] requestPhaseTransition: Unable to find Phase: {} for Actor: {}", phaseId, actor.getName() );
+        }
+        return;
+      }
+    }
+  }
+
+  void TimelinePack::requestPhaseTransition( const std::string& actorRef, const std::string& phaseName )
+  {
+    for( auto& actor : m_timelineActors )
+    {
+      if( actor.getName() == actorRef )
+      {
+        auto pPhase = actor.getPhaseByName( phaseName );
+        if( pPhase )
+        {
+          actor.transitionPhase( m_pEncounter, *this, Common::Util::getTimeMs(), pPhase );
+        }
+        else
+        {
+          Logger::error( "[TimelinePack] requestPhaseTransition: Unable to find Phase: {} for Actor: {}", phaseName, actor.getName() );
+        }
+        return;
+      }
+    }
   }
 }// namespace Sapphire::Encounter

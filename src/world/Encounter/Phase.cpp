@@ -1,5 +1,4 @@
 #include "Phase.h"
-#include "Phase.h"
 
 #include "Encounter/Encounter.h"
 
@@ -9,7 +8,7 @@
 #include "Trigger.h"
 #include "TriggerCondition.h"
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   void Phase::from_json( const nlohmann::json& json )
   {

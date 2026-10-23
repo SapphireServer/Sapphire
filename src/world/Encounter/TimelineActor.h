@@ -14,7 +14,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   enum class TimelineActorType : uint32_t
   {
@@ -34,13 +34,15 @@ namespace Sapphire
     TimelineActorState m_state;
 
   public:
-    uint32_t m_layoutId{ 0 };
+    TimelineActorType m_type;
+    uint32_t m_layoutId{ 0xE0000000 };
     uint32_t m_hp{ 0 };
     std::string m_name;
     uint32_t m_initialPhaseId{ 1 };
 
-    TimelineActor() {}
+    TimelineActor() : m_type( TimelineActorType::BattleNpc ) {}
     TimelineActor( const TimelineActor& rhs ) :
+      m_type( rhs.m_type ),
       m_layoutId( rhs.m_layoutId ),
       m_hp( rhs.m_hp ),
       m_name( rhs.m_name )
@@ -52,6 +54,12 @@ namespace Sapphire
       m_phases = rhs.m_phases;
     }
 
+    void setTypeEObj( const std::string& eobjName );
+
+    void setTypeBNpc( const std::string& name, uint32_t layoutId );
+
+    TimelineActorType getType() const;
+
     void addPhase( PhasePtr pPhase );
 
     const std::string& getName() const;
@@ -60,7 +68,11 @@ namespace Sapphire
 
     bool isPhaseActive( uint32_t phaseId ) const;
 
+    bool isPhaseActive( const std::string& phaseName ) const;
+
     PhasePtr getPhaseById( uint32_t phaseId );
+
+    PhasePtr getPhaseByName( const std::string& phaseName );
 
     uint64_t getPhaseElapsed() const;
 

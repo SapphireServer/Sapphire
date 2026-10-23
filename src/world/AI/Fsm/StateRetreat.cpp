@@ -9,38 +9,58 @@
 
 using namespace Sapphire::World;
 
-void AI::Fsm::StateRetreat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
+void AI::Fsm::StateRetreat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t tickCount )
 {
-  if( bnpc.moveTo( bnpc.getSpawnPos() ) )
+  auto elapsed = tickCount - m_lastTick;
+
+  if( elapsed < 2500 )
+    return;
+
+  if( auto pBNpc = pEntity->getAsBNpc() )
   {
-    bnpc.setRoamTargetReached( true );
-    bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+    auto& bnpc = *pBNpc;
+
+    if( bnpc.moveTo( bnpc.getSpawnPos() ) )
+    {
+      bnpc.setRoamTargetReached( true );
+      bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
+    }
+    if( bnpc.getHpPercent() < 100 )
+      bnpc.heal( bnpc.getMaxHp() / 10.f );
   }
-  if( bnpc.getHpPercent() < 100 )
-    bnpc.heal( bnpc.getMaxHp() / 10.f );
+  m_lastTick = tickCount;
 }
 
-void AI::Fsm::StateRetreat::onEnter( Entity::BNpc& bnpc )
+void AI::Fsm::StateRetreat::onEnter( Entity::GameObjectPtr& pEntity )
 {
-  bnpc.setRoamTargetReached( false );
-
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
+  auto pZone = teriMgr.getTerritoryByGuId( pEntity->getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
-  bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityIgnoreDamage );
+  if( auto pBNpc = pEntity->getAsBNpc() )
+  {
+    auto& bnpc = *pBNpc;
 
-  if( pNaviProvider )
-    pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getSpawnPos() );
+    bnpc.setRoamTargetReached( false );
+    bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityIgnoreDamage );
+
+    if( pNaviProvider )
+      pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getSpawnPos() );
+  }
 }
 
-void AI::Fsm::StateRetreat::onExit( Entity::BNpc& bnpc )
+void AI::Fsm::StateRetreat::onExit( Entity::GameObjectPtr& pEntity )
 {
-  bnpc.setOwner( nullptr );
-  bnpc.setRoamTargetReached( false );
-  bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
-  bnpc.setRot( bnpc.getSpawnRot() );
-  if( bnpc.getHpPercent() < 100 )
-    bnpc.heal( bnpc.getMaxHp() );
+  if( auto pBNpc = pEntity->getAsBNpc() )
+  {
+    auto& bnpc = *pBNpc;
+
+    bnpc.setOwner( nullptr );
+    bnpc.setRoamTargetReached( false );
+    bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
+    bnpc.setRot( bnpc.getSpawnRot() );
+    if( bnpc.getHpPercent() < 100 )
+      bnpc.heal( bnpc.getMaxHp() );
+  }
 }
 

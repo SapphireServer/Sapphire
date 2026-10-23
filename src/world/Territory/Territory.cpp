@@ -31,6 +31,10 @@
 
 #include "Action/ActionResult.h"
 
+#include "AI/Controller/Controller.h"
+
+#include <Encounter/Encounter.h>
+
 #include "Network/GameConnection.h"
 
 #include "Script/ScriptMgr.h"
@@ -172,9 +176,10 @@ Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const std::string
   m_ident.territoryTypeId = territoryTypeId;
   loadWeatherRates();
 
+  loadServerPaths();
+
   loadBNpcs();
 
-  loadServerPaths();
 
   m_currentWeather = getNextWeather();
 }
@@ -423,8 +428,15 @@ void Territory::removeActor( const Entity::GameObjectPtr& pActor )
   }
   else if( pActor->isBattleNpc() )
   {
-    if( m_pNaviProvider )
-      m_pNaviProvider->removeAgent( pActor->getAsChara()->getAgentId() );
+    auto pBNpc = pActor->getAsBNpc();
+    pBNpc->detachController();
+
+    if( m_pNaviProvider && pBNpc->getAgentId() != -1 )
+      m_pNaviProvider->removeAgent( pBNpc->getAgentId() );
+
+    pBNpc->setAgentId( -1 );
+    pBNpc->setNaviIsPathing( false );
+    pBNpc->setPathingActive( false );
     m_bNpcMap.erase( pActor->getId() );
   }
   else if( pActor->isEventObj() )
@@ -1006,14 +1018,41 @@ uint32_t Territory::getNextEncounterId()
   return m_nextEncounterId++;
 }
 
+World::Encounter::EncounterPtr Territory::registerEncounterDefinition( const World::Encounter::EncounterDefinition& def, Event::DirectorPtr pDirector )
+{
+  auto pEncounter = std::make_shared< World::Encounter::Encounter >( shared_from_this(), pDirector, def );
+  addEncounter( def.key, pEncounter );
+  return pEncounter;
+}
+
+void Territory::addEncounter( const std::string& name, World::Encounter::EncounterPtr pEncounter )
+{
+  // todo: override option?
+  if( m_encounters.find( name ) != m_encounters.end() )
+    Logger::debug( "Territory::addEncounter: Replacing counter by name {}", name );
+
+  m_encounters[ name ] = pEncounter;
+}
+
+World::Encounter::EncounterPtr Territory::getEncounter( const std::string& name )
+{
+  if( auto it = m_encounters.find( name ); it != m_encounters.end() )
+    return it->second;
+  return nullptr;
+}
+
 Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,
-                                                   uint32_t triggerOwnerId )
+                                                   uint32_t triggerOwnerId, World::AI::Controller::ControllerUPtr pController )
 {
   auto infoPtr = m_bNpcBaseMap.find( layoutId );
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
   auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
+
+  if( pController )
+    pBNpc->setController( std::move( pController ) );
+
   pBNpc->init();
   pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
@@ -1021,13 +1060,17 @@ Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t h
 }
 
 Entity::BNpcPtr Territory::createBNpcFromLayoutIdNoPush( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType,
-                                                         uint32_t triggerOwnerId )
+                                                         uint32_t triggerOwnerId, World::AI::Controller::ControllerUPtr pController )
 {
   auto infoPtr = m_bNpcBaseMap.find( layoutId );
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
   auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
+
+  if( pController )
+    pBNpc->setController( std::move( pController ) );
+
   pBNpc->init();
   pBNpc->setTriggerOwnerId( triggerOwnerId );
   return pBNpc;

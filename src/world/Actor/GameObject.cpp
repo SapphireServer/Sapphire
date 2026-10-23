@@ -23,6 +23,10 @@
 
 #include "StatusEffect/StatusEffect.h"
 
+#include "AI/Controller/Controller.h"
+
+#include <Logging/Logger.h>
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Entity;
 using namespace Sapphire::Network::Packets;
@@ -33,6 +37,17 @@ GameObject::GameObject( ObjKind type ) :
 {
 
 }
+
+void GameObject::spawn( PlayerPtr pTarget )
+{
+  Logger::debug( "Spawning Actor {} for Player {}", getId(), pTarget->getId() );
+}
+
+void GameObject::despawn( PlayerPtr pTarget )
+{
+  Logger::debug( "Despawning Actor {} for Player {}", getId(), pTarget->getId() );
+}
+
 
 uint32_t GameObject::getId() const
 {
@@ -406,4 +421,24 @@ Set the current cellId the actor is in
 void GameObject::setCellId( CellId cellId )
 {
   m_cellId = cellId;
+}
+
+Sapphire::World::AI::Controller::Controller* GameObject::getController()
+{
+  return nullptr;
+}
+
+uint32_t GameObject::getFollowTargetId() const
+{
+  return m_followTargetId;
+}
+
+void GameObject::setFollowTargetId( uint32_t id )
+{
+  m_followTargetId = id;
+}
+
+void GameObject::resetFollowTargetId()
+{
+  m_followTargetId = Common::INVALID_GAME_OBJECT_ID;
 }

@@ -13,7 +13,7 @@
 
 namespace Sapphire::Common::Navi
 {
-  const int32_t MAX_POLYS = 32;
+  const int32_t MAX_POLYS = 512;
   const int32_t MAX_SMOOTH = 2048;
 
   /** 1. Memory Allocator for Tile Cache **/
@@ -106,11 +106,13 @@ namespace Sapphire::Common::Navi
     Common::Vector3 toGamePos( float* pos );
 
     std::vector< Common::Vector3 > findFollowPath( const Common::Vector3& startPos,
-                                                              const Common::Vector3& endPos );
+                                                              const Common::Vector3& endPos, float radius = 1.f );
     Common::Vector3 findRandomPositionInCircle( const Common::Vector3& startPos,
                                                            float maxRadius );
 
     Common::Vector3 findNearestPosition( float x, float z );
+
+    Common::Vector3 findNearestPosition( float x, float y, float z );
 
     bool hasNaviMesh() const;
 
@@ -136,7 +138,7 @@ namespace Sapphire::Common::Navi
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
-    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed );
+    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision = false );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
     const dtTileCache* getTileCache() const { return m_tileCache; }
 
@@ -146,6 +148,8 @@ namespace Sapphire::Common::Navi
     void toggleBox( dtObstacleRef& doorRef, const Common::Vector3& pos, const Common::Vector3& halfExtents, float rot, bool enabled );
     void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
     bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
+
+    bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos );
 
   protected:
     std::string m_internalName;

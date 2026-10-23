@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 
+#include "MechanicRegistry.h"
 #include "ScriptLoader.h"
 
 namespace Sapphire::Scripting
@@ -21,6 +22,8 @@ namespace Sapphire::Scripting
      * @brief An internal list that maps script types to another list containing scripts indexed by their assoicated id
      */
     std::unordered_map< std::size_t, std::unordered_map< uint32_t, Sapphire::ScriptAPI::ScriptObject * > > m_scripts;
+
+    MechanicRegistry m_mechanicRegistry;
 
 
     ScriptLoader m_loader;
@@ -122,6 +125,8 @@ namespace Sapphire::Scripting
 
       return dynamic_cast< T * >( script->second );
     }
+
+    const MechanicRegistry& getMechanicRegistry() const;
   };
 
 
