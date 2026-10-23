@@ -553,8 +553,8 @@ public:
 
       auto anim = eobj.getAnimation();
 
-      constexpr uint32_t GRATE_PHASE_BUBBLE = 3;
-      constexpr uint32_t GRATE_PHASE_STOP_BUBBLE = 4;
+
+      constexpr uint32_t GRATE_PHASE_STOP_BUBBLE = 3;
 
       constexpr uint32_t ANIMFLAG_OPEN_GRATE = 0x01;
       constexpr uint32_t ANIMFLAG_CLOSE_GRATE = 0x02;
@@ -563,28 +563,11 @@ public:
 
       auto pTimeline = pEncounter->getTimelinePack();
       // todo: map the correct eobj to the guard bnpc
-      if( name == "Unnaturalripples" )
-      {
-        if( anim & ANIMFLAG_BUBBLE )
-          pTimeline->requestPhaseTransition( "Baleen Guard", GRATE_PHASE_STOP_BUBBLE );
-      }
-      else if( name == "Unnaturalripples_1" )
-      {
-        if( anim & ANIMFLAG_BUBBLE )
-          pTimeline->requestPhaseTransition( "Baleen Guard (LID 3978761)", GRATE_PHASE_STOP_BUBBLE );
-      }
-      else if( name == "Unnaturalripples_2" )
-      {
-        if( anim & ANIMFLAG_BUBBLE )
-          pTimeline->requestPhaseTransition( "Baleen Guard (LID 4064937)", GRATE_PHASE_STOP_BUBBLE );
-      }
-      else if( name == "Unnaturalripples_3" )
-      {
-        if( anim & ANIMFLAG_BUBBLE )
-          pTimeline->requestPhaseTransition( "Baleen Guard (LID 4064938)", GRATE_PHASE_STOP_BUBBLE );
-      }
+      if( pTimeline->isPhaseActive( name, "Bubbles" ) )
+        pTimeline->requestPhaseTransition( name, "Bubbles Interrupt" );
       
-      if( anim == 0 || anim & ANIMFLAG_STOP_BUBBLE )
+      
+      if( pTimeline->isPhaseActive( name, "Setup Phase" ) )
       {
         playerMgr().sendLogMessage( player, 2039 ); // There is nothing out of the ordinary.
       }

@@ -65,10 +65,26 @@ namespace Sapphire::World::Encounter
     return false;
   }
 
+  bool TimelineActor::isPhaseActive( const std::string& phaseName ) const
+  {
+    if( m_pPhase )
+      return m_pPhase->getName() == phaseName;
+    return false;
+  }
+
   PhasePtr TimelineActor::getPhaseById( uint32_t phaseId )
   {
     if( auto it = m_phases.find( phaseId ); it != m_phases.end() )
       return it->second;
+
+    return nullptr;
+  }
+
+  PhasePtr TimelineActor::getPhaseByName( const std::string& phaseName )
+  {
+    for( const auto& [ id, pPhase ] : m_phases )
+      if( pPhase->getName() == phaseName )
+        return pPhase;
 
     return nullptr;
   }

@@ -68,7 +68,11 @@ namespace Sapphire::World::Encounter
 
     bool isPhaseActive( uint32_t phaseId ) const;
 
+    bool isPhaseActive( const std::string& phaseName ) const;
+
     PhasePtr getPhaseById( uint32_t phaseId );
+
+    PhasePtr getPhaseByName( const std::string& phaseName );
 
     uint64_t getPhaseElapsed() const;
 

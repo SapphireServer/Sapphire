@@ -955,6 +955,9 @@ namespace Sapphire::World::Encounter
           if( pEncounter->isLocked() )
             pEncounter->bindActor( pBNpc );
 
+          auto pos = pBNpc->getPos();
+          Logger::info( "Timepoint::update: BNpcSpawn for actor: {} {} Pos {} {} {}", pBNpc->getId(), pBNpc->getName(), pos.x, pos.y, pos.z );
+
           pTeri->pushActor( pBNpc );
         }
       }
@@ -972,6 +975,13 @@ namespace Sapphire::World::Encounter
           
           pBNpc->resetFlags( flags );
           pBNpc->setInvincibilityType( static_cast< Common::InvincibilityType >( pBNpcFlagData->m_invincibilityType ) );
+
+          // todo: find and use possible actrl for updating flags?
+          for( auto& pPlayer : pEncounter->getPlayers() )
+          {
+            pBNpc->despawn( pPlayer );
+            pBNpc->spawn( pPlayer );
+          }
           // todo: resend some bnpc packet/actrl?
         }
       }

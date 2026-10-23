@@ -95,6 +95,8 @@ namespace Sapphire::World::Encounter
 
     bool isPhaseActive( const std::string& actorRef, uint32_t phaseId );
 
+    bool isPhaseActive( const std::string& actorRef, const std::string& phaseName );
+
     void setTriggerEnabled( const std::string& actorRef, uint32_t phaseId, uint32_t triggerId, bool enabled );
 
     bool valid();
@@ -111,6 +113,8 @@ namespace Sapphire::World::Encounter
                        const nlohmann::json& args );
 
     void requestPhaseTransition( const std::string& actorRef, uint32_t phaseId );
+
+    void requestPhaseTransition( const std::string& actorRef, const std::string& phaseName );
 
     static TimeLinePackPtr createTimelinePack( const std::string& name );
   };

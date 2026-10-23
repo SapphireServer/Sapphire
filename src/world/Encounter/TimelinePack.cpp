@@ -456,11 +456,21 @@ namespace Sapphire::World::Encounter
       pMechanic->update( now, *this, m_pEncounter );
   }
 
-  bool TimelinePack::isPhaseActive( const std::string& actorName, uint32_t phaseId )
+  bool TimelinePack::isPhaseActive( const std::string& actorRef, uint32_t phaseId )
   {
     for( const auto& actor : m_timelineActors )
-      if( actor.getName() == actorName )
+      if( actor.getName() == actorRef )
         return actor.isPhaseActive( phaseId );
+    return false;
+  }
+
+  bool TimelinePack::isPhaseActive( const std::string& actorRef, const std::string& phaseName )
+  {
+    for( const auto& actor : m_timelineActors )
+      if( actor.getName() == actorRef )
+        if( actor.isPhaseActive( phaseName ) )
+          return true;
+
     return false;
   }
 
@@ -561,6 +571,26 @@ namespace Sapphire::World::Encounter
         else
         {
           Logger::error( "[TimelinePack] requestPhaseTransition: Unable to find Phase: {} for Actor: {}", phaseId, actor.getName() );
+        }
+        return;
+      }
+    }
+  }
+
+  void TimelinePack::requestPhaseTransition( const std::string& actorRef, const std::string& phaseName )
+  {
+    for( auto& actor : m_timelineActors )
+    {
+      if( actor.getName() == actorRef )
+      {
+        auto pPhase = actor.getPhaseByName( phaseName );
+        if( pPhase )
+        {
+          actor.transitionPhase( m_pEncounter, *this, Common::Util::getTimeMs(), pPhase );
+        }
+        else
+        {
+          Logger::error( "[TimelinePack] requestPhaseTransition: Unable to find Phase: {} for Actor: {}", phaseName, actor.getName() );
         }
         return;
       }

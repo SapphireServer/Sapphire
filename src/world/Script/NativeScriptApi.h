@@ -84,6 +84,11 @@ namespace Sapphire::ScriptAPI
 
     virtual void update( uint64_t tick, World::Encounter::TimelinePack& pack,
                          World::Encounter::EncounterPtr pEncounter );
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
   using MechanicFactory = std::shared_ptr< MechanicScript > (*)();
