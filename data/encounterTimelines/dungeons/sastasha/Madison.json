@@ -100,9 +100,8 @@
           "onEnter": [
             {
               "data": {
-                "balloonId": 918,
+                "npcYellId": 137,
                 "params": [
-                  0,
                   0
                 ],
                 "talkerActorName": "Captain Madison"
@@ -110,15 +109,15 @@
               "description": "",
               "id": 2,
               "startTime": 0,
-              "type": "bubbleText"
+              "type": "npcYell"
             },
             {
               "data": {
                 "actorName": "Captain Madison",
                 "pos": [
-                  300.0,
+                  -300.0,
                   6.5,
-                  -300.0
+                  300.0
                 ],
                 "useNavi": true
               },

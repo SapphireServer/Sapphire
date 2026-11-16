@@ -802,6 +802,33 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     Network::Util::Packet::sendActorControl( player, player.getTargetId(), Network::ActorControl::BubbleText, param0, param1, param2, param3 );
   }
+  else if( subCommand == "npcYell" )
+  {
+    uint32_t npcYellRowId = 0;
+    uint32_t unknown = 0;
+    uint32_t unknownId = 0;
+    uint32_t param0 = 0;
+    uint32_t param1 = 0;
+    uint32_t param2 = 0;
+    uint32_t param3 = 0;
+
+    sscanf( params.c_str(), "%u %u %u %u %u %u %u", &npcYellRowId, &unknown, &unknownId, &param0, &param1, &param2, &param3 );
+
+    playerMgr.sendDebug( player, "NpcYellRowId {} Unknown {} UnknownId {} Params: {} {} {} {}", npcYellRowId, unknown, unknownId, param0, param1, param2, param3 );
+
+    auto pPacket = makeZonePacket< FFXIVIpcNpcYell >( player.getId(), player.getId() );
+    auto& data = pPacket->data();
+    data.ActorId = player.getTargetId();
+    data.Unknown = unknown;
+    data.NpcYellRowId = npcYellRowId;
+    data.UnknownId = unknownId;
+    data.Params[ 0 ] = param0;
+    data.Params[ 1 ] = param1;
+    data.Params[ 2 ] = param2;
+    data.Params[ 3 ] = param3;
+
+    server().queueForPlayer( player.getCharacterId(), pPacket );
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )

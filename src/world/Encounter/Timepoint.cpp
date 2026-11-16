@@ -15,10 +15,13 @@
 #include <AI/Controller/BNpcOverworldController.h>
 #include <AI/Controller/BNpcSubActorController.h>
 
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+
 #include <Event/Director.h>
 
 #include <Manager/ActionMgr.h>
 #include <Manager/PlayerMgr.h>
+#include <Manager/MgrUtil.h>
 
 #include <Random/RNGMgr.h>
 
@@ -74,7 +77,8 @@ namespace Sapphire::World::Encounter
       { "mechanic",            TimepointDataType::Mechanic },
       { "setVar",              TimepointDataType::SetVar },
       { "bubbleText",          TimepointDataType::BubbleText },
-      { "pathTo",              TimepointDataType::PathTo }
+      { "pathTo",              TimepointDataType::PathTo },
+      { "npcYell",             TimepointDataType::NpcYell }
     };
 
     const static std::unordered_map< std::string, VarOpId > opMap =
@@ -465,7 +469,16 @@ namespace Sapphire::World::Encounter
         m_pData = std::make_shared< TimepointDataPathTo >( actorRef, x, y, z, useNavi );
       }
       break;
+      case TimepointDataType::NpcYell:
+      {
+        auto& dataJ = json.at( "data" );
+        auto actorRef = dataJ.at( "talkerActorName" ).get< std::string >();
+        auto npcYellId = dataJ.at( "npcYellId" ).get< uint32_t >();
+        auto params = dataJ.at( "params" ).get< std::vector< uint32_t > >();
 
+        m_pData = std::make_shared< TimepointDataNpcYell >( actorRef, npcYellId, params );
+      }
+      break;
       default:
         break;
     }
@@ -1273,6 +1286,29 @@ namespace Sapphire::World::Encounter
         {
           pController->pathTo( { pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ }, 0.1f, flags );
         }
+      }
+      break;
+      case TimepointDataType::NpcYell:
+      {
+        auto pNpcYellData = std::dynamic_pointer_cast< TimepointDataNpcYell, TimepointData >( m_pData );
+
+        auto pActor = pack.getGameObjectByRef( pNpcYellData->m_actorRef, pEncounter );
+        if( !pActor )
+        {
+          Logger::error( "Timepoint::execute: [NpcYell] Unable to find actor by name {}", pNpcYellData->m_actorRef );
+          return false;
+        }
+
+        auto pPacket = Network::Packets::makeZonePacket< Network::Packets::WorldPackets::Server::FFXIVIpcNpcYell >( pActor->getId() );
+        auto& data = pPacket->data();
+        data.ActorId = pActor->getId();
+        data.NpcYellRowId = pNpcYellData->m_npcYellId;
+        data.Params[ 0 ] = pNpcYellData->m_params[ 0 ];
+        data.Params[ 1 ] = pNpcYellData->m_params[ 1 ];
+        data.Params[ 2 ] = pNpcYellData->m_params[ 2 ];
+        data.Params[ 3 ] = pNpcYellData->m_params[ 3 ];
+
+        Manager::server().queueForPlayers( pActor->getInRangePlayerIds( true ), pPacket );
       }
       break;
       default:

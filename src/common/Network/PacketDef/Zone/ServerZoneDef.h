@@ -2220,4 +2220,13 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint8_t TwinAdderRank;
     uint8_t ImmortalFlamesRank;
   };
+
+  struct FFXIVIpcNpcYell : FFXIVIpcBasePacket< NpcYell >
+  {
+    uint32_t ActorId;
+    uint32_t Unknown;
+    uint32_t UnknownId; // unknown. in sastasha Madison fight this is a BNpcName EXD ref
+    uint32_t NpcYellRowId;
+    uint32_t Params[ 4 ];
+  };
 }

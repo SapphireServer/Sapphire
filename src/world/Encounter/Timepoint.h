@@ -47,7 +47,8 @@ namespace Sapphire::World::Encounter
     SetVar,
 
     BubbleText, // idx in Balloon exd sheet
-    PathTo
+    PathTo,
+    NpcYell
   };
 
   enum class ActionTargetType : uint32_t
@@ -107,14 +108,16 @@ namespace Sapphire::World::Encounter
   //
   // Timepoint.m_pData objects
   //
-  struct TimepointData : public std::enable_shared_from_this< TimepointData > {
+  struct TimepointData : public std::enable_shared_from_this< TimepointData >
+  {
     TimepointData( TimepointDataType type ) : m_type( type ) {}
     virtual ~TimepointData(){};
     TimepointDataType m_type{ 0 };
   };
   using TimepointDataPtr = std::shared_ptr< TimepointData >;
 
-  struct TimepointDataIdle : public TimepointData {
+  struct TimepointDataIdle : public TimepointData
+  {
     uint64_t m_durationMs;
 
     TimepointDataIdle( uint64_t durationMs ) :
@@ -145,7 +148,8 @@ namespace Sapphire::World::Encounter
     }
   };
 
-  struct TimepointDataActionTimeLine : public TimepointData {
+  struct TimepointDataActionTimeLine : public TimepointData
+  {
     std::string m_actorRef;
     uint32_t m_actionId;
 
@@ -157,7 +161,8 @@ namespace Sapphire::World::Encounter
     }
   };
 
-  struct TimepointDataSetPos : public TimepointData {
+  struct TimepointDataSetPos : public TimepointData
+  {
     // todo: use internal id
     std::string m_actorRef;
     MoveType m_moveType;
@@ -182,7 +187,8 @@ namespace Sapphire::World::Encounter
     }
   };
 
-  struct TimepointDataLogMessage : public TimepointData {
+  struct TimepointDataLogMessage : public TimepointData
+  {
     uint32_t m_messageId;
     uint32_t m_params[ 5 ]{ 0 };
 
@@ -448,6 +454,22 @@ namespace Sapphire::World::Encounter
       m_posZ( z ),
       m_useNavi( useNavi )
     {
+    }
+  };
+
+  struct TimepointDataNpcYell : public TimepointData
+  {
+    std::string m_actorRef;
+    uint32_t m_npcYellId{ 0 };
+    uint32_t m_params[ 4 ]{ 0 };
+
+    TimepointDataNpcYell( const std::string& actorRef, uint32_t npcYellId, const std::vector< uint32_t >& params ) :
+      TimepointData( TimepointDataType::NpcYell ),
+      m_actorRef( actorRef ),
+      m_npcYellId( npcYellId )
+    {
+      for( auto i = 0; i < params.size() && i < 4; ++i )
+        m_params[ i ] = params[ i ];
     }
   };
 
