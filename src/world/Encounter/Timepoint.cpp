@@ -72,7 +72,9 @@ namespace Sapphire::World::Encounter
       { "interruptAction",     TimepointDataType::InterruptAction },
       { "rollRNG",             TimepointDataType::RollRNG },
       { "mechanic",            TimepointDataType::Mechanic },
-      { "setVar",              TimepointDataType::SetVar }
+      { "setVar",              TimepointDataType::SetVar },
+      { "bubbleText",          TimepointDataType::BubbleText },
+      { "pathTo",              TimepointDataType::PathTo }
     };
 
     const static std::unordered_map< std::string, VarOpId > opMap =
@@ -438,6 +440,32 @@ namespace Sapphire::World::Encounter
         m_pData = std::make_shared< TimepointDataSetVar >( type, op, idx, val );
       }
       break;
+      case TimepointDataType::BubbleText:
+      {
+        const auto& dataJ = json.at( "data" );
+        auto balloonId = dataJ.at( "balloonId" ).get< uint32_t >();
+        auto talkerRef = dataJ.at( "talkerActorName" ).get< std::string >();
+        auto params = dataJ.at( "params" ).get< std::vector< uint32_t > >();
+
+        m_pData = std::make_shared< TimepointDataBubbleText >( balloonId, talkerRef, params );
+      }
+      break;
+      case TimepointDataType::PathTo:
+      {
+        const auto& dataJ = json.at( "data" );
+        auto actorRef = dataJ.at( "actorName" ).get< std::string >();
+        auto pos = dataJ.at( "pos" ).get< std::vector< float > >();
+
+        auto x = pos[ 0 ];
+        auto y = pos[ 1 ];
+        auto z = pos[ 2 ];
+
+        bool useNavi = dataJ.at( "useNavi" ).get< bool >();
+
+        m_pData = std::make_shared< TimepointDataPathTo >( actorRef, x, y, z, useNavi );
+      }
+      break;
+
       default:
         break;
     }
@@ -1007,7 +1035,7 @@ namespace Sapphire::World::Encounter
         {
           pInstance->setCurrentBGM( pBgmData->m_bgmId );
         }
-        else if (pQBattle)
+        else if( pQBattle )
         {
           // todo:
         }
@@ -1209,7 +1237,44 @@ namespace Sapphire::World::Encounter
         }
       }
       break;
+      case TimepointDataType::BubbleText:
+      {
+        auto pBubbleTextData = std::dynamic_pointer_cast< TimepointDataBubbleText, TimepointData >( m_pData );
 
+        auto pActor = pack.getGameObjectByRef( pBubbleTextData->m_talkerRef, pEncounter );
+        if( !pActor )
+        {
+          Logger::error( "Timepoint::execute: [BubbleText] Unable to find actor by name {}", pBubbleTextData->m_talkerRef );
+          return false;
+        }
+
+        Network::Util::Packet::sendActorControl( pActor->getInRangePlayerIds(), pActor->getId(), Network::ActorControl::BubbleText,
+                                                 pBubbleTextData->m_balloonId, pBubbleTextData->m_params[ 0 ], pBubbleTextData->m_params[ 1 ], pBubbleTextData->m_params[ 2 ]
+        );
+      }
+      break;
+      case TimepointDataType::PathTo:
+      {
+        auto pPathData = std::dynamic_pointer_cast< TimepointDataPathTo, TimepointData >( m_pData );
+
+        // todo: do we want moving eobjs too?
+        auto pActor = pack.getGameObjectByRef( pPathData->m_actorRef, pEncounter );
+        if( !pActor )
+        {
+          Logger::error( "Timepoint::execute: [PathTo] Unable to find actor by name {}", pPathData->m_actorRef );
+          return false;
+        }
+
+        auto flags = World::AI::Controller::Controller::PathFlags::None;
+        if( !pPathData->m_useNavi )
+          flags = World::AI::Controller::Controller::PathFlags::IgnoreNavmesh;
+
+        if( auto pController = pActor->getController() )
+        {
+          pController->pathTo( { pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ }, 0.1f, flags );
+        }
+      }
+      break;
       default:
         break;
     }

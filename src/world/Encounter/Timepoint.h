@@ -42,9 +42,12 @@ namespace Sapphire::World::Encounter
 
     Snapshot,
     InterruptAction,
-    RollRNG, // todo: make this save to director var idx
+    RollRNG,
     Mechanic,
-    SetVar
+    SetVar,
+
+    BubbleText, // idx in Balloon exd sheet
+    PathTo
   };
 
   enum class ActionTargetType : uint32_t
@@ -408,6 +411,42 @@ namespace Sapphire::World::Encounter
       m_op( op ),
       m_index( index ),
       m_val( val )
+    {
+    }
+  };
+
+  struct TimepointDataBubbleText : public TimepointData
+  {
+    uint32_t m_balloonId;
+    std::string m_talkerRef;
+    uint32_t m_params[ 3 ]{ 0 };
+
+    TimepointDataBubbleText( uint32_t balloonId, const std::string& talkerRef, const std::vector< uint32_t >& params ) :
+      TimepointData( TimepointDataType::BubbleText ),
+      m_balloonId( balloonId ),
+      m_talkerRef( talkerRef )
+    {
+      for( auto i = 0; i < params.size() && i < 3; ++i )
+        m_params[ i ] = params[ i ];
+    }
+  };
+
+  struct TimepointDataPathTo : public TimepointData
+  {
+    std::string m_actorRef;
+    float m_posX;
+    float m_posY;
+    float m_posZ;
+
+    bool m_useNavi;
+
+    TimepointDataPathTo( const std::string& actorRef, float x, float y, float z, bool useNavi ) :
+      TimepointData( TimepointDataType::PathTo ),
+      m_actorRef( actorRef ),
+      m_posX( x ),
+      m_posY( y ),
+      m_posZ( z ),
+      m_useNavi( useNavi )
     {
     }
   };

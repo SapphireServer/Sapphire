@@ -79,11 +79,11 @@ namespace Sapphire::Network::ActorControl
     SetFallDamage = 0x2D,
 
     SetTarget = 0x32,
-    ToggleNameHidden = 0x36,
+    ToggleNameHidden = 0x36, // header(playerId, srcId), param0 == 0 ? hidden : visible
 
     LimitbreakStart = 0x47,
     LimitbreakPartyStart = 0x48,
-    BubbleText = 0x49,
+    BubbleText = 0x49, // param0 index into Balloon exd sheet
 
     DamageEffect = 0x50,
     RaiseAnimation = 0x51,

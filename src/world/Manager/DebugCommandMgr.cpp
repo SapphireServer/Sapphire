@@ -789,6 +789,19 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
       pBNpc->getController()->followPath( points, AI::Controller::Controller::PathFlags::CanReversePath, pointCb, destCb );
     }
   }
+  else if( subCommand == "bubbleText" )
+  {
+    uint32_t param0 = 0;
+    uint32_t param1 = 0;
+    uint32_t param2 = 0;
+    uint32_t param3 = 0;
+
+    sscanf( params.c_str(), "%u %u %u %u", &param0, &param1, &param2, &param3 );
+
+    playerMgr.sendDebug( player, "Actrl({}) Params: {} {} {} {}", (uint32_t)Network::ActorControl::BubbleText, param0, param1, param2, param3 );
+
+    Network::Util::Packet::sendActorControl( player, player.getTargetId(), Network::ActorControl::BubbleText, param0, param1, param2, param3 );
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )

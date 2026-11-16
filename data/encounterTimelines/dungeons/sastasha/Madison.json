@@ -10,7 +10,20 @@
         {
           "id": 1,
           "name": "Setup Phase",
-          "onEnter": [],
+          "onEnter": [
+            {
+              "data": {
+                "flags": 0,
+                "flagsMask": null,
+                "invulnType": 2,
+                "targetActor": ""
+              },
+              "description": "",
+              "id": 1,
+              "startTime": 0,
+              "type": "bNpcFlags"
+            }
+          ],
           "onExit": [],
           "schedules": [],
           "triggers": [
@@ -62,12 +75,71 @@
               "timepoints": []
             }
           ],
-          "triggers": []
+          "triggers": [
+            {
+              "action": {
+                "phaseId": 3,
+                "timepoint": null,
+                "type": "transitionPhase"
+              },
+              "condition": "hpPctBetween",
+              "description": "",
+              "enabled": true,
+              "id": 3,
+              "paramData": {
+                "hpMax": 40,
+                "hpMin": 0,
+                "sourceActor": "Captain Madison"
+              }
+            }
+          ]
         },
         {
           "id": 3,
           "name": "Run Away",
-          "onEnter": [],
+          "onEnter": [
+            {
+              "data": {
+                "balloonId": 918,
+                "params": [
+                  0,
+                  0
+                ],
+                "talkerActorName": "Captain Madison"
+              },
+              "description": "",
+              "id": 2,
+              "startTime": 0,
+              "type": "bubbleText"
+            },
+            {
+              "data": {
+                "actorName": "Captain Madison",
+                "pos": [
+                  300.0,
+                  6.5,
+                  -300.0
+                ],
+                "useNavi": true
+              },
+              "description": "",
+              "id": 3,
+              "startTime": 0,
+              "type": "pathTo"
+            },
+            {
+              "data": {
+                "flags": 32,
+                "flagsMask": 4294963489,
+                "invulnType": 2,
+                "targetActor": ""
+              },
+              "description": "",
+              "id": 4,
+              "startTime": 0,
+              "type": "bNpcFlags"
+            }
+          ],
           "onExit": [],
           "schedules": [
             {

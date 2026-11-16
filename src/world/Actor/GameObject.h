@@ -47,6 +47,8 @@ namespace Sapphire::Entity
 
     uint32_t m_followTargetId{ Common::INVALID_GAME_OBJECT_ID };
 
+    bool m_nameHidden{ false };
+
   public:
     explicit GameObject( Common::ObjKind type );
 
@@ -161,6 +163,9 @@ namespace Sapphire::Entity
     uint32_t getFollowTargetId() const;
     void setFollowTargetId( uint32_t id );
     void resetFollowTargetId();
+
+    // actrl ToggleNameHidden uses 0=hidden, 1=visible
+    virtual void toggleNameHidden( bool hidden );
   };
 
 }

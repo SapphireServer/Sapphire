@@ -37,7 +37,8 @@ namespace Sapphire::World::AI::Controller
       IgnoreActorCollision = 0x20,
       // todo:
       PathToExactPos = 0x40,
-      RestoreDefaultPathOnExit = 0x80
+      RestoreDefaultPathOnExit = 0x80,
+      IgnoreImmobile = 0x100
     };
 
     struct Path

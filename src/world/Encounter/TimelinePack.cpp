@@ -412,6 +412,21 @@ namespace Sapphire::World::Encounter
     return nullptr;
   }
 
+  Entity::GameObjectPtr TimelinePack::getGameObjectByRef( const std::string& name, EncounterPtr pEncounter )
+  {
+    for( const auto& actor : m_timelineActors )
+    {
+      auto pBNpc = actor.getBNpcByRef( name, pEncounter->getTeriPtr() );
+      if( pBNpc )
+        return pBNpc;
+
+      auto pEObj = pEncounter->getEObjByName( name );
+      if( pEObj )
+        return pEObj;
+    }
+    return nullptr;
+  }
+
   void TimelinePack::reset( EncounterPtr pEncounter )
   {
     m_mechanics.clear();

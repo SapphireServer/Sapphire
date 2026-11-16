@@ -84,6 +84,8 @@ namespace Sapphire::World::Encounter
     // get bnpc by internal timeline name
     Entity::BNpcPtr getBNpcByRef( const std::string& name, EncounterPtr pEncounter );
 
+    Entity::GameObjectPtr getGameObjectByRef( const std::string& name, EncounterPtr pEncounter );
+
     void reset( EncounterPtr pEncounter );
 
     void spawnAllSubActors( EncounterPtr pEncounter );

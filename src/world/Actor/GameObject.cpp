@@ -9,6 +9,8 @@
 #include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
+#include "Network/Util/PacketUtil.h"
+#include "Network/CommonActorControl.h"
 
 #include "Chara.h"
 #include "EventObject.h"
@@ -19,6 +21,7 @@
 #include "WorldServer.h"
 #include "Session.h"
 
+#include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
@@ -441,4 +444,12 @@ void GameObject::setFollowTargetId( uint32_t id )
 void GameObject::resetFollowTargetId()
 {
   m_followTargetId = Common::INVALID_GAME_OBJECT_ID;
+}
+
+void GameObject::toggleNameHidden( bool hidden )
+{
+  m_nameHidden = hidden;
+
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), Network::ActorControl::ToggleNameHidden, hidden ? 0 : 1 );
 }

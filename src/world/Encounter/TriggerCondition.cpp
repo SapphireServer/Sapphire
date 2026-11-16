@@ -32,7 +32,7 @@ namespace Sapphire::World::Encounter
       case ConditionType::HpPctBetween:
       {
         auto hpPct = pBNpc->getHpPercent();
-        return hpPct > m_hp.min && hpPct < m_hp.max;
+        return hpPct >= m_hp.min && hpPct <= m_hp.max;
       }
       default:
         break;

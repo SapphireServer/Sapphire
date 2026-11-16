@@ -203,6 +203,8 @@ namespace Sapphire::Entity
     bool getCanSwapTarget();
     void setCanSwapTarget( bool value );
 
+    void toggleNameHidden( bool hidden ) override;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;

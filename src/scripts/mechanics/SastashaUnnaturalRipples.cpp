@@ -206,9 +206,8 @@ public:
             pGuard->init();
             pTeri->pushActor( pGuard );
 
+            // ::update runs on 1s (intervalMs) tick, wait til guard is spawned so client can animate the action
             m_ambuscadeQueue.insert( guardId );
-            // cast ambuscade
-            actionMgr().handleTargetedAction( *pGuard, 835, pGuard->getId(), 0 );
 
             for( auto& pPlayer : pEncounter->getPlayersInside() )
             {

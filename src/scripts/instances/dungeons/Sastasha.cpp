@@ -398,6 +398,15 @@ public:
 
       if( pBNpc )
       {
+        bool winConditionMet = false;
+
+        if( pBNpc->getLayoutId() == BOSS_MADISON )
+          winConditionMet = pBNpc->getHpPercent() < 50;
+        else if( pBNpc->getLayoutId() == BOSS_MADISON_2 )
+          winConditionMet = pBNpc->getHpPercent() < 5;
+        else
+          winConditionMet = !pBNpc->isAlive();
+
         // set the encounter to active if a player has aggro
         if( pBNpc->hateListGetHighest() && pEncounter->getStatus() == EncounterStatus::IDLE )
         {
@@ -408,7 +417,7 @@ public:
           pEncounter->onEnterRange( pBNpc );
         }
         // set the encounter as successful if boss is dead
-        else if( !pBNpc->isAlive() && pEncounter->getStatus() != EncounterStatus::SUCCESS )
+        else if( winConditionMet && pEncounter->getStatus() != EncounterStatus::SUCCESS )
         {
           pEncounter->setStatus( EncounterStatus::SUCCESS );
         }

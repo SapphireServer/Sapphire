@@ -1217,6 +1217,11 @@ void BNpc::resetFlags( uint32_t flags )
     setAgentId( agentId );
     setPathingActive( true );
   }
+
+  if( flags & BNpcFlag::Untargetable )
+    toggleNameHidden( true );
+  else
+    toggleNameHidden( false );
 }
 
 void BNpc::setFlag( uint32_t flag )
@@ -1247,16 +1252,23 @@ void BNpc::setFlag( uint32_t flag )
     setAgentId( agentId );
     setPathingActive( true );
   }
+
+  if( flag & BNpcFlag::Untargetable )
+    toggleNameHidden( true );
 }
 
 void BNpc::removeFlag( uint32_t flag )
 {
   m_flags &= ~flag;
+
+  if( flag & BNpcFlag::Untargetable )
+    toggleNameHidden( false );
 }
 
 void BNpc::clearFlags()
 {
   m_flags = 0;
+  toggleNameHidden( false );
 }
 
 void BNpc::autoAttack( CharaPtr pTarget )
@@ -1467,4 +1479,15 @@ void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
 void BNpc::setPos( const Vector3& pos, bool broadcastUpdate )
 {
   setPos( pos.x, pos.y, pos.z, broadcastUpdate );
+}
+
+void BNpc::toggleNameHidden( bool hidden )
+{
+  // todo: should we really be handling flag setting here?
+  if( hidden )
+    m_flags |= BNpcFlag::Untargetable;
+  else
+    m_flags &= ~BNpcFlag::Untargetable;
+
+  GameObject::toggleNameHidden( hidden );
 }

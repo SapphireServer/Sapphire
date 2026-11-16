@@ -120,7 +120,7 @@ void AI::Fsm::StateFollowPath::onUpdate( Entity::GameObjectPtr& pEntity, uint64_
       const auto pathSize = path.m_points.size();
       if( pathSize == 0 || path.m_currPointIndex >= pathSize )
       {
-        if( !path.m_flags & Controller::Controller::PathFlags::CanReversePath )
+        if( !( path.m_flags & Controller::Controller::PathFlags::CanReversePath ) )
           path.m_active = false;
 
         path.m_currPointIndex = static_cast< uint32_t >( pathSize );
@@ -278,6 +278,12 @@ void AI::Fsm::StateFollowPath::onEnter( Entity::GameObjectPtr& pEntity )
     bnpc.setRoamTargetPos( path.m_targetPos );
 
     const bool ignoreNavmesh = path.m_flags & Controller::Controller::PathFlags::IgnoreNavmesh;
+
+    if( !ignoreNavmesh && pNaviProvider && bnpc.getAgentId() == -1 )
+    {
+      bnpc.setAgentId( pNaviProvider->addAgent( bnpc.getPos(), bnpc.getRadius(), bnpc.getCurrentSpeed() ) );
+    }
+
     if( ( !ignoreNavmesh && !pNaviProvider ) || bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) )
     {
       bnpc.setRoamTargetReached( true );
