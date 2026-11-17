@@ -829,6 +829,25 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     server().queueForPlayer( player.getCharacterId(), pPacket );
   }
+  else if( subCommand == "bnpc" )
+  {
+    uint32_t layoutId = Common::INVALID_GAME_OBJECT_ID;
+    sscanf( params.c_str(), "%u", &layoutId );
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    if( !pTeri )
+      return;
+
+    auto pBNpc = pTeri->createBNpcFromLayoutId( layoutId, 1000, Common::BNpcType::Enemy );
+    if( !pBNpc )
+    {
+      playerMgr.sendDebug( player, "Unable to create BNpc with layoutId {}", layoutId );
+      return;
+    }
+
+    auto& pos = pBNpc->getPos();
+    playerMgr.sendDebug( player, "BNpc ID: {} Pos: {} {} {}", pBNpc->getId(), pos.x, pos.y, pos.z );
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )

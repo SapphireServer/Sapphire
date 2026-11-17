@@ -72,6 +72,7 @@ private:
   static constexpr uint32_t ENCOUNTER_RAMBADE{ 2 };
   static constexpr uint32_t PLACENAME_RAMBADE{ 663 };
   static constexpr uint32_t BOSS_MADISON{ 3988325 };
+  static constexpr uint32_t BOSS_MADISON_PET{ 4192074 };
   static constexpr uint32_t HP_MADISON{ 600 };
 
   static constexpr uint32_t ENCOUNTER_RAMBADE_2{ 3 };
@@ -132,7 +133,8 @@ public:
 
     // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
     def.participants = {
-      { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+      { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required },
+      { BOSS_MADISON_PET, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam | Entity::BNpcFlag::Untargetable, EncounterBNpcCompletionRole::None }
     };
     // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
     //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
