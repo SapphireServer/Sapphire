@@ -25,6 +25,7 @@
 #include "Session.h"
 #include "Math/CalcStats.h"
 #include "Chara.h"
+#include "GameObject.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
@@ -45,7 +46,6 @@ using namespace Sapphire::Network::ActorControl;
 
 Chara::Chara( ObjKind type ) : GameObject( type ),
                                m_pose( 0 ),
-                               m_targetId( INVALID_GAME_OBJECT_ID64 ),
                                m_directorId( 0 ),
                                m_radius( 2.f )
 {
@@ -178,18 +178,6 @@ Role Chara::getRole() const
     default:
       return Role::None;
   }
-}
-
-/*! \param Id of the target to set */
-void Chara::setTargetId( uint64_t targetId )
-{
-  m_targetId = targetId;
-}
-
-/*! \return Id of the current target */
-uint64_t Chara::getTargetId() const
-{
-  return m_targetId;
 }
 
 /*! \return True if the actor is alive */

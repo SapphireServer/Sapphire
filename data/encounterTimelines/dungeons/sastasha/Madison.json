@@ -155,14 +155,19 @@
             {
               "data": {
                 "actorName": "Captain Madison",
+                "pathType": "serverPath",
                 "pos": [
                   -300.0,
                   6.5,
                   300.0
                 ],
+                "selectorIndex": 0,
+                "selectorName": "",
+                "serverPathId": 4092910,
+                "targetActor": "<unknown>",
                 "useNavi": true
               },
-              "description": "",
+              "description": "Server Path follow",
               "id": 3,
               "startTime": 0,
               "type": "pathTo"
@@ -430,14 +435,19 @@
             {
               "data": {
                 "actorName": "Madison Pet",
+                "pathType": "serverPath",
                 "pos": [
                   -300.0,
                   6.5,
                   300.0
                 ],
+                "selectorIndex": 0,
+                "selectorName": "",
+                "serverPathId": 4092910,
+                "targetActor": "<unknown>",
                 "useNavi": true
               },
-              "description": "",
+              "description": "Pet Server Path Follow",
               "id": 2,
               "startTime": 0,
               "type": "pathTo"

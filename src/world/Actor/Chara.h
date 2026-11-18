@@ -71,8 +71,6 @@ namespace Sapphire::Entity
     uint32_t m_modelEquip[10];
     /*! Current class of the actor */
     Common::ClassJob m_class;
-    /*! Id of the currently selected target actor */
-    uint64_t m_targetId;
     /*! Ptr to a queued action */
     World::Action::ActionPtr m_pCurrentAction;
     /*! id of the director this chara is assigned to */
@@ -234,10 +232,6 @@ namespace Sapphire::Entity
     void setClass( Common::ClassJob classJob );
 
     Common::Role getRole() const;
-
-    void setTargetId( uint64_t targetId );
-
-    uint64_t getTargetId() const;
 
     bool isAlive() const;
 

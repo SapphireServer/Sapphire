@@ -110,6 +110,8 @@ namespace Sapphire::World::Encounter
       { "target",         ActionTargetType::Target },
       { "selectorPos",    ActionTargetType::SelectorPos },
       { "selectorTarget", ActionTargetType::SelectorTarget },
+      { "fixedPos",       ActionTargetType::FixedPos },
+      { "timelineActor",  ActionTargetType::TimelineActor }
     };
 
     const static std::unordered_map< std::string, SetPosType > setPosTypeMap =
@@ -124,7 +126,20 @@ namespace Sapphire::World::Encounter
       { "self",           SetPosTargetType::Self },
       { "target",         SetPosTargetType::Target },
       { "selectorPos",    SetPosTargetType::SelectorPos },
-      { "selectorTarget", SetPosTargetType::SelectorTarget }
+      { "selectorTarget", SetPosTargetType::SelectorTarget },
+      { "fixedPos",       SetPosTargetType::FixedPos },
+      { "timelineActor",  SetPosTargetType::TimelineActor }
+    };
+
+    const static std::unordered_map< std::string, PathToTargetType > pathToTargetTypeMap =
+    {
+      { "none",           PathToTargetType::None },
+      { "target",         PathToTargetType::Target },
+      { "selectorPos",    PathToTargetType::SelectorPos },
+      { "selectorTarget", PathToTargetType::SelectorTarget },
+      { "fixedPos",       PathToTargetType::FixedPos },
+      { "timelineActor",  PathToTargetType::TimelineActor },
+      { "serverPath",     PathToTargetType::ServerPath }
     };
 
     const static std::unordered_map< std::string, VarType > varTypeMap =
@@ -158,10 +173,15 @@ namespace Sapphire::World::Encounter
         auto actionId = dataJ.at( "actionId" ).get< uint32_t >();
         auto targetType = actionTypeMap.at( dataJ.at( "targetType" ).get< std::string >() );
         auto selectorRef = dataJ.at( "selectorName" ).get< std::string >();
-        auto selectorIndex = dataJ.at( "selectorIndex" ).get< uint32_t >();
+        auto selectorIndex = dataJ.at( "selectorIndex" ).get< int32_t >();
+        auto targetRef = dataJ.contains( "targetActor" ) ? dataJ.at( "targetActor" ).get< std::string >() : std::string( "" );
+        auto pos = dataJ.contains( "pos" ) ? dataJ.at( "pos" ).get< std::vector< float > >() : std::vector< float >();
 
-        m_pData = std::make_shared< TimepointDataAction >( sourceRef, actionId, targetType,
-                                                           selectorRef, selectorIndex );
+        if( pos.size() < 3 )
+          pos.resize( 3 );
+
+        m_pData = std::make_shared< TimepointDataAction >( sourceRef, targetRef, actionId, targetType,
+                                                           selectorRef, selectorIndex, pos[ 0 ], pos[ 1 ], pos[ 2 ] );
       }
       break;
       case TimepointDataType::SetPos:
@@ -171,11 +191,15 @@ namespace Sapphire::World::Encounter
         auto rot = dataJ.at( "rot" ).get< float >();
         auto actorRef = dataJ.at( "actorName" ).get< std::string >();
         auto selectorName = dataJ.at( "selectorName" ).get< std::string >();
-        auto selectorIndex = dataJ.at( "selectorIndex" ).get< uint32_t >();
+        auto selectorIndex = dataJ.at( "selectorIndex" ).get< int32_t >();
         auto targetType = setPosTargetTypeMap.at( dataJ.at( "targetType" ).get< std::string >() );
         auto posType = setPosTypeMap.at( dataJ.at( "positionType" ).get< std::string >() );
+        auto targetRef = dataJ.contains( "targetActor" ) ? dataJ.at( "targetActor" ).get< std::string >() : std::string( "" );
+        
+        if( pos.size() < 3 )
+          pos.resize( 3 );
 
-        m_pData = std::make_shared< TimepointDataSetPos >( actorRef, posType, targetType, MoveType::SetPos,
+        m_pData = std::make_shared< TimepointDataSetPos >( actorRef, targetRef, posType, targetType, MoveType::SetPos,
                                                            selectorName, selectorIndex,
                                                            pos[ 0 ], pos[ 1 ], pos[ 2 ], rot );
       }
@@ -459,6 +483,14 @@ namespace Sapphire::World::Encounter
         const auto& dataJ = json.at( "data" );
         auto actorRef = dataJ.at( "actorName" ).get< std::string >();
         auto pos = dataJ.at( "pos" ).get< std::vector< float > >();
+        auto type = pathToTargetTypeMap.at( dataJ.at( "pathType" ).get< std::string >() );
+        auto targetRef = dataJ.at( "targetActor" ).get< std::string >();
+        auto selector = dataJ.at( "selectorName" ).get< std::string >();
+        auto selectorIndex = dataJ.at( "selectorIndex" ).get< int32_t >();
+        auto serverPath = dataJ.at( "serverPathId" ).get< uint32_t >();
+
+        if( pos.size() < 3 )
+          pos.resize( 3 );
 
         auto x = pos[ 0 ];
         auto y = pos[ 1 ];
@@ -466,7 +498,7 @@ namespace Sapphire::World::Encounter
 
         bool useNavi = dataJ.at( "useNavi" ).get< bool >();
 
-        m_pData = std::make_shared< TimepointDataPathTo >( actorRef, x, y, z, useNavi );
+        m_pData = std::make_shared< TimepointDataPathTo >( type, actorRef, targetRef, selector, selectorIndex, x, y, z, serverPath, useNavi );
       }
       break;
       case TimepointDataType::NpcYell:
@@ -561,6 +593,18 @@ namespace Sapphire::World::Encounter
               }
             }
             break;
+            case ActionTargetType::FixedPos:
+            {
+              pos = { pActionData->m_posX, pActionData->m_posY, pActionData->m_posZ };
+            }
+            break;
+            case ActionTargetType::TimelineActor:
+            {
+              auto pActor = pack.getGameObjectByRef( pActionData->m_targetRef, pEncounter );
+              if( pActor )
+                pos = pActor->getPos();
+            }
+            break;
             default:
               break;
           }
@@ -603,7 +647,7 @@ namespace Sapphire::World::Encounter
           // todo: this is probably wrong
           //if( !pAction || pAction->isInterrupted() )
           {
-            if( pActionData->m_targetType == ActionTargetType::SelectorPos )
+            if( pActionData->m_targetType == ActionTargetType::SelectorPos || pActionData->m_targetType == ActionTargetType::FixedPos )
               actionMgr.handlePlacedAction( *pBNpc, pActionData->m_actionId, pos, 0, targetId );
             else
               actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, 0 );
@@ -677,6 +721,13 @@ namespace Sapphire::World::Encounter
               }
             }
             break;
+            case SetPosTargetType::TimelineActor:
+            {
+              auto pActor = pack.getGameObjectByRef( pSetPosData->m_targetRef, pEncounter );
+              if( pActor )
+                pos = pActor->getPos();
+            }
+            break;
             default:
               break;
           }
@@ -744,36 +795,6 @@ namespace Sapphire::World::Encounter
         }
       }
       break;
-
-      /*
-      case TimepointDataType::MoveTo:
-      {
-        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( m_pData );
-        auto pBNpc = pack.getBNpcByRef( pMoveToData->m_actorRef, pTeri );
-
-        if( pBNpc )
-        {
-          auto currPos = pBNpc->getPos();
-          Common::FFXIVARR_POSITION3 targetPos = { pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z };
-
-          auto distance = Common::Util::distance( currPos, targetPos );
-          if( distance > 0.5f )
-          {
-            if( pMoveToData->m_moveType == MoveType::WalkPath )
-              pBNpc->moveTo( targetPos );
-            else
-              pBNpc->setPos( pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z );
-          }
-          else
-          {
-            // if we are at the pos, stop waiting
-            //state.m_finished = true;
-          }
-          pBNpc->setRot( pMoveToData->m_rot );
-        }
-      }
-      break;
-      //*/
       case TimepointDataType::LogMessage:
       {
         auto pLogMessage = std::dynamic_pointer_cast< TimepointDataLogMessage, TimepointData >( m_pData );
@@ -1282,9 +1303,102 @@ namespace Sapphire::World::Encounter
         if( !pPathData->m_useNavi )
           flags = World::AI::Controller::Controller::PathFlags::IgnoreNavmesh;
 
+        Common::Vector3 pos{ pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ };
+
+        switch( pPathData->m_type )
+        {
+          case PathToTargetType::Target:
+          {
+            Entity::GameObjectPtr pTarget = nullptr;
+            for( const auto& pIterActor : pActor->getInRangeActors() )
+            {
+              if( pIterActor->getId() == pActor->getTargetId() )
+              {
+                pTarget = pIterActor;
+                break;
+              }
+            }
+            if( pTarget )
+              pos = pTarget->getPos();
+          }
+          break;
+          case PathToTargetType::SelectorPos:
+          {
+            const auto& results = pack.getSnapshotResults( pPathData->m_selector );
+            if( pPathData->m_selectorIndex < results.size() )
+            {
+              pos = results[ pPathData->m_selectorIndex ].m_pos;
+            }
+          }
+          break;
+          // todo: idk what i was thinking here but should this just be the snapshotted position as above rather than live pos?
+          case PathToTargetType::SelectorTarget:
+          {
+            const auto& results = pack.getSnapshotResults( pPathData->m_selector );
+            if( pPathData->m_selectorIndex < results.size() )
+            {
+              // find the target by id and copy their pos
+              auto targetId = results[ pPathData->m_selectorIndex ].m_entityId;
+              for( const auto& pActor : pActor->getInRangeActors() )
+              {
+                if( pActor->getId() == targetId )
+                {
+                  pos = pActor->getPos();
+                  break;
+                }
+              }
+            }
+          }
+          break;
+          case PathToTargetType::TimelineActor:
+          {
+            auto pTarget = pack.getGameObjectByRef( pPathData->m_targetRef, pEncounter );
+
+            if( pTarget )
+              pos = pTarget->getPos();
+          }
+          break;
+          case PathToTargetType::FixedPos:
+          {
+            pos = { pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ };
+          }
+          break;
+          case PathToTargetType::ServerPath:
+          {
+            auto pTeri = pEncounter->getTeriPtr();
+            if( !pTeri )
+              return false;
+
+            auto pPath = pTeri->getServerPath( pPathData->m_serverPathId );
+            if( pPath )
+              pos = {
+                pPath->position.x + pPath->points[ 0 ].Translation.x,
+                pPath->position.y + pPath->points[ 0 ].Translation.y,
+                pPath->position.z + pPath->points[ 0 ].Translation.z
+              };
+          }
+          break;
+          default:
+            break;
+        }
+
         if( auto pController = pActor->getController() )
         {
-          pController->pathTo( { pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ }, 0.1f, flags );
+          if( pPathData->m_type == PathToTargetType::ServerPath )
+          {
+            auto serverPathId = pPathData->m_serverPathId;
+            auto onReachFirstPoint = [ pActor, serverPathId, flags ]()
+            {
+              if( pActor->getController() )
+                pActor->getController()->followServerPath( serverPathId, flags );
+            };
+
+            pController->pathTo( { pos.x, pos.y, pos.z }, 0.5f, AI::Controller::Controller::IgnoreActorCollision, nullptr, onReachFirstPoint );
+          }
+          else
+          {
+            pController->pathTo( { pos.x, pos.y, pos.z }, 0.1f, flags );
+          }
         }
       }
       break;

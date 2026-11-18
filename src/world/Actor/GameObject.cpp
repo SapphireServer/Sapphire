@@ -446,6 +446,16 @@ void GameObject::resetFollowTargetId()
   m_followTargetId = Common::INVALID_GAME_OBJECT_ID;
 }
 
+uint32_t GameObject::getTargetId() const
+{
+  return m_targetId;
+}
+
+void GameObject::setTargetId( uint32_t targetId )
+{
+  m_targetId = targetId;
+}
+
 void GameObject::toggleNameHidden( bool hidden )
 {
   m_nameHidden = hidden;

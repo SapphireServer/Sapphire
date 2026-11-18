@@ -848,6 +848,32 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     auto& pos = pBNpc->getPos();
     playerMgr.sendDebug( player, "BNpc ID: {} Pos: {} {} {}", pBNpc->getId(), pos.x, pos.y, pos.z );
   }
+  else if( subCommand == "serverPath" )
+  {
+    uint32_t pathId = 0;
+    sscanf( params.c_str(), "%u", &pathId );
+
+    auto pTeri = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    if( !pTeri )
+      return;
+
+    auto pPath = pTeri->getServerPath( pathId );
+    if( !pPath )
+    {
+      playerMgr.sendDebug( player, "Unable to find server path {}", pathId );
+      return;
+    }
+
+    auto pBNpc = pTeri->getActiveBNpcByEntityId( player.getTargetId() );
+    if( !pBNpc )
+    {
+      playerMgr.sendDebug( player, "Target a BNpc to use command on" );
+      return;
+    }
+
+    if( auto pController = pBNpc->getController() )
+      pController->followServerPath( pathId, World::AI::Controller::Controller::PathFlags::None );
+  }
 }
 
 void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )

@@ -57,7 +57,9 @@ namespace Sapphire::World::Encounter
     Self,
     Target,
     SelectorPos,
-    SelectorTarget
+    SelectorTarget,
+    FixedPos,
+    TimelineActor
   };
 
   enum class MoveType : uint32_t
@@ -79,7 +81,20 @@ namespace Sapphire::World::Encounter
     Self,
     Target,
     SelectorPos,
-    SelectorTarget
+    SelectorTarget,
+    FixedPos,
+    TimelineActor
+  };
+
+  enum class PathToTargetType: uint32_t
+  {
+    None,
+    Target,
+    SelectorPos,
+    SelectorTarget,
+    FixedPos,
+    TimelineActor,
+    ServerPath
   };
 
   enum class VarOpId
@@ -133,17 +148,24 @@ namespace Sapphire::World::Encounter
     uint32_t m_actionId;
     ActionTargetType m_targetType;
     std::string m_selectorRef;
-    uint32_t m_selectorIndex;
+    int32_t m_selectorIndex;
+    std::string m_targetRef;
+    float m_posX;
+    float m_posY;
+    float m_posZ;
 
-    TimepointDataAction( const std::string& sourceRef, uint32_t actionId,
-                         ActionTargetType type, const std::string& selectorRef,
-                         uint32_t selectorIndex = 0 ) :
+    TimepointDataAction( const std::string& sourceRef, const std::string& targetRef, uint32_t actionId,
+                         ActionTargetType type,
+                         const std::string& selectorRef, int32_t selectorIndex,
+                         float posX, float posY, float posZ) :
       TimepointData( TimepointDataType::CastAction ),
       m_sourceRef( sourceRef ),
+      m_targetRef( targetRef ),
       m_actionId( actionId ),
       m_targetType( type ),
       m_selectorRef( selectorRef ),
-      m_selectorIndex( selectorIndex )
+      m_selectorIndex( selectorIndex ),
+      m_posX( posX ), m_posY( posY ), m_posZ( posZ )
     {
     }
   };
@@ -169,15 +191,17 @@ namespace Sapphire::World::Encounter
     SetPosType m_posType;
     SetPosTargetType m_targetType;
     std::string m_selectorName;
-    uint32_t m_selectorIndex;
+    int32_t m_selectorIndex;
     float m_x, m_y, m_z, m_rot;
+    std::string m_targetRef;
 
-    TimepointDataSetPos( const std::string& actorRef,
+    TimepointDataSetPos( const std::string& actorRef, const std::string& targetRef,
                         SetPosType type, SetPosTargetType targetType, MoveType moveType,
-                        const std::string& selectorName, uint32_t selectorIndex,
+                        const std::string& selectorName, int32_t selectorIndex,
                         float x, float y, float z, float rot ) :
       TimepointData( TimepointDataType::SetPos ),
       m_actorRef( actorRef ),
+      m_targetRef( targetRef ),
       m_posType( type ),
       m_targetType( targetType ),
       m_moveType( moveType ),
@@ -440,18 +464,29 @@ namespace Sapphire::World::Encounter
   struct TimepointDataPathTo : public TimepointData
   {
     std::string m_actorRef;
+    PathToTargetType m_type;
     float m_posX;
     float m_posY;
     float m_posZ;
-
+    std::string m_selector;
+    int32_t m_selectorIndex;
+    std::string m_targetRef;
     bool m_useNavi;
+    uint32_t m_serverPathId;
 
-    TimepointDataPathTo( const std::string& actorRef, float x, float y, float z, bool useNavi ) :
+    TimepointDataPathTo( PathToTargetType type, const std::string& actorRef, const std::string& targetRef, const std::string& selector, int32_t selectorIndex,
+                         float x, float y, float z,
+                         uint32_t serverPathId, bool useNavi ) :
       TimepointData( TimepointDataType::PathTo ),
+      m_type( type ),
       m_actorRef( actorRef ),
+      m_targetRef( targetRef ),
+      m_selector( selector ),
+      m_selectorIndex( selectorIndex ),
       m_posX( x ),
       m_posY( y ),
       m_posZ( z ),
+      m_serverPathId( serverPathId ),
       m_useNavi( useNavi )
     {
     }
