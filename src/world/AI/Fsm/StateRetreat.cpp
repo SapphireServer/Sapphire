@@ -25,6 +25,15 @@ void AI::Fsm::StateRetreat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t t
       bnpc.setRoamTargetReached( true );
       bnpc.setLastRoamTargetReachedTime( Common::Util::getTimeSeconds() );
     }
+    else
+    {
+      if( auto pController = bnpc.getController() )
+      {
+        auto& path = pController->getPath();
+        path.m_flags = static_cast< Controller::Controller::PathFlags >( Controller::Controller::IgnoreObstacles |
+                       Controller::Controller::IgnoreActorCollision );
+      }
+    }
     if( bnpc.getHpPercent() < 100 )
       bnpc.heal( bnpc.getMaxHp() / 10.f );
   }
