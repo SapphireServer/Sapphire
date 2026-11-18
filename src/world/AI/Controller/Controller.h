@@ -38,7 +38,8 @@ namespace Sapphire::World::AI::Controller
       // todo:
       PathToExactPos = 0x40,
       RestoreDefaultPathOnExit = 0x80,
-      IgnoreImmobile = 0x100
+      IgnoreImmobile = 0x100,
+      IgnoreObstacles = 0x200
     };
 
     struct Path

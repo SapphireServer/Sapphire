@@ -291,9 +291,12 @@ void AI::Fsm::StateFollowPath::onEnter( Entity::GameObjectPtr& pEntity )
     }
 
     // disable agent-agent collision, restore in onExit
-    if( path.m_flags & Controller::Controller::PathFlags::IgnoreActorCollision && pNaviProvider )
+    bool ignoreActorCollision = path.m_flags & Controller::Controller::PathFlags::IgnoreActorCollision;
+    bool ignoreObstacles = path.m_flags & Controller::Controller::PathFlags::IgnoreObstacles;
+
+    if( pNaviProvider )
     {
-      pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), true );
+      pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), ignoreActorCollision, ignoreObstacles );
     }
 
     path.m_restoreDefaultPathOnExit = ( path.m_flags & Controller::Controller::PathFlags::RestoreDefaultPathOnExit );
@@ -384,7 +387,7 @@ void AI::Fsm::StateFollowPath::onExit( Entity::GameObjectPtr& pEntity )
 
       // allow agent-agent collision again if it was unset for this request
       if( pNaviProvider )
-        pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), false );
+        pNaviProvider->updateAgentParameters( pBNpc->getAgentId(), pBNpc->getRadius(), false, pBNpc->getCurrentSpeed(), false, false );
 
       // restore default server path if specified
       if( path.m_restoreDefaultPathOnExit )

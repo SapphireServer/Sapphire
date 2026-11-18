@@ -79,6 +79,16 @@ bool Sapphire::Common::Navi::NaviProvider::init( const std::string& naviPath )
     m_vod = dtAllocObstacleAvoidanceDebugData();
     m_vod->init( 2048 );
 
+    // standard agents
+    dtQueryFilter* defaultFilter = m_pCrowd->getEditableFilter( static_cast< uint32_t >( CrowdFilterIndex::Default ) );
+    defaultFilter->setIncludeFlags( FLAG_WALK );
+    defaultFilter->setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE ); // cannot traverse door polygons
+
+    // ignore doors and obstacles
+    dtQueryFilter* obstacleIgnoreFilter = m_pCrowd->getEditableFilter( static_cast< uint32_t >( CrowdFilterIndex::IgnoreObstacles ) );
+    obstacleIgnoreFilter->setIncludeFlags( FLAG_WALK | FLAG_DOOR | FLAG_OBSTACLE );
+    obstacleIgnoreFilter->setExcludeFlags( 0 );
+
     initQuery();
 
     return true;
@@ -742,11 +752,11 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   return true;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision, bool passThroughObstacles )
 {
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
-  params.height = 3.f;
+  params.height = 0.1f;
   params.maxAcceleration = 40.f;
   params.maxSpeed = speed;
   params.radius = radius;
@@ -760,18 +770,50 @@ int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& p
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
 
+  auto layer = ignoreAgentCollision ? CrowdAgentLayer::IgnoreAgents : CrowdAgentLayer::Default;
+  auto layerCollision = ignoreAgentCollision ? CrowdAgentLayer::None : CrowdAgentLayer::Default;
+
+  params.userData = new CrowdAgentLayerData{ static_cast< uint32_t >( layer ), static_cast< uint32_t >( layerCollision ) };
+
+  auto pLayerData = static_cast< CrowdAgentLayerData* >( params.userData );
+
+  // set these both to 0.0f since we're running our own agent collision before crowd->update
+  params.collisionQueryRange = 0.0f;
+  params.separationWeight = 0.0f;
+
+  if( ignoreAgentCollision )
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::IgnoreAgents );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::None );
+  }
+  else
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::Default );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::Default );
+  }
+
+  if( passThroughObstacles )
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::IgnoreObstacles );
+  }
+  else
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::Default );
+  }
 
   float position[] = { pos.x, pos.y, pos.z };
   return m_pCrowd->addAgent( position, &params );
 }
 
-void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision )
+void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision, bool passThroughObstacles )
 {
   if( naviAgentId == -1 )
     return;
-  dtCrowdAgentParams params{};
-  std::memset( &params, 0, sizeof( params ) );
-  params.height = radius;
+
+  auto ag = m_pCrowd->getEditableAgent( naviAgentId );
+  dtCrowdAgentParams params = ag->params;
+  
+  params.height = 0.1f;
   params.maxAcceleration = 40.f;
   params.maxSpeed = speed;
   params.radius = radius;
@@ -785,18 +827,36 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
 
-  // todo: this pushes other agents out of the way
-  // should this be updated to phase through agents?
+  auto pLayerData = static_cast< CrowdAgentLayerData* >( params.userData );
+
+  // set these both to 0.0f since we're running our own agent collision before crowd->update
+  params.collisionQueryRange = 0.0f;
+  params.separationWeight = 0.0f;
+
   if( ignoreAgentCollision )
   {
-    params.collisionQueryRange = 0.0f;
-    params.separationWeight = 0.0f;
-
-    params.updateFlags = DT_CROWD_ANTICIPATE_TURNS |
-                         DT_CROWD_OPTIMIZE_VIS |
-                         DT_CROWD_OPTIMIZE_TOPO;
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::IgnoreAgents );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::None );
   }
+  else
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::Default );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::Default );
+  }
+
+  if( passThroughObstacles )
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::IgnoreObstacles );
+  }
+  else
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::Default );
+  }
+
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
+
+  if( ag->active && ag->targetState == DT_CROWDAGENT_TARGET_VALID )
+    m_pCrowd->requestMoveTarget( naviAgentId, ag->targetRef, ag->targetPos );
 }
 
 void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
@@ -807,10 +867,86 @@ void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
 
   m_tileCache->update( timeInSeconds, m_naviMesh );
   m_pCrowd->update( timeInSeconds, &info );
+
+  // handle agent collision by layer ids
+  // todo: probably modify recast to support this
+  const int maxAgents = m_pCrowd->getAgentCount();
+  for( int i = 0; i < maxAgents; ++i )
+  {
+    dtCrowdAgent* agA = const_cast< dtCrowdAgent* >( m_pCrowd->getAgent( i ) );
+    if( !agA || !agA->active ) continue;
+
+    auto* layerA = static_cast< CrowdAgentLayerData* >( agA->params.userData );
+    if( !layerA || layerA->m_mask == 0 ) continue;
+
+    for( int j = i + 1; j < maxAgents; ++j )
+    {
+      dtCrowdAgent* agB = const_cast< dtCrowdAgent* >( m_pCrowd->getAgent( j ) );
+      if( !agB || !agB->active ) continue;
+
+      auto* layerB = static_cast< CrowdAgentLayerData* >( agB->params.userData );
+      if( !layerB ) continue;
+
+      bool aCollidesB = ( layerA->m_mask & layerB->m_group ) != 0;
+      bool bCollidesA = ( layerB->m_mask & layerA->m_group ) != 0;
+
+      if( !aCollidesB && !bCollidesA )
+        continue;
+
+      float diff[ 3 ];
+      dtVsub( diff, agA->npos, agB->npos );
+      diff[ 1 ] = 0.0f;
+
+      float distSqr = dtVlenSqr( diff );
+      float minDist = agA->params.radius + agB->params.radius;
+
+      if( distSqr < minDist * minDist )
+      {
+        float dist = dtMathSqrtf( distSqr );
+        float overlap = minDist - dist;
+
+        float normal[ 3 ];
+        if( dist > 0.0001f )
+        {
+          dtVscale( normal, diff, 1.0f / dist );
+        }
+        else
+        {
+          normal[ 0 ] = 1.0f;
+          normal[ 1 ] = 0.0f;
+          normal[ 2 ] = 0.0f;
+        }
+
+        if( aCollidesB && bCollidesA )
+        {
+          dtVmad( agA->npos, agA->npos, normal, overlap * 0.5f );
+          dtVmad( agB->npos, agB->npos, normal, -overlap * 0.5f );
+        }
+        else if( aCollidesB )
+        {
+          dtVmad( agA->npos, agA->npos, normal, overlap );
+        }
+        else if( bCollidesA )
+        {
+          dtVmad( agB->npos, agB->npos, normal, -overlap );
+        }
+      }
+    }
+  }
 }
 
 void Sapphire::Common::Navi::NaviProvider::removeAgent( int32_t naviAgentId )
 {
+  if( naviAgentId == -1 )
+    return;
+
+  auto pAgent = m_pCrowd->getAgent( naviAgentId );
+  if( pAgent )
+  {
+    auto pUserData = static_cast< CrowdAgentLayer* >( pAgent->params.userData );
+    if( pUserData )
+      delete pUserData;
+  }
   m_pCrowd->removeAgent( naviAgentId );
 }
 
@@ -936,7 +1072,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef
 
   if( enabled && obstacleRef == 0 )
   {
-    auto status = m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef );
+    auto status = m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef, AREA_DOOR );
     if( dtStatusFailed( status ) )
       Logger::error( "[Navmesh] addBoxObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
                      pos.x, pos.y, pos.z );
@@ -962,7 +1098,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
 
   if( enabled && obstacleRef == 0 )
   {
-    auto status = m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
+    auto status = m_tileCache->addObstacle( fpos, radius, height, &obstacleRef, AREA_OBSTACLE );
     if( dtStatusFailed( status ) )
       Logger::error( "[Navmesh] addObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
                      pos.x, pos.y, pos.z );

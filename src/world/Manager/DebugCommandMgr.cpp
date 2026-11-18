@@ -871,8 +871,11 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
       return;
     }
 
+    uint32_t flags = World::AI::Controller::Controller::PathFlags::IgnoreActorCollision;
+    flags |= World::AI::Controller::Controller::PathFlags::IgnoreObstacles;
+
     if( auto pController = pBNpc->getController() )
-      pController->followServerPath( pathId, World::AI::Controller::Controller::PathFlags::IgnoreActorCollision );
+      pController->followServerPath( pathId, static_cast< World::AI::Controller::Controller::PathFlags >( flags ) );
   }
 }
 

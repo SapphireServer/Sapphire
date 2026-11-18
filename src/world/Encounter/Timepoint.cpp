@@ -1303,6 +1303,8 @@ namespace Sapphire::World::Encounter
         if( !pPathData->m_useNavi )
           flags |= World::AI::Controller::Controller::PathFlags::IgnoreNavmesh;
 
+        flags |= World::AI::Controller::Controller::PathFlags::IgnoreObstacles;
+
         Common::Vector3 pos{ pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ };
 
         switch( pPathData->m_type )

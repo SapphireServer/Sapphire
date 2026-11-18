@@ -16,6 +16,25 @@ namespace Sapphire::Common::Navi
   const int32_t MAX_POLYS = 512;
   const int32_t MAX_SMOOTH = 2048;
 
+  enum class CrowdFilterIndex : uint32_t
+  {
+    Default,
+    IgnoreObstacles
+  };
+
+  enum class CrowdAgentLayer : uint32_t
+  {
+    None,
+    Default,
+    IgnoreAgents
+  };
+
+  struct CrowdAgentLayerData
+  {
+    uint32_t m_group;
+    uint32_t m_mask;
+  };
+
   /** 1. Memory Allocator for Tile Cache **/
   struct LinearAllocator : public dtTileCacheAlloc {
     unsigned char* buffer;
@@ -58,10 +77,17 @@ namespace Sapphire::Common::Navi
     {
       for( int i = 0; i < params->polyCount; ++i )
       {
-        if( polyAreas[ i ] == RC_WALKABLE_AREA )
+        if( polyAreas[ i ] == AREA_GROUND )
         {
-          polyAreas[ i ] = 0;   // Default Ground Area
-          polyFlags[ i ] = 0x01;// Walkable Flag
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_WALK );// Walkable Flag
+        }
+        else if( polyAreas[ i ] == AREA_DOOR )
+        {
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_DOOR );
+        }
+        else if( polyAreas[ i ] == AREA_OBSTACLE )
+        {
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_OBSTACLE );
         }
       }
     }
@@ -116,7 +142,7 @@ namespace Sapphire::Common::Navi
 
     bool hasNaviMesh() const;
 
-    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f );
+    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
 
     void removeAgent( int32_t naviAgentId );
 
@@ -138,7 +164,7 @@ namespace Sapphire::Common::Navi
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
-    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision = false );
+    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
     const dtTileCache* getTileCache() const { return m_tileCache; }
 
