@@ -86,7 +86,7 @@ bool Sapphire::Common::Navi::NaviProvider::init( const std::string& naviPath )
 
     // ignore doors and obstacles
     dtQueryFilter* obstacleIgnoreFilter = m_pCrowd->getEditableFilter( static_cast< uint32_t >( CrowdFilterIndex::IgnoreObstacles ) );
-    obstacleIgnoreFilter->setIncludeFlags( FLAG_WALK | FLAG_DOOR | FLAG_OBSTACLE );
+    obstacleIgnoreFilter->setIncludeFlags( FLAG_ALL );
     obstacleIgnoreFilter->setExcludeFlags( 0 );
 
     initQuery();
@@ -1029,11 +1029,11 @@ bool Sapphire::Common::Navi::NaviProvider::hasTargetState( int32_t naviAgentId )
   return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision, bool ignoreObstacles )
 {
   resetMoveTarget( naviAgentId );
   removeAgent( naviAgentId );
-  auto newIndex = addAgent( pos, radius, speed );
+  auto newIndex = addAgent( pos, radius, speed, ignoreAgentCollision, ignoreObstacles );
   return newIndex;
 }
 
@@ -1060,9 +1060,14 @@ void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAg
 void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef, const Common::Vector3& pos,
                                                        const Common::Vector3& halfExtents, float rot, bool enabled )
 {
+  const float cellSize = m_tileCache->getParams()->cs;
+  const float minHalfThickness = cellSize * 2.0f;
+
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
-  // Half-extents: Width, Height, Depth
-  float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
+  float fhalfExtents[ 3 ] = {
+          dtMax( halfExtents.x, minHalfThickness ),
+          halfExtents.y,
+          dtMax( halfExtents.z, minHalfThickness ) };
 
   if( obstacleRef != 0 && enabled )
   {
@@ -1141,7 +1146,7 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
   return true;// Both checks passed
 }
 
-bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos )
+bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles )
 {
   if( !m_naviMeshQuery )
   {
@@ -1156,6 +1161,17 @@ bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vecto
   float startNearest[ 3 ], endNearest[ 3 ];
   dtQueryFilter filter;
   float extents[ 3 ] = { 1.0f, 3.0f, 1.0f };
+
+  if( passThroughObstacles )
+  {
+    filter.setIncludeFlags( FLAG_ALL );
+    filter.setExcludeFlags( 0 );
+  }
+  else
+  {
+    filter.setIncludeFlags( FLAG_WALK );
+    filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
+  }
 
   m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest );
   m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest );

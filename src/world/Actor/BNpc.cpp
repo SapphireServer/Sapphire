@@ -474,7 +474,17 @@ bool BNpc::moveTo( const Vector3& pos, float targetReachedDist )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed() );
+
+    auto ignoreAgentCollision = false;
+    auto ignoreObstacles = false;
+    if( m_pController )
+    {
+      const auto& flags = m_pController->getPath().m_flags;
+      ignoreAgentCollision = ( flags & AI::Controller::Controller::PathFlags::IgnoreActorCollision );
+      ignoreObstacles = ( flags & AI::Controller::Controller::PathFlags::IgnoreObstacles );
+    }
+
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed(), ignoreAgentCollision, ignoreObstacles );
     setAgentId( newAgentId );
     m_naviTarget = pos;
     m_naviLastTarget = pos;

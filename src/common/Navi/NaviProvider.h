@@ -159,7 +159,7 @@ namespace Sapphire::Common::Navi
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;
 
-    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
 
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
@@ -175,7 +175,7 @@ namespace Sapphire::Common::Navi
     void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
     bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
 
-    bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos );
+    bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles = false );
 
   protected:
     std::string m_internalName;
