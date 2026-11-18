@@ -583,19 +583,19 @@ namespace Sapphire::World::Encounter
             case ActionTargetType::SelectorPos:
             case ActionTargetType::SelectorTarget:
             {
-              const auto& results = pack.getSnapshotResults( pActionData->m_selectorRef );
+              const auto& result = pack.getSnapshotResultAt( pActionData->m_selectorRef, pActionData->m_selectorIndex );
 
-              if( pActionData->m_selectorIndex < results.size() )
+              if( result.m_entityId != Common::INVALID_GAME_OBJECT_ID )
               {
-                const auto& res = results[ pActionData->m_selectorIndex ];
-                targetId = res.m_entityId;
-                pos = res.m_pos;
+                targetId = result.m_entityId;
+                pos = result.m_pos;
               }
             }
             break;
             case ActionTargetType::FixedPos:
             {
               pos = { pActionData->m_posX, pActionData->m_posY, pActionData->m_posZ };
+              targetId = pBNpc->getId();
             }
             break;
             case ActionTargetType::TimelineActor:
@@ -615,7 +615,7 @@ namespace Sapphire::World::Encounter
           // we need to pause the timeline if the player is out of range
           auto topHateId = pBNpc->getTargetId();
           {
-            auto pTargetActor = pEncounter->getTeriPtr()->getEntityById( topHateId );
+            auto pTargetActor = pTeri->getEntityById( topHateId );
 
             if( pTargetActor )
             {
@@ -693,22 +693,22 @@ namespace Sapphire::World::Encounter
             break;
             case SetPosTargetType::SelectorPos:
             {
-              const auto& results = pack.getSnapshotResults( pSetPosData->m_selectorName );
-              if( pSetPosData->m_selectorIndex < results.size() )
+              const auto& result = pack.getSnapshotResultAt( pSetPosData->m_selectorName, pSetPosData->m_selectorIndex );
+              if( result.m_entityId != Common::INVALID_GAME_OBJECT_ID )
               {
-                pos = results[ pSetPosData->m_selectorIndex ].m_pos;
-                rot = results[ pSetPosData->m_selectorIndex ].m_rot;
+                pos = result.m_pos;
+                rot = result.m_rot;
               }
             }
             break;
             // todo: idk what i was thinking here but should this just be the snapshotted position as above rather than live pos?
             case SetPosTargetType::SelectorTarget:
             {
-              const auto& results = pack.getSnapshotResults( pSetPosData->m_selectorName );
-              if( pSetPosData->m_selectorIndex < results.size() )
+              const auto& result = pack.getSnapshotResultAt( pSetPosData->m_selectorName, pSetPosData->m_selectorIndex );
+              if( result.m_entityId != Common::INVALID_GAME_OBJECT_ID )
               {
                 // find the target by id and copy their pos
-                auto targetId = results[ pSetPosData->m_selectorIndex ].m_entityId;
+                auto targetId = result.m_entityId;
                 for( const auto& pActor : pActorSelf->getInRangeActors() )
                 {
                   if( pActor->getId() == targetId )
@@ -1315,30 +1315,28 @@ namespace Sapphire::World::Encounter
               if( pIterActor->getId() == pActor->getTargetId() )
               {
                 pTarget = pIterActor;
+                pos = pTarget->getPos();
                 break;
               }
             }
-            if( pTarget )
-              pos = pTarget->getPos();
           }
           break;
           case PathToTargetType::SelectorPos:
           {
-            const auto& results = pack.getSnapshotResults( pPathData->m_selector );
-            if( pPathData->m_selectorIndex < results.size() )
+            const auto& result = pack.getSnapshotResultAt( pPathData->m_selector, pPathData->m_selectorIndex );
+            if( result.m_entityId != Common::INVALID_GAME_OBJECT_ID )
             {
-              pos = results[ pPathData->m_selectorIndex ].m_pos;
+              pos = result.m_pos;
             }
           }
           break;
           // todo: idk what i was thinking here but should this just be the snapshotted position as above rather than live pos?
           case PathToTargetType::SelectorTarget:
           {
-            const auto& results = pack.getSnapshotResults( pPathData->m_selector );
-            if( pPathData->m_selectorIndex < results.size() )
+            const auto& result = pack.getSnapshotResultAt( pPathData->m_selector, pPathData->m_selectorIndex );
+            if( result.m_entityId != Common::INVALID_GAME_OBJECT_ID )
             {
-              // find the target by id and copy their pos
-              auto targetId = results[ pPathData->m_selectorIndex ].m_entityId;
+              auto targetId = result.m_entityId;
               for( const auto& pActor : pActor->getInRangeActors() )
               {
                 if( pActor->getId() == targetId )
@@ -1365,7 +1363,6 @@ namespace Sapphire::World::Encounter
           break;
           case PathToTargetType::ServerPath:
           {
-            auto pTeri = pEncounter->getTeriPtr();
             if( !pTeri )
               return false;
 

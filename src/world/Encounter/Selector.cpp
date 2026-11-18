@@ -139,6 +139,16 @@ namespace Sapphire::World::Encounter
     return m_snapshot.getTargetIds();
   }
 
+  uint32_t Selector::getResultTargetIdAt( int32_t index ) const
+  {
+    return m_snapshot.getResultTargetIdAt( index );
+  }
+
+  const World::AI::Snapshot::CharaEntry& Selector::getResultAt( int32_t index ) const
+  {
+    return m_snapshot.getResultAt( index );
+  }
+
   void Selector::clearResults()
   {
     m_snapshot.clearResults();

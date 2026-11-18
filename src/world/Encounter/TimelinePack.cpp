@@ -380,6 +380,21 @@ namespace Sapphire::World::Encounter
       it->second.createSnapshot( src, exclude );
   }
 
+  const World::AI::Snapshot::CharaEntry& TimelinePack::getSnapshotResultAt( const std::string& selectorName, int32_t selectorIndex )
+  {
+    static AI::Snapshot::CharaEntry invalid;
+    if( auto it = m_selectors.find( selectorName ); it != m_selectors.end() )
+      return it->second.getResultAt( selectorIndex );
+    return invalid;
+  }
+
+  uint32_t TimelinePack::getSnapshotResultTargetIdAt( const std::string& selectorName, int32_t selectorIndex )
+  {
+    if( auto it = m_selectors.find( selectorName ); it != m_selectors.end() )
+      return it->second.getResultTargetIdAt( selectorIndex );
+    return Common::INVALID_GAME_OBJECT_ID;
+  }
+
   const World::AI::Snapshot::Results& TimelinePack::getSnapshotResults( const std::string& selectorName )
   {
     static World::AI::Snapshot::Results empty;

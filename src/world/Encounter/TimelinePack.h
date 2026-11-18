@@ -75,6 +75,10 @@ namespace Sapphire::World::Encounter
     void createSnapshot( const std::string& selectorName, Entity::Chara& src,
                          const std::vector< uint32_t >& exclude );
 
+    const World::AI::Snapshot::CharaEntry& getSnapshotResultAt( const std::string& selectorName, int32_t selectorIndex );
+
+    uint32_t getSnapshotResultTargetIdAt( const std::string& selectorName, int32_t selectorIndex );
+
     const World::AI::Snapshot::Results& getSnapshotResults( const std::string& selectorName );
 
     const World::AI::Snapshot::TargetIds& getSnapshotTargetIds( const std::string& selectorName );
