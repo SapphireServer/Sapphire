@@ -1299,9 +1299,9 @@ namespace Sapphire::World::Encounter
           return false;
         }
 
-        auto flags = World::AI::Controller::Controller::PathFlags::None;
+        uint32_t flags = World::AI::Controller::Controller::PathFlags::IgnoreActorCollision;
         if( !pPathData->m_useNavi )
-          flags = World::AI::Controller::Controller::PathFlags::IgnoreNavmesh;
+          flags |= World::AI::Controller::Controller::PathFlags::IgnoreNavmesh;
 
         Common::Vector3 pos{ pPathData->m_posX, pPathData->m_posY, pPathData->m_posZ };
 
@@ -1387,14 +1387,14 @@ namespace Sapphire::World::Encounter
             auto onReachFirstPoint = [ pActor, serverPathId, flags ]()
             {
               if( pActor->getController() )
-                pActor->getController()->followServerPath( serverPathId, flags );
+                pActor->getController()->followServerPath( serverPathId, static_cast< AI::Controller::Controller::PathFlags >( flags ) );
             };
 
-            pController->pathTo( { pos.x, pos.y, pos.z }, 0.5f, AI::Controller::Controller::IgnoreActorCollision, nullptr, onReachFirstPoint );
+            pController->pathTo( { pos.x, pos.y, pos.z }, 0.5f, static_cast< AI::Controller::Controller::PathFlags >( flags ), nullptr, onReachFirstPoint );
           }
           else
           {
-            pController->pathTo( { pos.x, pos.y, pos.z }, 0.1f, flags );
+            pController->pathTo( { pos.x, pos.y, pos.z }, 0.1f, static_cast< AI::Controller::Controller::PathFlags >( flags ) );
           }
         }
       }

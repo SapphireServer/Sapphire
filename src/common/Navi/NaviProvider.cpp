@@ -771,12 +771,12 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
     return;
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
-  params.height = 3.f;
+  params.height = radius;
   params.maxAcceleration = 40.f;
   params.maxSpeed = speed;
   params.radius = radius;
-  params.collisionQueryRange = speed * 0.5f;
-  params.pathOptimizationRange = speed * 3.0f;
+  params.collisionQueryRange = params.radius * 10.0f;
+  params.pathOptimizationRange = params.radius * 30.0f;
   params.updateFlags = 0;
   params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS |
                     DT_CROWD_OPTIMIZE_VIS |
@@ -785,9 +785,16 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
 
+  // todo: this pushes other agents out of the way
+  // should this be updated to phase through agents?
   if( ignoreAgentCollision )
   {
-    // todo:
+    params.collisionQueryRange = 0.0f;
+    params.separationWeight = 0.0f;
+
+    params.updateFlags = DT_CROWD_ANTICIPATE_TURNS |
+                         DT_CROWD_OPTIMIZE_VIS |
+                         DT_CROWD_OPTIMIZE_TOPO;
   }
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
 }

@@ -872,7 +872,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     }
 
     if( auto pController = pBNpc->getController() )
-      pController->followServerPath( pathId, World::AI::Controller::Controller::PathFlags::None );
+      pController->followServerPath( pathId, World::AI::Controller::Controller::PathFlags::IgnoreActorCollision );
   }
 }
 
