@@ -99,5 +99,7 @@ namespace Sapphire::World::Encounter
     Entity::BNpcPtr spawnSubActor( const std::string& name, TerritoryPtr pTeri );
     Entity::BNpcPtr getSubActor( const std::string& name ) const;
     void resetSubActors( TerritoryPtr pTeri );
+
+    void shiftTimes( uint64_t durationMs );
   };
 }

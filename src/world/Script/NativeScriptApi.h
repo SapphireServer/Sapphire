@@ -86,6 +86,14 @@ namespace Sapphire::ScriptAPI
     virtual void update( uint64_t tick, World::Encounter::TimelinePack& pack,
                          World::Encounter::EncounterPtr pEncounter );
 
+    // called on TimelinePack.pause/pauseUntil
+    virtual void onPause( uint64_t nowMs, World::Encounter::TimelinePack& pack,
+                          World::Encounter::EncounterPtr pEncounter );
+
+    // called on TimelinePack.endPause
+    virtual void onResume( uint64_t deltaMs, uint64_t nowMs, World::Encounter::TimelinePack& pack,
+                           World::Encounter::EncounterPtr pEncounter );
+
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
@@ -99,6 +107,13 @@ namespace Sapphire::ScriptAPI
     World::Manager::ActionMgr& actionMgr()
     {
       return Common::Service< World::Manager::ActionMgr >::ref();
+    }
+
+  protected:
+    static void shiftTime( uint64_t& timestampMs, uint64_t deltaMs )
+    {
+      if( timestampMs )
+        timestampMs += deltaMs;
     }
   };
 

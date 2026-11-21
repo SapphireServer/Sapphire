@@ -38,6 +38,7 @@ namespace Sapphire::World::Encounter
   // todo: actually handle solo stuff properly (or tie to zone director/content director at least)
   class TimelinePack
   {
+  protected:
     using TimeLinePackPtr = std::shared_ptr< TimelinePack >;
     TimelinePackType m_type{ TimelinePackType::EncounterFight };
     std::vector< TimelineActor > m_timelineActors;
@@ -51,6 +52,12 @@ namespace Sapphire::World::Encounter
 
     std::unordered_map< std::string, std::string > m_mechanicDefinitions;
     std::unordered_map< std::string, std::shared_ptr< ScriptAPI::MechanicScript > > m_mechanics;
+
+    bool m_paused{ false };
+    uint64_t m_pauseStart{ 0 };
+    uint64_t m_pauseEnd{ 0 };
+
+    void endPause( uint64_t timeMs );
 
   public:
     TimelinePack() {}
@@ -126,6 +133,14 @@ namespace Sapphire::World::Encounter
     uint64_t getPhaseElapsed( const std::string& actorRef ) const;
 
     std::string_view getPhaseName( const std::string& actorRef ) const;
+
+    bool isPaused() const;
+
+    void pause( uint64_t durationMs );
+
+    void pauseUntil( uint64_t timeMs );
+
+    void resume();
 
     static TimeLinePackPtr createTimelinePack( const std::string& name );
   };

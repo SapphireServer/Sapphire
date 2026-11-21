@@ -38,6 +38,7 @@
 #include <Util/UtilMath.h>
 #include <Util/Util.h>
 
+#include <algorithm>
 #include <filesystem>
 
 namespace Sapphire::World::Encounter
@@ -451,6 +452,9 @@ namespace Sapphire::World::Encounter
       actor.resetAllSubActors( pEncounter->getTeriPtr() );
       // todo: reset all phases
     }
+    m_paused = false;
+    m_pauseStart = 0;
+    m_pauseEnd = 0;
     m_startTime = 0;
     m_vars.clear();
   }
@@ -474,6 +478,18 @@ namespace Sapphire::World::Encounter
   void TimelinePack::update( uint64_t time )
   {
     auto now = Common::Util::getTimeMs();
+
+    // pause timeline if necessary
+    if( m_paused )
+    {
+      // wait until duration has elapsed
+      if( now < m_pauseEnd )
+        return;
+
+      // resume timeline
+      endPause( now );
+    }
+
     for( auto& actor : m_timelineActors )
       actor.update( m_pEncounter, *this, now );
 
@@ -547,6 +563,9 @@ namespace Sapphire::World::Encounter
   bool TimelinePack::callMechanic( const std::string& instanceName, const std::string& function,
                                    const nlohmann::json& args )
   {
+    if( m_paused )
+      Logger::warn( "TimelinePack '{}': calling mechanic {} function {} while paused", instanceName, function );
+
     auto definitionIt = m_mechanicDefinitions.find( instanceName );
     if( definitionIt == m_mechanicDefinitions.end() )
     {
@@ -589,6 +608,9 @@ namespace Sapphire::World::Encounter
 
   void TimelinePack::requestPhaseTransition( const std::string& actorRef, uint32_t phaseId )
   {
+    if( m_paused )
+      Logger::warn( "[TimelinePack] requestPhaseTransition: Requesting phase transition while paused on Actor: {} Phase: {}", actorRef, phaseId );
+
     for( auto& actor : m_timelineActors )
     {
       if( actor.getName() == actorRef )
@@ -609,6 +631,9 @@ namespace Sapphire::World::Encounter
 
   void TimelinePack::requestPhaseTransition( const std::string& actorRef, const std::string& phaseName )
   {
+    if( m_paused )
+      Logger::warn( "[TimelinePack] requestPhaseTransition: Requesting phase transition while paused on Actor: {} Phase: {}", actorRef, phaseName );
+
     for( auto& actor : m_timelineActors )
     {
       if( actor.getName() == actorRef )
@@ -642,5 +667,74 @@ namespace Sapphire::World::Encounter
         return actor.getPhaseName();
 
     return "";
+  }
+
+  void TimelinePack::endPause( uint64_t timeMs )
+  {
+    if( !m_paused )
+      return;
+
+    const auto delta = std::min( m_pauseEnd, timeMs ) - m_pauseStart;
+
+    for( auto& actor : m_timelineActors )
+      actor.shiftTimes( delta );
+
+    if( m_startTime )
+      m_startTime += delta;
+
+    m_paused = false;
+    m_pauseStart = 0;
+    m_pauseEnd = 0;
+
+    for( const auto& [ instanceName, pMechanic ] : m_mechanics )
+      pMechanic->onResume( delta, timeMs, *this, m_pEncounter );
+
+    Logger::info( "[TimelinePack] resumed timeline {} and mechanics", m_name );
+  }
+
+  bool TimelinePack::isPaused() const
+  {
+    return m_paused;
+  }
+
+  void TimelinePack::pause( uint64_t durationMs )
+  {
+    const auto now = Common::Util::getTimeMs();
+    const auto end = now + durationMs;
+
+    if( m_paused )
+    {
+      m_pauseEnd = std::max( m_pauseEnd, end );
+      return;
+    }
+
+    m_paused = true;
+    m_pauseStart = now;
+    m_pauseEnd = end;
+
+    for( const auto& [ instanceName, pMechanic ] : m_mechanics )
+      pMechanic->onPause( now, *this, m_pEncounter );
+
+    Logger::info( "[TimelinePack] paused timeline {} and mechanics", m_name );
+  }
+
+  void TimelinePack::pauseUntil( uint64_t timeMs )
+  {
+    const auto now = Common::Util::getTimeMs();
+
+    if( timeMs <= now )
+      return;
+
+    const auto remaining = timeMs - now;
+    pause( remaining );
+  }
+
+  void TimelinePack::resume()
+  {
+    if( !m_paused )
+      return;
+
+    const auto now = Common::Util::getTimeMs();
+    endPause( now );
   }
 }// namespace Sapphire::Encounter

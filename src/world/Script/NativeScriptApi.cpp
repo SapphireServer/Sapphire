@@ -49,6 +49,14 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void MechanicScript::onPause( uint64_t nowMs, World::Encounter::TimelinePack& pack, World::Encounter::EncounterPtr pEncounter )
+  {
+  }
+
+  void MechanicScript::onResume( uint64_t deltaMs, uint64_t nowMs, World::Encounter::TimelinePack& pack, World::Encounter::EncounterPtr pEncounter )
+  {
+  }
+
   MechanicScriptDefinition::MechanicScriptDefinition(
     std::string name, MechanicFactory factory,
     std::initializer_list< MechanicFunctionDefinition > functions ) :

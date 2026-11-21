@@ -280,4 +280,8 @@ namespace Sapphire::World::Encounter
     }
   }
 
+  void TimelineActor::shiftTimes( uint64_t durationMs )
+  {
+    m_state.shiftTimes( durationMs );
+  }
 };

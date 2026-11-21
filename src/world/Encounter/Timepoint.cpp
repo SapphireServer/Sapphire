@@ -602,7 +602,10 @@ namespace Sapphire::World::Encounter
             {
               auto pActor = pack.getGameObjectByRef( pActionData->m_targetRef, pEncounter );
               if( pActor )
+              {
+                targetId = pActor->getId();
                 pos = pActor->getPos();
+              }
             }
             break;
             default:
@@ -625,16 +628,20 @@ namespace Sapphire::World::Encounter
                 {
                   // stall if not facing target
                   if( !pBNpc->isFacingTarget( *pTargetChara, 0.99f ) )
+                  {
+                    pack.pause( 1000 );
                     return false;
-
+                  }
                   auto bnpcPos = pBNpc->getPos();
                   auto targPos = pTargetChara->getPos();
 
                   auto distance = Common::Util::distance( bnpcPos.x, bnpcPos.y, bnpcPos.z, targPos.x, targPos.y, targPos.z );
                   if( distance >= 3.f + pBNpc->getRadius() + pTargetChara->getRadius() )
                   {
-                    // pause at this timepoint
-                    // return false;
+                    // todo: only stall if the current actor is boss?
+                    // stall if target out of range
+                    pack.pause( 1000 );
+                    return false;
                   }
                 }
               }
