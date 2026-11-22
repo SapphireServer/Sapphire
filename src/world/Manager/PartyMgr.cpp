@@ -8,6 +8,8 @@
 #include "Network/GameConnection.h"
 
 #include "PartyMgr.h"
+#include "Notifications/PlayerEvents.h"
+#include "Notifications/SessionEvents.h"
 #include "WorldServer.h"
 #include "ChatChannelMgr.h"
 #include "PlayerMgr.h"
@@ -169,8 +171,9 @@ void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
   removeParty( party->PartyID );
 }
 
-void PartyMgr::onMoveZone( Sapphire::Entity::Player& movingPlayer )
+void PartyMgr::onMoveZone( const Notifications::PlayerTerritoryChanged& event )
 {
+  const auto& movingPlayer = event.player;
   if( movingPlayer.getPartyId() == 0 )
     return;
   auto party = getParty( movingPlayer.getPartyId() );
@@ -178,8 +181,9 @@ void PartyMgr::onMoveZone( Sapphire::Entity::Player& movingPlayer )
   sendPartyUpdate( *party );
 }
 
-void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
+void PartyMgr::onMemberDisconnect( const Notifications::PlayerLoggedOut& event )
 {
+  auto& disconnectingPlayer = event.player;
   if( disconnectingPlayer.getPartyId() == 0 )
     return;
 

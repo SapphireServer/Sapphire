@@ -18,7 +18,6 @@
 #include "HousingMgr.h"
 #include "WarpMgr.h"
 #include "PlayerMgr.h"
-#include "PartyMgr.h"
 #include "Linkshell/Linkshell.h"
 
 #include "Territory/Land.h"
@@ -653,9 +652,9 @@ TerritoryMgr::InstanceIdList TerritoryMgr::getInstanceContentIdList( uint16_t in
 bool TerritoryMgr::movePlayer( Sapphire::Territory& teri, Entity::Player& player )
 {
   auto& playerMgr = Common::Service< Manager::PlayerMgr >::ref();
-  auto& partyMgr = Common::Service< Manager::PartyMgr >::ref();
 
-  auto pPrevZone = getTerritoryByGuId( player.getTerritoryId() );
+  const auto previousTerritoryId = player.getTerritoryId();
+  const auto pPrevZone = getTerritoryByGuId( previousTerritoryId );
 
   player.setCondition( Common::PlayerCondition::BetweenAreas );
 
@@ -678,8 +677,9 @@ bool TerritoryMgr::movePlayer( Sapphire::Territory& teri, Entity::Player& player
   m_playerIdToInstanceMap[ player.getId() ] = teri.getGuId();
 
   teri.onBeforePlayerZoneIn( player );
-  playerMgr.onMoveZone( player );
-  partyMgr.onMoveZone( player );
+  playerMgr.sendZoneInSetup( player );
+  Common::Service< World::WorldServer >::ref().playerEvents().territoryChanged.publish(
+    { player, previousTerritoryId, teri.getGuId() } );
 
   return true;
 }

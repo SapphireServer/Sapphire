@@ -862,7 +862,7 @@ void BNpc::onDeath()
 
       playerMgr.sendDebug( *pPlayer, ( "Killed Layout ID: " + std::to_string( getLayoutId() ) ) );
 
-      playerMgr.onMobKill( *pPlayer, *this );
+      server().playerEvents().npcKillCredited.publish( { *pPlayer, *this } );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }
   }

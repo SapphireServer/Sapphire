@@ -13,7 +13,6 @@
 #include <Manager/WarpMgr.h>
 #include <Manager/MapMgr.h>
 
-#include <Script/ScriptMgr.h>
 #include <Common.h>
 
 #include <Database/ZoneDbConnection.h>
@@ -230,15 +229,6 @@ Sapphire::Entity::PlayerPtr PlayerMgr::syncPlayer( uint64_t characterId )
   return pPlayer;
 }
 
-void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
-{
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onBNpcKill( player, bnpc );
-
-  if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-    onUpdateHuntingLog( player, bnpc.getBNpcNameId() );
-}
-
 void PlayerMgr::onSkillProc( Entity::Player& player, uint8_t index )
 {
   player.setRecastGroup( index, 0.5f );
@@ -257,21 +247,15 @@ void PlayerMgr::sendLoginMessage( Entity::Player& player )
   }
 }
 
-void PlayerMgr::onLogin( Entity::Player &player )
+void PlayerMgr::onLogin( const Notifications::PlayerLoggedIn& )
 {
 }
 
-void PlayerMgr::onLogout( Entity::Player &player )
+void PlayerMgr::onLogout( const Notifications::PlayerLoggedOut& )
 {
 }
 
-void PlayerMgr::onDeath( Entity::Player& player )
-{
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onPlayerDeath( player );
-}
-
-void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
+void PlayerMgr::sendZoneInSetup( Sapphire::Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& housingMgr = Common::Service< HousingMgr >::ref();
@@ -336,10 +320,7 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 {
   // todo: shouldnt all this be in Player::update()?
   if( player.getHp() <= 0 && player.getStatus() != Common::ActorStatus::Dead )
-  {
     player.die();
-    onDeath( player );
-  }
 
   if( !player.isAlive() )
     return;
@@ -526,8 +507,13 @@ void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battl
                                          param1, param2, param3, param4, param5, param6, param7, param8 );
 }
 
-void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint32_t id )
+void PlayerMgr::onNpcKillCredited( const Notifications::NpcKillCredited& event )
 {
+  auto& player = event.player;
+  if( !player.hasReward( Common::UnlockEntry::HuntingLog ) )
+    return;
+
+  const auto id = event.npc.getBNpcNameId();
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
   const auto maxRank = 4;
   auto& pExdData = Common::Service< Data::ExdData >::ref();

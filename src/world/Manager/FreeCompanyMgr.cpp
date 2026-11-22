@@ -11,6 +11,7 @@
 
 #include "FreeCompany/FreeCompany.h"
 #include "FreeCompanyMgr.h"
+#include "Notifications/SessionEvents.h"
 #include "PlayerMgr.h"
 
 #include "Actor/Player.h"
@@ -240,51 +241,50 @@ void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), fcResultPacket );
 }
 
-void FreeCompanyMgr::onFcLogin( uint64_t characterId )
+void FreeCompanyMgr::onFcLogin( const Notifications::PlayerLoggedIn& event )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-  auto player = playerMgr.getPlayer( characterId );
-  if( !player )
-    return;
+  auto& player = event.player;
+  const auto characterId = player.getCharacterId();
 
-  auto fc = getPlayerFreeCompany( player->getCharacterId() );
+  auto fc = getPlayerFreeCompany( characterId );
   if( !fc )
     return;
 
-  m_onlinePlayers++;
-  auto fcResultSelf = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+  if( !m_onlineSessions.insert( &event.session ).second )
+    return;
+
+  auto fcResultSelf = makeFcResult( player, fc->getId(), m_onlineSessions.size(),
                                     FreeCompanyResultPacket::ResultType::FcLogin,
                                     0, FreeCompanyResultPacket::UpdateStatus::Execute,
                                     fc->getName(), fc->getTag() );
 
-  server.queueForPlayer( player->getCharacterId(), fcResultSelf );
+  server.queueForPlayer( characterId, fcResultSelf );
 
-  auto fcResultOthers = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+  auto fcResultOthers = makeFcResult( player, fc->getId(), m_onlineSessions.size(),
                                       FreeCompanyResultPacket::ResultType::FcLogin,
                                       0, FreeCompanyResultPacket::UpdateStatus::Member,
-                                      fc->getName(), player->getName() );
+                                      fc->getName(), player.getName() );
 
   server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
 }
 
-void FreeCompanyMgr::onFcLogout( uint64_t characterId )
+void FreeCompanyMgr::onFcLogout( const Notifications::PlayerLoggedOut& event )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-  auto player = playerMgr.getPlayer( characterId );
-  if( !player )
-    return;
+  m_onlineSessions.erase( &event.session );
 
-  auto fc = getPlayerFreeCompany( player->getCharacterId() );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& player = event.player;
+  const auto characterId = player.getCharacterId();
+
+  auto fc = getPlayerFreeCompany( characterId );
   if( !fc )
     return;
 
-  m_onlinePlayers--;
-  auto fcResultOthers = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+  auto fcResultOthers = makeFcResult( player, fc->getId(), m_onlineSessions.size(),
                                       FreeCompanyResultPacket::ResultType::FcLogout,
                                       0, FreeCompanyResultPacket::UpdateStatus::Member,
-                                      fc->getName(), player->getName() );
+                                      fc->getName(), player.getName() );
 
   server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
 }
@@ -297,14 +297,14 @@ void FreeCompanyMgr::onSignPetition( Entity::Player& source, Entity::Player& tar
     return;
 
   addMember( fc->getId(), source.getCharacterId() );
-  auto fcResultSelf = makeFcResult( source, fc->getId(), m_onlinePlayers,
+  auto fcResultSelf = makeFcResult( source, fc->getId(), m_onlineSessions.size(),
                                     FreeCompanyResultPacket::ResultType::FcCreateAccept,
                                     0, FreeCompanyResultPacket::UpdateStatus::Execute,
                                     fc->getName(), fc->getTag() );
 
   server.queueForPlayer( source.getCharacterId(), fcResultSelf );
 
-  auto fcResultOthers = makeFcResult( source, fc->getId(), m_onlinePlayers,
+  auto fcResultOthers = makeFcResult( source, fc->getId(), m_onlineSessions.size(),
                                       FreeCompanyResultPacket::ResultType::FcCreateAccept,
                                       0, FreeCompanyResultPacket::UpdateStatus::Member,
                                       fc->getName(), source.getName() );

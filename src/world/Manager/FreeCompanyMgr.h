@@ -2,9 +2,16 @@
 
 #include <memory>
 #include <map>
+#include <unordered_set>
 #include <vector>
 #include "ForwardsZone.h"
 #include "FreeCompany/FreeCompany.h"
+
+namespace Sapphire::World::Notifications
+{
+  struct PlayerLoggedIn;
+  struct PlayerLoggedOut;
+}
 
 namespace Sapphire::World::Manager
 {
@@ -21,7 +28,7 @@ namespace Sapphire::World::Manager
     std::unordered_map< uint64_t, uint64_t > m_charaIdToFcIdMap;
 
     uint64_t m_maxFcId{ 0 };
-    uint32_t m_onlinePlayers{ 0 };
+    std::unordered_set< const Session* > m_onlineSessions;
 
   public:
 
@@ -54,8 +61,8 @@ namespace Sapphire::World::Manager
     FreeCompanyPtr getFreeCompanyById( uint64_t fcId );
     FreeCompanyPtr getFreeCompanyByName( const std::string& name );
 
-    void onFcLogin( uint64_t characterId );
-    void onFcLogout( uint64_t characterId );
+    void onFcLogin( const Notifications::PlayerLoggedIn& event );
+    void onFcLogout( const Notifications::PlayerLoggedOut& event );
     void onSignPetition( Entity::Player& source, Entity::Player& target );
 
   };
