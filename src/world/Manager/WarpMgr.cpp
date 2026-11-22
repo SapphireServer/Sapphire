@@ -120,6 +120,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
         player.resetHp();
         player.resetMp();
         player.setStatus( Common::ActorStatus::Idle );
+        Network::Util::Packet::sendHudParam( player );
       }
       break;
     }

@@ -595,32 +595,31 @@ void Sapphire::InstanceContent::setState( InstanceContentState state )
   }
 }
 
-void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
+std::pair< Sapphire::Common::Vector3, float > Sapphire::InstanceContent::getEntrancePosition() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_instanceContentId );
-
   auto rect = instanceObjectCache.getEventRange( contentInfo->data().EntranceRect );
 
-  if( m_pEntranceEObj != nullptr )
+  Common::Vector3 pos{};
+  float rot = PI / 2;
+  if( rect )
   {
-    if( rect )
-      player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
-    else
-      player.setRot( PI - PI / 2 );
-    player.setPos( m_pEntranceEObj->getPos() );
+    const auto& transform = rect->header.Transformation;
+    pos = { transform.Translation.x, transform.Translation.y, transform.Translation.z };
+    rot = Util::eulerToDirection( { transform.Rotation.x, transform.Rotation.y, transform.Rotation.z } );
   }
-  else if( rect )
-  {
-    player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
-    player.setPos( { rect->header.Transformation.Translation.x, rect->header.Transformation.Translation.y, rect->header.Transformation.Translation.z } );
-  }
-  else
-  {
-    player.setRot( PI - PI / 2 );
-    player.setPos( { 0.f, 0.f, 0.f } );
-  }
+  if( m_pEntranceEObj )
+    pos = m_pEntranceEObj->getPos();
+  return { pos, rot };
+}
+
+void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
+{
+  auto [ pos, rot ] = getEntrancePosition();
+  player.setRot( rot );
+  player.setPos( pos );
 }
 
 void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )

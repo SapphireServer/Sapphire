@@ -71,7 +71,7 @@ namespace Sapphire
     enum EventHandlerOrderId : uint32_t
     {
       SheetDataReady = 0x80000000,
-      AbortContent = 0x40000001, //forceFlag
+      AbortContent = 0x80000001, //forceFlag
       LuaOnStartCutscene = 0x40000002, //returnCode
       VoteRequest = 0x40000003, //voteType
       VoteReplay = 0x40000004 //voteType, accept
@@ -220,6 +220,7 @@ namespace Sapphire
 
     std::set< uint32_t > getSpawnedPlayerIds() const;
 
+    std::pair< Common::Vector3, float > getEntrancePosition() const;
     void movePlayerToEntrance( Entity::Player& player );
 
     void setControllerEncounter( World::Encounter::EncounterPtr pEncounter );
