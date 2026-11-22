@@ -1481,14 +1481,14 @@ void BNpc::setCanSwapTarget( bool value )
   }
 }
 
-void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
+void BNpc::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  Chara::setPos( x, y, z, broadcastUpdate );
+  Chara::setPos( x, y, z, broadcastUpdate, sendPacketToSelf );
 }
 
-void BNpc::setPos( const Vector3& pos, bool broadcastUpdate )
+void BNpc::setPos( const Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate, sendPacketToSelf );
 }
 
 void BNpc::toggleNameHidden( bool hidden )

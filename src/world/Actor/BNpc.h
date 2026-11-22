@@ -150,8 +150,8 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
-    void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+    void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
     void restHp();
 

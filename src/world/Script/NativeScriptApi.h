@@ -576,6 +576,11 @@ namespace Sapphire::ScriptAPI
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!
@@ -607,6 +612,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
     }
   };
 }

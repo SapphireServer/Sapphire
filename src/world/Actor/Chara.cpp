@@ -186,15 +186,15 @@ bool Chara::isAlive() const
   return ( m_hp > 0 );
 }
 
-void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate )
+void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  GameObject::setPos( pos, broadcastUpdate );
+  GameObject::setPos( pos, broadcastUpdate, sendPacketToSelf );
   m_dirtyFlag |= DirtyFlag::Position;
 }
 
-void Chara::setPos( float x, float y, float z, bool broadcastUpdate )
+void Chara::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  GameObject::setPos( x, y, z, broadcastUpdate );
+  GameObject::setPos( x, y, z, broadcastUpdate, sendPacketToSelf );
   m_dirtyFlag |= DirtyFlag::Position;
 }
 

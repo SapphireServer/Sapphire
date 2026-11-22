@@ -280,7 +280,7 @@ bool EventObject::isCollisionEnabled() const
   return m_collisionEnabled;
 }
 
-void EventObject::setPos( float x, float y, float z, bool broadcastUpdate )
+void EventObject::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -303,7 +303,7 @@ void EventObject::setPos( float x, float y, float z, bool broadcastUpdate )
   }
 }
 
-void EventObject::setPos( const Common::Vector3& pos, bool broadcastUpdate )
+void EventObject::setPos( const Common::Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate, sendPacketToSelf );
 }

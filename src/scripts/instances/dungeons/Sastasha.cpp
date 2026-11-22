@@ -85,6 +85,10 @@ private:
   static constexpr uint32_t BOSS_DENN{ 3978771 };
   static constexpr uint32_t HP_DENN{ 1000 };
 
+  static constexpr float POPRANGE_4033741[ 4 ] = { 74.695801f, 29.641500f, -50.012428f, -0.759668f };
+  static constexpr float POPRANGE_4033745[ 4 ] = { -24.229860f, 21.561069f, 51.027889f, -0.795675f };
+  static constexpr float POPRANGE_4165184[ 4 ] = { -181.568298f, 6.235275f, 239.162201f, -0.795675f };
+
   // < groupName, vector< layoutId > >
   // todo: use this to track which trash groups need to drop eobj etc
   std::map< std::string, std::vector< uint32_t > > trashGroups;
@@ -249,6 +253,7 @@ public:
 
     pEObj = instance.addEObj( "Inconspicuousswitch", 2000216, 3653858, 3280956, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f, 0 ); 
     pEObj->setPermissionInvisibility( 1 );
+
     pEObj = instance.addEObj( "Hiddendoor", 2000217, 3653517, 3280959, 4, { 59.000000f, 32.000000f, -35.000000f }, 1.000000f, -2.007129f, 0 ); 
     pEObj->addCollisionBox( { 59.048332, 39.016666, -35.022537 }, 2.007129, 17.600000, 15.436666, 1.476608 );
     pEObj->setCollisionEnabled( true );
@@ -551,7 +556,40 @@ public:
                               }
                             } );
     }
-
+    else if( eobj.getName() == "Shortcut" )
+    {
+      if( eobj.getPermissionInvisibility() == 0 )
+      {
+        eventMgr().playScene( player, eventId, 1, HIDE_HOTBAR, { 1 }, 
+          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+          {
+              if( result.getResult( 0 ) == 0 )
+              {
+                switch( instance.getCustomVar( Variables::CurrEncounterId ) )
+                {
+                  case ENCOUNTER_RAMBADE:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4033741[ 0 ], POPRANGE_4033741[ 1 ], POPRANGE_4033741[ 2 ] }, POPRANGE_4033741[ 3 ] );
+                  }
+                  break;
+                  case ENCOUNTER_RAMBADE_2:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4033745[ 0 ], POPRANGE_4033745[ 1 ], POPRANGE_4033745[ 2 ] }, POPRANGE_4033745[ 3 ] );
+                  }
+                  break;
+                  case ENCOUNTER_DENN:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4165184[ 0 ], POPRANGE_4165184[ 1 ], POPRANGE_4165184[ 2 ] }, POPRANGE_4165184[ 3 ] );
+                  }
+                  break;
+                  default:
+                    break;
+                }
+              }
+          }
+        );
+      }
+    }
     auto pEncounter = instance.getEncounter( "Denn" );
     if( pEncounter )
     {
@@ -603,13 +641,24 @@ public:
     if( var == Variables::CurrEncounterId )
     {
       if( val == ENCOUNTER_CHOPPER )
+      {
         instance.getEncounter( "Chopper" )->init();
+      }
       else if( val == ENCOUNTER_RAMBADE )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
         instance.getEncounter( "Madison" )->init();
+      }
       else if( val == ENCOUNTER_RAMBADE_2 )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
         instance.getEncounter( "Madison2" )->init();
+      }
       else if( val == ENCOUNTER_DENN )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
         instance.getEncounter( "Denn" )->init();
+      }
     }
   }
 

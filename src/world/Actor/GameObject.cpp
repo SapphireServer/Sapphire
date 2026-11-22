@@ -77,7 +77,7 @@ const Vector3& GameObject::getPos() const
   return m_pos;
 }
 
-void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
+void GameObject::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
   m_pos.x = x;
   m_pos.y = y;
@@ -92,7 +92,7 @@ void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
 
 }
 
-void GameObject::setPos( const Vector3& pos, bool broadcastUpdate )
+void GameObject::setPos( const Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
   m_pos = pos;
 

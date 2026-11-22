@@ -69,9 +69,9 @@ namespace Sapphire::Entity
     Common::Vector3& getPos();
     const Common::Vector3& getPos() const;
 
-    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true );
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false );
 
-    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true );
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false );
 
     float getRot() const;
 

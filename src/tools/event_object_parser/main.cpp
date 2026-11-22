@@ -382,6 +382,8 @@ int main( int argc, char* argv[] )
   for( auto entry : contentList )
   {
     std::string eobjects = "    Entity::EventObjectPtr pEObj;\n\n";
+    std::string popranges = "";
+
     entryStartTime = std::chrono::system_clock::now();
     zoneName = entry.zoneName;
     try
@@ -430,6 +432,18 @@ int main( int argc, char* argv[] )
             {
               auto pGimmick = dynamic_cast< SharedGroupEntry* >( pEntry.get() );
               m_sharedGroupMap.emplace( pEntry->header.InstanceID, pGimmick );
+            }
+            else if( pEntry->getType() == eAssetType::PopRange )
+            {
+              const auto& transform = pEntry->header.Transformation;
+              const auto& pos = transform.Translation;
+              const auto& rot = transform.Rotation.y;
+
+              popranges += "  static constexpr float POPRANGE_" + std::to_string( pEntry->header.InstanceID );
+              popranges += "[4] = { ";
+              popranges += std::to_string( pos.x ) + "f, " + std::to_string( pos.y ) + "f, " + std::to_string( pos.z ) + "f, ";
+              popranges += std::to_string( rot ) + "f ";
+              popranges += "}; \n";
             }
             else if( pEntry->getType() == eAssetType::EventObject )
             {
@@ -678,6 +692,7 @@ int main( int argc, char* argv[] )
     auto result = std::regex_replace( instanceTpl, std::regex( "\\INSTANCE_NAME" ), entry.name );
     result = std::regex_replace( result, std::regex( "\\INSTANCE_ID" ), std::to_string( entry.id ) );
     result = std::regex_replace( result, std::regex( "\\EOBJ_INIT" ), eobjects );
+    result = std::regex_replace( result, std::regex( "\\POPRANGE" ), popranges );
 
     if( entry.type == 7 )
     {

@@ -235,9 +235,9 @@ namespace Sapphire::Entity
 
     bool isAlive() const;
 
-    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
-    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
     virtual void setRot( float rot ) override;
 

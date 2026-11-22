@@ -803,6 +803,10 @@ namespace Sapphire::Entity
 
     const Common::CharaLandData& getCharaLandData( Common::LandFlagsSlot slot ) const;
 
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+
+    void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+
   private:
     using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 

@@ -1752,3 +1752,21 @@ const CharaLandData& Entity::Player::getCharaLandData( Common::LandFlagsSlot slo
 {
   return m_charaLandData[ slot ];
 }
+
+void Entity::Player::setPos( const Common::Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate, sendPacketToSelf );
+}
+
+void Entity::Player::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
+{
+  Chara::setPos( x, y, z, broadcastUpdate );
+
+  auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( getId() );
+  setActorPosPacket->data().x = x;
+  setActorPosPacket->data().y = y;
+  setActorPosPacket->data().z = z;
+  setActorPosPacket->data().Dir = getRotUInt16();
+
+  server().queueForPlayers( getInRangePlayerIds( sendPacketToSelf ), setActorPosPacket );
+}
