@@ -41,7 +41,7 @@ void MoveTerritoryTask::execute()
   if( !pPlayer )
     return;
 
-  pPlayer->setTargetId( 0 );
+  pPlayer->setTargetId( Common::INVALID_GAME_OBJECT_ID64 );
   pPlayer->setStance( Common::Stance::Passive );
   pPlayer->setAutoattack( false );
 

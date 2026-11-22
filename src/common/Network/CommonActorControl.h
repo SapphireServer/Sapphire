@@ -81,6 +81,8 @@ namespace Sapphire::Network::ActorControl
     SetTarget = 0x32,
     ToggleNameHidden = 0x36, // header(playerId, srcId), param0 == 0 ? hidden : visible
 
+    SetSubTarget = 0x3A,
+
     LimitbreakStart = 0x47,
     LimitbreakPartyStart = 0x48,
     BubbleText = 0x49, // param0 index into Balloon exd sheet
@@ -496,6 +498,7 @@ namespace Sapphire::Network::ActorControl
       DRAWN_SWORD = 0x1,
       AUTO_ATTACK = 0x2,
       TARGET_DECIDE = 0x3,
+      TARGET_ANCHOR = 0x4,
       REQUEST_ACTION = 0x64,
       CANCEL_MOUNT = 0x65,
       COMPANION = 0x66,

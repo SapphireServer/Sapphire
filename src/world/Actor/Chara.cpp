@@ -351,8 +351,13 @@ Set and propagate the actor stance to in range players
 */
 void Chara::setStance( Stance stance )
 {
+  setStance( stance, 1 );
+}
+
+void Chara::setStance( Stance stance, uint32_t animation )
+{
   m_currentStance = stance;
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, stance, 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, stance, animation );
 }
 
 /*!

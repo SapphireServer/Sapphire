@@ -18,8 +18,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
                               uint32_t param2 = 0,
                               uint32_t param3 = 0,
                               uint32_t param4 = 0,
-                              uint64_t targetId = 0,
-                              uint32_t padding1 = 0 ) :
+                              uint64_t targetId = 0 ) :
       ZoneChannelPacket< FFXIVIpcActorControlTarget >( actorId, actorId )
     {
       initialize( category, param1, param2, param3, param4, targetId );

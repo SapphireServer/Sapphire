@@ -57,7 +57,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ClassJob = 0;
 
       m_data.ContentId = bnpc.getDirectorId();
-      m_data.MainTarget = bnpc.getTargetId();
+      m_data.MainTarget = bnpc.getTargetObjectId();
       // no idea ... m_data.spawnerId = Common::INVALID_GAME_OBJECT_ID64;
       m_data.ParentId = Common::INVALID_GAME_OBJECT_ID;
       m_data.TriggerId = bnpc.getTriggerOwnerId();
@@ -105,7 +105,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       //m_data.currentMount = bnpc.getCurrentMount();
       //m_data.persistentEmote = bnpc.getPersistentEmote();
 
-      m_data.MainTarget = static_cast< uint64_t >( bnpc.getTargetId() );
+      m_data.MainTarget = bnpc.getTargetObjectId();
 
       uint64_t currentTimeMs = Common::Util::getTimeMs();
 
