@@ -42,7 +42,7 @@ namespace Sapphire::Entity
     std::set< PlayerPtr > m_inRangePlayers;
     std::set< BNpcPtr > m_inRangeBNpc;
 
-    uint32_t m_targetId{ Common::INVALID_GAME_OBJECT_ID };
+    uint64_t m_targetId{ Common::INVALID_GAME_OBJECT_ID64 };
 
     /*! Parent cell in the zone */
     Common::CellId m_cellId;
@@ -166,9 +166,10 @@ namespace Sapphire::Entity
     void setFollowTargetId( uint32_t id );
     void resetFollowTargetId();
 
-    void setTargetId( uint32_t targetId );
+    void setTargetId( uint64_t targetId );
 
     uint32_t getTargetId() const;
+    uint64_t getTargetObjectId() const;
 
     // actrl ToggleNameHidden uses 0=hidden, 1=visible
     virtual void toggleNameHidden( bool hidden );

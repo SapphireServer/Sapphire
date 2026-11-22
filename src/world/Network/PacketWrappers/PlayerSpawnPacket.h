@@ -136,7 +136,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
      // m_data.currentMount = player.getCurrentMount();
 
-      m_data.MainTarget = player.getTargetId();
+      m_data.MainTarget = player.getTargetObjectId();
       //m_data.type = 1;
       //m_data.unknown_33 = 4;
       //m_data.unknown_38 = 0x70;

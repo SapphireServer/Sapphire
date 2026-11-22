@@ -46,6 +46,8 @@ const char* packetCommandToString( uint16_t commandId )
       return "DRAWN_SWORD";
     case TARGET_DECIDE:
       return "TARGET_DECIDE";
+    case TARGET_ANCHOR:
+      return "TARGET_ANCHOR";
     case REQUEST_ACTION:
       return "REQUEST_ACTION";
     case CANCEL_MOUNT:
@@ -400,7 +402,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   const auto& data = packet.data();
 
-  const auto arg0arg1 = *reinterpret_cast< const uint64_t* >( &packet.data().Arg0 );
+  const uint64_t arg0arg1 = ( static_cast< uint64_t >( data.Arg1 ) << 32 ) | data.Arg0;
 
   Logger::debug( "\t\t {8} | {1:X} ( p1:{2:X} p11:{3:X} p12:{4:X} p2:{5:X} p3:{6:X} p4:{7:X} )",
                  m_pSession->getId(), data.Id, arg0arg1, data.Arg0, data.Arg1, data.Arg2, data.Target, data.Arg3, packetCommandToString( data.Id ) );
@@ -433,12 +435,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::TARGET_DECIDE: // Change target
     {
-      uint64_t targetId = arg0arg1;
-
-      if( targetId == player.getTargetId() || targetId == Common::INVALID_GAME_OBJECT_ID )
-        targetId = 0;
-
-      player.changeTarget( targetId );
+      player.changeTarget( arg0arg1 );
+      break;
+    }
+    case PacketCommand::TARGET_ANCHOR:
+    {
+      Network::Util::Packet::sendActorControlTarget( player.getInRangePlayerIds(), player.getId(), SetSubTarget, 0, 0, 0, 0, data.Target );
       break;
     }
     case PacketCommand::CANCEL_MOUNT:
@@ -504,7 +506,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::EMOTE: // emote
     {
-      uint64_t targetId = player.getTargetId();
+      const uint64_t targetId = player.getTargetObjectId();
       uint32_t emoteId = data.Arg0;
       bool isSilent = data.Arg2 == 1;
 

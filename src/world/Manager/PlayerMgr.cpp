@@ -362,7 +362,7 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
 {
   auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
-  if( !mainWeap || player.hasAction() || !player.isAutoattackOn() || !player.getTargetId() || player.getStance() != Common::Active )
+  if( !mainWeap || player.hasAction() || !player.isAutoattackOn() || player.getTargetId() == Common::INVALID_GAME_OBJECT_ID || player.getStance() != Common::Active )
     return;
 
   for( const auto& actor : player.getInRangeActors() )
@@ -514,7 +514,7 @@ void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
 
 void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,

@@ -448,10 +448,15 @@ void GameObject::resetFollowTargetId()
 
 uint32_t GameObject::getTargetId() const
 {
+  return m_targetId >> 32 ? Common::INVALID_GAME_OBJECT_ID : static_cast< uint32_t >( m_targetId );
+}
+
+uint64_t GameObject::getTargetObjectId() const
+{
   return m_targetId;
 }
 
-void GameObject::setTargetId( uint32_t targetId )
+void GameObject::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
 }
