@@ -7,18 +7,18 @@
 
 #include "Network/GameConnection.h"
 #include "Actor/Player.h"
+#include "Notifications/SessionEvents.h"
 #include "WorldServer.h"
 #include "Manager/PlayerMgr.h"
-#include "Manager/FreeCompanyMgr.h"
-#include "Manager/PartyMgr.h"
 
 #include "Session.h"
 
 using namespace Sapphire::World::Manager;
 namespace fs = std::filesystem;
 
-Sapphire::World::Session::Session( uint32_t entityId ) :
+Sapphire::World::Session::Session( uint32_t entityId, const Notifications::SessionEvents& events ) :
   m_entityId( entityId ),
+  m_events( events ),
   m_lastDataTime( Common::Util::getTimeSeconds() ),
   m_lastSqlTime( Common::Util::getTimeSeconds() ),
   m_isValid( false ),
@@ -69,8 +69,22 @@ bool Sapphire::World::Session::loadPlayer()
   return true;
 }
 
+void Sapphire::World::Session::notifyLogin()
+{
+  if( m_lifecycle != Lifecycle::AwaitingLogin || !m_pPlayer )
+    return;
+
+  m_lifecycle = Lifecycle::LoggedIn;
+  m_events.loggedIn.publish( { *m_pPlayer, *this } );
+}
+
 void Sapphire::World::Session::close()
 {
+  if( m_lifecycle == Lifecycle::Closed )
+    return;
+
+  m_lifecycle = Lifecycle::Closed;
+
   if( m_pZoneConnection )
     m_pZoneConnection->disconnect();
 
@@ -80,12 +94,7 @@ void Sapphire::World::Session::close()
   // remove the session from the player
   if( m_pPlayer )
   {
-    auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-    auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
-    auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-    playerMgr.onLogout( *m_pPlayer );
-    fcMgr.onFcLogout( m_pPlayer->getCharacterId() );
-    partyMgr.onMemberDisconnect( *m_pPlayer );
+    m_events.loggedOut.publish( { *m_pPlayer, *this } );
     m_pPlayer->unload();
   }
 }

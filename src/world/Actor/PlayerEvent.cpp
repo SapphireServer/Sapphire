@@ -8,7 +8,7 @@
 #include "Territory/Territory.h"
 
 #include "Action/EventAction.h"
-#include "Manager/PlayerMgr.h"
+#include "WorldServer.h"
 #include "Service.h"
 #include <Network/Util/PacketUtil.h>
 
@@ -56,7 +56,7 @@ void Player::removeEvent( uint32_t eventId )
 
 void Player::onDeath()
 {
-  Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
+  Service< World::WorldServer >::ref().playerEvents().died.publish( { *this } );
 }
 
 // TODO: slightly ugly here and way too static. Needs too be done properly

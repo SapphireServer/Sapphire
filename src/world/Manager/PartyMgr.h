@@ -7,6 +7,8 @@
 #include <set>
 #include <unordered_map>
 
+#include "Notifications/Forwards.h"
+
 namespace Sapphire::World::Manager
 {
   enum UpdateStatus : int32_t
@@ -52,7 +54,7 @@ namespace Sapphire::World::Manager
 
     void onLeave( Entity::Player& leavingPlayer );
 
-    void onMoveZone( Entity::Player& movingPlayer );
+    void onMoveZone( const Notifications::PlayerTerritoryChanged& event );
 
     void onDisband( Entity::Player& disbandingPlayer );
 
@@ -60,7 +62,7 @@ namespace Sapphire::World::Manager
 
     void onChangeLeader( Entity::Player& newLeader, Entity::Player& oldLeader );
 
-    void onMemberDisconnect( Entity::Player& disconnectingPlayer );
+    void onMemberDisconnect( const Notifications::PlayerLoggedOut& event );
 
     void onMemberRejoin( Entity::Player& joiningPlayer );
 

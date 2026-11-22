@@ -3,6 +3,7 @@
 #include "ForwardsZone.h"
 #include <spdlog/fmt/fmt.h>
 #include "MgrUtil.h"
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {
@@ -26,16 +27,14 @@ namespace Sapphire::World::Manager
     bool loadPlayers();
     Entity::PlayerPtr syncPlayer( uint64_t characterId );
 
-    void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );
 
     void onSkillProc( Entity::Player& player, uint8_t index );
 
     void sendLoginMessage( Sapphire::Entity::Player& player );
 
-    void onLogin( Sapphire::Entity::Player& player );
-    void onLogout( Sapphire::Entity::Player& player );
-    void onDeath( Sapphire::Entity::Player& player );
-    void onMoveZone( Sapphire::Entity::Player& player );
+    void onLogin( const Notifications::PlayerLoggedIn& event );
+    void onLogout( const Notifications::PlayerLoggedOut& event );
+    void sendZoneInSetup( Sapphire::Entity::Player& player );
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
 
@@ -43,7 +42,7 @@ namespace Sapphire::World::Manager
 
     void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
 
-    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint32_t id );
+    void onNpcKillCredited( const Notifications::NpcKillCredited& event );
 
     void onExitInstance( Sapphire::Entity::Player& player );
 

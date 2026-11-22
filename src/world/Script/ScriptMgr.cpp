@@ -36,23 +36,34 @@ using namespace Sapphire::World::Manager;
 namespace fs = std::filesystem;
 
 Sapphire::Scripting::ScriptMgr::ScriptMgr() :
+  ScriptMgr( createNativeScriptMgr( Common::Service< World::WorldServer >::ref().getConfig().scripts.cachePath ) )
+{
+}
+
+Sapphire::Scripting::ScriptMgr::ScriptMgr( std::shared_ptr< NativeScriptMgr > nativeScriptMgr ) :
+  m_nativeScriptMgr( std::move( nativeScriptMgr ) ),
   m_firstScriptChangeNotificiation( false )
 {
-  // Get cache path from WorldServer config in the EXE and pass it explicitly
-  auto& server = Common::Service< World::WorldServer >::ref();
-  m_nativeScriptMgr = createNativeScriptMgr( server.getConfig().scripts.cachePath );
 }
 
 Sapphire::Scripting::ScriptMgr::~ScriptMgr()
 {
-  // Ensure watchers are cleared; scripts are ideally unloaded via shutdown() called by WorldServer
+  stopWatchingDirectories();
+}
+
+void Sapphire::Scripting::ScriptMgr::stopWatchingDirectories()
+{
+  if( !m_watchingDirectories )
+    return;
+
   Watchdog::unwatchAll();
+  m_watchingDirectories = false;
 }
 
 void Sapphire::Scripting::ScriptMgr::shutdown()
 {
   // Stop watching for changes and unload scripts
-  Watchdog::unwatchAll();
+  stopWatchingDirectories();
   if( m_nativeScriptMgr )
   {
     m_nativeScriptMgr->unloadAll();
@@ -135,6 +146,7 @@ void Sapphire::Scripting::ScriptMgr::watchDirectories()
                            }
                          }
                        } );
+  m_watchingDirectories = true;
 }
 
 bool Sapphire::Scripting::ScriptMgr::loadDir( const std::string& dirname, std::set< std::string >& files,
@@ -555,8 +567,10 @@ void Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& play
   }
 }
 
-bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, Entity::BNpc& bnpc )
+void Sapphire::Scripting::ScriptMgr::onBNpcKill( const World::Notifications::NpcKillCredited& event )
 {
+  auto& player = event.player;
+  auto& bnpc = event.npc;
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   // loop through all active quests and try to call available onBNpcKill callbacks
@@ -582,13 +596,11 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, Entity:
         player.updateQuest( quest );
     }
   }
-
-  return true;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onPlayerDeath( Entity::Player& player )
+void Sapphire::Scripting::ScriptMgr::onPlayerDeath( const World::Notifications::PlayerDied& event )
 {
-  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto& player = event.player;
 
   // loop through all active quests and try to call available onPlayerDeath callbacks
   for( size_t i = 0; i < 30; i++ )
@@ -602,9 +614,7 @@ bool Sapphire::Scripting::ScriptMgr::onPlayerDeath( Entity::Player& player )
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
-      std::string objName = eventMgr.getEventName( questId );
-
-      PlayerMgr::sendDebug( player, "Calling: {0}.onPlayerDeath name: {1}", objName, player.getName() );
+      PlayerMgr::sendDebug( player, "Calling quest {0}.onPlayerDeath for {1}", questId, player.getName() );
 
       World::Quest preQ = quest;
       script->onPlayerDeath( quest, player );
@@ -612,8 +622,6 @@ bool Sapphire::Scripting::ScriptMgr::onPlayerDeath( Entity::Player& player )
         player.updateQuest( quest );
     }
   }
-
-  return true;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )

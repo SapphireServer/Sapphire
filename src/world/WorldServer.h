@@ -8,6 +8,8 @@
 #include <set>
 #include <thread>
 #include "ForwardsZone.h"
+#include "Notifications/PlayerEvents.h"
+#include "Notifications/SessionEvents.h"
 #include <Config/ConfigDef.h>
 
 namespace Sapphire
@@ -50,6 +52,8 @@ namespace Sapphire::World
     void update( uint64_t tickCount );
 
     void shutdown();
+
+    const Notifications::PlayerEvents& playerEvents() const { return m_playerEvents; }
 
     bool isRunning() const;
 
@@ -98,6 +102,9 @@ namespace Sapphire::World
     std::shared_ptr< Sapphire::Network::Hive > m_hive;
 
     Sapphire::Common::Config::WorldConfig m_config;
+
+    Notifications::SessionEvents m_sessionEvents;
+    Notifications::PlayerEvents m_playerEvents;
 
     std::map< uint32_t, SessionPtr > m_sessionMapById;
     std::map< uint64_t, SessionPtr > m_sessionMapByCharacterId;

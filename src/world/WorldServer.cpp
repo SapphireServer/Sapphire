@@ -65,6 +65,18 @@
 using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
 
+namespace
+{
+  template< typename Event, typename Manager >
+  void subscribeManager( Notifications::EventSignal< Event >& signal, void ( Manager::*handler )( const Event& ) )
+  {
+    signal.subscribe( [handler]( const Event& event )
+    {
+      ( Sapphire::Common::Service< Manager >::ref().*handler )( event );
+    } );
+  }
+}
+
 WorldServer::WorldServer( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
@@ -72,6 +84,17 @@ WorldServer::WorldServer( const std::string& configName ) :
   m_worldId( 67 ),
   m_port( 0 )
 {
+  subscribeManager( m_sessionEvents.loggedIn, &PlayerMgr::onLogin );
+  subscribeManager( m_sessionEvents.loggedIn, &FreeCompanyMgr::onFcLogin );
+
+  subscribeManager( m_sessionEvents.loggedOut, &PlayerMgr::onLogout );
+  subscribeManager( m_sessionEvents.loggedOut, &FreeCompanyMgr::onFcLogout );
+  subscribeManager( m_sessionEvents.loggedOut, &PartyMgr::onMemberDisconnect );
+
+  subscribeManager( m_playerEvents.died, &Sapphire::Scripting::ScriptMgr::onPlayerDeath );
+  subscribeManager( m_playerEvents.npcKillCredited, &Sapphire::Scripting::ScriptMgr::onBNpcKill );
+  subscribeManager( m_playerEvents.npcKillCredited, &PlayerMgr::onNpcKillCredited );
+  subscribeManager( m_playerEvents.territoryChanged, &PartyMgr::onMoveZone );
 }
 
 std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()
@@ -596,7 +619,7 @@ bool WorldServer::createSession( uint32_t sessionId )
 
   Logger::info( "[{0}] Creating new session", sessionIdStr );
 
-  auto newSession = std::make_shared< Session >( sessionId );
+  auto newSession = std::make_shared< Session >( sessionId, m_sessionEvents );
   if( !newSession->loadPlayer() )
   {
     Logger::error( "[{0}] Error loading player {0}", sessionIdStr );

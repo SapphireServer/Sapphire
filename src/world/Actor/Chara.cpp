@@ -303,7 +303,7 @@ void Chara::die()
   auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  if( auto pInstance = pTeri->getAsInstanceContent() )
+  if( auto pInstance = pTeri ? pTeri->getAsInstanceContent() : nullptr )
   {
     auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
     scriptMgr.onInstanceActorDeath( *pInstance, *this );

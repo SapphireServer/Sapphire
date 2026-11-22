@@ -284,7 +284,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   {
     player.resetDiscovery();
     player.setIsLogin( true );
-    playerMgr.onMoveZone( player );
+    playerMgr.sendZoneInSetup( player );
   }
   else if( subCommand == "classjob" )
   {
@@ -572,7 +572,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     player.fillRewardFlags();
 
     player.setIsLogin( true );
-    playerMgr.onMoveZone( player );
+    playerMgr.sendZoneInSetup( player );
   }
   else if( subCommand == "effect" )
   {

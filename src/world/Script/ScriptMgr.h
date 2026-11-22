@@ -7,6 +7,7 @@
 
 #include <Common.h>
 #include <ForwardsCommon.h>
+#include "Notifications/Forwards.h"
 #include "Territory/InstanceContent.h"
 
 namespace Sapphire::Scripting
@@ -26,9 +27,14 @@ namespace Sapphire::Scripting
      * Because reasons, it likes to emit an initial notification with all the files that match the filter, we don't want that so we ignore it.
      */
     bool m_firstScriptChangeNotificiation;
+    bool m_watchingDirectories{ false };
+
+    void stopWatchingDirectories();
 
   public:
     ScriptMgr();
+
+    explicit ScriptMgr( std::shared_ptr< NativeScriptMgr > nativeScriptMgr );
 
     ~ScriptMgr();
 
@@ -77,9 +83,9 @@ namespace Sapphire::Scripting
     bool onEventGroundItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId,
                             Common::Vector3 pos );
 
-    bool onBNpcKill( Entity::Player& player, Entity::BNpc& bnpc );
+    void onBNpcKill( const World::Notifications::NpcKillCredited& event );
 
-    bool onPlayerDeath( Entity::Player& player );
+    void onPlayerDeath( const World::Notifications::PlayerDied& event );
 
     void onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc );
 

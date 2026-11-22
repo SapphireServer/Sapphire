@@ -4,13 +4,14 @@
 #include <memory>
 
 #include "ForwardsZone.h"
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World
 {
   class Session : public std::enable_shared_from_this< Session >
   {
   public:
-    Session( uint32_t entityId );
+    Session( uint32_t entityId, const Notifications::SessionEvents& events );
 
     ~Session() = default;
 
@@ -37,6 +38,8 @@ namespace Sapphire::World
     void processReplay();
 
     void sendReplayInfo();
+
+    void notifyLogin();
 
     void close();
 
@@ -65,7 +68,16 @@ namespace Sapphire::World
     uint32_t getLastPing() const;
 
   private:
+    enum class Lifecycle
+    {
+      AwaitingLogin,
+      LoggedIn,
+      Closed
+    };
+
     uint32_t m_entityId;
+    const Notifications::SessionEvents& m_events;
+    Lifecycle m_lifecycle{ Lifecycle::AwaitingLogin };
 
     Entity::PlayerPtr m_pPlayer;
 
