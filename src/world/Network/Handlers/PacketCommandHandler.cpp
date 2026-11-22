@@ -411,14 +411,10 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
   {
     case PacketCommand::DRAWN_SWORD:  // Toggle sheathe
     {
-      if( data.Arg0 == 1 )
-        player.setStance( Stance::Active );
-      else
-      {
-        player.setStance( Stance::Passive );
+      player.setStance( data.Arg0 == 1 ? Stance::Active : Stance::Passive, data.Arg1 );
+      if( data.Arg0 != 1 )
         player.setAutoattack( false );
-      }
-      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player.getId(), ToggleWeapon, data.Arg0, 1 );
+      Network::Util::Packet::sendActorControl( player, player.getId(), ToggleWeapon, data.Arg0, data.Arg1 );
       break;
     }
     case PacketCommand::AUTO_ATTACK:  // Toggle auto-attack
@@ -431,7 +427,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       else
         player.setAutoattack( false );
 
-      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player.getId(), AutoAttack, data.Arg0, 1 );
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), AutoAttack, data.Arg0, 1 );
 
       break;
     }

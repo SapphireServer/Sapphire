@@ -196,6 +196,7 @@ namespace Sapphire::Entity
     Common::Stance getStance() const;
 
     void setStance( Common::Stance stance );
+    void setStance( Common::Stance stance, uint32_t animation );
 
     const ActorStatsArray& getStats() const;
 
