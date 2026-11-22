@@ -201,8 +201,7 @@ namespace Sapphire::Entity
     /*! returns the level of the currently active class / job */
     uint8_t getLevel() const override;
 
-    /*! returns the level sync of current active class / job */
-    uint8_t getLevelSync() const;
+    void setLevelSync( uint8_t level );
 
     /*! returns the level of the provided class / job */
     uint8_t getLevelForClass( Common::ClassJob classJobId ) const;

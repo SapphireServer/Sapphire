@@ -418,6 +418,17 @@ void Chara::changeTarget( uint64_t targetId )
 /*!
 Dummy function \return 0
 */
+uint8_t Chara::getLevelSync() const
+{
+  return m_levelSync;
+}
+
+uint8_t Chara::getEffectiveLevel() const
+{
+  auto level = getLevel();
+  return m_levelSync ? std::min( level, m_levelSync ) : level;
+}
+
 uint8_t Chara::getLevel() const
 {
   return 0;

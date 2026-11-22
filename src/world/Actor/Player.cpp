@@ -316,7 +316,7 @@ void Player::calculateStats()
   calculateBonusStats();
 
   uint8_t tribe = getLookAt( Common::CharaLook::Tribe );
-  uint8_t level = getLevel();
+  uint8_t level = getEffectiveLevel();
   auto job = static_cast< uint8_t >( getClass() );
   auto deity = getGuardianDeity();
 
@@ -585,10 +585,9 @@ uint8_t Player::getLevel() const
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
-uint8_t Player::getLevelSync() const
+void Player::setLevelSync( uint8_t level )
 {
-  // TODO: implement levelSync
-  return getLevel();
+  m_levelSync = level;
 }
 
 uint8_t Player::getLevelForClass( Common::ClassJob classJobId ) const

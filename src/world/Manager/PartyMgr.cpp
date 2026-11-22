@@ -368,7 +368,7 @@ void PartyMgr::sendPartyUpdate( Party& party )
     memberEntry.Mp = member->getMp();
     memberEntry.MpMax = member->getMaxMp();
     memberEntry.ClassJob = static_cast< uint8_t >( member->getClass() );
-    memberEntry.Lv = member->getLevel();
+    memberEntry.Lv = member->getEffectiveLevel();
     memberEntry.ObjType = 4; // 1 PC, 2 Buddy ??
     memberEntry.TerritoryType = member->getTerritoryTypeId();
     memberEntry.Valid = 1;

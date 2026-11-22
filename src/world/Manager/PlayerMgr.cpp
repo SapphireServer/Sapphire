@@ -5,6 +5,7 @@
 #include <Exd/ExdData.h>
 #include <Util/Util.h>
 #include <Territory/Land.h>
+#include <Territory/InstanceContent.h>
 
 #include <Manager/AchievementMgr.h>
 #include <Manager/TerritoryMgr.h>
@@ -283,6 +284,14 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
     return;
   }
   auto& teri = *pZone;
+  auto instance = teri.getAsInstanceContent();
+  uint8_t levelSync = instance ? instance->getInstanceConfiguration()->data().LevelMax : 0;
+  bool updateLevelSync = levelSync || player.getLevelSync();
+  if( levelSync != player.getLevelSync() )
+  {
+    player.setLevelSync( levelSync );
+    player.calculateStats();
+  }
 
   Network::Util::Packet::sendLogin( player );
 
@@ -329,6 +338,12 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
   }
 
   teri.onPlayerZoneIn( player );
+  if( updateLevelSync )
+  {
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetLevelSync, levelSync, player.getId() );
+    Network::Util::Packet::sendStatusUpdate( player );
+    Network::Util::Packet::sendHudParam( player );
+  }
 
 }
 
