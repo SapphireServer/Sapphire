@@ -51,35 +51,7 @@ uint8_t Sapphire::Event::Director::getSequence() const
 
 void Sapphire::Event::Director::sendEventLogMessage( Sapphire::Entity::Player& player, Sapphire::InstanceContent& instance, uint32_t msgId, std::initializer_list< uint32_t > args ) const
 {
-  FFXIVPacketBasePtr packet = nullptr;
-
-  assert( args.size() <= 32 );
-
-  if( args.size() == 0 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessageHeader >( player, instance.getDirectorId(), msgId ) );
-  }
-  else if( args.size() <= 2 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessage2 >( player, instance.getDirectorId(), msgId, args ) );
-  }
-  else if( args.size() <= 4 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessage4 >( player, instance.getDirectorId(), msgId, args ) );
-  }
-  else if( args.size() <= 8 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessage8 >( player, instance.getDirectorId(), msgId, args ) );
-  }
-  else if( args.size() <= 16 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessage16 >( player, instance.getDirectorId(), msgId, args ) );
-  }
-  else if( args.size() <= 32 )
-  {
-    packet = std::move( std::make_shared< class EventLogMessage32 >( player, instance.getDirectorId(), msgId, args ) );
-  }
-
+  auto packet = makeEventLogMessage( player.getId(), instance.getDirectorId(), msgId, args );
   instance.queuePacketForZone( player, packet, true );
 }
 

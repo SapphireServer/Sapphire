@@ -1341,7 +1341,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t eventId;
     uint16_t scene;
     uint16_t padding;
-    uint32_t sceneFlags;
+    uint64_t sceneFlags;
     uint8_t paramCount;
     uint8_t padding2[3];
     uint32_t params[ArgCount];
@@ -1643,6 +1643,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t guildOrderAttainFlag[10];
     uint8_t bossBattleAttainFlag[6];
     uint8_t colosseumAttainFlag[2];
+    uint8_t frontlineAttainFlag[2];
+    uint8_t padding[6];
   };
 
   /**
@@ -1696,7 +1698,8 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint32_t directorId;
     uint8_t sequence;
     uint8_t flags;
-    uint8_t vars[10];
+    uint8_t vars[12];
+    uint8_t padding[6];
   };
 
 
@@ -1936,7 +1939,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint32_t ModelEquips[3];
   };
 
-  struct FFXIVIpcCreateObject : FFXIVIpcBasePacket< CreateObject >
+  struct alignas( 8 ) FFXIVIpcCreateObject : FFXIVIpcBasePacket< CreateObject >
   {
     uint8_t Index;
     uint8_t Kind;
@@ -1959,7 +1962,8 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     Common::Vector3 Pos;
   };
 
-  struct FFXIVIpcDeleteObject : FFXIVIpcBasePacket< DeleteObject >
+
+  struct alignas( 8 ) FFXIVIpcDeleteObject : FFXIVIpcBasePacket< DeleteObject >
   {
     uint8_t Index;
   };
