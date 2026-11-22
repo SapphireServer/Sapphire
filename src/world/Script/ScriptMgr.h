@@ -7,13 +7,8 @@
 
 #include <Common.h>
 #include <ForwardsCommon.h>
+#include "Notifications/Forwards.h"
 #include "Territory/InstanceContent.h"
-
-namespace Sapphire::World::Notifications
-{
-  struct NpcKillCredited;
-  struct PlayerDied;
-}
 
 namespace Sapphire::Scripting
 {

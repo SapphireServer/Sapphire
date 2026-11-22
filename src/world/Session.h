@@ -4,14 +4,10 @@
 #include <memory>
 
 #include "ForwardsZone.h"
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World
 {
-  namespace Notifications
-  {
-    struct SessionEvents;
-  }
-
   class Session : public std::enable_shared_from_this< Session >
   {
   public:

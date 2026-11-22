@@ -6,12 +6,7 @@
 #include <vector>
 #include "ForwardsZone.h"
 #include "FreeCompany/FreeCompany.h"
-
-namespace Sapphire::World::Notifications
-{
-  struct PlayerLoggedIn;
-  struct PlayerLoggedOut;
-}
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {

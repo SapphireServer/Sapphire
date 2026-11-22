@@ -3,13 +3,7 @@
 #include "ForwardsZone.h"
 #include <spdlog/fmt/fmt.h>
 #include "MgrUtil.h"
-
-namespace Sapphire::World::Notifications
-{
-  struct NpcKillCredited;
-  struct PlayerLoggedIn;
-  struct PlayerLoggedOut;
-}
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {

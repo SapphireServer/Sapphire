@@ -7,11 +7,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace Sapphire::World::Notifications
-{
-  struct PlayerLoggedOut;
-  struct PlayerTerritoryChanged;
-}
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {
