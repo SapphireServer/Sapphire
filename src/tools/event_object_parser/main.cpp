@@ -413,7 +413,22 @@ int main( int argc, char* argv[] )
       LGB_FILE planeventLgb( &planeventData[ 0 ], "planevent" );
       //LGB_FILE planerLgb( &plannerData[ 0 ], "planner" );
 
+      std::unique_ptr< xiv::dat::File > vfxFile;
       std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb, planeventLgb };
+      const auto vfxPath = zonePath + "/level/vfx.lgb";
+      try
+      {
+        if( g_gameData->doesFileExist( vfxPath ) )
+        {
+          vfxFile = g_gameData->getFile( vfxPath );
+          const LGB_FILE::AssetTypeFilter sharedGroups = []( eAssetType type ) { return type == eAssetType::SharedGroup; };
+          lgbList.emplace_back( vfxFile->access_data_sections().at( 0 ).data(), "vfx", &sharedGroups );
+        }
+      }
+      catch( const std::exception& e )
+      {
+        Logger::warn( "Unable to load {}: {}", vfxPath, e.what() );
+      }
 
       uint32_t totalGroups = 0;
       uint32_t totalGroupEntries = 0;
