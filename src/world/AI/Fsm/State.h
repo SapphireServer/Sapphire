@@ -17,7 +17,7 @@ namespace Sapphire::World::AI::Fsm
   {
   public:
     State() :
-      m_lastTick( Common::Util::getTimeMs() )
+      m_lastTick( 0 )
     {
 
     }

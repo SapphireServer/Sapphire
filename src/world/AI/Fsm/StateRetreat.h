@@ -16,5 +16,7 @@ namespace Sapphire::World::AI::Fsm
     void onEnter( Entity::GameObjectPtr& pEntity );
     void onExit( Entity::GameObjectPtr& pEntity );
 
+  private:
+    uint64_t m_lastHeal{ 0 };
   };
 }

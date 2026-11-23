@@ -12,14 +12,13 @@ using namespace Sapphire::World;
 void AI::Fsm::StateRetreat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t tickCount )
 {
   auto elapsed = tickCount - m_lastTick;
-
-  if( elapsed < 2500 )
-    return;
+  auto elapsedHeal = tickCount - m_lastHeal;
 
   if( auto pBNpc = pEntity->getAsBNpc() )
   {
     auto& bnpc = *pBNpc;
 
+    // we call moveTo on tick to sync the position from navmesh agent
     if( bnpc.moveTo( bnpc.getSpawnPos() ) )
     {
       bnpc.setRoamTargetReached( true );
@@ -34,8 +33,12 @@ void AI::Fsm::StateRetreat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t t
                        Controller::Controller::IgnoreActorCollision );
       }
     }
-    if( bnpc.getHpPercent() < 100 )
+
+    if( elapsedHeal >= 2500 && bnpc.getHpPercent() < 100 )
+    {
       bnpc.heal( bnpc.getMaxHp() / 10.f );
+      m_lastHeal = tickCount;
+    }
   }
   m_lastTick = tickCount;
 }
@@ -53,8 +56,20 @@ void AI::Fsm::StateRetreat::onEnter( Entity::GameObjectPtr& pEntity )
     bnpc.setRoamTargetReached( false );
     bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityIgnoreDamage );
 
+    bnpc.setState( Entity::BNpcState::Retreat );
+
     if( pNaviProvider )
-      pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getSpawnPos() );
+    {
+      auto& path = bnpc.getController()->getPath();
+      path.m_type = Controller::Controller::PathType::FixedPos;
+      path.m_targetPos = bnpc.getSpawnPos();
+      path.m_flags = static_cast< Controller::Controller::PathFlags >( Controller::Controller::PathFlags::IgnoreActorCollision | Controller::Controller::PathFlags::IgnoreObstacles );
+      path.m_targetReachedDist = 0.5f;
+
+      pNaviProvider->setMoveTarget( bnpc.getAgentId(), path.m_targetPos );
+
+      bnpc.moveTo( path.m_targetPos );
+    }
   }
 }
 
@@ -68,6 +83,9 @@ void AI::Fsm::StateRetreat::onExit( Entity::GameObjectPtr& pEntity )
     bnpc.setRoamTargetReached( false );
     bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityNone );
     bnpc.setRot( bnpc.getSpawnRot() );
+
+    bnpc.setState( Entity::BNpcState::Idle );
+
     if( bnpc.getHpPercent() < 100 )
       bnpc.heal( bnpc.getMaxHp() );
   }

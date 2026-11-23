@@ -446,6 +446,15 @@ float BNpc::getCurrentSpeed() const
 
 bool BNpc::moveTo( const Vector3& pos, float targetReachedDist )
 {
+  auto yThreshold = 2.5f;
+
+  if( targetReachedDist == std::numeric_limits< float >::max() )
+    targetReachedDist = getNaviTargetReachedDistance();
+
+  if( getAgentId() == -1 )
+    return Common::Util::distance2D( m_pos.x, m_pos.z, pos.x, pos.z ) <= targetReachedDist &&
+           std::fabs( m_pos.y - pos.y ) <= yThreshold;
+
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
@@ -457,15 +466,11 @@ bool BNpc::moveTo( const Vector3& pos, float targetReachedDist )
     return false;
   }
 
-  if( targetReachedDist == std::numeric_limits< float >::max() )
-    targetReachedDist = getNaviTargetReachedDistance();
-
   auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
 
   auto dY = std::fabs( pos.y - pos1.y );
   auto dXZ = Common::Util::distance2D( pos1.x, pos1.z, pos.x, pos.z );
   // todo: find the real y diff retail uses to determine if we should move
-  auto yThreshold = 2.5f;
 
   auto distance = Common::Util::distance( pos1, pos );
 
