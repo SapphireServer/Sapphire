@@ -842,25 +842,25 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
 
   assert( paramCount <= 255 );
 
-  if( paramCount < 2 )
+  if( paramCount <= 2 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket2 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 4 )
+  else if( paramCount <= 4 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket4 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 8 )
+  else if( paramCount <= 8 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket8 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 16 )
+  else if( paramCount <= 16 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket16 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 32 )
+  else if( paramCount <= 32 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket32 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 64 )
+  else if( paramCount <= 64 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket64 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if( paramCount < 128 )
+  else if( paramCount <= 128 )
     pPacket = std::move(
       std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount <= 255 )

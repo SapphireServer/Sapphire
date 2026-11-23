@@ -2,124 +2,52 @@
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Actor/Player.h>
 #include <ForwardsCommon.h>
+#include <algorithm>
+#include <initializer_list>
+#include <iterator>
+#include <stdexcept>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
-
-  /**
-  * @brief The packet sent for event log messages.
-  */
-  class EventLogMessageHeader : public ZoneChannelPacket< FFXIVIpcEventLogMessageHeader >
+  template< typename PacketType >
+  class EventLogMessagePacket : public ZoneChannelPacket< PacketType >
   {
   public:
-    EventLogMessageHeader( const Entity::Player& player,
-                           uint32_t directorId,
-                           uint32_t msgId ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessageHeader >( player.getId() )
+    EventLogMessagePacket( uint32_t actorId, uint32_t handlerId, uint32_t messageId,
+                           std::initializer_list< uint32_t > args ) :
+      ZoneChannelPacket< PacketType >( actorId )
     {
-      initialize( player, directorId, msgId );
-    };
+      auto& data = this->data();
+      if( args.size() > std::size( data.args ) )
+        throw std::length_error( "Event log arguments exceed packet capacity" );
 
-  private:
-    void initialize( const Entity::Player& player,
-                     uint32_t directorId,
-                     uint32_t msgId )
-    {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = 0;
-    };
+      data.handlerId = handlerId;
+      data.messageId = messageId;
+      data.numOfArgs = static_cast< uint8_t >( args.size() );
+      std::copy( args.begin(), args.end(), data.args );
+    }
   };
-  class EventLogMessage2 : public ZoneChannelPacket< FFXIVIpcEventLogMessage2 >
+
+  inline FFXIVPacketBasePtr makeEventLogMessage( uint32_t actorId, uint32_t handlerId, uint32_t messageId,
+                                                 std::initializer_list< uint32_t > args )
   {
-  public:
-    EventLogMessage2( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessage2 >( player.getId() )
+    if( args.size() <= 2 )
     {
-      initialize( player, directorId, msgId, args );
-    };
-
-  private:
-    void initialize( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args )
+      return std::make_shared< EventLogMessagePacket< FFXIVIpcEventLogMessage2 > >( actorId, handlerId, messageId, args );
+    }
+    if( args.size() <= 4 )
     {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
-      std::copy( args.begin(), args.end(), m_data.args );
-    };
-  };
-  class EventLogMessage4 : public ZoneChannelPacket< FFXIVIpcEventLogMessage4 >
-  {
-  public:
-    EventLogMessage4( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessage4 >( player.getId() )
+      return std::make_shared< EventLogMessagePacket< FFXIVIpcEventLogMessage4 > >( actorId, handlerId, messageId, args );
+    }
+    if( args.size() <= 8 )
     {
-      initialize( player, directorId, msgId, args );
-    };
-
-  private:
-    void initialize( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args )
+      return std::make_shared< EventLogMessagePacket< FFXIVIpcEventLogMessage8 > >( actorId, handlerId, messageId, args );
+    }
+    if( args.size() <= 16 )
     {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
-      std::copy( args.begin(), args.end(), m_data.args );
-    };
-  };
-  class EventLogMessage8 : public ZoneChannelPacket< FFXIVIpcEventLogMessage8 >
-  {
-  public:
-    EventLogMessage8( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessage8 >( player.getId() )
-    {
-      initialize( player, directorId, msgId, args );
-    };
-
-  private:
-    void initialize( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args )
-    {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
-      std::copy( args.begin(), args.end(), m_data.args );
-    };
-  };
-  class EventLogMessage16 : public ZoneChannelPacket< FFXIVIpcEventLogMessage16 >
-  {
-  public:
-    EventLogMessage16( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessage16 >( player.getId() )
-    {
-      initialize( player, directorId, msgId, args );
-    };
-
-  private:
-    void initialize( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args )
-    {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
-      std::copy( args.begin(), args.end(), m_data.args );
-    };
-  };
-  class EventLogMessage32 : public ZoneChannelPacket< FFXIVIpcEventLogMessage32 >
-  {
-  public:
-    EventLogMessage32( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args ) :
-      ZoneChannelPacket< FFXIVIpcEventLogMessage32 >( player.getId() )
-    {
-      initialize( player, directorId, msgId, args );
-    };
-
-  private:
-    void initialize( const Entity::Player& player, uint32_t directorId, uint32_t msgId, const std::initializer_list< uint32_t > args )
-    {
-      m_data.handlerId = directorId;
-      m_data.messageId = msgId;
-      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
-      std::copy( args.begin(), args.end(), m_data.args );
-    };
-  };
+      return std::make_shared< EventLogMessagePacket< FFXIVIpcEventLogMessage16 > >( actorId, handlerId, messageId, args );
+    }
+    return std::make_shared< EventLogMessagePacket< FFXIVIpcEventLogMessage32 > >( actorId, handlerId, messageId, args );
+  }
 }

@@ -143,7 +143,7 @@ namespace Sapphire::Event
     /*! current flags */
     uint8_t m_flags;
 
-    uint8_t m_vars[ 10 ];
+    uint8_t m_vars[ 12 ];
 
     /*! type of the director */
     DirectorType m_type;

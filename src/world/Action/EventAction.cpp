@@ -53,12 +53,13 @@ void Action::EventAction::start()
 
   m_startTime = Common::Util::getTimeMs();
 
-  auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastStart, 1, m_id, 0x4000004E );
+  auto pPlayer = m_pSource->getAsPlayer();
+  auto pEvent = pPlayer ? pPlayer->getEvent( m_eventId ) : nullptr;
+  uint32_t targetId = pEvent ? static_cast< uint32_t >( pEvent->getActorId() ) : m_pSource->getId();
+  auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastStart, 1, m_id, targetId );
 
-  if( m_pSource->isPlayer() )
+  if( pPlayer )
   {
-    auto pPlayer = m_pSource->getAsPlayer();
-    
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
 
     if( pPlayer->hasCondition( PlayerCondition::InNpcEvent ) )
