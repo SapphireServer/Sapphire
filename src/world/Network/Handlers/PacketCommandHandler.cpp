@@ -9,6 +9,7 @@
 
 #include "Manager/HousingMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Territory/InstanceContent.h"
 #include "Manager/AchievementMgr.h"
 
 #include "Network/GameConnection.h"
@@ -578,8 +579,23 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
           warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 5 );
           break;
         case ResurrectType::Return:
-          warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 4 );
+        {
+          if( !pZone || player.getStatus() != ActorStatus::Dead || player.hasCondition( PlayerCondition::BetweenAreas ) )
+            break;
+
+          if( auto instance = pZone->getAsInstanceContent() )
+          {
+            if( instance->getState() == DutyReset )
+              break;
+
+            auto [ pos, rot ] = instance->getEntrancePosition();
+            player.setCondition( PlayerCondition::BetweenAreas );
+            warpMgr.requestWarp( player, WarpType::WARP_TYPE_EXIT_RANGE, pos, rot );
+          }
+          else
+            warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 4 );
           break;
+        }
         default:
           break;
       }
