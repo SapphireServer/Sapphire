@@ -2898,8 +2898,8 @@ void ZoneEditor::buildScriptIndexCache()
   fs::path scriptRoot;
 
   auto exeDir = Sapphire::Common::Util::executableDir();
-  auto candidate = exeDir / "../../../../src/scripts/instances";
-  auto candidateOoB = exeDir / "../../../src/scripts/instances";
+  auto candidate = exeDir / "../../../src/scripts/instances";
+  auto candidateOoB = exeDir / "../../src/scripts/instances";
   if( fs::exists( candidate ) )
     scriptRoot = fs::canonical( candidate );
   else if( fs::exists( candidateOoB ) )
