@@ -946,8 +946,8 @@ void BNpc::checkAggro()
     return;
   }
 
-  auto calculateAdjustedRange = []( float baseRange, int targetLevel, int sourceLevel ) -> float {
-    auto levelDiff = std::abs( targetLevel - sourceLevel );
+  auto calculateAdjustedRange = [ this ]( float baseRange, const CharaPtr& target ) -> float {
+    auto levelDiff = std::abs( target->getEffectiveLevel() - getLevel() );
 
     if( levelDiff >= 10 )
       return 0.0f;
@@ -991,7 +991,7 @@ void BNpc::checkAggro()
               continue;
 
           // diminish sense range if required.
-          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget );
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < adjustedSenseRange )
           {
@@ -1030,7 +1030,7 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
 
           // Diminish sense range if required
-          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget );
 
           if( distance > adjustedSenseRange )
             continue;// Too far away

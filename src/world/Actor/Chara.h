@@ -71,6 +71,7 @@ namespace Sapphire::Entity
     uint32_t m_modelEquip[10];
     /*! Current class of the actor */
     Common::ClassJob m_class;
+    uint8_t m_levelSync{ 0 };
     /*! Ptr to a queued action */
     World::Action::ActionPtr m_pCurrentAction;
     /*! id of the director this chara is assigned to */
@@ -289,6 +290,10 @@ namespace Sapphire::Entity
     virtual void changeTarget( uint64_t targetId );
 
     virtual uint8_t getLevel() const;
+
+    uint8_t getEffectiveLevel() const;
+
+    uint8_t getLevelSync() const;
 
     virtual void takeDamage( uint32_t damage, bool broadcastUpdate = true );
 

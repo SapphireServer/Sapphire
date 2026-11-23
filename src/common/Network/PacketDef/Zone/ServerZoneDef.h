@@ -568,7 +568,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     float RecastMax[80];
   };
 
-  struct FFXIVIpcHudParam : FFXIVIpcBasePacket< HudParam >
+  struct alignas( 8 ) FFXIVIpcHudParam : FFXIVIpcBasePacket< HudParam >
   {
     uint8_t ClassJob;
     uint8_t Lv;

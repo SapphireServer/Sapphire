@@ -81,9 +81,9 @@ void Util::Packet::sendStatusUpdate( Entity::Player& player )
 {
   auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
   playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
-  playerStatusUpdate->data().Lv = player.getLevel();
+  playerStatusUpdate->data().Lv = player.getEffectiveLevel();
   playerStatusUpdate->data().Lv1 = player.getLevel();
-  playerStatusUpdate->data().LvSync = 0; //player.getLevelSync();
+  playerStatusUpdate->data().LvSync = player.getLevelSync();
   playerStatusUpdate->data().Exp = player.getCurrentExp();
 
   server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
@@ -336,7 +336,7 @@ void Util::Packet::sendChangeClass( Entity::Player& player )
   auto& borrowAction = player.getBorrowAction();
   classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
   classInfo->data().Lv = player.getLevel();
-  classInfo->data().Lv1 = player.getLevel();
+  classInfo->data().Lv1 = player.getEffectiveLevel();
   classInfo->data().Login = player.isLogin() ? 1 : 0;
   memcpy( &classInfo->data().BorrowAction[ 0 ], borrowAction.data(), borrowAction.size() * 4 );
   server().queueForPlayer( player.getCharacterId(), classInfo );
