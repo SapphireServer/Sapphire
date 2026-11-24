@@ -133,7 +133,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
     Network::Util::Packet::sendActorControlSelf( player.getInRangePlayerIds(), player.getId(), Appear, warpFinishAnim, raiseAnim );
 
   Network::Util::Packet::sendActorControlSelf( player, player.getId(), Appear, warpFinishAnim, raiseAnim );
-  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), SetStatus, static_cast< uint8_t >( player.getStatus() ) );
 
   player.removeCondition( PlayerCondition::BetweenAreas );
 
