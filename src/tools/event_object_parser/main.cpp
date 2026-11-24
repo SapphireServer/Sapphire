@@ -445,7 +445,6 @@ int main( int argc, char* argv[] )
       uint8_t permissionInv = 0;
       for( const auto& lgb : lgbList )
       {
-        std::map< std::string, uint32_t > nameMap;
         for( const auto& group : lgb.groups )
         {
           totalGroups++;
@@ -460,9 +459,9 @@ int main( int argc, char* argv[] )
         }
       }
 
+      std::map< std::string, uint32_t > nameMap;
       for( const auto& lgb : lgbList )
       {
-        std::map< std::string, uint32_t > nameMap;
         for( const auto& group : lgb.groups )
         {
           for( const auto& pEntry : group.entries )
@@ -493,6 +492,9 @@ int main( int argc, char* argv[] )
 
               eobjlevelHierachyId = pEobj->header.BoundInstanceID;
 
+              if( eobjNameMap.find( pEobj->header.BaseId ) != eobjNameMap.end() )
+                name = eobjNameMap.at( pEobj->header.BaseId );
+
               std::string states = "";
               std::string gimmickName = "";
 
@@ -509,8 +511,11 @@ int main( int argc, char* argv[] )
 
                 if( pos != std::string::npos )
                 {
-                  name = pGObjR->AssetPath.substr( pos + 1 );
-                  name = name.substr( 0, name.length() - 4 );
+                  if( name.empty() )
+                  {
+                    name = pGObjR->AssetPath.substr( pos + 1 );
+                    name = name.substr( 0, name.length() - 4 );
+                  }
                   gimmickName = name;
                 }
 
@@ -520,9 +525,9 @@ int main( int argc, char* argv[] )
                   for( auto i = 0; i < sgbFile.timelines.size(); ++i )
                   {
                     auto entries1 = sgbFile.timelines[ i ];
-                    auto name = sgbFile.timelineNames[ i ];
+                    auto stateName = sgbFile.timelineNames[ i ];
 
-                    states += name + " (mask: " + std::to_string( 1 << i ) + ") ";
+                    states += stateName + " (mask: " + std::to_string( 1 << i ) + ") ";
                   }
                   states += "\n";
 
@@ -546,8 +551,11 @@ int main( int argc, char* argv[] )
 
                   if( pos != std::string::npos )
                   {
-                    name = sgbPath.substr( pos + 1 );
-                    name = name.substr( 0, name.length() - 4 );
+                    if( name.empty() )
+                    {
+                      name = sgbPath.substr( pos + 1 );
+                      name = name.substr( 0, name.length() - 4 );
+                    }
                     gimmickName = name;
                   }
 
@@ -557,9 +565,9 @@ int main( int argc, char* argv[] )
                     for( auto i = 0; i < sgbFile.timelines.size(); ++i )
                     {
                       auto entries1 = sgbFile.timelines[ i ];
-                      auto name = sgbFile.timelineNames[ i ];
+                      auto stateName = sgbFile.timelineNames[ i ];
 
-                      states += name + " (mask: " + std::to_string( 1 << i ) + ") ";
+                      states += stateName + " (mask: " + std::to_string( 1 << i ) + ") ";
                     }
                     states += "\n";
                   }
@@ -680,28 +688,60 @@ int main( int argc, char* argv[] )
                       // eobjLine += "    pEObj->addCollisionSphere( { " +
                       //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
                       //             std::to_string( radius ) + " );\n";
-                      break;
+                    break;
                     case TriggerBoxShapeCylinder:
+                    {
                       shapeStr = "Cylinder";
                       // todo:
-                      // eobjLine += "    pEObj->addCollisionCylinder( { " +
-                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                      //             std::to_string( radius ) + ", " + std::to_string( height ) + " );\n"
-                      break;
+                      auto radius = collisionBox->header.Transformation.Scale.x;
+                      auto height = collisionBox->header.Transformation.Scale.y;
+
+                      eobjLine += "    pEObj->addCollisionCylinder( { " +
+                                  std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                                  std::to_string( radius ) + ", " + std::to_string( height ) + " );\n";
+                    }
+                    break;
                     case TriggerBoxShapeBoard:
+                    {
                       shapeStr = "Board";
-                      break;
+                      const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
+                      // SGB stores Transformation.Scale as half-extents; addCollisionBox expects full extents, so multiply by 2
+                      const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
+                      eobjLine += "    pEObj->addCollisionBox( { " +
+                                  std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                                  std::to_string( rot * -1.f ) + ", " +
+                                  std::to_string( box.x * 2.f ) + ", " + std::to_string( box.y * 2.f ) + ", " + std::to_string( box.z * 2.f ) + " );\n";
+                    }
+                    break;
                     case TriggerBoxShapeMesh:
                       shapeStr = "Mesh";
-                      break;
+                    break;
                     case TriggerBoxShapeBoardBothSides:
                       shapeStr = "Board Both Sides";
-                      break;
+                    break;
                     default:
                       shapeStr = "Unknown";
-                      break;
+                    break;
                   }
                   std::cout << "\t\t " << "- " << instanceObject->header.InstanceID << " CollisionBox Shape:" << shapeStr << "\n";
+                  if( shapeStr != "Box" )
+                  {
+                    std::string output;
+                    output += std::string(shapeStr) + "\n";
+                    auto scale = instanceObject->header.Transformation.Scale;
+                    auto rot = instanceObject->header.Transformation.Rotation;
+                    output += "Zone: " + zoneName + "\n";
+                    output += "InstanceID " + std::to_string( instanceObject->header.InstanceID ) + "\n";
+                    output += "Pos: " + std::to_string( pos.x ) + " " + std::to_string( pos.y ) + " " + std::to_string( pos.z ) + "\n";
+                    output += "Scale: " + std::to_string( scale.x ) + " " + std::to_string( scale.y ) + " " + std::to_string( scale.z ) + "\n";
+                    output += "Rot: " + std::to_string( rot.x ) + " " + std::to_string( rot.y ) + " " + std::to_string( rot.z ) + "\n\n";
+
+                    std::ofstream of;
+                    of.open( "collision.txt", std::ios_base::app );
+
+                    of << output;
+                    of.close();
+                  }
                 }
               }
             }
