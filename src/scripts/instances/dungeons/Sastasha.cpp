@@ -306,13 +306,17 @@ public:
     pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_4", 2000264, 4208413, 3425474, 4, { 97.055313f, 27.081551f, -70.264381f }, 0.991789f, -0.618915f, 0 ); 
     // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
 
-    pEObj = instance.addEObj( "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
     pEObj = instance.addEObj( "Shortcut", 2000700, 0, 4033735, 4, { 344.705688f, 43.781551f, -217.365997f }, 0.991760f, 0.000048f, 0 ); 
     pEObj->setPermissionInvisibility( 1 );

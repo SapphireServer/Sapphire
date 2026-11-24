@@ -46,6 +46,7 @@ bool ignoreModels = false;
 //std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
+std::unordered_map< uint32_t, std::string > eobjSgbPathMap;
 
 struct instanceContent
 {
@@ -117,6 +118,13 @@ void loadEobjNames()
 
     if( !eObjName->getString( eObjName->data().Text.SGL ).empty() )
       eobjNameMap[ id ] = eObjName->getString( eObjName->data().Text.SGL );
+
+    auto exportedSGRow = g_exdData.getRow< Excel::ExportedSG >( eObjName->data().SharedGroup );
+    if( !exportedSGRow )
+      continue;
+
+    if( !exportedSGRow->getString( exportedSGRow->data().SGFilePath ).empty() )
+      eobjSgbPathMap[ id ] = exportedSGRow->getString( exportedSGRow->data().SGFilePath );
   }
 }
 
@@ -448,7 +456,18 @@ int main( int argc, char* argv[] )
               auto pGimmick = dynamic_cast< SharedGroupEntry* >( pEntry.get() );
               m_sharedGroupMap.emplace( pEntry->header.InstanceID, pGimmick );
             }
-            else if( pEntry->getType() == eAssetType::PopRange )
+          }
+        }
+      }
+
+      for( const auto& lgb : lgbList )
+      {
+        std::map< std::string, uint32_t > nameMap;
+        for( const auto& group : lgb.groups )
+        {
+          for( const auto& pEntry : group.entries )
+          {
+            if( pEntry->getType() == eAssetType::PopRange )
             {
               const auto& transform = pEntry->header.Transformation;
               const auto& pos = transform.Translation;
@@ -476,24 +495,58 @@ int main( int argc, char* argv[] )
 
               std::string states = "";
               std::string gimmickName = "";
-              for( const auto& pEntry1 : group.entries )
-              {
-                auto pGObj = pEntry1.get();
-                if( pGObj->getType() == eAssetType::SharedGroup && pGObj->header.InstanceID == pEobj->header.BoundInstanceID )
-                {
-                  auto pGObjR = reinterpret_cast< SharedGroupEntry* >( pGObj );
-                  char* dataSection = nullptr;
 
-                  auto file = g_gameData->getFile( pGObjR->AssetPath );
+              if( auto pGObjR = m_sharedGroupMap[ pEobj->header.BoundInstanceID ] )
+              {
+                char* dataSection = nullptr;
+
+                auto file = g_gameData->getFile( pGObjR->AssetPath );
+                auto sections = file->get_data_sections();
+                dataSection = &sections.at( 0 )[ 0 ];
+                auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
+
+                auto pos = pGObjR->AssetPath.find_last_of( "/" );
+
+                if( pos != std::string::npos )
+                {
+                  name = pGObjR->AssetPath.substr( pos + 1 );
+                  name = name.substr( 0, name.length() - 4 );
+                  gimmickName = name;
+                }
+
+                if( sgbFile.timelines.size() > 0 )
+                {
+                  states = "    // States -> ";
+                  for( auto i = 0; i < sgbFile.timelines.size(); ++i )
+                  {
+                    auto entries1 = sgbFile.timelines[ i ];
+                    auto name = sgbFile.timelineNames[ i ];
+
+                    states += name + " (mask: " + std::to_string( 1 << i ) + ") ";
+                  }
+                  states += "\n";
+
+                  std::cout << states << std::endl;
+                }
+              }
+
+              // fallback if we cant find timelines by LGB SharedGroupEntry
+              if( states.empty() )
+              {
+                auto sgbPath = eobjSgbPathMap[ pEobj->header.BaseId ];
+                if( !sgbPath.empty() && g_gameData->doesFileExist( sgbPath ) )
+                {
+                  char* dataSection = nullptr;
+                  auto file = g_gameData->getFile( sgbPath );
                   auto sections = file->get_data_sections();
                   dataSection = &sections.at( 0 )[ 0 ];
                   auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
 
-                  auto pos = pGObjR->AssetPath.find_last_of( "/" );
+                  auto pos = sgbPath.find_last_of( "/" );
 
                   if( pos != std::string::npos )
                   {
-                    name = pGObjR->AssetPath.substr( pos + 1 );
+                    name = sgbPath.substr( pos + 1 );
                     name = name.substr( 0, name.length() - 4 );
                     gimmickName = name;
                   }
@@ -505,13 +558,14 @@ int main( int argc, char* argv[] )
                     {
                       auto entries1 = sgbFile.timelines[ i ];
                       auto name = sgbFile.timelineNames[ i ];
-                      states += name + " (id: " + std::to_string( entries1.MemberID ) + ") ";
+
+                      states += name + " (mask: " + std::to_string( 1 << i ) + ") ";
                     }
                     states += "\n";
                   }
-                  break;
                 }
               }
+
               int state = 4;
 
               if( eobjNameMap.find( id ) != eobjNameMap.end() )
