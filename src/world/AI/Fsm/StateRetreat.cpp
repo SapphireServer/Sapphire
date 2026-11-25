@@ -86,6 +86,9 @@ void AI::Fsm::StateRetreat::onExit( Entity::GameObjectPtr& pEntity )
 
     bnpc.setState( Entity::BNpcState::Idle );
 
+    auto& path = bnpc.getController()->getPath();
+    path.reset();
+
     if( bnpc.getHpPercent() < 100 )
       bnpc.heal( bnpc.getMaxHp() );
   }
