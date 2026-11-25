@@ -598,6 +598,7 @@ void PlayerMgr::onExitInstance( Entity::Player& player )
 
 void PlayerMgr::onClassJobChanged( Entity::Player& player, Common::ClassJob classJob )
 {
+  const auto previousClassJob = player.getClass();
   player.setClassJob( classJob );
   if( player.getHp() > player.getMaxHp() )
     player.setHp( player.getMaxHp() );
@@ -611,7 +612,8 @@ void PlayerMgr::onClassJobChanged( Entity::Player& player, Common::ClassJob clas
   Network::Util::Packet::sendStatusUpdate( player );
   Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), ClassJobChange, 4 );
   Network::Util::Packet::sendHudParam( player );
-  Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
+
+  server().playerEvents().classJobUpdated.publish( { player, previousClassJob, classJob } );
 }
 
 void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )

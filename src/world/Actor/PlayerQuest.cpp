@@ -3,7 +3,6 @@
 #include <Service.h>
 
 #include "Manager/QuestMgr.h"
-#include "Manager/MapMgr.h"
 
 #include "Player.h"
 #include "WorldServer.h"
@@ -45,15 +44,12 @@ void Player::removeQuest( uint16_t questId )
     return;
   }
 
-  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
-  auto& mapMgr = Common::Service< Manager::MapMgr >::ref();
-
   m_quests[ idx ] = World::Quest();
   removeQuestTracking( idx );
   deleteDbQuest( questId );
 
-  mapMgr.updateQuests( *this );
-  questMgr.onRemoveQuest( *this, idx );
+  Common::Service< WorldServer >::ref().playerEvents().activeQuestChanged.publish(
+    { *this, questId, static_cast< uint8_t >( idx ), Notifications::ActiveQuestChanged::Kind::Removed } );
 
 }
 
@@ -83,15 +79,12 @@ int8_t Player::getQuestIndex( uint16_t questId )
 
 void Player::updateQuest( const World::Quest& quest )
 {
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
-  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
-
   if( hasQuest( quest.getId() ) )
   {
     uint8_t index = getQuestIndex( quest.getId() );
     m_quests[ index ] = quest;
-    mapMgr.updateQuests( *this );
-    questMgr.onUpdateQuest( *this, index );
+    Common::Service< WorldServer >::ref().playerEvents().activeQuestChanged.publish(
+      { *this, quest.getId(), index, Notifications::ActiveQuestChanged::Kind::Updated } );
   }
   else if( quest.getSeq() != 0 )
     addQuest( quest );
@@ -107,16 +100,13 @@ bool Player::addQuest( const World::Quest& quest )
     return false;
   }
 
-  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
-  auto& mapMgr = Common::Service< Manager::MapMgr >::ref();
-
   m_quests[ idx ] = quest;
 
   insertDbQuest( quest, idx );
   addQuestTracking( idx );
 
-  mapMgr.updateQuests( *this );
-  questMgr.onUpdateQuest( *this, idx );
+  Common::Service< WorldServer >::ref().playerEvents().activeQuestChanged.publish(
+    { *this, quest.getId(), static_cast< uint8_t >( idx ), Notifications::ActiveQuestChanged::Kind::Added } );
 
   return true;
 }
@@ -168,7 +158,7 @@ void Player::updateQuestsCompleted( uint32_t questId )
 
   m_questCompleteFlags[ index ] |= value;
 
-  Common::Service< Manager::MapMgr >::ref().updateQuests( *this );
+  Common::Service< WorldServer >::ref().playerEvents().questCompletionUpdated.publish( { *this, questId, true } );
 }
 
 bool Player::isQuestCompleted( uint32_t questId )
@@ -190,7 +180,7 @@ void Player::removeQuestsCompleted( uint32_t questId )
 
   m_questCompleteFlags[ index ] &= static_cast< uint8_t >( ~value );
 
-  Common::Service< Manager::MapMgr >::ref().updateQuests( *this );
+  Common::Service< WorldServer >::ref().playerEvents().questCompletionUpdated.publish( { *this, questId, false } );
 }
 
 World::Quest& Player::getQuestByIndex( uint16_t index )

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <ForwardsZone.h>
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {
@@ -13,8 +14,7 @@ namespace Sapphire::World::Manager
     QuestMgr() = default;
 
     /// Perform required actions for events
-    void onUpdateQuest( Entity::Player& player, uint8_t questIndex );
-    void onRemoveQuest( Entity::Player& player, uint8_t questIndex );
+    void onActiveQuestChanged( const Notifications::ActiveQuestChanged& event );
     void onCompleteQuest( Entity::Player& player, uint16_t questId, uint32_t optionalChoice = 0 );
 
 

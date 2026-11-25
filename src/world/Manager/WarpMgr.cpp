@@ -17,12 +17,11 @@
 #include <Network/Util/PacketUtil.h>
 
 #include <Manager/PlayerMgr.h>
-#include <Manager/MapMgr.h>
 #include <Manager/MgrUtil.h>
-#include "WorldServer.h"
 
 #include "Actor/Player.h"
 #include <Territory/InstanceObjectCache.h>
+#include <Territory/Territory.h>
 
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::World;
@@ -100,8 +99,6 @@ void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Co
 
 void WarpMgr::finishWarp( Entity::Player& player )
 {
-  auto& playerMgr = Common::Service< PlayerMgr >::ref();
-
   WarpType warpType = WarpType::WARP_TYPE_NORMAL;
   auto it = m_entityIdToWarpInfoMap.find( player.getId() );
   if( it != m_entityIdToWarpInfoMap.end() )
@@ -137,7 +134,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
 
   player.removeCondition( PlayerCondition::BetweenAreas );
 
-  Common::Service< MapMgr >::ref().updateAll( player );
+  Common::Service< WorldServer >::ref().playerEvents().warpFinished.publish( { player, warpType } );
 }
 
 void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteId, uint8_t teleportType )

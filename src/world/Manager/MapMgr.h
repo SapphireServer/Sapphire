@@ -2,6 +2,7 @@
 
 #include <Common.h>
 #include "ForwardsZone.h"
+#include "Notifications/Forwards.h"
 
 #include "Territory/Territory.h"
 
@@ -39,6 +40,10 @@ namespace Sapphire::World::Manager
 
     void updateAll( Entity::Player& player );
     void updateQuests( Entity::Player& player );
+    void onActiveQuestChanged( const Notifications::ActiveQuestChanged& event );
+    void onQuestCompletionUpdated( const Notifications::QuestCompletionUpdated& event );
+    void onPlayerClassJobUpdated( const Notifications::PlayerClassJobUpdated& event );
+    void onPlayerWarpFinished( const Notifications::PlayerWarpFinished& event );
 
   private:
     struct EventData
