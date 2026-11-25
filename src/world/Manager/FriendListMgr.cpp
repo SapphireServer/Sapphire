@@ -4,6 +4,7 @@
 
 #include "Actor/Player.h"
 #include "FriendListMgr.h"
+#include "Notifications/PlayerEvents.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -111,6 +112,12 @@ bool FriendListMgr::onInviteDecline( Entity::Player& source, Entity::Player& tar
   source.updateDbFriendList();
   target.updateDbFriendList();
   return true;
+}
+
+void FriendListMgr::onPlayerAddedToBlacklist( const Notifications::PlayerAddedToBlacklist& event )
+{
+  if( isFriend( event.source, event.target ) )
+    onRemoveFriend( event.source, event.target );
 }
 
 bool FriendListMgr::onRemoveFriend( Entity::Player& source, Entity::Player& target )

@@ -6,7 +6,6 @@
 #include <Util/Util.h>
 #include <Territory/Land.h>
 
-#include <Manager/AchievementMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
@@ -617,6 +616,8 @@ void PlayerMgr::onClassJobChanged( Entity::Player& player, Common::ClassJob clas
 
 void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )
 {
+  const auto classJob = player.getClass();
+  const auto previousLevel = player.getLevel();
   player.setLevel( level );
   player.calculateStats();
 
@@ -627,8 +628,7 @@ void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )
   Network::Util::Packet::sendStatusUpdate( player );
   Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ), player.getLevel(), player.getLevel() - 1 );
 
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+  server().playerEvents().jobLevelChanged.publish( { player, classJob, previousLevel, level } );
   Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
 }
 

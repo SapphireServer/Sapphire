@@ -2,6 +2,7 @@
 #define SAPPHIRE_INSTANCECONTENT_H
 
 #include "Territory.h"
+#include "InstanceContentState.h"
 #include "Event/Director.h"
 #include <ForwardsCommon.h>
 #include <Exd/Structs.h>
@@ -9,15 +10,6 @@
 
 namespace Sapphire
 {
-  enum InstanceContentState
-  {
-    Created,
-    DutyReset,
-    DutyInProgress,
-    DutyFinished,
-    Terminate
-  };
-
   class InstanceContent : public Event::Director, public Territory
   {
   public:

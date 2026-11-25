@@ -95,6 +95,11 @@ WorldServer::WorldServer( const std::string& configName ) :
   subscribeManager( m_playerEvents.npcKillCredited, &Sapphire::Scripting::ScriptMgr::onBNpcKill );
   subscribeManager( m_playerEvents.npcKillCredited, &PlayerMgr::onNpcKillCredited );
   subscribeManager( m_playerEvents.territoryChanged, &PartyMgr::onMoveZone );
+  subscribeManager( m_playerEvents.jobLevelChanged, &AchievementMgr::onPlayerJobLevelChanged );
+  subscribeManager( m_playerEvents.questCompleted, &AchievementMgr::onQuestCompleted );
+  subscribeManager( m_playerEvents.addedToBlacklist, &FriendListMgr::onPlayerAddedToBlacklist );
+  subscribeManager( m_instanceEvents.actorDied, &Sapphire::Scripting::ScriptMgr::onInstanceActorDeath );
+  subscribeManager( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
 }
 
 std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()

@@ -29,7 +29,6 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
-#include "Script/ScriptMgr.h"
 
 #include "Navi/NaviProvider.h"
 #include "Common.h"
@@ -304,10 +303,7 @@ void Chara::die()
   auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   if( auto pInstance = pTeri ? pTeri->getAsInstanceContent() : nullptr )
-  {
-    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-    scriptMgr.onInstanceActorDeath( *pInstance, *this );
-  }
+    server().instanceEvents().actorDied.publish( { *pInstance, *this } );
 
   removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnDeath );
 

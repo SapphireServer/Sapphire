@@ -6,6 +6,7 @@
 #include "Manager/MapMgr.h"
 
 #include "Player.h"
+#include "WorldServer.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -24,6 +25,7 @@ void Player::finishQuest( uint16_t questId, uint32_t optionalChoice )
 
   //@todo should probably be changed to a bool function in case reward can not be obtained as quests will not complete in that case
   questMgr.onCompleteQuest( *this, questId, optionalChoice );
+  Common::Service< WorldServer >::ref().playerEvents().questCompleted.publish( { *this, questId } );
 }
 
 void Player::unfinishQuest( uint16_t questId )

@@ -9,6 +9,7 @@
 #include <Common.h>
 
 #include "Actor/Player.h"
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {
@@ -19,6 +20,9 @@ namespace Sapphire::World::Manager
     ~AchievementMgr() = default;
 
     bool cacheAchievements();
+
+    void onPlayerJobLevelChanged( const Notifications::PlayerJobLevelChanged& event );
+    void onQuestCompleted( const Notifications::QuestCompleted& event );
 
     /// <summary>
     /// progress an achievement by its given properties

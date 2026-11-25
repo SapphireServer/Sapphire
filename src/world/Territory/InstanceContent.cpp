@@ -581,10 +581,7 @@ void Sapphire::InstanceContent::setState( InstanceContentState state )
   auto oldState = m_state;
   m_state = state;
   if( oldState != m_state )
-  {
-    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
-  }
+    Common::Service< World::WorldServer >::ref().instanceEvents().stateChanged.publish( { *this, oldState, m_state } );
 }
 
 void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
