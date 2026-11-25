@@ -119,6 +119,18 @@ WorldServer::WorldServer( const std::string& configName ) :
 
   subscribeEvent( m_instanceEvents.actorDied, &Sapphire::Scripting::ScriptMgr::onInstanceActorDeath );
 
+  subscribeEvent( m_instanceEvents.customVarUpdated, &Sapphire::Scripting::ScriptMgr::onInstanceCustomVarUpdated );
+
+  subscribeEvent( m_instanceEvents.directorFlagsUpdated, &Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagsUpdated );
+
+  subscribeEvent( m_instanceEvents.directorSequenceUpdated, &Sapphire::Scripting::ScriptMgr::onInstanceDirectorSequenceUpdated );
+
+  subscribeEvent( m_instanceEvents.directorVarUpdated, &Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarUpdated );
+
+  subscribeEvent( m_instanceEvents.playerRemoved, &Sapphire::Scripting::ScriptMgr::onInstancePlayerRemoved );
+
+  subscribeEvent( m_instanceEvents.reset, &Sapphire::Scripting::ScriptMgr::onInstanceReset );
+
   subscribeEvent( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
 }
 

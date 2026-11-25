@@ -117,13 +117,11 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 
   clearDirector( player );
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceLeaveTerritory( *this, player );
+  Common::Service< World::WorldServer >::ref().instanceEvents().playerRemoved.publish( { *this, player } );
 }
 
 void Sapphire::InstanceContent::updateState( uint64_t tickCount )
 {
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   switch( m_state )
   {
     case InstanceContentState::Created:
@@ -213,7 +211,7 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
         if( m_pEntranceEObj )
           m_pEntranceEObj->setPermissionInvisibility( 0 );
 
-        scriptMgr.onInstanceReset( *this );
+        server.instanceEvents().reset.publish( { *this } );
 
         return;
       }
@@ -391,8 +389,7 @@ void Sapphire::InstanceContent::setVar( uint8_t index, uint8_t value )
     sendDirectorVars( *playerIt.second );
   }
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceDirectorVarChange( *this, index, value );
+  Common::Service< World::WorldServer >::ref().instanceEvents().directorVarUpdated.publish( { *this, index, value } );
 }
 
 void Sapphire::InstanceContent::setSequence( uint8_t value )
@@ -403,8 +400,8 @@ void Sapphire::InstanceContent::setSequence( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceDirectorSeqChange( *this, value );
+
+  Common::Service< World::WorldServer >::ref().instanceEvents().directorSequenceUpdated.publish( { *this, value } );
 }
 
 void Sapphire::InstanceContent::setFlags( uint8_t value )
@@ -415,16 +412,15 @@ void Sapphire::InstanceContent::setFlags( uint8_t value )
   {
     sendDirectorVars( *playerIt.second );
   }
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceDirectorFlagChange( *this, value );
+
+  Common::Service< World::WorldServer >::ref().instanceEvents().directorFlagsUpdated.publish( { *this, value } );
 }
 
 void Sapphire::InstanceContent::setCustomVar( uint32_t var, uint64_t value )
 {
   Director::setCustomVar( var, value );
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceCustomVarChange( *this, var, value );
+  Common::Service< World::WorldServer >::ref().instanceEvents().customVarUpdated.publish( { *this, var, value } );
 }
 
 void Sapphire::InstanceContent::startQte()

@@ -810,19 +810,11 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceReset( InstanceContent& instance )
+void Sapphire::Scripting::ScriptMgr::onInstanceReset( const World::Notifications::InstanceReset& event )
 {
-  auto instId = instance.getDirectorId();
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
-
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onReset( instance );
-
-    return true;
-  }
-
-  return false;
+    script->onReset( event.instance );
 }
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance, uint64_t tickCount )
@@ -861,64 +853,39 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player )
+void Sapphire::Scripting::ScriptMgr::onInstancePlayerRemoved( const World::Notifications::InstancePlayerRemoved& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onLeaveTerritory( instance, player );
-    return true;
-  }
-
-  return false;
+    script->onLeaveTerritory( event.instance, event.player );
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorSeqChange( InstanceContent& instance, uint8_t seq )
+void Sapphire::Scripting::ScriptMgr::onInstanceDirectorSequenceUpdated( const World::Notifications::InstanceDirectorSequenceUpdated& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onDirectorSeqChange( instance, seq );
-    return true;
-  }
-
-  return false;
+    script->onDirectorSeqChange( event.instance, event.sequence );
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagChange( InstanceContent& instance, uint8_t flag )
+void Sapphire::Scripting::ScriptMgr::onInstanceDirectorFlagsUpdated( const World::Notifications::InstanceDirectorFlagsUpdated& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onDirectorFlagChange( instance, flag );
-    return true;
-  }
-
-  return false;
+    script->onDirectorFlagChange( event.instance, event.flags );
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val )
+void Sapphire::Scripting::ScriptMgr::onInstanceDirectorVarUpdated( const World::Notifications::InstanceDirectorVarUpdated& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onDirectorVarChange( instance, var, val );
-    return true;
-  }
-
-  return false;
+    script->onDirectorVarChange( event.instance, event.index, event.value );
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val )
+void Sapphire::Scripting::ScriptMgr::onInstanceCustomVarUpdated( const World::Notifications::InstanceCustomVarUpdated& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onCustomVarChange( instance, var, val );
-    return true;
-  }
-
-  return false;
+    script->onCustomVarChange( event.instance, event.index, event.value );
 }
 
 void Sapphire::Scripting::ScriptMgr::onInstanceActorDeath( const World::Notifications::InstanceActorDied& event )
