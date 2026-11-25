@@ -68,7 +68,7 @@ using namespace Sapphire::World::Manager;
 namespace
 {
   template< typename Event, typename Manager >
-  void subscribeManager( Notifications::EventSignal< Event >& signal, void ( Manager::*handler )( const Event& ) )
+  void subscribeEvent( Notifications::EventSignal< Event >& signal, void ( Manager::*handler )( const Event& ) )
   {
     signal.subscribe( [handler]( const Event& event )
     {
@@ -84,22 +84,42 @@ WorldServer::WorldServer( const std::string& configName ) :
   m_worldId( 67 ),
   m_port( 0 )
 {
-  subscribeManager( m_sessionEvents.loggedIn, &PlayerMgr::onLogin );
-  subscribeManager( m_sessionEvents.loggedIn, &FreeCompanyMgr::onFcLogin );
+  subscribeEvent( m_sessionEvents.loggedIn, &PlayerMgr::onLogin );
+  subscribeEvent( m_sessionEvents.loggedIn, &FreeCompanyMgr::onFcLogin );
 
-  subscribeManager( m_sessionEvents.loggedOut, &PlayerMgr::onLogout );
-  subscribeManager( m_sessionEvents.loggedOut, &FreeCompanyMgr::onFcLogout );
-  subscribeManager( m_sessionEvents.loggedOut, &PartyMgr::onMemberDisconnect );
+  subscribeEvent( m_sessionEvents.loggedOut, &PlayerMgr::onLogout );
+  subscribeEvent( m_sessionEvents.loggedOut, &FreeCompanyMgr::onFcLogout );
+  subscribeEvent( m_sessionEvents.loggedOut, &PartyMgr::onMemberDisconnect );
 
-  subscribeManager( m_playerEvents.died, &Sapphire::Scripting::ScriptMgr::onPlayerDeath );
-  subscribeManager( m_playerEvents.npcKillCredited, &Sapphire::Scripting::ScriptMgr::onBNpcKill );
-  subscribeManager( m_playerEvents.npcKillCredited, &PlayerMgr::onNpcKillCredited );
-  subscribeManager( m_playerEvents.territoryChanged, &PartyMgr::onMoveZone );
-  subscribeManager( m_playerEvents.jobLevelChanged, &AchievementMgr::onPlayerJobLevelChanged );
-  subscribeManager( m_playerEvents.questCompleted, &AchievementMgr::onQuestCompleted );
-  subscribeManager( m_playerEvents.addedToBlacklist, &FriendListMgr::onPlayerAddedToBlacklist );
-  subscribeManager( m_instanceEvents.actorDied, &Sapphire::Scripting::ScriptMgr::onInstanceActorDeath );
-  subscribeManager( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
+  ///////////////////////////////////
+
+  subscribeEvent( m_playerEvents.died, &Sapphire::Scripting::ScriptMgr::onPlayerDeath );
+
+  subscribeEvent( m_playerEvents.npcKillCredited, &Sapphire::Scripting::ScriptMgr::onBNpcKill );
+  subscribeEvent( m_playerEvents.npcKillCredited, &PlayerMgr::onNpcKillCredited );
+
+  subscribeEvent( m_playerEvents.territoryChanged, &PartyMgr::onMoveZone );
+
+  subscribeEvent( m_playerEvents.warpFinished, &MapMgr::onPlayerWarpFinished );
+
+  subscribeEvent( m_playerEvents.classJobUpdated, &MapMgr::onPlayerClassJobUpdated );
+
+  subscribeEvent( m_playerEvents.jobLevelChanged, &AchievementMgr::onPlayerJobLevelChanged );
+
+  subscribeEvent( m_playerEvents.questCompleted, &AchievementMgr::onQuestCompleted );
+
+  subscribeEvent( m_playerEvents.activeQuestChanged, &MapMgr::onActiveQuestChanged );
+  subscribeEvent( m_playerEvents.activeQuestChanged, &QuestMgr::onActiveQuestChanged );
+
+  subscribeEvent( m_playerEvents.questCompletionUpdated, &MapMgr::onQuestCompletionUpdated );
+
+  subscribeEvent( m_playerEvents.addedToBlacklist, &FriendListMgr::onPlayerAddedToBlacklist );
+
+  ///////////////////////////////////
+
+  subscribeEvent( m_instanceEvents.actorDied, &Sapphire::Scripting::ScriptMgr::onInstanceActorDeath );
+
+  subscribeEvent( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
 }
 
 std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()

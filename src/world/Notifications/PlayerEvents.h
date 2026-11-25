@@ -7,6 +7,7 @@
 namespace Sapphire::Common
 {
   enum class ClassJob : uint8_t;
+  enum WarpType : uint8_t;
 }
 
 namespace Sapphire::Entity
@@ -30,10 +31,25 @@ namespace Sapphire::World::Notifications
     uint32_t territoryId;
   };
 
+  // Published after warp setup, before FINISH_LOADING updates the player's loading state.
+  struct PlayerWarpFinished
+  {
+    Entity::Player& player;
+    Common::WarpType warpType;
+  };
+
   struct NpcKillCredited
   {
     Entity::Player& player;
     Entity::BNpc& npc;
+  };
+
+  // Published after class/job setup, including when the same job is reapplied.
+  struct PlayerClassJobUpdated
+  {
+    Entity::Player& player;
+    Common::ClassJob previousClassJob;
+    Common::ClassJob classJob;
   };
 
   struct PlayerJobLevelChanged
@@ -51,19 +67,46 @@ namespace Sapphire::World::Notifications
     uint16_t questId;
   };
 
+  // Published after each completion flag write, including writes of the existing value.
+  struct QuestCompletionUpdated
+  {
+    Entity::Player& player;
+    uint32_t questId;
+    bool completed;
+  };
+
   struct PlayerAddedToBlacklist
   {
     Entity::Player& source;
     Entity::Player& target;
   };
 
+  struct ActiveQuestChanged
+  {
+    enum class Kind
+    {
+      Added,
+      Updated,
+      Removed
+    };
+
+    Entity::Player& player;
+    uint16_t questId;
+    uint8_t slot;
+    Kind kind;
+  };
+
   struct PlayerEvents
   {
     EventSignal< PlayerDied > died;
     EventSignal< NpcKillCredited > npcKillCredited;
+    EventSignal< PlayerClassJobUpdated > classJobUpdated;
     EventSignal< PlayerJobLevelChanged > jobLevelChanged;
     EventSignal< PlayerTerritoryChanged > territoryChanged;
+    EventSignal< PlayerWarpFinished > warpFinished;
     EventSignal< QuestCompleted > questCompleted;
+    EventSignal< QuestCompletionUpdated > questCompletionUpdated;
+    EventSignal< ActiveQuestChanged > activeQuestChanged;
     EventSignal< PlayerAddedToBlacklist > addedToBlacklist;
   };
 }

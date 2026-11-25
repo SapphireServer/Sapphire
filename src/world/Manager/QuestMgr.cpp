@@ -20,15 +20,22 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void QuestMgr::onUpdateQuest( Entity::Player& player, uint8_t questIndex )
+void QuestMgr::onActiveQuestChanged( const Notifications::ActiveQuestChanged& event )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto quests = player.getQuestArrayRef();
+  auto& player = event.player;
   auto questUpdatePacket = makeZonePacket< FFXIVIpcQuest >( player.getId() );
-  questUpdatePacket->data().index = questIndex;
-  questUpdatePacket->data().questInfo = quests[ questIndex ].getQuestData();
-  server.queueForPlayer( player.getCharacterId(), questUpdatePacket );
+  auto& data = questUpdatePacket->data();
+  data.index = event.slot;
+  if( event.kind == Notifications::ActiveQuestChanged::Kind::Removed )
+  {
+    data.questInfo.c.questId = 0;
+    data.questInfo.c.sequence = 0xFF;
+  }
+  else
+    data.questInfo = player.getQuestByIndex( event.slot ).getQuestData();
 
+  server.queueForPlayer( player.getCharacterId(), questUpdatePacket );
   sendQuestTracker( player );
 }
 
@@ -42,18 +49,6 @@ void QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId, uint32
   server.queueForPlayer( player.getCharacterId(), questFinishPacket );
 
   giveQuestRewards( player, questId, optionalChoice );
-}
-
-void QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
-{
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto questUpdatePacket = makeZonePacket< FFXIVIpcQuest >( player.getId() );
-  questUpdatePacket->data().index = static_cast< uint8_t >( questIndex );
-  questUpdatePacket->data().questInfo.c.questId = 0;
-  questUpdatePacket->data().questInfo.c.sequence = 0xFF;
-  server.queueForPlayer( player.getCharacterId(), questUpdatePacket );
-
-  sendQuestTracker( player );
 }
 
 bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )

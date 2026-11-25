@@ -100,6 +100,11 @@ std::shared_ptr< Excel::ExcelStruct< Excel::EObj > > MapMgr::getEObjRow( uint32_
   return row;
 }
 
+void MapMgr::onPlayerWarpFinished( const Notifications::PlayerWarpFinished& event )
+{
+  updateAll( event.player );
+}
+
 void MapMgr::updateAll( Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -250,6 +255,21 @@ void MapMgr::updateAll( Entity::Player& player )
   }
   
   sendPackets( player, mapData, All );
+}
+
+void MapMgr::onActiveQuestChanged( const Notifications::ActiveQuestChanged& event )
+{
+  updateQuests( event.player );
+}
+
+void MapMgr::onQuestCompletionUpdated( const Notifications::QuestCompletionUpdated& event )
+{
+  updateQuests( event.player );
+}
+
+void MapMgr::onPlayerClassJobUpdated( const Notifications::PlayerClassJobUpdated& event )
+{
+  updateQuests( event.player );
 }
 
 void MapMgr::updateQuests( Entity::Player& player )
