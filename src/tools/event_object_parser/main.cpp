@@ -673,13 +673,17 @@ int main( int argc, char* argv[] )
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
+                      auto colRot = collisionBox->header.Transformation.Rotation;
+                      auto colPos = collisionBox->header.Transformation.Translation;
+                      auto colScale = collisionBox->header.Transformation.Scale;
+
                       const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
                       // SGB stores Transformation.Scale as half-extents; addCollisionBox expects full extents, so multiply by 2
                       const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
                       eobjLine += "    pEObj->addCollisionBox( { " +
-                                  std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                                  std::to_string( rot * -1.f ) + ", " +
-                                  std::to_string( box.x * 2.f ) + ", " + std::to_string( box.y * 2.f ) + ", " + std::to_string( box.z * 2.f ) + " );\n";
+                                  std::to_string( colPos.x ) + ", " + std::to_string( colPos.y ) + ", " + std::to_string( colPos.z ) + " }, " +
+                                  " { " + std::to_string( colRot.x ) + ", " + std::to_string( colRot.y ) + ", " + std::to_string( colRot.z ) + " }, " +
+                                  std::to_string( colScale.x ) + ", " + std::to_string( colScale.y ) + ", " + std::to_string( colScale.z ) + " );\n";
                     }
                     break;
                     case TriggerBoxShapeSphere:

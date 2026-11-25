@@ -12,6 +12,7 @@ struct PopRangeEntry;
 struct EventObjectEntry;
 struct EventNPCEntry;
 struct EventRangeEntry;
+struct SharedGroupEntry;
 
 
 namespace Sapphire
@@ -86,9 +87,12 @@ namespace Sapphire
     using EObjPtr = std::shared_ptr< EventObjectEntry >;
     using ENpcPtr = std::shared_ptr< EventNPCEntry >;
     using EventRangePtr = std::shared_ptr< EventRangeEntry >;
+    using SharedGroupPtr = std::shared_ptr< SharedGroupEntry >;
 
     using EObjMapPtr = std::unordered_map< uint32_t, EObjPtr >*;
     using ENpcMapPtr = std::unordered_map< uint32_t, ENpcPtr >*;
+
+    using SharedGroupMapPtr = std::unordered_map< uint32_t, SharedGroupPtr >*;
 
     struct PopRangeInfo
     {
@@ -113,8 +117,11 @@ namespace Sapphire
 
     EObjMapPtr getAllEObj( uint16_t zoneId );
     ENpcMapPtr getAllENpc( uint16_t zoneId );
+    SharedGroupMapPtr getAllSharedGroups( uint16_t zoneId );
 
     EventRangePtr getEventRange( uint32_t eventRangeId );
+
+    SharedGroupPtr getSharedGroup( uint16_t zoneId, uint32_t instanceId );
 
   private:
     ObjectCache< MapRangeEntry > m_mapRangeCache;
@@ -123,6 +130,7 @@ namespace Sapphire
     ObjectCache< EventObjectEntry > m_eobjCache;
     ObjectCache< EventNPCEntry > m_enpcCache;
     ObjectCache< EventRangeEntry > m_eventRangeCache;
+    ObjectCache< SharedGroupEntry > m_sharedGroupCache;
 
     std::map< std::pair< uint16_t, uint32_t >, uint32_t > m_eobjBaseInstanceMap;
     std::shared_ptr< Framework > m_pFramework;

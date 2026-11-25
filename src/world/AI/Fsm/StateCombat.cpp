@@ -47,10 +47,11 @@ void AI::Fsm::StateCombat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t ti
     }
 
     auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );
+    auto ignoreObstacles = bnpc.getController() && bnpc.getController()->getPath().m_flags & AI::Controller::Controller::PathFlags::IgnoreObstacles;
 
     // deaggro if target is dead, not in zone, or unreachable
     if( !pHatedActor->isAlive() || bnpc.getTerritoryId() != pHatedActor->getTerritoryId() ||
-      ( pNaviProvider && !pNaviProvider->isPointReachable( bnpc.getPos(), pHatedActor->getPos() ) && !bnpc.hasFlag( Entity::NoDeaggro ) )  )
+      ( pNaviProvider && !pNaviProvider->isPointReachable( bnpc.getPos(), pHatedActor->getPos(), ignoreObstacles ) && !bnpc.hasFlag( Entity::NoDeaggro ) )  )
     {
       bnpc.deaggro( pHatedActor );
       pHatedActor = bnpc.hateListGetHighest();

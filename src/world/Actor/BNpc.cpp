@@ -960,8 +960,21 @@ void BNpc::checkAggro()
   auto pCharaSelf = getAsChara();
   static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
 
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( !pTeri )
+    return;
+
+  auto ignoreObstacles = false;
+  if( m_pController )
+    ignoreObstacles = m_pController->getPath().m_flags & AI::Controller::Controller::PathFlags::IgnoreObstacles;
+
   for( uint32_t i = 0; i < 2; ++i )
   {
+    auto hasLineOfSight = true;
+    
     float senseRange = m_senseData.SenseRange[ i ];
 
     switch( m_senseData.Sense[ i ] )
@@ -995,8 +1008,14 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < adjustedSenseRange )
           {
-            aggro( actor->getAsChara() );
-            hasAggro = true;
+            if( auto pNavi = pTeri->getNaviProvider() )
+              hasLineOfSight = pNavi->isPointReachable( getPos(), pCharaTarget->getPos(), ignoreObstacles );
+
+            if( hasLineOfSight )
+            {
+              aggro( actor->getAsChara() );
+              hasAggro = true;
+            }
             break;
           }
         }
@@ -1063,9 +1082,14 @@ void BNpc::checkAggro()
           {
             // Player is within vision cone, check for line of sight if needed
             // TODO: Add line of sight check using navmesh/collision mesh raycast if required
+            if( auto pNavi = pTeri->getNaviProvider() )
+              hasLineOfSight = pNavi->hasLineOfSight( getPos(), pCharaTarget->getPos(), ignoreObstacles );
 
-            aggro( actor->getAsChara() );
-            hasAggro = true;
+            if( hasLineOfSight )
+            {
+              aggro( actor->getAsChara() );
+              hasAggro = true;
+            }
             break;
           }
         }
@@ -1098,8 +1122,14 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
-            aggro( actor->getAsChara() );
-            hasAggro = true;
+            if( auto pNavi = pTeri->getNaviProvider() )
+              hasLineOfSight = pNavi->isPointReachable( getPos(), pCharaTarget->getPos(), ignoreObstacles );
+
+            if( hasLineOfSight )
+            {
+              aggro( actor->getAsChara() );
+              hasAggro = true;
+            }
             break;
           }
         }

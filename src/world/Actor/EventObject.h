@@ -24,8 +24,10 @@ namespace Sapphire::Entity
   {
     EventObjectCollisionType m_type;
     Common::Vector3 m_pos;
-    float m_rot;
+    Common::Vector3 m_rot;
     uint32_t m_obstacleRef{ 0 };
+    bool m_useParentTransformation{ false };
+
     union
     {
       struct
@@ -102,7 +104,9 @@ namespace Sapphire::Entity
 
     void setCollisionEnabled( bool enabled );
 
-    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
+    void addCollisionBox( Common::Vector3 pos, float rot, float width, float height, float depth );
+
+    void addCollisionBox( Common::Vector3 pos, Common::Vector3 rotation, float width, float height, float depth );
 
     void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
 

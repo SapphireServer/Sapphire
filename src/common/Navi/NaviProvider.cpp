@@ -1117,7 +1117,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
   }
 }
 
-bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos )
+bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos, bool ignoreObstacles )
 {
   if( m_naviMeshQuery == nullptr )
   {
@@ -1129,9 +1129,22 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
   // 1. DETOUR CHECK: Is the path clear on the NavMesh?
   dtPolyRef startRef{ 0 };
   float nearestPt[ 3 ];
-  float extents[ 3 ] = { 2.0f, 4.0f, 2.0f };
+  float extents[ 3 ] = { 2.0f, 10.0f, 2.0f };
   float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
   float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+
+  if( ignoreObstacles )
+  {
+    filter.setIncludeFlags( FLAG_ALL );
+    filter.setExcludeFlags( 0 );
+  }
+  else
+  {
+    filter.setIncludeFlags( FLAG_WALK );
+    filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
+  }
+
   m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, nearestPt );
 
   dtRaycastHit navHit{ 0 };
@@ -1160,7 +1173,7 @@ bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vecto
   dtPolyRef startRef{ 0 }, endRef{ 0 };
   float startNearest[ 3 ], endNearest[ 3 ];
   dtQueryFilter filter;
-  float extents[ 3 ] = { 1.0f, 3.0f, 1.0f };
+  float extents[ 3 ] = { 1.0f, 10.0f, 1.0f };
 
   if( passThroughObstacles )
   {

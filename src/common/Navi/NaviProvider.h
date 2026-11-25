@@ -173,7 +173,7 @@ namespace Sapphire::Common::Navi
     // halfExtents: { width, height, depth } 
     void toggleBox( dtObstacleRef& doorRef, const Common::Vector3& pos, const Common::Vector3& halfExtents, float rot, bool enabled );
     void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
-    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
+    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos, bool ignoreObstacles = false );
 
     bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles = false );
 
