@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "ForwardsZone.h"
+#include "Notifications/Forwards.h"
 
 namespace Sapphire::World::Manager
 {
@@ -17,6 +18,7 @@ namespace Sapphire::World::Manager
     bool onInviteDecline( Entity::Player& source, Entity::Player& target );
 
     bool onRemoveFriend( Entity::Player& source, Entity::Player& target );
+    void onPlayerAddedToBlacklist( const Notifications::PlayerAddedToBlacklist& event );
     bool onAssignGroup( Entity::Player& source, Entity::Player& target, uint8_t group );
 
     bool isFriend( Entity::Player& source, Entity::Player& target ) const;

@@ -123,9 +123,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceUpdate( InstanceContent& instance, uint64_t tickCount );
 
-    bool onInstanceStateChange( InstanceContent& instance,
-                                InstanceContentState oldState,
-                                InstanceContentState newState );
+    void onInstanceStateChange( const World::Notifications::InstanceStateChanged& event );
 
     bool
     onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
@@ -141,7 +139,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val );
 
-    bool onInstanceActorDeath( InstanceContent& instance, Entity::Chara& chara );
+    void onInstanceActorDeath( const World::Notifications::InstanceActorDied& event );
 
     bool onPlayerSetup( QuestBattle& instance, Entity::Player& player );
 

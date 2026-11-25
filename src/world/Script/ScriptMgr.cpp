@@ -840,20 +840,11 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance
 }
 
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceStateChange( Sapphire::InstanceContent& instance,
-                                                            Sapphire::InstanceContentState oldState,
-                                                            Sapphire::InstanceContentState newState )
+void Sapphire::Scripting::ScriptMgr::onInstanceStateChange( const World::Notifications::InstanceStateChanged& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
-
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onStateChange( instance, oldState, newState );
-
-    return true;
-  }
-
-  return false;
+    script->onStateChange( event.instance, event.previousState, event.state );
 }
 
 
@@ -930,16 +921,11 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceCustomVarChange( InstanceContent&
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceActorDeath( InstanceContent& instance, Entity::Chara& chara )
+void Sapphire::Scripting::ScriptMgr::onInstanceActorDeath( const World::Notifications::InstanceActorDied& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( event.instance.getDirectorId() );
   if( script )
-  {
-    script->onActorDeath( instance, chara );
-    return true;
-  }
-
-  return false;
+    script->onActorDeath( event.instance, event.actor );
 }
 
 bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( QuestBattle& instance, Entity::Player& player )

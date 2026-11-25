@@ -10,7 +10,6 @@
 
 #include "Actor/Player.h"
 #include "BlacklistMgr.h"
-#include "FriendListMgr.h"
 #include "PlayerMgr.h"
 
 #include "WorldServer.h"
@@ -66,10 +65,7 @@ bool BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& ta
 
   sendAddResultPacket( source, pTarget, 0 );
 
-  // check if player is friends with target
-  auto& flMgr = Common::Service< FriendListMgr >::ref();
-  if( flMgr.isFriend( source, target ) )
-    flMgr.onRemoveFriend( source, target );
+  Common::Service< World::WorldServer >::ref().playerEvents().addedToBlacklist.publish( { source, target } );
 
   return true;
 }

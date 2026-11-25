@@ -4,6 +4,11 @@
 
 #include "EventSignal.h"
 
+namespace Sapphire::Common
+{
+  enum class ClassJob : uint8_t;
+}
+
 namespace Sapphire::Entity
 {
   class BNpc;
@@ -31,10 +36,34 @@ namespace Sapphire::World::Notifications
     Entity::BNpc& npc;
   };
 
+  struct PlayerJobLevelChanged
+  {
+    Entity::Player& player;
+    Common::ClassJob classJob;
+    uint8_t previousLevel;
+    uint8_t level;
+  };
+
+  // Reports recorded quest completion after the reward attempt has finished.
+  struct QuestCompleted
+  {
+    Entity::Player& player;
+    uint16_t questId;
+  };
+
+  struct PlayerAddedToBlacklist
+  {
+    Entity::Player& source;
+    Entity::Player& target;
+  };
+
   struct PlayerEvents
   {
     EventSignal< PlayerDied > died;
     EventSignal< NpcKillCredited > npcKillCredited;
+    EventSignal< PlayerJobLevelChanged > jobLevelChanged;
     EventSignal< PlayerTerritoryChanged > territoryChanged;
+    EventSignal< QuestCompleted > questCompleted;
+    EventSignal< PlayerAddedToBlacklist > addedToBlacklist;
   };
 }

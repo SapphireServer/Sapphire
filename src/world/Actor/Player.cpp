@@ -21,7 +21,6 @@
 #include "Manager/MapMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/ActionMgr.h"
-#include "Manager/AchievementMgr.h"
 
 #include "Territory/InstanceContent.h"
 
@@ -644,6 +643,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( classjob ) )->data().WorkIndex;
+  const auto previousLevel = static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 
   if( m_classArray[ classJobIndex ] == 0 )
     insertDbClass( classJobIndex, level );
@@ -652,8 +652,8 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
   Network::Util::Packet::sendActorControlSelf( *this, getId(), ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
 
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( classjob ) );
+  Common::Service< World::WorldServer >::ref().playerEvents().jobLevelChanged.publish(
+    { *this, classjob, previousLevel, level } );
 }
 
 uint32_t Player::getModelForSlot( Common::GearModelSlot slot )

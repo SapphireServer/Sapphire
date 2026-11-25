@@ -2,6 +2,7 @@
 #include <Util/Util.h>
 
 #include "AchievementMgr.h"
+#include "Notifications/PlayerEvents.h"
 #include <Network/Util/PacketUtil.h>
 #include <Network/CommonActorControl.h>
 
@@ -10,6 +11,16 @@ using namespace Sapphire::Network;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::World::Manager;
+
+void AchievementMgr::onPlayerJobLevelChanged( const Notifications::PlayerJobLevelChanged& event )
+{
+  progressAchievementByType< Common::Achievement::Type::Classjob >( event.player, static_cast< int32_t >( event.classJob ) );
+}
+
+void AchievementMgr::onQuestCompleted( const Notifications::QuestCompleted& event )
+{
+  progressAchievementByType< Common::Achievement::Type::Quest >( event.player, event.questId );
+}
 
 bool AchievementMgr::cacheAchievements()
 {
