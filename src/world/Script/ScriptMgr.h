@@ -119,7 +119,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( InstanceContent& instance );
 
-    bool onInstanceReset( InstanceContent& instance );
+    void onInstanceReset( const World::Notifications::InstanceReset& event );
 
     bool onInstanceUpdate( InstanceContent& instance, uint64_t tickCount );
 
@@ -129,15 +129,15 @@ namespace Sapphire::Scripting
     onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                               uint16_t param2 );
 
-    bool onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player );
+    void onInstancePlayerRemoved( const World::Notifications::InstancePlayerRemoved& event );
 
-    bool onInstanceDirectorSeqChange( InstanceContent& instance, uint8_t seq );
+    void onInstanceDirectorSequenceUpdated( const World::Notifications::InstanceDirectorSequenceUpdated& event );
 
-    bool onInstanceDirectorFlagChange( InstanceContent& instance, uint8_t flag );
+    void onInstanceDirectorFlagsUpdated( const World::Notifications::InstanceDirectorFlagsUpdated& event );
 
-    bool onInstanceDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val );
+    void onInstanceDirectorVarUpdated( const World::Notifications::InstanceDirectorVarUpdated& event );
 
-    bool onInstanceCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val );
+    void onInstanceCustomVarUpdated( const World::Notifications::InstanceCustomVarUpdated& event );
 
     void onInstanceActorDeath( const World::Notifications::InstanceActorDied& event );
 
