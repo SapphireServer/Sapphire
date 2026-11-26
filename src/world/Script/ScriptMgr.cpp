@@ -539,11 +539,12 @@ bool Sapphire::Scripting::ScriptMgr::onEventGroundItem( Entity::Player& player, 
   return false;
 }
 
-void Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc )
+void Sapphire::Scripting::ScriptMgr::onNpcTriggerOwnerDeaggro( const World::Notifications::NpcTriggerOwnerDeaggro& event )
 {
+  auto& player = event.player;
+  auto& bnpc = event.npc;
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-  // loop through all active quests and try to call available onBNpcKill callbacks
   for( size_t i = 0; i < 30; i++ )
   {
     auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ) );
@@ -624,13 +625,11 @@ void Sapphire::Scripting::ScriptMgr::onPlayerDeath( const World::Notifications::
   }
 }
 
-bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
+void Sapphire::Scripting::ScriptMgr::onPlayerEventObjectHit( const World::Notifications::PlayerEventObjectHit& event )
 {
+  auto& player = event.player;
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
-  bool didCallScript = false;
-
-  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-  auto actor = pEventMgr.getActorBaseId( static_cast< uint32_t >( actorId ) );
+  const auto actor = eventMgr.getActorBaseId( static_cast< uint32_t >( event.targetId ) );
 
   for( size_t i = 0; i < 30; i++ )
   {
@@ -643,19 +642,16 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
-      didCallScript = true;
       std::string objName = eventMgr.getEventName( questId );
 
       PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#{2}", objName, actor, quest.getId() );
 
       World::Quest preQ = quest;
-      script->onEObjHit( quest, player, actor, actionId );
+      script->onEObjHit( quest, player, actor, event.actionId );
       if( quest != preQ )
         player.updateQuest( quest );
     }
   }
-
-  return didCallScript;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
@@ -726,20 +722,16 @@ bool Sapphire::Scripting::ScriptMgr::onStart( World::Action::Action& action )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
+void Sapphire::Scripting::ScriptMgr::onStatusEffectApplied( const World::Notifications::StatusEffectApplied& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
-
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( event.effectId );
   if( script )
   {
-    if( pActor->isPlayer() )
-      PlayerMgr::sendDebug( *pActor->getAsPlayer(), "Calling status receive for statusid#{0}", effectId );
+    if( event.target.isPlayer() )
+      PlayerMgr::sendDebug( *event.target.getAsPlayer(), "Calling status receive for statusid#{0}", event.effectId );
 
-    script->onApply( *pActor );
-    return true;
+    script->onApply( event.target );
   }
-
-  return false;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pActor,
@@ -755,19 +747,16 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pActor,
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, uint32_t effectId )
+void Sapphire::Scripting::ScriptMgr::onStatusEffectRemoving( const World::Notifications::StatusEffectRemoving& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effectId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( event.effectId );
   if( script )
   {
-    if( pChara->isPlayer() )
-      PlayerMgr::sendDebug( *pChara->getAsPlayer(), "Calling status timeout for statusid#{0}", effectId );
+    if( event.target.isPlayer() )
+      PlayerMgr::sendDebug( *event.target.getAsPlayer(), "Calling status timeout for statusid#{0}", event.effectId );
 
-    script->onExpire( *pChara );
-    return true;
+    script->onExpire( event.target );
   }
-
-  return false;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onPlayerHit( Entity::CharaPtr& pHitChara,

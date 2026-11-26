@@ -87,9 +87,9 @@ namespace Sapphire::Scripting
 
     void onPlayerDeath( const World::Notifications::PlayerDied& event );
 
-    void onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc );
+    void onNpcTriggerOwnerDeaggro( const World::Notifications::NpcTriggerOwnerDeaggro& event );
 
-    bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );
+    void onPlayerEventObjectHit( const World::Notifications::PlayerEventObjectHit& event );
 
     bool onBeforeBootstrap( World::Action::Action& action );
 
@@ -101,11 +101,11 @@ namespace Sapphire::Scripting
 
     bool onAfterBuildEffect( World::Action::Action& action );
 
-    bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
+    void onStatusEffectApplied( const World::Notifications::StatusEffectApplied& event );
 
     bool onStatusTick( Entity::CharaPtr pActor, Sapphire::StatusEffect::StatusEffect& effect );
 
-    bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
+    void onStatusEffectRemoving( const World::Notifications::StatusEffectRemoving& event );
 
     bool onPlayerHit( Entity::CharaPtr& pHitChara, Sapphire::StatusEffect::StatusEffect& effect );
 

@@ -23,6 +23,13 @@ namespace Sapphire::World::Notifications
     Entity::Player& player;
   };
 
+  struct PlayerEventObjectHit
+  {
+    Entity::Player& player;
+    uint64_t targetId;
+    uint32_t actionId;
+  };
+
   // Published after zone-in setup. The client may still be loading.
   struct PlayerTerritoryChanged
   {
@@ -39,6 +46,13 @@ namespace Sapphire::World::Notifications
   };
 
   struct NpcKillCredited
+  {
+    Entity::Player& player;
+    Entity::BNpc& npc;
+  };
+
+  // Published after the trigger owner's player-side aggro update.
+  struct NpcTriggerOwnerDeaggro
   {
     Entity::Player& player;
     Entity::BNpc& npc;
@@ -99,7 +113,9 @@ namespace Sapphire::World::Notifications
   struct PlayerEvents
   {
     EventSignal< PlayerDied > died;
+    EventSignal< PlayerEventObjectHit > eventObjectHit;
     EventSignal< NpcKillCredited > npcKillCredited;
+    EventSignal< NpcTriggerOwnerDeaggro > npcTriggerOwnerDeaggro;
     EventSignal< PlayerClassJobUpdated > classJobUpdated;
     EventSignal< PlayerJobLevelChanged > jobLevelChanged;
     EventSignal< PlayerTerritoryChanged > territoryChanged;

@@ -475,8 +475,6 @@ void Action::Action::execute()
     return;
   }
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
   if( hasCastTime() && m_pSource->isPlayer() )
   {
     auto pPlayer = m_pSource->getAsPlayer();
@@ -490,10 +488,10 @@ void Action::Action::execute()
       Manager::PlayerMgr::sendDebug( *player, "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
-  if( !hasClientsideTarget()  )
+  if( !hasClientsideTarget() )
     buildActionResults();
   else if( auto player = m_pSource->getAsPlayer() )
-    scriptMgr.onEObjHit( *player, m_targetId, getId() );
+    server().playerEvents().eventObjectHit.publish( { *player, m_targetId, getId() } );
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)

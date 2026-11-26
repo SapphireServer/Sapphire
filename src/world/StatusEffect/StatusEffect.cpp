@@ -23,6 +23,7 @@
 #include "Script/ScriptMgr.h"
 
 #include "StatusEffect.h"
+#include "WorldServer.h"
 
 #include <AI/TargetHelper.h>
 
@@ -265,7 +266,6 @@ void Sapphire::StatusEffect::StatusEffect::delModifier( Common::ParamModifier pa
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   if( m_modifiers.empty() )
   {  
@@ -282,13 +282,11 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 
   m_targetActor->calculateStats();
 
-  scriptMgr.onStatusReceive( m_targetActor, m_id );
+  Common::Service< World::WorldServer >::ref().statusEffectEvents().applied.publish( { *m_targetActor, m_id } );
 }
 
 void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
   m_modifiers.clear();
 
   m_targetActor->calculateStats();
@@ -299,7 +297,7 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
       m_targetActor->removeAreaObject();
   }
 
-  scriptMgr.onStatusTimeOut( m_targetActor, m_id );
+  Common::Service< World::WorldServer >::ref().statusEffectEvents().removing.publish( { *m_targetActor, m_id } );
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getId() const
