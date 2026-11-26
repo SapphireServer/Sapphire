@@ -133,6 +133,15 @@ add_subdirectory( "deps/mysqlConnector" )
 set(RECASTNAVIGATION_DT_POLYREF64 ON CACHE BOOL "Use 64bit polyrefs instead of 32bit for Detour" FORCE)
 add_subdirectory( "deps/recastnavigation" )
 
+if( TARGET Tests )
+  # Keep Catch2 exceptions enabled after Recast's raw /EHs-c- flag.
+  if( MSVC )
+    target_compile_options( Tests PRIVATE /EHsc- /U_HAS_EXCEPTIONS )
+  else()
+    target_compile_options( Tests PRIVATE -fexceptions )
+  endif()
+endif()
+
 if( SAPPHIRE_BUILD_TOOLKIT )
   # Build GLM as a static library
   set( BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE )

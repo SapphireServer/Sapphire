@@ -80,11 +80,6 @@ void AI::Fsm::StateCombat::onUpdate( Entity::GameObjectPtr& pEntity, uint64_t ti
         }
       }
     }
-    if( bnpc.getBoundEncounterId() != pHatedActor->getBoundEncounterId() )
-    {
-      bnpc.deaggro( pHatedActor );
-    }
-
     auto dtMove = tickCount - m_lastMoveTime;
     auto dtRot = tickCount - m_lastRotTime;
     if( dtRot == tickCount )

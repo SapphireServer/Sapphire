@@ -77,7 +77,7 @@ float toGameYaw( float yaw )
 
 float directionFromForward( const vec3& forward )
 {
-  return wrapAngle( std::atan2( -forward.x, forward.z ) );
+  return wrapAngle( std::atan2( forward.x, forward.z ) );
 }
 
 float composeCollisionRotation( const vec3& parentRotation, const vec3& localRotation )
@@ -266,10 +266,9 @@ void EventObject::setCollisionEnabled( bool enabled )
   }
   else
   {
-    // todo: make this a flag
-    // parentScale = pBoundGroup->header.Transformation.Scale;
-    // parentRotation = pBoundGroup->header.Transformation.Rotation;
-    // parentTranslation = pBoundGroup->header.Transformation.Translation;
+    parentScale = pBoundGroup->header.Transformation.Scale;
+    parentRotation = pBoundGroup->header.Transformation.Rotation;
+    parentTranslation = pBoundGroup->header.Transformation.Translation;
   }
 
   if( auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() ) )
@@ -296,7 +295,8 @@ void EventObject::setCollisionEnabled( bool enabled )
         {
           case EventObjectCollisionType::Box:
           {
-            const auto box = scaleExtents( vec3( collision.m_shape.box.width, collision.m_shape.box.height, collision.m_shape.box.depth ), parentScale );
+            const auto scale = collision.m_useParentTransformation ? parentScale : vec3( m_scale, m_scale, m_scale );
+            const auto box = scaleExtents( vec3( collision.m_shape.box.width, collision.m_shape.box.height, collision.m_shape.box.depth ), scale );
 
             pNavi->toggleBox( collision.m_obstacleRef, { pos.x, pos.y, pos.z }, { box.x, box.y, box.z }, rot, enabled );
           }

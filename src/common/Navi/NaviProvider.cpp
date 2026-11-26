@@ -865,7 +865,15 @@ void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
   info.idx = -1;
   info.vod = m_vod;
 
-  m_tileCache->update( timeInSeconds, m_naviMesh );
+  bool upToDate = false;
+  while( !upToDate )
+  {
+    if( dtStatusFailed( m_tileCache->update( timeInSeconds, m_naviMesh, &upToDate ) ) )
+    {
+      Logger::error( "[Navmesh] Failed to update obstacle tiles for {}", m_internalName );
+      return;
+    }
+  }
   m_pCrowd->update( timeInSeconds, &info );
 
   // handle agent collision by layer ids
@@ -1122,14 +1130,13 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
   if( m_naviMeshQuery == nullptr )
   {
     Logger::error( "[Navmesh] hasLineOfSight: m_naviMeshQuery is null" );
-    return true;
+    return false;
   }
 
   dtQueryFilter filter;
-  // 1. DETOUR CHECK: Is the path clear on the NavMesh?
-  dtPolyRef startRef{ 0 };
-  float nearestPt[ 3 ];
-  float extents[ 3 ] = { 2.0f, 10.0f, 2.0f };
+  dtPolyRef startRef{ 0 }, endRef{ 0 };
+  float startNearest[ 3 ], endNearest[ 3 ];
+  float extents[ 3 ] = { 1.0f, 10.0f, 1.0f };
   float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
   float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
 
@@ -1145,26 +1152,34 @@ bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3
     filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
   }
 
-  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, nearestPt );
-
-  dtRaycastHit navHit{ 0 };
-  m_naviMeshQuery->raycast( startRef, fstartPos, fendPos, &filter, 0, &navHit );
-
-  // If navHit.t < 1.0, the ray hit a NavMesh boundary (a wall or a hole)
-  if( navHit.t < 1.0f )
-  {
+  if( dtStatusFailed( m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest ) ) || !startRef ||
+      dtStatusFailed( m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest ) ) || !endRef )
     return false;
-  }
 
-  return true;// Both checks passed
+  if( dtVdist2DSqr( fstartPos, startNearest ) > 0.0001f )
+    return false;
+
+  dtPolyRef path[ MAX_POLYS ];
+  dtRaycastHit navHit{ 0 };
+  navHit.path = path;
+  navHit.maxPath = MAX_POLYS;
+  auto status = m_naviMeshQuery->raycast( startRef, fstartPos, fendPos, &filter, 0, &navHit );
+
+  if( dtStatusFailed( status ) || dtStatusDetail( status, DT_BUFFER_TOO_SMALL | DT_PARTIAL_RESULT ) ||
+      navHit.t <= 1.0f || navHit.pathCount == 0 )
+    return false;
+
+  float endHeight;
+  return dtStatusSucceed( m_naviMeshQuery->getPolyHeight( path[ navHit.pathCount - 1 ], fendPos, &endHeight ) ) &&
+         std::abs( endHeight - endNearest[ 1 ] ) < 0.1f;
 }
 
 bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles )
 {
   if( !m_naviMeshQuery )
   {
-    Logger::error( "[Navmesh] isPointReachable: m_naviMeshQuery is null. Returning true." );
-    return true;
+    Logger::error( "[Navmesh] isPointReachable: m_naviMeshQuery is null" );
+    return false;
   }
 
   float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
@@ -1186,8 +1201,9 @@ bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vecto
     filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
   }
 
-  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest );
-  m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest );
+  if( dtStatusFailed( m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest ) ) || !startRef ||
+      dtStatusFailed( m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest ) ) || !endRef )
+    return false;
 
   // todo: this is probably way too large but hopefully should prevent partial paths
   std::vector< dtPolyRef > pathCorridor( MAX_SMOOTH );

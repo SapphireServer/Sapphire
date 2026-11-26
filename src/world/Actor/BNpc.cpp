@@ -934,7 +934,7 @@ void BNpc::setTimeOfDeath( uint32_t timeOfDeath )
 
 void BNpc::checkAggro()
 {
-  if( !isAlive() )
+  if( !isAlive() || m_state == BNpcState::Retreat )
     return;
 
   // passive mobs should ignore players unless aggro'd
@@ -945,16 +945,6 @@ void BNpc::checkAggro()
   {
     return;
   }
-
-  auto calculateAdjustedRange = [ this ]( float baseRange, const CharaPtr& target ) -> float {
-    auto levelDiff = std::abs( target->getEffectiveLevel() - getLevel() );
-
-    if( levelDiff >= 10 )
-      return 0.0f;
-    else
-      return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
-  };
-
 
   bool hasAggro = false;
   auto pCharaSelf = getAsChara();
@@ -967,14 +957,29 @@ void BNpc::checkAggro()
   if( !pTeri )
     return;
 
-  auto ignoreObstacles = false;
-  if( m_pController )
-    ignoreObstacles = m_pController->getPath().m_flags & AI::Controller::Controller::PathFlags::IgnoreObstacles;
+  auto pNavi = pTeri->getNaviProvider();
+  if( !pNavi )
+    return;
+
+  const bool isInstance = pTeri->getAsInstanceContent() != nullptr;
+  auto calculateAdjustedRange = [ this, isInstance ]( float baseRange, const CharaPtr& target ) -> float {
+    if( isInstance || target->getEffectiveLevel() <= getLevel() )
+      return baseRange;
+
+    auto levelDiff = target->getEffectiveLevel() - getLevel();
+    if( levelDiff >= 10 )
+      return 0.0f;
+
+    return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+  };
+
+  auto canSenseTarget = [ this, &pNavi ]( const CharaPtr& target ) {
+    return pNavi->hasLineOfSight( getPos(), target->getPos() ) &&
+           pNavi->isPointReachable( getPos(), target->getPos() );
+  };
 
   for( uint32_t i = 0; i < 2; ++i )
   {
-    auto hasLineOfSight = true;
-    
     float senseRange = m_senseData.SenseRange[ i ];
 
     switch( m_senseData.Sense[ i ] )
@@ -989,6 +994,9 @@ void BNpc::checkAggro()
 
           auto pCharaTarget = actor->getAsChara();
 
+          if( !pCharaTarget->isAlive() )
+            continue;
+
           // if this chara is in our battalion, dont aggro
           if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
             continue;
@@ -1000,7 +1008,7 @@ void BNpc::checkAggro()
 
 
           if( auto pPlayer = actor->getAsPlayer() )
-            if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+            if( !pPlayer->isRunning() )
               continue;
 
           // diminish sense range if required.
@@ -1008,14 +1016,11 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < adjustedSenseRange )
           {
-            if( auto pNavi = pTeri->getNaviProvider() )
-              hasLineOfSight = pNavi->isPointReachable( getPos(), pCharaTarget->getPos(), ignoreObstacles );
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
 
-            if( hasLineOfSight )
-            {
-              aggro( actor->getAsChara() );
-              hasAggro = true;
-            }
+            aggro( pCharaTarget );
+            hasAggro = true;
             break;
           }
         }
@@ -1078,18 +1083,13 @@ void BNpc::checkAggro()
           // Check if player is within the 75-degree vision cone (37.5 degrees on each side)
           float halfConeAngle = ( 75.0f * PI / 180.0f ) / 2.0f;
 
-          if( abs( angleDiff ) <= halfConeAngle )
+          if( std::abs( angleDiff ) <= halfConeAngle )
           {
-            // Player is within vision cone, check for line of sight if needed
-            // TODO: Add line of sight check using navmesh/collision mesh raycast if required
-            if( auto pNavi = pTeri->getNaviProvider() )
-              hasLineOfSight = pNavi->hasLineOfSight( getPos(), pCharaTarget->getPos(), ignoreObstacles );
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
 
-            if( hasLineOfSight )
-            {
-              aggro( actor->getAsChara() );
-              hasAggro = true;
-            }
+            aggro( pCharaTarget );
+            hasAggro = true;
             break;
           }
         }
@@ -1122,14 +1122,11 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
-            if( auto pNavi = pTeri->getNaviProvider() )
-              hasLineOfSight = pNavi->isPointReachable( getPos(), pCharaTarget->getPos(), ignoreObstacles );
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
 
-            if( hasLineOfSight )
-            {
-              aggro( actor->getAsChara() );
-              hasAggro = true;
-            }
+            aggro( pCharaTarget );
+            hasAggro = true;
             break;
           }
         }
