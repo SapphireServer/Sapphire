@@ -11,6 +11,7 @@
 #include "Notifications/InstanceEvents.h"
 #include "Notifications/PlayerEvents.h"
 #include "Notifications/SessionEvents.h"
+#include "Notifications/StatusEffectEvents.h"
 #include <Config/ConfigDef.h>
 
 namespace Sapphire
@@ -56,6 +57,7 @@ namespace Sapphire::World
 
     const Notifications::PlayerEvents& playerEvents() const { return m_playerEvents; }
     const Notifications::InstanceEvents& instanceEvents() const { return m_instanceEvents; }
+    const Notifications::StatusEffectEvents& statusEffectEvents() const { return m_statusEffectEvents; }
 
     bool isRunning() const;
 
@@ -108,6 +110,7 @@ namespace Sapphire::World
     Notifications::SessionEvents m_sessionEvents;
     Notifications::PlayerEvents m_playerEvents;
     Notifications::InstanceEvents m_instanceEvents;
+    Notifications::StatusEffectEvents m_statusEffectEvents;
 
     std::map< uint32_t, SessionPtr > m_sessionMapById;
     std::map< uint64_t, SessionPtr > m_sessionMapByCharacterId;

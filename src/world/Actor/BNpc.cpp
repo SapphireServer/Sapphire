@@ -39,7 +39,6 @@
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
 #include <Manager/ActionMgr.h>
-#include <Script/ScriptMgr.h>
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
@@ -775,11 +774,7 @@ void BNpc::notifyPlayerDeaggro( const CharaPtr& pChara )
   tmpPlayer->onMobDeaggro( *this );
 
   if( getTriggerOwnerId() == pChara->getId() )
-  {
-    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-    auto& bnpc = *getAsBNpc();
-    scriptMgr.onTriggerOwnerDeaggro( *tmpPlayer, bnpc );
-  }
+    server().playerEvents().npcTriggerOwnerDeaggro.publish( { *tmpPlayer, *this } );
 }
 
 void BNpc::onTick()

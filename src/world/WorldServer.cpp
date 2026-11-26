@@ -95,8 +95,12 @@ WorldServer::WorldServer( const std::string& configName ) :
 
   subscribeEvent( m_playerEvents.died, &Sapphire::Scripting::ScriptMgr::onPlayerDeath );
 
+  subscribeEvent( m_playerEvents.eventObjectHit, &Sapphire::Scripting::ScriptMgr::onPlayerEventObjectHit );
+
   subscribeEvent( m_playerEvents.npcKillCredited, &Sapphire::Scripting::ScriptMgr::onBNpcKill );
   subscribeEvent( m_playerEvents.npcKillCredited, &PlayerMgr::onNpcKillCredited );
+
+  subscribeEvent( m_playerEvents.npcTriggerOwnerDeaggro, &Sapphire::Scripting::ScriptMgr::onNpcTriggerOwnerDeaggro );
 
   subscribeEvent( m_playerEvents.territoryChanged, &PartyMgr::onMoveZone );
 
@@ -132,6 +136,9 @@ WorldServer::WorldServer( const std::string& configName ) :
   subscribeEvent( m_instanceEvents.reset, &Sapphire::Scripting::ScriptMgr::onInstanceReset );
 
   subscribeEvent( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
+
+  subscribeEvent( m_statusEffectEvents.applied, &Sapphire::Scripting::ScriptMgr::onStatusEffectApplied );
+  subscribeEvent( m_statusEffectEvents.removing, &Sapphire::Scripting::ScriptMgr::onStatusEffectRemoving );
 }
 
 std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()

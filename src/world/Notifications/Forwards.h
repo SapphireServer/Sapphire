@@ -12,9 +12,11 @@ namespace Sapphire::World::Notifications
   struct InstanceReset;
   struct InstanceStateChanged;
   struct NpcKillCredited;
+  struct NpcTriggerOwnerDeaggro;
   struct PlayerAddedToBlacklist;
   struct PlayerClassJobUpdated;
   struct PlayerDied;
+  struct PlayerEventObjectHit;
   struct PlayerJobLevelChanged;
   struct PlayerLoggedIn;
   struct PlayerLoggedOut;
@@ -23,4 +25,6 @@ namespace Sapphire::World::Notifications
   struct QuestCompleted;
   struct QuestCompletionUpdated;
   struct SessionEvents;
+  struct StatusEffectApplied;
+  struct StatusEffectRemoving;
 }
