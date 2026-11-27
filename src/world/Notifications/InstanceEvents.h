@@ -8,6 +8,7 @@
 namespace Sapphire
 {
   class InstanceContent;
+  class QuestBattle;
 }
 
 namespace Sapphire::Entity
@@ -71,6 +72,13 @@ namespace Sapphire::World::Notifications
     InstanceContentState state;
   };
 
+  // Published after the final victory scene and before the return warp.
+  struct QuestBattleCompleted
+  {
+    QuestBattle& battle;
+    Entity::Player& player;
+  };
+
   struct InstanceEvents
   {
     EventSignal< InstanceActorDied > actorDied;
@@ -81,5 +89,6 @@ namespace Sapphire::World::Notifications
     EventSignal< InstancePlayerRemoved > playerRemoved;
     EventSignal< InstanceReset > reset;
     EventSignal< InstanceStateChanged > stateChanged;
+    EventSignal< QuestBattleCompleted > questBattleCompleted;
   };
 }

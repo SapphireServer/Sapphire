@@ -446,8 +446,7 @@ void Action::Action::interrupt()
 
 void Action::Action::onInterrupt()
 {
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInterrupt( *this );
+  server().actionEvents().interrupted.publish( { *this, m_interruptType } );
 }
 
 void Action::Action::execute()
@@ -598,7 +597,7 @@ void Action::Action::buildActionResults()
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     handleStatusEffects();
-    scriptMgr.onAfterBuildEffect( *this );
+    server().actionEvents().effectsBuilt.publish( { *this } );
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( m_hitActors );
     return;
@@ -674,7 +673,7 @@ void Action::Action::buildActionResults()
   handleJobAction();
   handleStatusEffects();
 
-  scriptMgr.onAfterBuildEffect( *this );
+  server().actionEvents().effectsBuilt.publish( { *this } );
 
   m_actionResultBuilder->sendActionResults( m_hitActors );
 

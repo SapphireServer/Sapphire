@@ -2,6 +2,8 @@
 
 namespace Sapphire::World::Notifications
 {
+  struct ActionEffectsBuilt;
+  struct ActionInterrupted;
   struct ActiveQuestChanged;
   struct InstanceActorDied;
   struct InstanceCustomVarUpdated;
@@ -22,9 +24,11 @@ namespace Sapphire::World::Notifications
   struct PlayerLoggedOut;
   struct PlayerTerritoryChanged;
   struct PlayerWarpFinished;
+  struct QuestBattleCompleted;
   struct QuestCompleted;
   struct QuestCompletionUpdated;
   struct SessionEvents;
   struct StatusEffectApplied;
   struct StatusEffectRemoving;
+  struct StatusEffectTargetHit;
 }

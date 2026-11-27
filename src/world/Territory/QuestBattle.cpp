@@ -319,9 +319,10 @@ void Sapphire::QuestBattle::success()
                         {
                           eventMgr.eventFinish( player, getDirectorId(), 1 );
 
-                          auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-                          scriptMgr.onDutyComplete( *this, *m_pPlayer );
+                          if( m_state == DutyFailed )
+                            return;
 
+                          Common::Service< World::WorldServer >::ref().instanceEvents().questBattleCompleted.publish( { *this, player } );
                           playerMgr().onExitInstance( player );
                         } );
 
