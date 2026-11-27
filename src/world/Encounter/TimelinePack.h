@@ -7,6 +7,7 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -21,7 +22,12 @@
 #include "Selector.h"
 #include "ForwardsEncounter.h"
 
-namespace Sapphire
+namespace Sapphire::ScriptAPI
+{
+  class MechanicScript;
+}
+
+namespace Sapphire::World::Encounter
 {
   enum class TimelinePackType : uint32_t
   {
@@ -32,6 +38,7 @@ namespace Sapphire
   // todo: actually handle solo stuff properly (or tie to zone director/content director at least)
   class TimelinePack
   {
+  protected:
     using TimeLinePackPtr = std::shared_ptr< TimelinePack >;
     TimelinePackType m_type{ TimelinePackType::EncounterFight };
     std::vector< TimelineActor > m_timelineActors;
@@ -43,6 +50,15 @@ namespace Sapphire
     std::shared_ptr< Encounter > m_pEncounter;
     std::map< uint32_t, uint64_t > m_vars;
 
+    std::unordered_map< std::string, std::string > m_mechanicDefinitions;
+    std::unordered_map< std::string, std::shared_ptr< ScriptAPI::MechanicScript > > m_mechanics;
+
+    bool m_paused{ false };
+    uint64_t m_pauseStart{ 0 };
+    uint64_t m_pauseEnd{ 0 };
+
+    void endPause( uint64_t timeMs );
+
   public:
     TimelinePack() {}
     TimelinePack( const TimelinePack& rhs ) :
@@ -50,6 +66,7 @@ namespace Sapphire
       m_name( rhs.m_name ),
       m_timelineActors( rhs.m_timelineActors ),
       m_selectors( rhs.m_selectors ),
+      m_mechanicDefinitions( rhs.m_mechanicDefinitions ),
       m_startTime( 0 )
     {
       for( auto& selector : m_selectors )
@@ -65,6 +82,10 @@ namespace Sapphire
     void createSnapshot( const std::string& selectorName, Entity::Chara& src,
                          const std::vector< uint32_t >& exclude );
 
+    const World::AI::Snapshot::CharaEntry& getSnapshotResultAt( const std::string& selectorName, int32_t selectorIndex );
+
+    uint32_t getSnapshotResultTargetIdAt( const std::string& selectorName, int32_t selectorIndex );
+
     const World::AI::Snapshot::Results& getSnapshotResults( const std::string& selectorName );
 
     const World::AI::Snapshot::TargetIds& getSnapshotTargetIds( const std::string& selectorName );
@@ -73,6 +94,8 @@ namespace Sapphire
 
     // get bnpc by internal timeline name
     Entity::BNpcPtr getBNpcByRef( const std::string& name, EncounterPtr pEncounter );
+
+    Entity::GameObjectPtr getGameObjectByRef( const std::string& name, EncounterPtr pEncounter );
 
     void reset( EncounterPtr pEncounter );
 
@@ -86,15 +109,38 @@ namespace Sapphire
 
     bool isPhaseActive( const std::string& actorRef, uint32_t phaseId );
 
+    bool isPhaseActive( const std::string& actorRef, const std::string& phaseName );
+
     void setTriggerEnabled( const std::string& actorRef, uint32_t phaseId, uint32_t triggerId, bool enabled );
 
     bool valid();
 
     void setEncounter( std::shared_ptr< Encounter > pEncounter );
 
-    uint32_t getVar( uint32_t index ) const;
+    uint64_t getVar( uint32_t index ) const;
 
-    void setVar( uint32_t index, uint32_t val );
+    void setVar( uint32_t index, uint64_t val );
+
+    void addMechanicDefinition( const std::string& instanceName, const std::string& scriptName );
+
+    bool callMechanic( const std::string& instanceName, const std::string& function,
+                       const nlohmann::json& args );
+
+    void requestPhaseTransition( const std::string& actorRef, uint32_t phaseId );
+
+    void requestPhaseTransition( const std::string& actorRef, const std::string& phaseName );
+
+    uint64_t getPhaseElapsed( const std::string& actorRef ) const;
+
+    std::string_view getPhaseName( const std::string& actorRef ) const;
+
+    bool isPaused() const;
+
+    void pause( uint64_t durationMs );
+
+    void pauseUntil( uint64_t timeMs );
+
+    void resume();
 
     static TimeLinePackPtr createTimelinePack( const std::string& name );
   };

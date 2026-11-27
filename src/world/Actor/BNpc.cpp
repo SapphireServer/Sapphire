@@ -61,6 +61,9 @@
 #include <AI/Fsm/StateResumePath.h>
 #include <AI/TargetHelper.h>
 
+#include <AI/Controller/Controller.h>
+#include <AI/Controller/BNpcOverworldController.h>
+
 using namespace Sapphire;
 using namespace Sapphire::World;
 using namespace Sapphire::Common;
@@ -306,7 +309,33 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNpcCacheEntry > pInfo, const 
   calculateStats();
 }
 
-BNpc::~BNpc() = default;
+BNpc::~BNpc()
+{
+  detachController();
+}
+
+World::AI::Controller::Controller* BNpc::getController()
+{
+  return m_pController.get();
+}
+
+bool BNpc::setController( World::AI::Controller::ControllerUPtr pController )
+{
+  if( m_controllerInitialized || !pController )
+    return false;
+
+  m_pController = std::move( pController );
+  return true;
+}
+
+void BNpc::detachController()
+{
+  if( m_pController && m_controllerInitialized )
+    m_pController->onDetach();
+
+  m_controllerInitialized = false;
+  m_pController.reset();
+}
 
 uint8_t BNpc::getAggressionMode() const
 {
@@ -414,8 +443,17 @@ float BNpc::getCurrentSpeed() const
   return isRunning ? getRunSpeed() : getWalkSpeed();
 }
 
-bool BNpc::moveTo( const Vector3& pos )
+bool BNpc::moveTo( const Vector3& pos, float targetReachedDist )
 {
+  auto yThreshold = 2.5f;
+
+  if( targetReachedDist == std::numeric_limits< float >::max() )
+    targetReachedDist = getNaviTargetReachedDistance();
+
+  if( getAgentId() == -1 )
+    return Common::Util::distance2D( m_pos.x, m_pos.z, pos.x, pos.z ) <= targetReachedDist &&
+           std::fabs( m_pos.y - pos.y ) <= yThreshold;
+
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
@@ -428,14 +466,29 @@ bool BNpc::moveTo( const Vector3& pos )
   }
 
   auto pos1 = pNaviProvider->getAgentPos( getAgentId() );
+
+  auto dY = std::fabs( pos.y - pos1.y );
+  auto dXZ = Common::Util::distance2D( pos1.x, pos1.z, pos.x, pos.z );
+  // todo: find the real y diff retail uses to determine if we should move
+
   auto distance = Common::Util::distance( pos1, pos );
 
-  if( distance <= getNaviTargetReachedDistance() )
+  if( dXZ <= targetReachedDist && dY <= yThreshold )
   {
     // Reached destination
     face( pos );
     setPos( pos1 );
-    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed() );
+
+    auto ignoreAgentCollision = false;
+    auto ignoreObstacles = false;
+    if( m_pController )
+    {
+      const auto& flags = m_pController->getPath().m_flags;
+      ignoreAgentCollision = ( flags & AI::Controller::Controller::PathFlags::IgnoreActorCollision );
+      ignoreObstacles = ( flags & AI::Controller::Controller::PathFlags::IgnoreObstacles );
+    }
+
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius(), getCurrentSpeed(), ignoreAgentCollision, ignoreObstacles );
     setAgentId( newAgentId );
     m_naviTarget = pos;
     m_naviLastTarget = pos;
@@ -456,9 +509,9 @@ bool BNpc::moveTo( const Vector3& pos )
   return false;
 }
 
-bool BNpc::moveTo( const Chara& targetChara )
+bool BNpc::moveTo( const Chara& targetChara, float targetReachedDist )
 {
-  return moveTo( targetChara.getPos() );
+  return moveTo( targetChara.getPos(), targetReachedDist );
 }
 
 float mapSpeedToRange( float speed, float minSpeed = 0.0f, float maxSpeed = 18.0f )
@@ -499,7 +552,7 @@ void BNpc::sendPositionUpdate( uint64_t tickCount )
     float s1 = mapSpeedToRange( getCurrentSpeed(), 0, 25.5f );
     uint8_t dirS1 = Common::Util::floatToUInt8Rot( s1 );
 
-    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, dirS1 );
+    auto movePacket = std::make_shared< MoveActorPacket >( *this, 0x3A, animationType, 0, dirS1 );
     server().queueForPlayers( getInRangePlayerIds(), movePacket );
   }
   m_lastPos = m_pos;
@@ -790,12 +843,11 @@ void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
 
-  checkAggro();
+  if( m_pController )
+    m_pController->update( tickCount );
   // removed check for now, replaced by position check to last position
   //if( m_dirtyFlag & DirtyFlag::Position )
   sendPositionUpdate( tickCount );
-
-  m_fsm->update( *this, tickCount );
 }
 
 void BNpc::restHp()
@@ -877,7 +929,7 @@ void BNpc::setTimeOfDeath( uint32_t timeOfDeath )
 
 void BNpc::checkAggro()
 {
-  if( !isAlive() )
+  if( !isAlive() || m_state == BNpcState::Retreat )
     return;
 
   // passive mobs should ignore players unless aggro'd
@@ -889,19 +941,37 @@ void BNpc::checkAggro()
     return;
   }
 
-  auto calculateAdjustedRange = []( float baseRange, int targetLevel, int sourceLevel ) -> float {
-    auto levelDiff = std::abs( targetLevel - sourceLevel );
-
-    if( levelDiff >= 10 )
-      return 0.0f;
-    else
-      return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
-  };
-
-
   bool hasAggro = false;
   auto pCharaSelf = getAsChara();
   static auto pBattalionFilter = std::make_shared< World::AI::OwnBattalionFilter >();
+
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( !pTeri )
+    return;
+
+  auto pNavi = pTeri->getNaviProvider();
+  if( !pNavi )
+    return;
+
+  const bool isInstance = pTeri->getAsInstanceContent() != nullptr;
+  auto calculateAdjustedRange = [ this, isInstance ]( float baseRange, const CharaPtr& target ) -> float {
+    if( isInstance || target->getEffectiveLevel() <= getLevel() )
+      return baseRange;
+
+    auto levelDiff = target->getEffectiveLevel() - getLevel();
+    if( levelDiff >= 10 )
+      return 0.0f;
+
+    return std::max< float >( 0.0f, baseRange - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
+  };
+
+  auto canSenseTarget = [ this, &pNavi ]( const CharaPtr& target ) {
+    return pNavi->hasLineOfSight( getPos(), target->getPos() ) &&
+           pNavi->isPointReachable( getPos(), target->getPos() );
+  };
 
   for( uint32_t i = 0; i < 2; ++i )
   {
@@ -919,6 +989,9 @@ void BNpc::checkAggro()
 
           auto pCharaTarget = actor->getAsChara();
 
+          if( !pCharaTarget->isAlive() )
+            continue;
+
           // if this chara is in our battalion, dont aggro
           if( pBattalionFilter->isApplicable( pCharaSelf, pCharaTarget ) )
             continue;
@@ -930,15 +1003,18 @@ void BNpc::checkAggro()
 
 
           if( auto pPlayer = actor->getAsPlayer() )
-            if( !pPlayer->isRunning() || !pPlayer->isAlive() )
+            if( !pPlayer->isRunning() )
               continue;
 
           // diminish sense range if required.
-          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget );
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < adjustedSenseRange )
           {
-            aggro( actor->getAsChara() );
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
+
+            aggro( pCharaTarget );
             hasAggro = true;
             break;
           }
@@ -973,7 +1049,7 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
 
           // Diminish sense range if required
-          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget->getLevel(), getLevel() );
+          float adjustedSenseRange = calculateAdjustedRange( senseRange, pCharaTarget );
 
           if( distance > adjustedSenseRange )
             continue;// Too far away
@@ -1002,12 +1078,12 @@ void BNpc::checkAggro()
           // Check if player is within the 75-degree vision cone (37.5 degrees on each side)
           float halfConeAngle = ( 75.0f * PI / 180.0f ) / 2.0f;
 
-          if( abs( angleDiff ) <= halfConeAngle )
+          if( std::abs( angleDiff ) <= halfConeAngle )
           {
-            // Player is within vision cone, check for line of sight if needed
-            // TODO: Add line of sight check using navmesh/collision mesh raycast if required
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
 
-            aggro( actor->getAsChara() );
+            aggro( pCharaTarget );
             hasAggro = true;
             break;
           }
@@ -1041,7 +1117,10 @@ void BNpc::checkAggro()
           float distance = Common::Util::distance( getPos(), actor->getPos() );
           if( distance < senseRange )
           {
-            aggro( actor->getAsChara() );
+            if( !canSenseTarget( pCharaTarget ) )
+              continue;
+
+            aggro( pCharaTarget );
             hasAggro = true;
             break;
           }
@@ -1175,6 +1254,11 @@ void BNpc::resetFlags( uint32_t flags )
     setAgentId( agentId );
     setPathingActive( true );
   }
+
+  if( flags & BNpcFlag::Untargetable )
+    toggleNameHidden( true );
+  else
+    toggleNameHidden( false );
 }
 
 void BNpc::setFlag( uint32_t flag )
@@ -1205,16 +1289,23 @@ void BNpc::setFlag( uint32_t flag )
     setAgentId( agentId );
     setPathingActive( true );
   }
+
+  if( flag & BNpcFlag::Untargetable )
+    toggleNameHidden( true );
 }
 
 void BNpc::removeFlag( uint32_t flag )
 {
   m_flags &= ~flag;
+
+  if( flag & BNpcFlag::Untargetable )
+    toggleNameHidden( false );
 }
 
 void BNpc::clearFlags()
 {
   m_flags = 0;
+  toggleNameHidden( false );
 }
 
 void BNpc::autoAttack( CharaPtr pTarget )
@@ -1313,6 +1404,8 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  std::shared_ptr< AI::GambitPack > pGambitPack{ nullptr };
+
   /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
@@ -1334,64 +1427,22 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
   */
-  initFsm();
+  if( !m_pController )
+    m_pController = std::make_unique< AI::Controller::BNpcOverworldController >( *this );
+
+  m_pController->setGambitPack( pGambitPack );
+  m_pController->initialize();
+  m_controllerInitialized = true;
 }
 
 void BNpc::initFsm()
 {
-  using namespace AI::Fsm;
-  m_fsm = make_StateMachine();
-  auto stateIdle = make_StateIdle();
-  auto stateCombat = make_StateCombat();
-  auto stateDead = make_StateDead();
-
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  if( m_pInfo->ServerPathId != 0 && pZone && pZone->getServerPath( m_pInfo->ServerPathId ) )
-  {
-    auto statePath = make_StateFollowPath();
-    auto stateResumePath = make_StateResumePath();
-    statePath->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    statePath->addTransition( stateDead, make_IsDeadCondition() );
-
-    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-    stateCombat->addTransition( stateResumePath, make_HateListEmptyCondition() );
-    stateResumePath->addTransition( statePath, make_RoamTargetReachedCondition() );
-
-    m_fsm->addState( statePath );
-
-    m_fsm->setCurrentState( statePath );
-  }
-  else
-  {
-    if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
-    {
-      auto stateRoam = make_StateRoam();
-      stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
-      stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-      stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-      stateRoam->addTransition( stateDead, make_IsDeadCondition() );
-      m_fsm->addState( stateRoam );
-    }
-    stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
-    //stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
-    stateIdle->addTransition( stateDead, make_IsDeadCondition() );
-    stateCombat->addTransition( stateDead, make_IsDeadCondition() );
-    m_fsm->addState( stateIdle );
-    if( !hasFlag( NoDeaggro ) )
-    {
-      auto stateRetreat = make_StateRetreat();
-      stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
-      stateCombat->addTransition( stateRetreat, make_HateListEmptyCondition() );
-      stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
-    }
-    m_fsm->setCurrentState( stateIdle );
-  }
+  // todo: assign controller based on mob type
 }
 
 void BNpc::processGambits( uint64_t tickCount )
 {
+  // todo: should this be handled by Controller instead of BNpc?
   m_tp = 1000;
   if( m_pGambitPack )
     m_pGambitPack->update( *this, tickCount );
@@ -1457,12 +1508,23 @@ void BNpc::setCanSwapTarget( bool value )
   }
 }
 
-void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
+void BNpc::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  Chara::setPos( x, y, z, broadcastUpdate );
+  Chara::setPos( x, y, z, broadcastUpdate, sendPacketToSelf );
 }
 
-void BNpc::setPos( const Vector3& pos, bool broadcastUpdate )
+void BNpc::setPos( const Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate, sendPacketToSelf );
+}
+
+void BNpc::toggleNameHidden( bool hidden )
+{
+  // todo: should we really be handling flag setting here?
+  if( hidden )
+    m_flags |= BNpcFlag::Untargetable;
+  else
+    m_flags &= ~BNpcFlag::Untargetable;
+
+  GameObject::toggleNameHidden( hidden );
 }

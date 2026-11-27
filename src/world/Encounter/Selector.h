@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   class Selector
   {
@@ -21,6 +21,10 @@ namespace Sapphire
     void createSnapshot( Entity::Chara& src, const std::vector< uint32_t >& exclude = {} );
     const World::AI::Snapshot::Results& getResults();
     const World::AI::Snapshot::TargetIds& getTargetIds();
+
+    uint32_t getResultTargetIdAt( int32_t index ) const;
+    const World::AI::Snapshot::CharaEntry& getResultAt( int32_t index ) const;
+
     void clearResults();
     void from_json( const nlohmann::json& json );
   };

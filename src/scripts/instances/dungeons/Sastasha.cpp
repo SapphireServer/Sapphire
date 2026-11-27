@@ -7,6 +7,7 @@
 #include <Actor/BNpc.h>
 
 #include <Encounter/Encounter.h>
+#include <Encounter/TimelinePack.h>
 
 #include <WorldServer.h>
 
@@ -14,9 +15,12 @@
 #include <Network/GameConnection.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
+#include <nlohmann/json.hpp>
+
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets;
+using namespace Sapphire::World::Encounter;
 
 class Sastasha :
   public Sapphire::ScriptAPI::InstanceContentScript
@@ -37,7 +41,9 @@ private:
     UnnaturalRipples = 2,
     UnnaturalRipples2 = 3,
     UnnaturalRipples3 = 4,
-    UnnaturalRipples4 = 5
+    UnnaturalRipples4 = 5,
+
+    CurrEncounterId = 6
   };
 
   enum Sequence : uint8_t
@@ -66,6 +72,7 @@ private:
   static constexpr uint32_t ENCOUNTER_RAMBADE{ 2 };
   static constexpr uint32_t PLACENAME_RAMBADE{ 663 };
   static constexpr uint32_t BOSS_MADISON{ 3988325 };
+  static constexpr uint32_t BOSS_MADISON_PET{ 4192074 };
   static constexpr uint32_t HP_MADISON{ 600 };
 
   static constexpr uint32_t ENCOUNTER_RAMBADE_2{ 3 };
@@ -78,6 +85,10 @@ private:
   static constexpr uint32_t BOSS_DENN{ 3978771 };
   static constexpr uint32_t HP_DENN{ 1000 };
 
+  static constexpr float POPRANGE_4033741[ 4 ] = { 74.695801f, 29.641500f, -50.012428f, -0.759668f };
+  static constexpr float POPRANGE_4033745[ 4 ] = { -24.229860f, 21.561069f, 51.027889f, -0.795675f };
+  static constexpr float POPRANGE_4165184[ 4 ] = { -181.568298f, 6.235275f, 239.162201f, -0.795675f };
+
   // < groupName, vector< layoutId > >
   // todo: use this to track which trash groups need to drop eobj etc
   std::map< std::string, std::vector< uint32_t > > trashGroups;
@@ -86,6 +97,130 @@ public:
   Sastasha() :
     Sapphire::ScriptAPI::InstanceContentScript( 4 )
   { }
+
+  static World::Encounter::EncounterDefinition makeChopperEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Chopper";
+    def.timeline = "dungeons/sastasha/Chopper";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Chopper";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.exits = { {} };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_CATTERY;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeMadisonEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Madison";
+    def.timeline = "dungeons/sastasha/Madison";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Madison";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required },
+      { BOSS_MADISON_PET, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam | Entity::BNpcFlag::Untargetable, EncounterBNpcCompletionRole::None }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.exits = {
+      { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, 0, true, EncounterEntityRemoveFlag::None }
+    };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_RAMBADE;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeMadison2EncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Madison2";
+    def.timeline = "dungeons/sastasha/Madison2";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Madison2";
+
+    // { { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_MADISON_2, HP_MADISON_2, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "sgbg_s1d1_m1_sht1_1", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.onInitEObjList = {
+      { "sgbg_s1d1_m1_pri1", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, 0, true, EncounterEntityRemoveFlag::None }
+    };
+    def.exits = {
+      { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, 0, true, EncounterEntityRemoveFlag::None }
+    };
+    def.hasLockout = true;
+    def.placeName = PLACENAME_RAMBADE_2;
+    def.bgmInCombat = BGM_ENCOUNTER_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
+
+  static World::Encounter::EncounterDefinition makeDennEncounterDef()
+  {
+    EncounterDefinition def;
+    def.key = "Denn";
+    def.timeline = "dungeons/sastasha/Denn";
+
+    def.shape = EncounterShape::POLYGON;
+    def.shapeFileName = "dungeons/sastasha/Denn";
+
+    //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, EncounterBNpcCompletionRole role } }
+    def.participants = {
+      { BOSS_DENN, HP_DENN, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, EncounterBNpcCompletionRole::Required }
+    };
+    // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility,
+    //     uint32_t animation, bool collisionDefaultEnabled EncounterEntityRemoveFlag removeFlag } }
+    def.entrances = {
+      { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, 0, false, EncounterEntityRemoveFlag::OnSuccess }
+    };
+    def.onInitEObjList = {
+            { "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, 10, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, 10, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, 10, false, EncounterEntityRemoveFlag::None },
+            { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, 10, false, EncounterEntityRemoveFlag::None }
+    };
+
+    def.hasLockout = true;
+    def.placeName = PLACENAME_SULTANAS_LAP;
+    def.bgmInCombat = BGM_ENCOUNTER_FINAL_BOSS;
+    def.bgmToRestore = BGM_NORMAL;
+
+    return def;
+  }
 
   void onInit( InstanceContent& instance ) override
   {
@@ -108,125 +243,162 @@ public:
 
     Entity::EventObjectPtr pEObj;
 
-    pEObj = instance.addEObj( "unknown_0", 2000211, 0, 3280858, 4, { 367.827087f, 47.400051f, -226.694305f }, 4.714991f, 0.000432f, 0 ); 
+    pEObj = instance.addEObj( "unknown_0", 2000211, 0, 3280858, 4, { 367.827087f, 47.400051f, -226.694305f }, 4.714991f, 0.000432f, 0 );
 
-    pEObj = instance.addEObj( "Bluecoralformation", 2000213, 3668215, 3280868, 4, { 75.869797f, 35.101421f, -32.537209f }, 0.930753f, 0.000240f, 0 ); 
+    pEObj = instance.addEObj( "Bluecoralformation", 2000213, 3668215, 3280868, 4, { 75.869797f, 35.101421f, -32.537209f }, 0.930753f, 0.000240f, 0 );
+    // States -> hide (mask: 1) show (mask: 2)
 
-    pEObj = instance.addEObj( "Redcoralformation", 2000214, 3668214, 3280879, 4, { 88.769371f, 31.135691f, -40.869640f }, 0.930753f, 0.000240f, 0 ); 
+    pEObj = instance.addEObj( "Redcoralformation", 2000214, 3668214, 3280879, 4, { 88.769371f, 31.135691f, -40.869640f }, 0.930753f, 0.000240f, 0 );
+    // States -> hide (mask: 1) show (mask: 2)
 
-    pEObj = instance.addEObj( "Greencoralformation", 2000215, 3668216, 3280932, 4, { 64.988159f, 33.672821f, -56.690559f }, 0.991789f, 0.000048f, 0 ); 
+    pEObj = instance.addEObj( "Greencoralformation", 2000215, 3668216, 3280932, 4, { 64.988159f, 33.672821f, -56.690559f }, 0.991789f, 0.000048f, 0 );
+    // States -> hide (mask: 1) show (mask: 2)
 
-    pEObj = instance.addEObj( "Inconspicuousswitch", 2000216, 3653858, 3280956, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f, 0 ); 
-    pEObj->setPermissionInvisibility( 1 );
-    pEObj = instance.addEObj( "Hiddendoor", 2000217, 3653517, 3280959, 4, { 59.000000f, 32.000000f, -35.000000f }, 1.000000f, -2.007129f, 0 ); 
-    pEObj->addCollisionBox( { 59.048332, 39.016666, -35.022537 }, 2.007129, 17.600000, 15.436666, 1.476608 );
+    pEObj = instance.addEObj( "Inconspicuousswitch", 2000216, 3653858, 3280956, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f, 0 );
+    // States -> out (mask: 1) in (mask: 2)
+    pEObj->setPermissionInvisibility( 7 );
+
+    pEObj = instance.addEObj( "Hiddendoor", 2000217, 3653517, 3280959, 4, { 59.000000f, 32.000000f, -35.000000f }, 1.000000f, -2.007129f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 7.016666, 0.053328 }, { 0.000000, -0.000000, 0.000000 }, 8.800000, 7.718333, 0.738304 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 ); 
-    pEObj->addCollisionBox( { -35.299999, 29.043749, 60.799999 }, 2.007129, 14.520002, 11.591252, 0.600005 );
+    pEObj = instance.addEObj( "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 5.043749, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 7.260001, 5.795626, 0.300003 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "Captainsquarters", 2000227, 3687697, 3281045, 4, { -95.044670f, 20.513069f, 172.039597f }, 0.991789f, 0.000048f, 0 ); 
-    pEObj->addCollisionBox( { -95.065819, 23.074062, 172.106201 }, -3.141593, 7.431962, 6.763168, 0.981615 );
+    pEObj = instance.addEObj( "Captainsquarters", 2000227, 3687697, 3281045, 4, { -95.044670f, 20.513069f, 172.039597f }, 0.991789f, 0.000048f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 3.074062, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 3.715981, 3.381584, 0.490808 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "WaveriderGate", 2000231, 3655909, 3281133, 4, { -130.600006f, 16.000000f, 156.800003f }, 1.000000f, -2.007129f, 0 ); 
-    pEObj->addCollisionBox( { -130.600006, 20.793749, 156.800003 }, 2.007129, 14.520002, 11.591252, 0.600005 );
+    pEObj = instance.addEObj( "WaveriderGate", 2000231, 3655909, 3281133, 4, { -130.600006f, 16.000000f, 156.800003f }, 1.000000f, -2.007129f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 5.043749, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 7.260001, 5.795626, 0.300003 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "TheHole", 2000232, 3656260, 3281161, 4, { -36.000000f, 16.500000f, 163.300003f }, 1.000000f, 1.047198f, 0 ); 
-    pEObj->addCollisionBox( { -36.000000, 22.126310, 163.300003 }, -2.094395, 15.180008, 12.375000, 1.050023 );
+    pEObj = instance.addEObj( "TheHole", 2000232, 3656260, 3281161, 4, { -36.000000f, 16.500000f, 163.300003f }, 1.000000f, 1.047198f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 5.625000, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 7.590004, 6.187500, 0.525011 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0 ); 
-    pEObj->addCollisionBox( { -190.000000, 11.943748, 252.000000 }, 2.443461, 14.520002, 11.591252, 0.600005 );
+    pEObj = instance.addEObj( "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 5.043749, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 7.260001, 5.795626, 0.300003 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0 ); 
-    pEObj->addCollisionBox( { -156.500000, 14.225000, 252.500000 }, -2.007129, 15.180008, 12.375000, 1.050023 );
+    pEObj = instance.addEObj( "sgbg_s1d1_m1_pri1", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 5.625000, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 7.590004, 6.187500, 0.525011 );
     pEObj->setCollisionEnabled( true );
 
-    pEObj = instance.addEObj( "Exit", 2000139, 0, 3281180, 4, { -314.279114f, 5.630589f, 348.735596f }, 0.900235f, 0.000336f, 0 ); 
+    pEObj = instance.addEObj( "Exit", 2000139, 0, 3281180, 4, { -314.279114f, 5.630589f, 348.735596f }, 0.900235f, 0.000336f, 0 );
+    // States -> vf_htras1_on (mask: 1) vf_htras1_of (mask: 2)
 
-    pEObj = instance.addEObj( "Giantclam", 2000222, 4208408, 3284776, 4, { 181.170303f, 32.104599f, -128.069000f }, 0.991789f, -0.862350f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "Giantclam", 2000222, 4208408, 3284776, 4, { 181.170303f, 32.104599f, -128.069000f }, 0.991789f, -0.862350f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "WaveriderGatekey", 2000255, 0, 3332312, 4, { -95.515343f, 20.000000f, 177.197800f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "WaveriderGatekey", 2000255, 0, 3332312, 4, { -95.515343f, 20.000000f, 177.197800f }, 1.000000f, 0.000000f, 0 );
 
-    pEObj = instance.addEObj( "KeytotheHole", 2000256, 0, 3332313, 4, { -38.076599f, 17.232731f, 158.839401f }, 0.991760f, 1.561760f, 0 ); 
+    pEObj = instance.addEObj( "KeytotheHole", 2000256, 0, 3332313, 4, { -38.076599f, 17.232731f, 158.839401f }, 0.991760f, 1.561760f, 0 );
 
-    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1", 2000260, 4208409, 3424283, 4, { 166.318695f, 30.735420f, -128.312103f }, 0.991789f, 0.481030f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1", 2000260, 4208409, 3424283, 4, { 166.318695f, 30.735420f, -128.312103f }, 0.991789f, 0.481030f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_1", 2000261, 4208410, 3425471, 4, { 158.800598f, 28.586321f, -76.340927f }, 0.991789f, 1.471638f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_1", 2000261, 4208410, 3425471, 4, { 158.800598f, 28.586321f, -76.340927f }, 0.991789f, 1.471638f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_2", 2000262, 4208411, 3425472, 4, { 125.463402f, 29.260550f, -51.934608f }, 0.991789f, -0.375975f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_2", 2000262, 4208411, 3425472, 4, { 125.463402f, 29.260550f, -51.934608f }, 0.991789f, -0.375975f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_3", 2000263, 4208412, 3425473, 4, { 126.070198f, 28.913260f, -99.908722f }, 1.000000f, 0.020540f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_3", 2000263, 4208412, 3425473, 4, { 126.070198f, 28.913260f, -99.908722f }, 1.000000f, 0.020540f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_4", 2000264, 4208413, 3425474, 4, { 97.055313f, 27.081551f, -70.264381f }, 0.991789f, -0.618915f, 0 ); 
-    // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
+    pEObj = instance.addEObj( "sgbg_s1d1_p1_shel1_4", 2000264, 4208413, 3425474, 4, { 97.055313f, 27.081551f, -70.264381f }, 0.991789f, -0.618915f, 0 );
+    // States -> vf_kai_off (mask: 1) vf_kai_on (mask: 2) vf_kai_pop (mask: 4) close_open (mask: 8) open_close (mask: 16)
 
-    pEObj = instance.addEObj( "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples", 2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0 );
+    // States -> open (mask: 1) close (mask: 2) vfx_on (mask: 4) vfx_off (mask: 8)
 
-    pEObj = instance.addEObj( "Shortcut", 2000700, 0, 4033735, 4, { 344.705688f, 43.781551f, -217.365997f }, 0.991760f, 0.000048f, 0 ); 
-    pEObj->setPermissionInvisibility( 1 );
+    pEObj = instance.addEObj( "Shortcut", 2000700, 0, 4033735, 4, { 344.705688f, 43.781551f, -217.365997f }, 0.991760f, 0.000048f, 0 );
+    pEObj->setPermissionInvisibility( 7 );
 
-    pEObj = instance.addEObj( "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 0 ); 
-    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
-    pEObj->addCollisionBox( { 98.210648, 29.116930, -61.158611 }, -0.916448, 21.000000, 10.000000, 1.500000 );
-    pEObj->setPermissionInvisibility( 1 );
+    pEObj = instance.addEObj( "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 0 );
+    // States -> vf_bextwall_on (mask: 1) vf_bextwall_of (mask: 2)
+    pEObj->addCollisionBox( { 0.000000, 2.500000, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 15.000000, 4.000000, 0.750000 );
+    pEObj->setPermissionInvisibility( 7 );
 
-    pEObj = instance.addEObj( "sgvf_w_lvd_b0249", 2001505, 4323997, 4036039, 4, { 95.510597f, 26.620729f, -67.853653f }, 1.000000f, 0.000000f, 0 ); 
-    // States -> vf_line_on (id: 10) vf_line_of (id: 11) 
+    pEObj = instance.addEObj( "sgvf_w_lvd_b0249", 2001505, 4323997, 4036039, 4, { 95.510597f, 26.620729f, -67.853653f }, 1.000000f, 0.000000f, 0 );
+    // States -> vf_line_on (mask: 1) vf_line_of (mask: 2)
 
-    pEObj = instance.addEObj( "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1 ); 
-    pEObj->addCollisionBox( { -162.986496, 11.158604, 219.803619 }, -0.261799, 6.177516, 7.462764, 1.020000 );
+    pEObj = instance.addEObj( "sgbg_s1d1_m1_sht1_1", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2)
+    pEObj->addCollisionBox( { 0.013983, 2.979504, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 3.088758, 3.731382, 0.510000 );
 
-    pEObj = instance.addEObj( "sgvf_w_lvd_b0094_1", 2001540, 4056793, 4036043, 4, { -163.598602f, 8.026373f, 214.030106f }, 0.991760f, 0.000048f, 0 ); 
-    // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
+    pEObj = instance.addEObj( "sgvf_w_lvd_b0094_1", 2001540, 4056793, 4036043, 4, { -163.598602f, 8.026373f, 214.030106f }, 0.991760f, 0.000048f, 0 );
+    // States -> vf_line_on (mask: 1) vf_line_of (mask: 2)
 
-    pEObj = instance.addEObj( "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1 ); 
-    pEObj->addCollisionBox( { -300.141296, 8.076687, 278.205902 }, -3.141593, 10.500000, 8.000000, 1.500000 );
-    pEObj->addCollisionBox( { -345.069397, 7.546691, 278.205902 }, -3.141593, 21.000000, 8.000000, 1.500000 );
+    pEObj = instance.addEObj( "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 0 );
+    pEObj->addCollisionBox( { 0.014000, 2.500000, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 5.250000, 4.000000, 0.750000 );
+    pEObj->addCollisionBox( { 44.942101, 1.970000, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 10.500000, 4.000000, 0.750000 );
 
-    pEObj = instance.addEObj( "sgpl_s1d1_bossline", 2001509, 4236990, 4036046, 4, { -305.302002f, 5.542851f, 275.750885f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "sgpl_s1d1_bossline", 2001509, 4236990, 4036046, 4, { -305.302002f, 5.542851f, 275.750885f }, 1.000000f, 0.000000f, 0 );
 
-    pEObj = instance.addEObj( "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 ); 
-    pEObj->addCollisionBox( { -3.186494, 26.457243, 30.003618 }, -0.261799, 6.177516, 7.462764, 1.020000 );
+    pEObj = instance.addEObj( "sgbg_s1d1_m1_sht1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 0 );
+    // States -> open (mask: 1) close (mask: 2)
+    pEObj->addCollisionBox( { 0.013983, 2.979504, 0.000000 }, { 0.000000, -0.000000, 0.000000 }, 3.088758, 3.731382, 0.510000 );
 
-    pEObj = instance.addEObj( "sgvf_w_lvd_b0094", 2001507, 4035750, 4056798, 4, { -2.841087f, 23.114571f, 38.090420f }, 0.991760f, 0.000048f, 0 ); 
-    // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
+    pEObj = instance.addEObj( "sgvf_w_lvd_b0094", 2001507, 4035750, 4056798, 4, { -2.841087f, 23.114571f, 38.090420f }, 0.991760f, 0.000048f, 0 );
+    // States -> vf_line_on (mask: 1) vf_line_of (mask: 2)
 
-    pEObj = instance.addEObj( "Entrance", 2000182, 4096706, 4096707, 5, { 361.881714f, 46.092751f, -225.181305f }, 1.000000f, 0.000000f, 0 ); 
-    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
-    pEObj->addCollisionBox( { 359.516113, 47.920158, -228.417206 }, 0.000000, 2.600000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 359.525909, 47.920158, -222.417206 }, 0.000000, 2.600000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 362.516113, 47.920158, -225.413315 }, 1.570451, 2.600000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 356.516113, 47.920158, -225.406235 }, 1.570451, 2.600000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 357.416107, 47.920158, -227.517212 }, 0.785398, 2.800000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 361.616119, 47.920158, -223.317200 }, 0.785398, 2.800000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 361.616119, 47.920158, -227.517212 }, -0.785398, 2.800000, 8.000000, 0.500000 );
-    pEObj->addCollisionBox( { 357.416107, 47.920158, -223.317200 }, -0.785398, 2.800000, 8.000000, 0.500000 );
+    pEObj = instance.addEObj( "Entrance", 2000182, 4096706, 4096707, 5, { 361.881714f, 46.092751f, -225.181305f }, 1.000000f, 0.000000f, 0 );
+    // States -> vf_lock_on (mask: 1) vf_lock_of (mask: 2)
+    pEObj->addCollisionBox( { 0.000000, 2.000000, -3.000000 }, { 0.000000, -0.000000, 0.000000 }, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { 0.009802, 2.000000, 3.000000 }, { 0.000000, -0.000000, 0.000000 }, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { 3.000000, 2.000000, 0.003891 }, { -0.000000, 1.570451, 0.000000 }, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -3.000000, 2.000000, 0.010976 }, { -0.000000, 1.570451, 0.000000 }, 1.300000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -2.100000, 2.000000, -2.100000 }, { 0.000000, 0.785398, 0.000000 }, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { 2.100000, 2.000000, 2.100000 }, { 0.000000, 0.785398, 0.000000 }, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { 2.100000, 2.000000, -2.100000 }, { 0.000000, -0.785398, 0.000000 }, 1.400000, 4.000000, 0.250000 );
+    pEObj->addCollisionBox( { -2.100000, 2.000000, 2.100000 }, { 0.000000, -0.785398, 0.000000 }, 1.400000, 4.000000, 0.250000 );
 
-    pEObj = instance.addEObj( "Captainsquarterskey", 2000250, 0, 4192068, 4, { -100.625000f, 15.600010f, 137.150696f }, 1.000000f, 0.000000f, 0 ); 
+    pEObj = instance.addEObj( "Captainsquarterskey", 2000250, 0, 4192068, 4, { -100.625000f, 15.600010f, 137.150696f }, 1.000000f, 0.000000f, 0 );
 
-    pEObj = instance.addEObj( "sgpl_s1d1_sghit_ctrl", 2000223, 4200832, 4200772, 4, { -24.018980f, 18.475060f, 111.404900f }, 1.000000f, 0.000000f, 0 ); 
-    pEObj->addCollisionBox( { -11.414590, 22.215639, 108.525803 }, 0.000000, 18.736109, 6.194796, 0.527770 );
+    pEObj = instance.addEObj( "sgpl_s1d1_sghit_ctrl", 2000223, 4200832, 4200772, 4, { -24.018980f, 18.475060f, 111.404900f }, 1.000000f, 0.000000f, 0 );
+    pEObj->addCollisionBox( { 0.000000, 0.000000, 0.000000 }, { 0.000000, 0.000000, 0.000000 }, 1.000000, 1.000000, 1.000000 );
+
+
+    // set up encounters
+    instance.registerEncounterDefinition( makeChopperEncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeMadisonEncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeMadison2EncounterDef(), instance.getAsInstanceContent() );
+    instance.registerEncounterDefinition( makeDennEncounterDef(), instance.getAsInstanceContent() );
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
   {
-    auto pEncounter = instance.getEncounter();
+    World::Encounter::EncounterPtr pEncounter = nullptr;
+    auto encounterId = instance.getCustomVar( Variables::CurrEncounterId );
+
+    switch( encounterId )
+    {
+      case ENCOUNTER_CHOPPER:
+        pEncounter = instance.getEncounter( "Chopper" );
+        break;
+      case ENCOUNTER_RAMBADE:
+        pEncounter = instance.getEncounter( "Madison" );
+        break;
+      case ENCOUNTER_RAMBADE_2:
+        pEncounter = instance.getEncounter( "Madison2" );
+        break;
+      case ENCOUNTER_DENN:
+        pEncounter = instance.getEncounter( "Denn" );
+        break;
+    }
+
     if( pEncounter )
     {
       pEncounter->update( tickCount );
@@ -244,6 +416,15 @@ public:
 
       if( pBNpc )
       {
+        bool winConditionMet = false;
+
+        if( pBNpc->getLayoutId() == BOSS_MADISON )
+          winConditionMet = pBNpc->getHpPercent() < 50;
+        else if( pBNpc->getLayoutId() == BOSS_MADISON_2 )
+          winConditionMet = pBNpc->getHpPercent() < 5;
+        else
+          winConditionMet = !pBNpc->isAlive();
+
         // set the encounter to active if a player has aggro
         if( pBNpc->hateListGetHighest() && pEncounter->getStatus() == EncounterStatus::IDLE )
         {
@@ -254,7 +435,7 @@ public:
           pEncounter->onEnterRange( pBNpc );
         }
         // set the encounter as successful if boss is dead
-        else if( !pBNpc->isAlive() && pEncounter->getStatus() != EncounterStatus::SUCCESS )
+        else if( winConditionMet && pEncounter->getStatus() != EncounterStatus::SUCCESS )
         {
           pEncounter->setStatus( EncounterStatus::SUCCESS );
         }
@@ -270,37 +451,9 @@ public:
       // todo: find a better place to put this?
       // todo: retail only spawns the encounter after passing the boss entrance/wall/line
       // enable the final encounter (probably make an onEnterRange and play this after event?)
-      if( pEncounter->getId() == ENCOUNTER_RAMBADE_2 && pEncounter->getStatus() == EncounterStatus::SUCCESS )
+      if( pEncounter->getId() == ENCOUNTER_RAMBADE_2 && pEncounter->getStatus() == EncounterStatus::SUCCESS && instance.getCustomVar( Variables::CurrEncounterId ) != ENCOUNTER_DENN )
       {
-        auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-        auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-        auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Denn" );
-        EncounterSetup setup;
-        setup.timelineName = "dungeons/sastasha/Denn";
-
-        setup.encounterShape = EncounterShape::POLYGON;
-        setup.polygonShapeFile = "dungeons/sastasha/Denn";
-
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-        setup.bnpcSetupList = { { BOSS_DENN, HP_DENN, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-        setup.lockoutEntrances = { { "sgpl_s1d1_bosswall", 2001508, 4236989, 4036045, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-        setup.onInitEObjSetupList = {
-          { "Unnaturalripples",   2000405, 3992454, 3741845, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_1", 2000406, 3992452, 3741894, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_2", 2000407, 3992449, 3741895, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f, 0, EncounterEntityRemoveFlag::None },
-          { "Unnaturalripples_3", 2000408, 3992453, 3741897, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f, 0, EncounterEntityRemoveFlag::None }
-        };
-
-        setup.hasLockout = true;
-        setup.placeName = PLACENAME_SULTANAS_LAP;
-        setup.bgmInCombat = BGM_ENCOUNTER_FINAL_BOSS;
-        setup.bgmToRestore = BGM_NORMAL;
-
-        pEncounter->setEncounterSetup( setup );
-        instance.setEncounter( pEncounter );
-        pEncounter->init();
+        instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_DENN );
       }
     }
   }
@@ -348,37 +501,11 @@ public:
     // spawn chopper
     else if( eobj.getName() == "Inconspicuousswitch" )
     {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
+      auto pEncounter = instance.getEncounter( "Chopper" );
 
-      std::shared_ptr< Encounter > pEncounter = instance.getEncounter();
-      // set up chopper encounter
-      if( pEncounter == nullptr || pEncounter->getId() < ENCOUNTER_CHOPPER )
-      {
-        pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Chopper" );
-        EncounterSetup setup;
-        setup.timelineName = "dungeons/sastasha/Chopper";
-
-        setup.encounterShape = EncounterShape::POLYGON;
-        setup.polygonShapeFile = "dungeons/sastasha/Chopper";
-
-        //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-        setup.bnpcSetupList = { { BOSS_CHOPPER, HP_CHOPPER, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-        // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-        setup.lockoutEntrances = { { "sgvf_w_lvd_b0250", 2001504, 4323996, 4036038, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-        setup.lockoutExits = { {} };
-        setup.hasLockout = true;
-        setup.placeName = PLACENAME_CATTERY;
-        setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-        setup.bgmToRestore = BGM_NORMAL;
-
-        pEncounter->setEncounterSetup( setup );
-        instance.setEncounter( pEncounter );
-        pEncounter->init();
-      }
-      // chopper encounter is successful, set up the next encounter
-      else if( pEncounter && pEncounter->getId() == ENCOUNTER_CHOPPER && pEncounter->getStatus() == EncounterStatus::SUCCESS )
-      {
+      if( pEncounter->getStatus() == EncounterStatus::UNINITIALIZED )
+        instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_CHOPPER );
+      else if( pEncounter->getStatus() == EncounterStatus::SUCCESS )
         eventMgr().eventActionStart( player, getId(), EventActionTouch, [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
                                       eobj.setPermissionInvisibility( 1 );
 
@@ -387,9 +514,8 @@ public:
                                       pDoor->setCollisionEnabled( false );
 
                                       instance.setVar( 0, Seq2 );
-                                      instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } );
-        }, nullptr, getId() );
-      }
+                                      instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_RAMBADE );
+                                      instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } ); }, nullptr, getId() );
     }
     // Pick up key and progress duty
     else if( eobj.getName() == "Captainsquarterskey" )
@@ -399,6 +525,7 @@ public:
                                   {
                                     eobj.setPermissionInvisibility( 1 );
                                     instance.setVar( 0, Seq4 );
+                                    instance.setCustomVar( Variables::CurrEncounterId, ENCOUNTER_RAMBADE_2 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000512 } );
                                   },
                                   nullptr, getId() );
@@ -413,7 +540,6 @@ public:
                                     eobj.setPermissionInvisibility( 1 );
                                     instance.setVar( 0, Seq5 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000513 } );
-                                    //denn = instance.createBNpcFromLayoutId( 3978771, 1000, Common::BNpcType::Enemy );
                                   },
                                   nullptr, getId() );
     }
@@ -430,6 +556,7 @@ public:
                                 eventMgr().eventActionStart( player, getId(), EventActionTouch,
                                                       [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                                       {
+                                                        eobj.setCollisionEnabled( false );
                                                         eobj.setPermissionInvisibility( 1 );
                                                         if( eobj.getName() == "Captainsquarters" )
                                                           instance.sendEventLogMessage( player, instance, 2059, { 668 } );
@@ -440,26 +567,77 @@ public:
                               }
                             } );
     }
-
-    auto pEncounter = instance.getEncounter();
-    if( pEncounter && pEncounter->getId() == ENCOUNTER_DENN )
+    else if( eobj.getName() == "Shortcut" )
     {
+      if( eobj.getPermissionInvisibility() == 0 )
+      {
+        eventMgr().playScene( player, eventId, 1, HIDE_HOTBAR, { 1 }, 
+          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+          {
+              if( result.getResult( 0 ) == 0 )
+              {
+                switch( instance.getCustomVar( Variables::CurrEncounterId ) )
+                {
+                  case ENCOUNTER_RAMBADE:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4033741[ 0 ], POPRANGE_4033741[ 1 ], POPRANGE_4033741[ 2 ] }, POPRANGE_4033741[ 3 ] );
+                  }
+                  break;
+                  case ENCOUNTER_RAMBADE_2:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4033745[ 0 ], POPRANGE_4033745[ 1 ], POPRANGE_4033745[ 2 ] }, POPRANGE_4033745[ 3 ] );
+                  }
+                  break;
+                  case ENCOUNTER_DENN:
+                  {
+                    warpMgr().requestWarp( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, { POPRANGE_4165184[ 0 ], POPRANGE_4165184[ 1 ], POPRANGE_4165184[ 2 ] }, POPRANGE_4165184[ 3 ] );
+                  }
+                  break;
+                  default:
+                    break;
+                }
+              }
+          }
+        );
+      }
+    }
+    auto pEncounter = instance.getEncounter( "Denn" );
+    if( pEncounter )
+    {
+      // todo: handle this all in TimelinePack
       const auto& name = eobj.getName();
-      if( name == "Unnaturalripples" )
-      {
-        
-      }
-      else if( name == "Unnaturalripples_1" )
-      {
-      }
-      else if( name == "Unnaturalripples_2" )
-      {
 
-      }
-      else if( name == "Unnaturalripples_3" )
-      {
+      if( name != "Unnaturalripples" && name != "Unnaturalripples_1" && name != "Unnaturalripples_2" && name != "Unnaturalripples_3" )
+        return;
 
+      auto anim = eobj.getAnimation();
+
+
+      constexpr uint32_t GRATE_PHASE_STOP_BUBBLE = 3;
+
+      constexpr uint32_t ANIMFLAG_OPEN_GRATE = 0x01;
+      constexpr uint32_t ANIMFLAG_CLOSE_GRATE = 0x02;
+      constexpr uint32_t ANIMFLAG_BUBBLE = 0x04;
+      constexpr uint32_t ANIMFLAG_STOP_BUBBLE = 0x08;
+
+      auto pTimeline = pEncounter->getTimelinePack();
+
+      // todo: map the correct eobj to the guard bnpc
+
+      // handle ripples talk. only play the action if bubbling
+      if( pTimeline->isPhaseActive( name, "Bubbles" ) )
+      {
+        eventMgr().eventActionStart( player, getId(), EventActionTouch, [ pTimeline, name ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+          if( pTimeline->isPhaseActive( name, "Bubbles" ) )
+            pTimeline->requestPhaseTransition( name, "Bubbles Interrupt" );
+        }, nullptr, getId() );
       }
+      // no bubbles
+      else if( pTimeline->isPhaseActive( name, "Setup Phase" ) )
+      {
+        playerMgr().sendLogMessage( player, 2039 ); // There is nothing out of the ordinary.
+      }
+      
     }
   }
 
@@ -469,65 +647,36 @@ public:
 
   }
 
+  void onCustomVarChange( InstanceContent& instance, uint32_t var, uint64_t val ) override
+  {
+    if( var == Variables::CurrEncounterId )
+    {
+      if( val == ENCOUNTER_CHOPPER )
+      {
+        instance.getEncounter( "Chopper" )->init();
+      }
+      else if( val == ENCOUNTER_RAMBADE )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
+        instance.getEncounter( "Madison" )->init();
+      }
+      else if( val == ENCOUNTER_RAMBADE_2 )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
+        instance.getEncounter( "Madison2" )->init();
+      }
+      else if( val == ENCOUNTER_DENN )
+      {
+        instance.getEObjByName( "Shortcut" )->setPermissionInvisibility( 0 );
+        instance.getEncounter( "Denn" )->init();
+      }
+    }
+  }
+
   void onDirectorVarChange( InstanceContent& instance, uint8_t var, uint8_t val ) override
   {
-    // spawn madison
-    if( var == 0 && val == Seq2 )
+    if( var == 0 && val == SeqFinish )
     {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-      auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison" );
-      EncounterSetup setup;
-      setup.timelineName = "dungeons/sastasha/Madison";
-
-      setup.encounterShape = EncounterShape::POLYGON;
-      setup.polygonShapeFile = "dungeons/sastasha/Madison";
-
-      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-      setup.bnpcSetupList = { { BOSS_MADISON, HP_MADISON, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-      setup.lockoutEntrances = { { "unknown_1", 2001506, 3653862, 4056797, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-      setup.lockoutExits = { { "Rambadedoor", 2000225, 3653865, 3281037, 4, { -35.299999f, 24.000000f, 60.799999f }, 1.000000f, -2.007129f, 0, EncounterEntityRemoveFlag::None } };
-      setup.hasLockout = true;
-      setup.placeName = PLACENAME_RAMBADE;
-      setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-      setup.bgmToRestore = BGM_NORMAL;
-
-      pEncounter->setEncounterSetup( setup );
-      instance.setEncounter( pEncounter );
-      pEncounter->init();
-    }
-    else if( var == 0 && val == Seq5 )
-    {
-      auto instanceContent = instance.shared_from_this()->getAsInstanceContent();
-      auto director = std::static_pointer_cast< Event::Director >( instanceContent );
-
-      auto pEncounter = std::make_shared< Encounter >( instanceContent, director, "dungeons/sastasha/Madison2" );
-      EncounterSetup setup;
-      setup.timelineName = "dungeons/sastasha/Madison2";
-
-      setup.encounterShape = EncounterShape::POLYGON;
-      setup.polygonShapeFile = "dungeons/sastasha/Madison2";
-
-      //{ { uint32_t layoutId, uint32_t hp, Common::BNpcType type, Entity::BNpcFlag flag, bool isBoss } }
-      setup.bnpcSetupList = { { BOSS_MADISON_2, HP_MADISON_2, Common::BNpcType::Enemy, Entity::BNpcFlag::NoRoam, true } };
-      // { { std::string name, uint32_t baseId, uint32_t boundInstanceId, uint32_t instanceId, uint8_t state, Common::Vector3 pos, float scale, float rotation, uint8_t permissionInvisibility, EncounterEntityRemoveFlag removeFlag } }
-      setup.lockoutEntrances = { { "unknown_2", 2001539, 3653864, 4036041, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f, 1, EncounterEntityRemoveFlag::OnSuccess } };
-      setup.onInitEObjSetupList = { { "unknown_3", 2000235, 3656262, 3281178, 4, { -156.500000f, 8.600000f, 252.500000f }, 1.000000f, 1.134464f, 0, EncounterEntityRemoveFlag::None } };
-      setup.lockoutExits = { { "Rambadedoor_1", 2000236, 3655908, 3281175, 4, { -190.000000f, 7.000000f, 252.000000f }, 1.000000f, -2.443461f, 0, EncounterEntityRemoveFlag::None } };
-      setup.hasLockout = true;
-      setup.placeName = PLACENAME_RAMBADE_2;
-      setup.bgmInCombat = BGM_ENCOUNTER_BOSS;
-      setup.bgmToRestore = BGM_NORMAL;
-
-      pEncounter->setEncounterSetup( setup );
-      instance.setEncounter( pEncounter );
-      pEncounter->init();
-    }
-    else if( var == 0 && val == SeqFinish )
-    {
-
       instance.sendDutyComplete();
     }
   }

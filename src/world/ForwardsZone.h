@@ -28,8 +28,6 @@ TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
 TYPE_FORWARD( FreeCompany );
-TYPE_FORWARD( Encounter );
-TYPE_FORWARD( EncounterState );
 
 namespace World
 {
@@ -55,6 +53,14 @@ namespace World::AI
   TYPE_FORWARD( GambitPack );
   TYPE_FORWARD( GambitTimeLinePack );
   TYPE_FORWARD( GambitRuleSetPack );
+
+  namespace Controller
+  {
+    TYPE_FORWARD( Controller );
+    TYPE_FORWARD( BNpcOverworldController );
+    TYPE_FORWARD( BNpcHomingController );
+    TYPE_FORWARD( BNpcSubActorController );
+  }
 }
 
 namespace World::AI::Fsm

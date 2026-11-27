@@ -201,8 +201,7 @@ namespace Sapphire::Entity
     /*! returns the level of the currently active class / job */
     uint8_t getLevel() const override;
 
-    /*! returns the level sync of current active class / job */
-    uint8_t getLevelSync() const;
+    void setLevelSync( uint8_t level );
 
     /*! returns the level of the provided class / job */
     uint8_t getLevelForClass( Common::ClassJob classJobId ) const;
@@ -802,6 +801,10 @@ namespace Sapphire::Entity
     void setConnected( bool isConnected );
 
     const Common::CharaLandData& getCharaLandData( Common::LandFlagsSlot slot ) const;
+
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+
+    void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
   private:
     using InventoryMap = std::map< uint16_t, ItemContainerPtr >;

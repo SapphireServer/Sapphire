@@ -292,7 +292,7 @@ namespace Sapphire::World::AI
         // idk
         std::shuffle( remaining.begin(), remaining.end(), *RNGMgr.getRNGEngine() );
 
-        auto pChara = remaining.back();
+        const auto& pChara = remaining.back();
         CharaEntry entry{};
         entry.m_entityId = pChara->getId();
         entry.m_pos = pChara->getPos();
@@ -325,6 +325,36 @@ namespace Sapphire::World::AI
   const std::vector< uint32_t >& Snapshot::getTargetIds() const
   {
     return m_targetIds;
+  }
+
+  const Snapshot::CharaEntry& Snapshot::getResultAt( int32_t index ) const
+  {
+    const size_t count = m_results.size();
+
+    if( count == 0 )
+    {
+      static const Snapshot::CharaEntry invalid{};
+      return invalid;
+    }
+
+    if( index >= 0 )
+    {
+      const size_t pos = static_cast< size_t >( index );
+      return m_results[ pos < count ? pos : count - 1 ];
+    }
+
+    const uint32_t offset = 0u - static_cast< uint32_t >( index );
+    return m_results[ offset < count ? count - offset : 0 ];
+  }
+
+  uint32_t Snapshot::getResultTargetIdAt( int32_t index ) const
+  {
+    return getResultAt( index ).m_entityId;
+  }
+
+  size_t Snapshot::getResultsCount() const
+  {
+    return m_results.size();
   }
 
   void Snapshot::clearResults()

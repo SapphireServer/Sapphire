@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   class Selector;
   class TimelineActor;
@@ -20,9 +20,11 @@ namespace Sapphire
   using TriggerActionPtr = std::shared_ptr< TriggerAction >;
   using TriggerConditionPtr = std::shared_ptr< TriggerCondition >;
 
+  struct EncounterDefinition;
+
   class Encounter;
   class TimelinePack;
 
   using EncounterPtr = std::shared_ptr< Encounter >;
-
+  using TimelinePackPtr = std::shared_ptr< TimelinePack >;
 }

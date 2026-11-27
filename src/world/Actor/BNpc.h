@@ -6,6 +6,7 @@
 #include <ForwardsCommon.h>
 #include "ForwardsZone.h"
 #include "Npc.h"
+#include <limits>
 #include <map>
 #include <queue>
 #include <unordered_map>
@@ -76,6 +77,10 @@ namespace Sapphire::Entity
 
     void init();
 
+    World::AI::Controller::Controller* getController() override;
+    bool setController( World::AI::Controller::ControllerUPtr pController );
+    void detachController();
+
     void spawn( PlayerPtr pTarget ) override;
     void despawn( PlayerPtr pTarget ) override;
 
@@ -105,9 +110,9 @@ namespace Sapphire::Entity
     Common::Vector3 getNaviMoveTarget() const;
 
     // return true if it reached the position
-    bool moveTo( const Common::Vector3& pos );
+    bool moveTo( const Common::Vector3& pos, float targetReachedDist = std::numeric_limits< float >::max() );
 
-    bool moveTo( const Entity::Chara& targetChara );
+    bool moveTo( const Entity::Chara& targetChara, float targetReachedDist = std::numeric_limits< float >::max() );
 
     void sendPositionUpdate( uint64_t tickCount );
 
@@ -145,8 +150,8 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true ) override;
-    void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+    void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
     void restHp();
 
@@ -197,6 +202,8 @@ namespace Sapphire::Entity
 
     bool getCanSwapTarget();
     void setCanSwapTarget( bool value );
+
+    void toggleNameHidden( bool hidden ) override;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -252,6 +259,9 @@ namespace Sapphire::Entity
 
     CharaPtr m_pOwner;
     World::AI::GambitPackPtr m_pGambitPack;
+
+    World::AI::Controller::ControllerUPtr m_pController;
+    bool m_controllerInitialized{ false };
 
     std::shared_ptr< World::AI::Fsm::StateMachine > m_fsm;
   };

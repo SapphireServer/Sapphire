@@ -1,9 +1,18 @@
 #ifndef NATIVE_SCRIPT_API
 #define NATIVE_SCRIPT_API
 
+#include <initializer_list>
+#include <memory>
 #include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
+#include <nlohmann/json.hpp>
 #include "ForwardsZone.h"
 #include "Event/EventHandler.h"
+#include "Manager/ActionMgr.h"
 #include "Manager/EventMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PlayerMgr.h"
@@ -24,6 +33,13 @@
 namespace Sapphire
 {
   class Framework;
+}
+
+namespace Sapphire::World::Encounter
+{
+  class Encounter;
+  class TimelinePack;
+  using EncounterPtr = std::shared_ptr< Encounter >;
 }
 
 namespace Sapphire::ScriptAPI
@@ -60,6 +76,118 @@ namespace Sapphire::ScriptAPI
     */
     virtual std::size_t getType() const;
   };
+
+  /*! Per-encounter state and lifecycle for a timeline mechanic. */
+  class MechanicScript
+  {
+  public:
+    virtual ~MechanicScript() = default;
+
+    virtual void update( uint64_t tick, World::Encounter::TimelinePack& pack,
+                         World::Encounter::EncounterPtr pEncounter );
+
+    // called on TimelinePack.pause/pauseUntil
+    virtual void onPause( uint64_t nowMs, World::Encounter::TimelinePack& pack,
+                          World::Encounter::EncounterPtr pEncounter );
+
+    // called on TimelinePack.endPause
+    virtual void onResume( uint64_t deltaMs, uint64_t nowMs, World::Encounter::TimelinePack& pack,
+                           World::Encounter::EncounterPtr pEncounter );
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::TerritoryMgr& teriMgr()
+    {
+      return Common::Service< World::Manager::TerritoryMgr >::ref();
+    }
+
+    World::Manager::ActionMgr& actionMgr()
+    {
+      return Common::Service< World::Manager::ActionMgr >::ref();
+    }
+
+  protected:
+    static void shiftTime( uint64_t& timestampMs, uint64_t deltaMs )
+    {
+      if( timestampMs )
+        timestampMs += deltaMs;
+    }
+  };
+
+  using MechanicFactory = std::shared_ptr< MechanicScript > (*)();
+  using MechanicHandler = void (*)( MechanicScript& instance,
+                                    const nlohmann::json& args,
+                                    World::Encounter::TimelinePack& pack,
+                                    World::Encounter::EncounterPtr pEncounter );
+
+  struct MechanicFunctionDefinition
+  {
+    std::string name;
+    MechanicHandler handler;
+  };
+
+  /*! Loader-visible definition for a mechanic type. */
+  class MechanicScriptDefinition : public ScriptObject
+  {
+  public:
+    MechanicScriptDefinition( std::string name, MechanicFactory factory,
+                              std::initializer_list< MechanicFunctionDefinition > functions );
+
+    const std::string& getName() const;
+    std::shared_ptr< MechanicScript > createInstance() const;
+    MechanicHandler findFunction( std::string_view name ) const;
+
+  private:
+    std::string m_name;
+    MechanicFactory m_factory;
+    std::unordered_map< std::string, MechanicHandler > m_functions;
+  };
+
+  template< typename T >
+  std::shared_ptr< MechanicScript > createMechanicInstance()
+  {
+    static_assert( std::is_base_of_v< MechanicScript, T >,
+                   "Exposed mechanic must inherit MechanicScript" );
+    return std::make_shared< T >();
+  }
+
+  template< typename T,
+            void ( T::*Method )( const nlohmann::json&,
+                                 World::Encounter::TimelinePack&,
+                                 World::Encounter::EncounterPtr ) >
+  MechanicFunctionDefinition makeMechanicFunction( std::string_view name )
+  {
+    static_assert( std::is_base_of_v< MechanicScript, T >,
+                   "Mechanic functions must belong to a MechanicScript" );
+
+    return
+    {
+      std::string( name ),
+      []( MechanicScript& instance, const nlohmann::json& args,
+          World::Encounter::TimelinePack& pack,
+          World::Encounter::EncounterPtr pEncounter )
+      {
+        auto& typedInstance = static_cast< T& >( instance );
+        ( typedInstance.*Method )( args, pack, pEncounter );
+      }
+    };
+  }
+
+  template< typename T >
+  ScriptObject* makeMechanicDefinition(
+    std::string name,
+    std::initializer_list< MechanicFunctionDefinition > functions )
+  {
+    static_assert( std::is_base_of_v< MechanicScript, T >,
+                   "Exposed mechanic must inherit MechanicScript" );
+
+    return new MechanicScriptDefinition( std::move( name ),
+                                         &createMechanicInstance< T >,
+                                         functions );
+  }
 
 
   /*!
@@ -448,6 +576,11 @@ namespace Sapphire::ScriptAPI
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!
@@ -479,6 +612,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
     }
   };
 }

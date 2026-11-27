@@ -15,14 +15,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   class MoveActorPacket : public ZoneChannelPacket< FFXIVIpcActorMove >
   {
   public:
-    MoveActorPacket( Entity::Chara& actor, uint8_t dirBeforeSlip, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation = 0 ) :
+    explicit MoveActorPacket( Entity::GameObject& actor, uint8_t dirBeforeSlip, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation = 0 ) :
       ZoneChannelPacket< FFXIVIpcActorMove >( actor.getId(), actor.getId() )
     {
       initialize( actor, dirBeforeSlip, animationType, state, animationSpeed, unknownRotation );
     };
 
   private:
-    void initialize( Entity::Chara& actor, uint8_t dirBeforeSlip, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation )
+    void initialize( Entity::GameObject& actor, uint8_t dirBeforeSlip, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation )
     {
 
       m_data.dir = actor.getRotUInt8();

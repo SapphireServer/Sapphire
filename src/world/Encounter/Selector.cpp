@@ -2,7 +2,7 @@
 
 #include <Actor/Chara.h>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   void Selector::from_json( const nlohmann::json& json )
   {
@@ -137,6 +137,16 @@ namespace Sapphire
   const World::AI::Snapshot::TargetIds& Selector::getTargetIds()
   {
     return m_snapshot.getTargetIds();
+  }
+
+  uint32_t Selector::getResultTargetIdAt( int32_t index ) const
+  {
+    return m_snapshot.getResultTargetIdAt( index );
+  }
+
+  const World::AI::Snapshot::CharaEntry& Selector::getResultAt( int32_t index ) const
+  {
+    return m_snapshot.getResultAt( index );
   }
 
   void Selector::clearResults()

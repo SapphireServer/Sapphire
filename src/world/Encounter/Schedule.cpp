@@ -9,7 +9,7 @@
 
 #include <unordered_map>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   void Schedule::from_json( const nlohmann::json& json )
   {

@@ -109,7 +109,7 @@ std::unique_ptr< Sapphire::Common::Random::RandGenerator< float > > CalcStats::r
 float CalcStats::calculateBaseStat( const Chara& chara )
 {
   float base = 0.0f;
-  uint8_t level = chara.getLevel();
+  uint8_t level = chara.getEffectiveLevel();
 
   if( level > Common::MAX_PLAYER_LEVEL )
     level = Common::MAX_PLAYER_LEVEL;
@@ -128,12 +128,12 @@ uint32_t CalcStats::calculateMaxHp( Entity::Player& player )
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
   auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getEffectiveLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
 
-  uint8_t level = player.getLevel();
+  uint8_t level = player.getEffectiveLevel();
 
   auto vitMod = player.getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( player );
@@ -162,12 +162,12 @@ uint32_t CalcStats::calculateMaxHp( Chara& chara )
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
   auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getEffectiveLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
 
-  uint8_t level = chara.getLevel();
+  uint8_t level = chara.getEffectiveLevel();
 
   auto vitMod = chara.getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( chara );
@@ -189,7 +189,7 @@ uint32_t CalcStats::calculateMaxMp( Entity::Player& player )
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getEffectiveLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -209,7 +209,7 @@ uint32_t CalcStats::calculateMaxMp( Entity::Player& player )
 uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getEffectiveLevel() );
   if( !paramGrowthInfo )
     return 0;
 
@@ -220,7 +220,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
 
 uint16_t CalcStats::blockProbability( const Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
   auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   uint16_t blockMod = chara.getModifier( Common::ParamModifier::BlockRate );
@@ -231,7 +231,7 @@ uint16_t CalcStats::blockProbability( const Chara& chara )
 float CalcStats::criticalHitProbability( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   // ⌊ 200 × ( CHR - subVal )/ divVal + 50 ⌋ / 10
   // CHR is the critical hit stat. Additional modifiers from (de)buffs get applied at the end
@@ -268,7 +268,7 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
 float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, Common::BaseParam calcStat, float weaponDamage )
 {
   const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
@@ -324,7 +324,7 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, Common::Bas
 
 float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
   if( level <= 50 )
@@ -383,7 +383,7 @@ float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -393,7 +393,7 @@ float CalcStats::determination( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -403,7 +403,7 @@ float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -427,7 +427,7 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -437,7 +437,7 @@ float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
@@ -446,7 +446,7 @@ float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
@@ -455,7 +455,7 @@ float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
 {
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
   auto blockStrength = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockStrength ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
@@ -480,7 +480,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara, Common::BaseP
     autoAttackDelay = pItem->getDelay() / 1000.f;
   }
 
-  auto level = chara.getLevel();
+  auto level = chara.getEffectiveLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
   auto innerCalc = weaponDamage( chara, calcStat, wepDmg );
@@ -616,7 +616,7 @@ int32_t CalcStats::calcAggro( const Sapphire::Entity::Chara& source, int32_t val
 
 int32_t CalcStats::calcStatusAggro( const Sapphire::Entity::Chara& source )
 {
-  int32_t aggro = static_cast< int32_t >( levelTable[ source.getLevel() ][ Common::LevelTableEntry::THREAT ] );
+  int32_t aggro = static_cast< int32_t >( levelTable[ source.getEffectiveLevel() ][ Common::LevelTableEntry::THREAT ] );
   auto aggroMod = 1 - ( source.getModifier( Common::ParamModifier::EnmityReduction ) / 100 );
   return aggro * aggroMod;
 }

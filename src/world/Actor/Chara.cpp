@@ -25,6 +25,7 @@
 #include "Session.h"
 #include "Math/CalcStats.h"
 #include "Chara.h"
+#include "GameObject.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
@@ -44,7 +45,6 @@ using namespace Sapphire::Network::ActorControl;
 
 Chara::Chara( ObjKind type ) : GameObject( type ),
                                m_pose( 0 ),
-                               m_targetId( INVALID_GAME_OBJECT_ID64 ),
                                m_directorId( 0 ),
                                m_radius( 2.f )
 {
@@ -179,33 +179,21 @@ Role Chara::getRole() const
   }
 }
 
-/*! \param Id of the target to set */
-void Chara::setTargetId( uint64_t targetId )
-{
-  m_targetId = targetId;
-}
-
-/*! \return Id of the current target */
-uint64_t Chara::getTargetId() const
-{
-  return m_targetId;
-}
-
 /*! \return True if the actor is alive */
 bool Chara::isAlive() const
 {
   return ( m_hp > 0 );
 }
 
-void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate )
+void Chara::setPos( const Common::Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  GameObject::setPos( pos, broadcastUpdate );
+  GameObject::setPos( pos, broadcastUpdate, sendPacketToSelf );
   m_dirtyFlag |= DirtyFlag::Position;
 }
 
-void Chara::setPos( float x, float y, float z, bool broadcastUpdate )
+void Chara::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
-  GameObject::setPos( x, y, z, broadcastUpdate );
+  GameObject::setPos( x, y, z, broadcastUpdate, sendPacketToSelf );
   m_dirtyFlag |= DirtyFlag::Position;
 }
 
@@ -359,8 +347,13 @@ Set and propagate the actor stance to in range players
 */
 void Chara::setStance( Stance stance )
 {
+  setStance( stance, 1 );
+}
+
+void Chara::setStance( Stance stance, uint32_t animation )
+{
   m_currentStance = stance;
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, stance, 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, stance, animation );
 }
 
 /*!
@@ -421,6 +414,17 @@ void Chara::changeTarget( uint64_t targetId )
 /*!
 Dummy function \return 0
 */
+uint8_t Chara::getLevelSync() const
+{
+  return m_levelSync;
+}
+
+uint8_t Chara::getEffectiveLevel() const
+{
+  auto level = getLevel();
+  return m_levelSync ? std::min( level, m_levelSync ) : level;
+}
+
 uint8_t Chara::getLevel() const
 {
   return 0;

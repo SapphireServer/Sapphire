@@ -8,6 +8,8 @@
 #include <Exd/Structs.h>
 #include <memory>
 
+#include <Encounter/ForwardsEncounter.h>
+
 namespace Sapphire
 {
   class InstanceContent : public Event::Director, public Territory
@@ -61,7 +63,7 @@ namespace Sapphire
     enum EventHandlerOrderId : uint32_t
     {
       SheetDataReady = 0x80000000,
-      AbortContent = 0x40000001, //forceFlag
+      AbortContent = 0x80000001, //forceFlag
       LuaOnStartCutscene = 0x40000002, //returnCode
       VoteRequest = 0x40000003, //voteType
       VoteReplay = 0x40000004 //voteType, accept
@@ -178,6 +180,8 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+    Entity::EventObjectPtr getEObjByBaseId( uint32_t baseId );
+
     Entity::EventObjectPtr getEObjById( uint32_t eobjId );
 
     /*! binds a player to the instance */
@@ -208,10 +212,11 @@ namespace Sapphire
 
     std::set< uint32_t > getSpawnedPlayerIds() const;
 
+    std::pair< Common::Vector3, float > getEntrancePosition() const;
     void movePlayerToEntrance( Entity::Player& player );
 
-    void setEncounter( EncounterPtr pEncounter );
-    EncounterPtr getEncounter();
+    void setControllerEncounter( World::Encounter::EncounterPtr pEncounter );
+    World::Encounter::EncounterPtr getControllerEncounter();
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > m_contentFinderCondition;
@@ -238,7 +243,7 @@ namespace Sapphire
     // the players which are bound to the instance, regardless of inside or offline
     std::set< uint32_t > m_boundPlayerIds;
 
-    EncounterPtr m_pEncounter;
+    World::Encounter::EncounterPtr m_pControllerEncounter;
   };
 
 }

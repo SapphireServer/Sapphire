@@ -315,7 +315,7 @@ void Player::calculateStats()
   calculateBonusStats();
 
   uint8_t tribe = getLookAt( Common::CharaLook::Tribe );
-  uint8_t level = getLevel();
+  uint8_t level = getEffectiveLevel();
   auto job = static_cast< uint8_t >( getClass() );
   auto deity = getGuardianDeity();
 
@@ -584,10 +584,9 @@ uint8_t Player::getLevel() const
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
-uint8_t Player::getLevelSync() const
+void Player::setLevelSync( uint8_t level )
 {
-  // TODO: implement levelSync
-  return getLevel();
+  m_levelSync = level;
 }
 
 uint8_t Player::getLevelForClass( Common::ClassJob classJobId ) const
@@ -1037,7 +1036,7 @@ void Player::hateListRemove( const BNpc& bnpc )
 bool Player::hateListHasEntry( const BNpc& bnpc )
 {
   return std::any_of( m_actorIdTohateSlotMap.begin(), m_actorIdTohateSlotMap.end(),
-                     [ bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
+                     [ &bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
 }
 
 std::vector< CharaPtr > Player::getHateList()
@@ -1751,4 +1750,22 @@ void Player::updatePrevTerritory()
 const CharaLandData& Entity::Player::getCharaLandData( Common::LandFlagsSlot slot ) const
 {
   return m_charaLandData[ slot ];
+}
+
+void Entity::Player::setPos( const Common::Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate, sendPacketToSelf );
+}
+
+void Entity::Player::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
+{
+  Chara::setPos( x, y, z, broadcastUpdate );
+
+  auto setActorPosPacket = makeZonePacket< FFXIVIpcWarp >( getId() );
+  setActorPosPacket->data().x = x;
+  setActorPosPacket->data().y = y;
+  setActorPosPacket->data().z = z;
+  setActorPosPacket->data().Dir = getRotUInt16();
+
+  server().queueForPlayers( getInRangePlayerIds( sendPacketToSelf ), setActorPosPacket );
 }

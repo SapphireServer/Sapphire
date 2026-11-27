@@ -46,6 +46,7 @@ bool ignoreModels = false;
 //std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::string gamePath( "D:\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
+std::unordered_map< uint32_t, std::string > eobjSgbPathMap;
 
 struct instanceContent
 {
@@ -117,6 +118,13 @@ void loadEobjNames()
 
     if( !eObjName->getString( eObjName->data().Text.SGL ).empty() )
       eobjNameMap[ id ] = eObjName->getString( eObjName->data().Text.SGL );
+
+    auto exportedSGRow = g_exdData.getRow< Excel::ExportedSG >( eObjName->data().SharedGroup );
+    if( !exportedSGRow )
+      continue;
+
+    if( !exportedSGRow->getString( exportedSGRow->data().SGFilePath ).empty() )
+      eobjSgbPathMap[ id ] = exportedSGRow->getString( exportedSGRow->data().SGFilePath );
   }
 }
 
@@ -382,6 +390,8 @@ int main( int argc, char* argv[] )
   for( auto entry : contentList )
   {
     std::string eobjects = "    Entity::EventObjectPtr pEObj;\n\n";
+    std::string popranges = "";
+
     entryStartTime = std::chrono::system_clock::now();
     zoneName = entry.zoneName;
     try
@@ -411,7 +421,22 @@ int main( int argc, char* argv[] )
       LGB_FILE planeventLgb( &planeventData[ 0 ], "planevent" );
       //LGB_FILE planerLgb( &plannerData[ 0 ], "planner" );
 
+      std::unique_ptr< xiv::dat::File > vfxFile;
       std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb, planeventLgb };
+      const auto vfxPath = zonePath + "/level/vfx.lgb";
+      try
+      {
+        if( g_gameData->doesFileExist( vfxPath ) )
+        {
+          vfxFile = g_gameData->getFile( vfxPath );
+          const LGB_FILE::AssetTypeFilter sharedGroups = []( eAssetType type ) { return type == eAssetType::SharedGroup; };
+          lgbList.emplace_back( vfxFile->access_data_sections().at( 0 ).data(), "vfx", &sharedGroups );
+        }
+      }
+      catch( const std::exception& e )
+      {
+        Logger::warn( "Unable to load {}: {}", vfxPath, e.what() );
+      }
 
       uint32_t totalGroups = 0;
       uint32_t totalGroupEntries = 0;
@@ -420,7 +445,6 @@ int main( int argc, char* argv[] )
       uint8_t permissionInv = 0;
       for( const auto& lgb : lgbList )
       {
-        std::map< std::string, uint32_t > nameMap;
         for( const auto& group : lgb.groups )
         {
           totalGroups++;
@@ -430,6 +454,29 @@ int main( int argc, char* argv[] )
             {
               auto pGimmick = dynamic_cast< SharedGroupEntry* >( pEntry.get() );
               m_sharedGroupMap.emplace( pEntry->header.InstanceID, pGimmick );
+            }
+          }
+        }
+      }
+
+      std::map< std::string, uint32_t > nameMap;
+      for( const auto& lgb : lgbList )
+      {
+        for( const auto& group : lgb.groups )
+        {
+          for( const auto& pEntry : group.entries )
+          {
+            if( pEntry->getType() == eAssetType::PopRange )
+            {
+              const auto& transform = pEntry->header.Transformation;
+              const auto& pos = transform.Translation;
+              const auto& rot = transform.Rotation.y;
+
+              popranges += "  static constexpr float POPRANGE_" + std::to_string( pEntry->header.InstanceID );
+              popranges += "[4] = { ";
+              popranges += std::to_string( pos.x ) + "f, " + std::to_string( pos.y ) + "f, " + std::to_string( pos.z ) + "f, ";
+              popranges += std::to_string( rot ) + "f ";
+              popranges += "}; \n";
             }
             else if( pEntry->getType() == eAssetType::EventObject )
             {
@@ -445,27 +492,70 @@ int main( int argc, char* argv[] )
 
               eobjlevelHierachyId = pEobj->header.BoundInstanceID;
 
+              if( eobjNameMap.find( pEobj->header.BaseId ) != eobjNameMap.end() )
+                name = eobjNameMap.at( pEobj->header.BaseId );
+
               std::string states = "";
               std::string gimmickName = "";
-              for( const auto& pEntry1 : group.entries )
-              {
-                auto pGObj = pEntry1.get();
-                if( pGObj->getType() == eAssetType::SharedGroup && pGObj->header.InstanceID == pEobj->header.BoundInstanceID )
-                {
-                  auto pGObjR = reinterpret_cast< SharedGroupEntry* >( pGObj );
-                  char* dataSection = nullptr;
 
-                  auto file = g_gameData->getFile( pGObjR->AssetPath );
+              if( auto pGObjR = m_sharedGroupMap[ pEobj->header.BoundInstanceID ] )
+              {
+                char* dataSection = nullptr;
+
+                auto file = g_gameData->getFile( pGObjR->AssetPath );
+                auto sections = file->get_data_sections();
+                dataSection = &sections.at( 0 )[ 0 ];
+                auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
+
+                auto pos = pGObjR->AssetPath.find_last_of( "/" );
+
+                if( pos != std::string::npos )
+                {
+                  if( name.empty() )
+                  {
+                    name = pGObjR->AssetPath.substr( pos + 1 );
+                    name = name.substr( 0, name.length() - 4 );
+                  }
+                  gimmickName = name;
+                }
+
+                if( sgbFile.timelines.size() > 0 )
+                {
+                  states = "    // States -> ";
+                  for( auto i = 0; i < sgbFile.timelines.size(); ++i )
+                  {
+                    auto entries1 = sgbFile.timelines[ i ];
+                    auto stateName = sgbFile.timelineNames[ i ];
+
+                    states += stateName + " (mask: " + std::to_string( 1 << i ) + ") ";
+                  }
+                  states += "\n";
+
+                  std::cout << states << std::endl;
+                }
+              }
+
+              // fallback if we cant find timelines by LGB SharedGroupEntry
+              if( states.empty() )
+              {
+                auto sgbPath = eobjSgbPathMap[ pEobj->header.BaseId ];
+                if( !sgbPath.empty() && g_gameData->doesFileExist( sgbPath ) )
+                {
+                  char* dataSection = nullptr;
+                  auto file = g_gameData->getFile( sgbPath );
                   auto sections = file->get_data_sections();
                   dataSection = &sections.at( 0 )[ 0 ];
                   auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
 
-                  auto pos = pGObjR->AssetPath.find_last_of( "/" );
+                  auto pos = sgbPath.find_last_of( "/" );
 
                   if( pos != std::string::npos )
                   {
-                    name = pGObjR->AssetPath.substr( pos + 1 );
-                    name = name.substr( 0, name.length() - 4 );
+                    if( name.empty() )
+                    {
+                      name = sgbPath.substr( pos + 1 );
+                      name = name.substr( 0, name.length() - 4 );
+                    }
                     gimmickName = name;
                   }
 
@@ -475,14 +565,15 @@ int main( int argc, char* argv[] )
                     for( auto i = 0; i < sgbFile.timelines.size(); ++i )
                     {
                       auto entries1 = sgbFile.timelines[ i ];
-                      auto name = sgbFile.timelineNames[ i ];
-                      states += name + " (id: " + std::to_string( entries1.MemberID ) + ") ";
+                      auto stateName = sgbFile.timelineNames[ i ];
+
+                      states += stateName + " (mask: " + std::to_string( 1 << i ) + ") ";
                     }
                     states += "\n";
                   }
-                  break;
                 }
               }
+
               int state = 4;
 
               if( eobjNameMap.find( id ) != eobjNameMap.end() )
@@ -582,6 +673,41 @@ int main( int argc, char* argv[] )
                     case TriggerBoxShapeBox:
                     {
                       shapeStr = "Box";
+                      auto colRot = collisionBox->header.Transformation.Rotation;
+                      auto colPos = collisionBox->header.Transformation.Translation;
+                      auto colScale = collisionBox->header.Transformation.Scale;
+
+                      const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
+                      // SGB stores Transformation.Scale as half-extents; addCollisionBox expects full extents, so multiply by 2
+                      const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
+                      eobjLine += "    pEObj->addCollisionBox( { " +
+                                  std::to_string( colPos.x ) + ", " + std::to_string( colPos.y ) + ", " + std::to_string( colPos.z ) + " }, " +
+                                  " { " + std::to_string( colRot.x ) + ", " + std::to_string( colRot.y ) + ", " + std::to_string( colRot.z ) + " }, " +
+                                  std::to_string( colScale.x ) + ", " + std::to_string( colScale.y ) + ", " + std::to_string( colScale.z ) + " );\n";
+                    }
+                    break;
+                    case TriggerBoxShapeSphere:
+                      shapeStr = "Sphere";
+                      // todo:
+                      // eobjLine += "    pEObj->addCollisionSphere( { " +
+                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                      //             std::to_string( radius ) + " );\n";
+                    break;
+                    case TriggerBoxShapeCylinder:
+                    {
+                      shapeStr = "Cylinder";
+                      // todo:
+                      auto radius = collisionBox->header.Transformation.Scale.x;
+                      auto height = collisionBox->header.Transformation.Scale.y;
+
+                      eobjLine += "    pEObj->addCollisionCylinder( { " +
+                                  std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
+                                  std::to_string( radius ) + ", " + std::to_string( height ) + " );\n";
+                    }
+                    break;
+                    case TriggerBoxShapeBoard:
+                    {
+                      shapeStr = "Board";
                       const auto rot = composeCollisionRotation( parentRotation, toVec3( collisionBox->header.Transformation.Rotation ) );
                       // SGB stores Transformation.Scale as half-extents; addCollisionBox expects full extents, so multiply by 2
                       const auto box = scaleExtents( toVec3( collisionBox->header.Transformation.Scale ), parentScale );
@@ -591,34 +717,35 @@ int main( int argc, char* argv[] )
                                   std::to_string( box.x * 2.f ) + ", " + std::to_string( box.y * 2.f ) + ", " + std::to_string( box.z * 2.f ) + " );\n";
                     }
                     break;
-                    case TriggerBoxShapeSphere:
-                      shapeStr = "Sphere";
-                      // todo:
-                      // eobjLine += "    pEObj->addCollisionSphere( { " +
-                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                      //             std::to_string( radius ) + " );\n";
-                      break;
-                    case TriggerBoxShapeCylinder:
-                      shapeStr = "Cylinder";
-                      // todo:
-                      // eobjLine += "    pEObj->addCollisionCylinder( { " +
-                      //             std::to_string( pos.x ) + ", " + std::to_string( pos.y ) + ", " + std::to_string( pos.z ) + " }, " +
-                      //             std::to_string( radius ) + ", " + std::to_string( height ) + " );\n"
-                      break;
-                    case TriggerBoxShapeBoard:
-                      shapeStr = "Board";
-                      break;
                     case TriggerBoxShapeMesh:
                       shapeStr = "Mesh";
-                      break;
+                    break;
                     case TriggerBoxShapeBoardBothSides:
                       shapeStr = "Board Both Sides";
-                      break;
+                    break;
                     default:
                       shapeStr = "Unknown";
-                      break;
+                    break;
                   }
                   std::cout << "\t\t " << "- " << instanceObject->header.InstanceID << " CollisionBox Shape:" << shapeStr << "\n";
+                  if( shapeStr != "Box" )
+                  {
+                    std::string output;
+                    output += std::string(shapeStr) + "\n";
+                    auto scale = instanceObject->header.Transformation.Scale;
+                    auto rot = instanceObject->header.Transformation.Rotation;
+                    output += "Zone: " + zoneName + "\n";
+                    output += "InstanceID " + std::to_string( instanceObject->header.InstanceID ) + "\n";
+                    output += "Pos: " + std::to_string( pos.x ) + " " + std::to_string( pos.y ) + " " + std::to_string( pos.z ) + "\n";
+                    output += "Scale: " + std::to_string( scale.x ) + " " + std::to_string( scale.y ) + " " + std::to_string( scale.z ) + "\n";
+                    output += "Rot: " + std::to_string( rot.x ) + " " + std::to_string( rot.y ) + " " + std::to_string( rot.z ) + "\n\n";
+
+                    std::ofstream of;
+                    of.open( "collision.txt", std::ios_base::app );
+
+                    of << output;
+                    of.close();
+                  }
                 }
               }
             }
@@ -678,6 +805,7 @@ int main( int argc, char* argv[] )
     auto result = std::regex_replace( instanceTpl, std::regex( "\\INSTANCE_NAME" ), entry.name );
     result = std::regex_replace( result, std::regex( "\\INSTANCE_ID" ), std::to_string( entry.id ) );
     result = std::regex_replace( result, std::regex( "\\EOBJ_INIT" ), eobjects );
+    result = std::regex_replace( result, std::regex( "\\POPRANGE" ), popranges );
 
     if( entry.type == 7 )
     {

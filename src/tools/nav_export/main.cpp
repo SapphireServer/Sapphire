@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <charconv>
 #include <fstream>
 #include <regex>
 #include <map>
@@ -329,7 +330,7 @@ void exportSgbModel( const std::string& sgbFilePath, InstanceObjectEntry *pSg, E
 
 int main( int argc, char *argv[ ] )
 {
-  printf( "Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n"
+  printf( "Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--jobs N | N] [--zone NAME]\n"
     "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~10GB RAM using 16 jobs.\n" );
 
   auto startTime = std::chrono::high_resolution_clock::now();
@@ -340,7 +341,7 @@ int main( int argc, char *argv[ ] )
 
   bool generateNavmesh = true;
   bool dumpAllZones = true;
-  int nJobs = std::thread::hardware_concurrency();
+  int nJobs = 4;
 
   int exportFileType = 0;
   if( !noObj )
@@ -351,21 +352,47 @@ int main( int argc, char *argv[ ] )
   if( argc > 1 )
     gamePath = std::string( argv[ 1 ] );
 
-  if( argc > 2 )
-    nJobs = std::atoi( argv[ 2 ] );
+  for( int i = 2; i < argc; ++i )
+  {
+    std::string arg = argv[ i ];
+    if( arg == "--zone" || arg == "--jobs" )
+    {
+      if( i + 1 >= argc )
+      {
+        fprintf( stderr, "Missing value for %s\n", arg.c_str() );
+        return 1;
+      }
+      if( arg == "--zone" )
+      {
+        zoneName = argv[ ++i ];
+        dumpAllZones = false;
+        continue;
+      }
+      arg = argv[ ++i ];
+    }
+
+    const auto result = std::from_chars( arg.data(), arg.data() + arg.size(), nJobs );
+    if( result.ec != std::errc{} || result.ptr != arg.data() + arg.size() || nJobs <= 0 )
+    {
+      fprintf( stderr, "Invalid job count '%s': expected a positive integer\n", arg.c_str() );
+      return 1;
+    }
+  }
+
+  printf( "[Navmesh] Jobs: %d, output directory: %s\n", nJobs, ( std::filesystem::current_path() / "navi" ).string().c_str() );
 
   try
   {
     initExd( gamePath );
     getEobjSgbPath( 0 );
+    zoneNameToPath( zoneName );
   } catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD!\n" );
-    return -1;
+    fprintf( stderr, "Unable to initialise export: %s\n", e.what() );
+    return 1;
   }
 
   ExportMgr exportMgr( nJobs );
-  zoneNameToPath( zoneName );
 
   if( dumpAllZones )
   {

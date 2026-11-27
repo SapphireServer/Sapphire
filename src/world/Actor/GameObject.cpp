@@ -9,6 +9,8 @@
 #include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
+#include "Network/Util/PacketUtil.h"
+#include "Network/CommonActorControl.h"
 
 #include "Chara.h"
 #include "EventObject.h"
@@ -19,9 +21,14 @@
 #include "WorldServer.h"
 #include "Session.h"
 
+#include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
+
+#include "AI/Controller/Controller.h"
+
+#include <Logging/Logger.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Entity;
@@ -33,6 +40,17 @@ GameObject::GameObject( ObjKind type ) :
 {
 
 }
+
+void GameObject::spawn( PlayerPtr pTarget )
+{
+  Logger::debug( "Spawning Actor {} for Player {}", getId(), pTarget->getId() );
+}
+
+void GameObject::despawn( PlayerPtr pTarget )
+{
+  Logger::debug( "Despawning Actor {} for Player {}", getId(), pTarget->getId() );
+}
+
 
 uint32_t GameObject::getId() const
 {
@@ -59,7 +77,7 @@ const Vector3& GameObject::getPos() const
   return m_pos;
 }
 
-void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
+void GameObject::setPos( float x, float y, float z, bool broadcastUpdate, bool sendPacketToSelf )
 {
   m_pos.x = x;
   m_pos.y = y;
@@ -74,7 +92,7 @@ void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
 
 }
 
-void GameObject::setPos( const Vector3& pos, bool broadcastUpdate )
+void GameObject::setPos( const Vector3& pos, bool broadcastUpdate, bool sendPacketToSelf )
 {
   m_pos = pos;
 
@@ -406,4 +424,47 @@ Set the current cellId the actor is in
 void GameObject::setCellId( CellId cellId )
 {
   m_cellId = cellId;
+}
+
+Sapphire::World::AI::Controller::Controller* GameObject::getController()
+{
+  return nullptr;
+}
+
+uint32_t GameObject::getFollowTargetId() const
+{
+  return m_followTargetId;
+}
+
+void GameObject::setFollowTargetId( uint32_t id )
+{
+  m_followTargetId = id;
+}
+
+void GameObject::resetFollowTargetId()
+{
+  m_followTargetId = Common::INVALID_GAME_OBJECT_ID;
+}
+
+uint32_t GameObject::getTargetId() const
+{
+  return m_targetId >> 32 ? Common::INVALID_GAME_OBJECT_ID : static_cast< uint32_t >( m_targetId );
+}
+
+uint64_t GameObject::getTargetObjectId() const
+{
+  return m_targetId;
+}
+
+void GameObject::setTargetId( uint64_t targetId )
+{
+  m_targetId = targetId;
+}
+
+void GameObject::toggleNameHidden( bool hidden )
+{
+  m_nameHidden = hidden;
+
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), Network::ActorControl::ToggleNameHidden, hidden ? 0 : 1 );
 }

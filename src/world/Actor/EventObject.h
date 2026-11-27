@@ -24,8 +24,10 @@ namespace Sapphire::Entity
   {
     EventObjectCollisionType m_type;
     Common::Vector3 m_pos;
-    float m_rot;
+    Common::Vector3 m_rot;
     uint32_t m_obstacleRef{ 0 };
+    bool m_useParentTransformation{ false };
+
     union
     {
       struct
@@ -102,13 +104,25 @@ namespace Sapphire::Entity
 
     void setCollisionEnabled( bool enabled );
 
-    void addCollisionBox( Common::Vector3 pos, float rotation, float width, float height, float depth );
+    void addCollisionBox( Common::Vector3 pos, float rot, float width, float height, float depth );
+
+    void addCollisionBox( Common::Vector3 pos, Common::Vector3 rotation, float width, float height, float depth );
 
     void addCollisionCylinder( Common::Vector3 pos, float radius, float height );
 
     void addCollisionSphere( Common::Vector3 pos, float radius );
 
     const std::vector< EventObjectCollision >& getCollisionData() const;
+
+    void setAnimation( uint32_t animation );
+
+    uint32_t getAnimation() const;
+
+    bool isCollisionEnabled() const;
+
+    void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
+
+    void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false ) override;
 
 
   protected:
@@ -124,6 +138,7 @@ namespace Sapphire::Entity
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
     std::vector< EventObjectCollision > m_collision;
-
+    uint32_t m_animation{ 0 };
+    bool m_collisionEnabled{ false };
   };
 }

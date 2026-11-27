@@ -5,13 +5,14 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ForwardsZone.h>
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire
+namespace Sapphire::World::Encounter
 {
   enum class TimepointDataType : uint32_t
   {
@@ -41,7 +42,13 @@ namespace Sapphire
 
     Snapshot,
     InterruptAction,
-    RollRNG // todo: make this save to director var idx
+    RollRNG,
+    Mechanic,
+    SetVar,
+
+    BubbleText, // idx in Balloon exd sheet
+    PathTo,
+    NpcYell
   };
 
   enum class ActionTargetType : uint32_t
@@ -50,7 +57,9 @@ namespace Sapphire
     Self,
     Target,
     SelectorPos,
-    SelectorTarget
+    SelectorTarget,
+    FixedPos,
+    TimelineActor
   };
 
   enum class MoveType : uint32_t
@@ -72,10 +81,23 @@ namespace Sapphire
     Self,
     Target,
     SelectorPos,
-    SelectorTarget
+    SelectorTarget,
+    FixedPos,
+    TimelineActor
   };
 
-  enum class DirectorOpId
+  enum class PathToTargetType: uint32_t
+  {
+    None,
+    Target,
+    SelectorPos,
+    SelectorTarget,
+    FixedPos,
+    TimelineActor,
+    ServerPath
+  };
+
+  enum class VarOpId
   {
     Set,// idx = val
     Add,// idx += val
@@ -101,14 +123,16 @@ namespace Sapphire
   //
   // Timepoint.m_pData objects
   //
-  struct TimepointData : public std::enable_shared_from_this< TimepointData > {
+  struct TimepointData : public std::enable_shared_from_this< TimepointData >
+  {
     TimepointData( TimepointDataType type ) : m_type( type ) {}
     virtual ~TimepointData(){};
     TimepointDataType m_type{ 0 };
   };
   using TimepointDataPtr = std::shared_ptr< TimepointData >;
 
-  struct TimepointDataIdle : public TimepointData {
+  struct TimepointDataIdle : public TimepointData
+  {
     uint64_t m_durationMs;
 
     TimepointDataIdle( uint64_t durationMs ) :
@@ -124,22 +148,30 @@ namespace Sapphire
     uint32_t m_actionId;
     ActionTargetType m_targetType;
     std::string m_selectorRef;
-    uint32_t m_selectorIndex;
+    int32_t m_selectorIndex;
+    std::string m_targetRef;
+    float m_posX;
+    float m_posY;
+    float m_posZ;
 
-    TimepointDataAction( const std::string& sourceRef, uint32_t actionId,
-                         ActionTargetType type, const std::string& selectorRef,
-                         uint32_t selectorIndex = 0 ) :
+    TimepointDataAction( const std::string& sourceRef, const std::string& targetRef, uint32_t actionId,
+                         ActionTargetType type,
+                         const std::string& selectorRef, int32_t selectorIndex,
+                         float posX, float posY, float posZ) :
       TimepointData( TimepointDataType::CastAction ),
       m_sourceRef( sourceRef ),
+      m_targetRef( targetRef ),
       m_actionId( actionId ),
       m_targetType( type ),
       m_selectorRef( selectorRef ),
-      m_selectorIndex( selectorIndex )
+      m_selectorIndex( selectorIndex ),
+      m_posX( posX ), m_posY( posY ), m_posZ( posZ )
     {
     }
   };
 
-  struct TimepointDataActionTimeLine : public TimepointData {
+  struct TimepointDataActionTimeLine : public TimepointData
+  {
     std::string m_actorRef;
     uint32_t m_actionId;
 
@@ -151,22 +183,25 @@ namespace Sapphire
     }
   };
 
-  struct TimepointDataSetPos : public TimepointData {
+  struct TimepointDataSetPos : public TimepointData
+  {
     // todo: use internal id
     std::string m_actorRef;
     MoveType m_moveType;
     SetPosType m_posType;
     SetPosTargetType m_targetType;
     std::string m_selectorName;
-    uint32_t m_selectorIndex;
+    int32_t m_selectorIndex;
     float m_x, m_y, m_z, m_rot;
+    std::string m_targetRef;
 
-    TimepointDataSetPos( const std::string& actorRef,
+    TimepointDataSetPos( const std::string& actorRef, const std::string& targetRef,
                         SetPosType type, SetPosTargetType targetType, MoveType moveType,
-                        const std::string& selectorName, uint32_t selectorIndex,
+                        const std::string& selectorName, int32_t selectorIndex,
                         float x, float y, float z, float rot ) :
       TimepointData( TimepointDataType::SetPos ),
       m_actorRef( actorRef ),
+      m_targetRef( targetRef ),
       m_posType( type ),
       m_targetType( targetType ),
       m_moveType( moveType ),
@@ -176,7 +211,8 @@ namespace Sapphire
     }
   };
 
-  struct TimepointDataLogMessage : public TimepointData {
+  struct TimepointDataLogMessage : public TimepointData
+  {
     uint32_t m_messageId;
     uint32_t m_params[ 5 ]{ 0 };
 
@@ -209,7 +245,7 @@ namespace Sapphire
 
   struct TimepointDataDirector : public TimepointData
   {
-    DirectorOpId m_directorOp{ 0 };
+    VarOpId m_directorOp{ 0 };
     union
     {
       struct
@@ -228,7 +264,7 @@ namespace Sapphire
       uint8_t flags;
     } m_data{ 0 };
 
-    TimepointDataDirector( TimepointDataType type, DirectorOpId op ) :
+    TimepointDataDirector( TimepointDataType type, VarOpId op ) :
       TimepointData( type ),
       m_directorOp( op )
     {
@@ -286,13 +322,19 @@ namespace Sapphire
 
   struct TimepointDataEObjState : public TimepointData
   {
-    uint32_t m_eobjId{ 0xE0000000 };
+    std::string m_eobjName;
     uint32_t m_state{ 0 };
+    uint32_t m_animation{ 0 };
+    uint32_t m_permissionInvisibility{ 0 };
+    bool m_collision{ false };
 
-    TimepointDataEObjState( uint32_t eobjId, uint32_t state ) :
+    TimepointDataEObjState( const std::string& name, uint32_t state, uint32_t animation, uint32_t permissionInvisibilty, bool collision ) :
       TimepointData( TimepointDataType::SetEObjState ),
-      m_eobjId( eobjId ),
-      m_state( state )
+      m_eobjName( name ),
+      m_state( state ),
+      m_animation( animation ),
+      m_permissionInvisibility( permissionInvisibilty ),
+      m_collision( collision )
     {
     }
   };
@@ -356,18 +398,113 @@ namespace Sapphire
 
   struct TimepointDataRollRNG : public TimepointData
   {
-    uint32_t m_min;
-    uint32_t m_max;
+    uint64_t m_min;
+    uint64_t m_max;
     VarType m_type;
     uint32_t m_idx;
 
-    TimepointDataRollRNG( uint32_t min, uint32_t max, VarType type, uint32_t varIdx ) :
+    TimepointDataRollRNG( uint64_t min, uint64_t max, VarType type, uint32_t varIdx ) :
       TimepointData( TimepointDataType::RollRNG ),
       m_min( min ),
       m_max( max ),
       m_type( type ),
       m_idx( varIdx )
     {
+    }
+  };
+
+  struct TimepointDataMechanic : public TimepointData
+  {
+    std::string m_instance;
+    std::string m_function;
+    nlohmann::json m_args;
+
+    TimepointDataMechanic( std::string instance, std::string function, nlohmann::json args ) :
+      TimepointData( TimepointDataType::Mechanic ),
+      m_instance( std::move( instance ) ),
+      m_function( std::move( function ) ),
+      m_args( std::move( args ) )
+    {
+    }
+  };
+
+  struct TimepointDataSetVar : public TimepointData
+  {
+    VarType m_type;
+    VarOpId m_op;
+    uint64_t m_index;
+    uint64_t m_val;
+
+    TimepointDataSetVar( VarType type, VarOpId op, uint64_t index, uint64_t val ) :
+      TimepointData( TimepointDataType::SetVar ),
+      m_type( type ),
+      m_op( op ),
+      m_index( index ),
+      m_val( val )
+    {
+    }
+  };
+
+  struct TimepointDataBubbleText : public TimepointData
+  {
+    uint32_t m_balloonId;
+    std::string m_talkerRef;
+    uint32_t m_params[ 3 ]{ 0 };
+
+    TimepointDataBubbleText( uint32_t balloonId, const std::string& talkerRef, const std::vector< uint32_t >& params ) :
+      TimepointData( TimepointDataType::BubbleText ),
+      m_balloonId( balloonId ),
+      m_talkerRef( talkerRef )
+    {
+      for( auto i = 0; i < params.size() && i < 3; ++i )
+        m_params[ i ] = params[ i ];
+    }
+  };
+
+  struct TimepointDataPathTo : public TimepointData
+  {
+    std::string m_actorRef;
+    PathToTargetType m_type;
+    float m_posX;
+    float m_posY;
+    float m_posZ;
+    std::string m_selector;
+    int32_t m_selectorIndex;
+    std::string m_targetRef;
+    bool m_useNavi;
+    uint32_t m_serverPathId;
+
+    TimepointDataPathTo( PathToTargetType type, const std::string& actorRef, const std::string& targetRef, const std::string& selector, int32_t selectorIndex,
+                         float x, float y, float z,
+                         uint32_t serverPathId, bool useNavi ) :
+      TimepointData( TimepointDataType::PathTo ),
+      m_type( type ),
+      m_actorRef( actorRef ),
+      m_targetRef( targetRef ),
+      m_selector( selector ),
+      m_selectorIndex( selectorIndex ),
+      m_posX( x ),
+      m_posY( y ),
+      m_posZ( z ),
+      m_serverPathId( serverPathId ),
+      m_useNavi( useNavi )
+    {
+    }
+  };
+
+  struct TimepointDataNpcYell : public TimepointData
+  {
+    std::string m_actorRef;
+    uint32_t m_npcYellId{ 0 };
+    uint32_t m_params[ 4 ]{ 0 };
+
+    TimepointDataNpcYell( const std::string& actorRef, uint32_t npcYellId, const std::vector< uint32_t >& params ) :
+      TimepointData( TimepointDataType::NpcYell ),
+      m_actorRef( actorRef ),
+      m_npcYellId( npcYellId )
+    {
+      for( auto i = 0; i < params.size() && i < 4; ++i )
+        m_params[ i ] = params[ i ];
     }
   };
 

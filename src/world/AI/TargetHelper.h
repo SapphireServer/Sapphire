@@ -267,7 +267,7 @@ namespace Sapphire::World::AI
   public:
     struct CharaEntry
     {
-      uint32_t m_entityId;
+      uint32_t m_entityId{ 0xE0000000 };
       Common::Vector3 m_pos;
       float m_rot;
       // todo: status effects?
@@ -289,6 +289,12 @@ namespace Sapphire::World::AI
     // returns actors sorted by distance
     const std::vector< CharaEntry >& getResults() const;
     const std::vector< uint32_t >& getTargetIds() const;
+
+    const CharaEntry& getResultAt( int32_t index ) const;
+    uint32_t getResultTargetIdAt( int32_t index ) const;
+
+    size_t getResultsCount() const;
+
     void clearResults();
   };
   using SnapshotPtr = std::shared_ptr< Snapshot >;

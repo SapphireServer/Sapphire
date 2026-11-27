@@ -184,7 +184,12 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       if( m_instanceResetFinishTime == 0 )
       {
         m_instanceResetFinishTime = tickCount + 5000;
-        m_pEncounter->reset();
+
+        for( auto& [ name, pEncounter ] : m_encounters )
+          pEncounter->reset();
+
+        if( m_pControllerEncounter )
+          m_pControllerEncounter->reset();
 
         std::vector< Entity::PlayerPtr > playerList;
 
@@ -265,10 +270,13 @@ void Sapphire::InstanceContent::updateState( uint64_t tickCount )
       {
         sendDutyComplete();
         m_instanceResetTime = tickCount + 3000;
-        if( m_pEncounter )
-        {
-          m_pEncounter->removeBNpcs();
-        }
+
+        for( auto& [ name, pEncounter ] : m_encounters )
+          if( pEncounter)
+            pEncounter->removeBNpcs();
+
+        if( m_pControllerEncounter )
+          m_pControllerEncounter->removeBNpcs();
 
         return;
       }
@@ -458,7 +466,7 @@ void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
-  if( object->getBaseId() == 2000182 ) // start
+  if( object->getName() == "Entrance" )// start
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -580,32 +588,31 @@ void Sapphire::InstanceContent::setState( InstanceContentState state )
     Common::Service< World::WorldServer >::ref().instanceEvents().stateChanged.publish( { *this, oldState, m_state } );
 }
 
-void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
+std::pair< Sapphire::Common::Vector3, float > Sapphire::InstanceContent::getEntrancePosition() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_instanceContentId );
-
   auto rect = instanceObjectCache.getEventRange( contentInfo->data().EntranceRect );
 
-  if( m_pEntranceEObj != nullptr )
+  Common::Vector3 pos{};
+  float rot = PI / 2;
+  if( rect )
   {
-    if( rect )
-      player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
-    else
-      player.setRot( PI - PI / 2 );
-    player.setPos( m_pEntranceEObj->getPos() );
+    const auto& transform = rect->header.Transformation;
+    pos = { transform.Translation.x, transform.Translation.y, transform.Translation.z };
+    rot = Util::eulerToDirection( { transform.Rotation.x, transform.Rotation.y, transform.Rotation.z } );
   }
-  else if( rect )
-  {
-    player.setRot( Util::eulerToDirection( { rect->header.Transformation.Rotation.x, rect->header.Transformation.Rotation.y, rect->header.Transformation.Rotation.z } ) );
-    player.setPos( { rect->header.Transformation.Translation.x, rect->header.Transformation.Translation.y, rect->header.Transformation.Translation.z } );
-  }
-  else
-  {
-    player.setRot( PI - PI / 2 );
-    player.setPos( { 0.f, 0.f, 0.f } );
-  }
+  if( m_pEntranceEObj )
+    pos = m_pEntranceEObj->getPos();
+  return { pos, rot };
+}
+
+void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
+{
+  auto [ pos, rot ] = getEntrancePosition();
+  player.setRot( rot );
+  player.setPos( pos );
 }
 
 void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
@@ -632,13 +639,21 @@ Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByName( const
   return it->second;
 }
 
+Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByBaseId( uint32_t baseId )
+{
+  for( auto& eobj : m_eventObjectMap )
+    if( eobj.second->getBaseId() == baseId )
+      return eobj.second;
+
+  return nullptr;
+}
+
+
 Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjById( uint32_t eobjId )
 {
-  Entity::EventObjectPtr pEObj = nullptr;
-
   for( auto& eobj : m_eventIdToObjectMap )
-    if( eobj.second->getBaseId() == eobjId )
-      return pEObj;
+    if( eobj.second->getId() == eobjId )
+      return eobj.second;
 
   return nullptr;
 }
@@ -833,13 +848,12 @@ std::set< uint32_t > Sapphire::InstanceContent::getSpawnedPlayerIds() const
   return m_spawnedPlayers;
 }
 
-void Sapphire::InstanceContent::setEncounter( Sapphire::EncounterPtr pEncounter )
+void Sapphire::InstanceContent::setControllerEncounter( World::Encounter::EncounterPtr pEncounter )
 {
-  m_pEncounter = pEncounter;
+  m_pControllerEncounter = pEncounter;
 }
 
-Sapphire::EncounterPtr Sapphire::InstanceContent::getEncounter()
+Sapphire::World::Encounter::EncounterPtr Sapphire::InstanceContent::getControllerEncounter()
 {
-  return m_pEncounter;
+  return m_pControllerEncounter;
 }
-

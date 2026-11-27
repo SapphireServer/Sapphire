@@ -11583,7 +11583,7 @@
   },
   "835": {
     "name": "Ambuscade",
-    "potency": 0,
+    "potency": 100,
     "comboPotency": 0,
     "flankPotency": 0,
     "frontPotency": 0,
@@ -11591,7 +11591,7 @@
     "curePotency": 0,
     "restorePercentage": 0,
     "nextCombo": [],
-    "targetFilter": 0,
+    "targetFilter": 1,
     "aggroModifier": 1.0,
     "statuses": {
       "caster": [],

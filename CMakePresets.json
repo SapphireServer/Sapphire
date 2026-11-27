@@ -65,7 +65,7 @@
     {
       "name": "vs2022-release",
       "configurePreset": "vs2022-release",
-      "configuration": "Release"
+      "configuration": "RelWithDebInfo"
     },
     {
       "name": "clangd-debug",

@@ -19,7 +19,7 @@ namespace Sapphire::Common
   const uint8_t MAX_DISPLAYED_ACTORS = 99;
   const uint8_t MAX_DISPLAYED_EOBJS = 40;
 
-  const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
+  const uint32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
   const uint16_t MAX_PLAYER_LEVEL = 60;

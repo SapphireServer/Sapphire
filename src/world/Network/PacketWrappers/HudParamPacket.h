@@ -6,6 +6,7 @@
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
 #include <ForwardsCommon.h>
+#include <utility>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
@@ -26,9 +27,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     void initialize( Entity::Chara& chara )
     {
       m_data.ClassJob = static_cast< uint8_t >( chara.getClass() );
-      m_data.Lv = chara.getLevel();
+      m_data.Lv = chara.getEffectiveLevel();
       m_data.OrgLv = chara.getLevel();
-      m_data.LvSync = 0; //player.getLevelSync();
+      m_data.LvSync = chara.getLevelSync();
       m_data.Hp = chara.getHp();
       m_data.Mp = chara.getMp();
       m_data.Tp = chara.getTp();
@@ -58,8 +59,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
   };
   template< typename... Args >
-  std::shared_ptr< HudParamPacket > makeHudParam( Args... args )
+  std::shared_ptr< HudParamPacket > makeHudParam( Args&&... args )
   {
-    return std::make_shared< HudParamPacket >( args... );
+    return std::make_shared< HudParamPacket >( std::forward< Args >( args )... );
   }
 }

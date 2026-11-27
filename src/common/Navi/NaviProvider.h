@@ -13,8 +13,27 @@
 
 namespace Sapphire::Common::Navi
 {
-  const int32_t MAX_POLYS = 32;
+  const int32_t MAX_POLYS = 512;
   const int32_t MAX_SMOOTH = 2048;
+
+  enum class CrowdFilterIndex : uint32_t
+  {
+    Default,
+    IgnoreObstacles
+  };
+
+  enum class CrowdAgentLayer : uint32_t
+  {
+    None,
+    Default,
+    IgnoreAgents
+  };
+
+  struct CrowdAgentLayerData
+  {
+    uint32_t m_group;
+    uint32_t m_mask;
+  };
 
   /** 1. Memory Allocator for Tile Cache **/
   struct LinearAllocator : public dtTileCacheAlloc {
@@ -58,10 +77,17 @@ namespace Sapphire::Common::Navi
     {
       for( int i = 0; i < params->polyCount; ++i )
       {
-        if( polyAreas[ i ] == RC_WALKABLE_AREA )
+        if( polyAreas[ i ] == AREA_GROUND )
         {
-          polyAreas[ i ] = 0;   // Default Ground Area
-          polyFlags[ i ] = 0x01;// Walkable Flag
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_WALK );// Walkable Flag
+        }
+        else if( polyAreas[ i ] == AREA_DOOR )
+        {
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_DOOR );
+        }
+        else if( polyAreas[ i ] == AREA_OBSTACLE )
+        {
+          polyFlags[ i ] = static_cast< uint16_t >( FLAG_OBSTACLE );
         }
       }
     }
@@ -106,15 +132,17 @@ namespace Sapphire::Common::Navi
     Common::Vector3 toGamePos( float* pos );
 
     std::vector< Common::Vector3 > findFollowPath( const Common::Vector3& startPos,
-                                                              const Common::Vector3& endPos );
+                                                              const Common::Vector3& endPos, float radius = 1.f );
     Common::Vector3 findRandomPositionInCircle( const Common::Vector3& startPos,
                                                            float maxRadius );
 
     Common::Vector3 findNearestPosition( float x, float z );
 
+    Common::Vector3 findNearestPosition( float x, float y, float z );
+
     bool hasNaviMesh() const;
 
-    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f );
+    int32_t addAgent( const Common::Vector3& pos, float radius, float speed = 1.0f, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
 
     void removeAgent( int32_t naviAgentId );
 
@@ -131,12 +159,12 @@ namespace Sapphire::Common::Navi
     bool isAgentActive( int32_t naviAgentId ) const;
     bool hasTargetState( int32_t naviAgentId ) const;
 
-    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
 
     void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
     void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
-    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed );
+    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision = false, bool passThroughObstacles = false );
     const dtNavMesh* getNavMesh() const { return m_naviMesh; }
     const dtTileCache* getTileCache() const { return m_tileCache; }
 
@@ -145,7 +173,9 @@ namespace Sapphire::Common::Navi
     // halfExtents: { width, height, depth } 
     void toggleBox( dtObstacleRef& doorRef, const Common::Vector3& pos, const Common::Vector3& halfExtents, float rot, bool enabled );
     void toggleObstacle( dtObstacleRef& obstacleRef, const Common::Vector3& pos, float radius, float height, bool enabled );
-    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos );
+    bool hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos, bool ignoreObstacles = false );
+
+    bool isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles = false );
 
   protected:
     std::string m_internalName;

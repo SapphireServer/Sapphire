@@ -42,17 +42,23 @@ namespace Sapphire::Entity
     std::set< PlayerPtr > m_inRangePlayers;
     std::set< BNpcPtr > m_inRangeBNpc;
 
+    uint64_t m_targetId{ Common::INVALID_GAME_OBJECT_ID64 };
+
     /*! Parent cell in the zone */
     Common::CellId m_cellId;
+
+    uint32_t m_followTargetId{ Common::INVALID_GAME_OBJECT_ID };
+
+    bool m_nameHidden{ false };
 
   public:
     explicit GameObject( Common::ObjKind type );
 
     virtual ~GameObject() {};
 
-    virtual void spawn( PlayerPtr pTarget ) {}
+    virtual void spawn( PlayerPtr pTarget );
 
-    virtual void despawn( PlayerPtr pTarget ) {}
+    virtual void despawn( PlayerPtr pTarget );
 
     uint32_t getId() const;
 
@@ -63,9 +69,9 @@ namespace Sapphire::Entity
     Common::Vector3& getPos();
     const Common::Vector3& getPos() const;
 
-    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true );
+    virtual void setPos( const Common::Vector3& pos, bool broadcastUpdate = true, bool sendPacketToSelf = false );
 
-    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true );
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true, bool sendPacketToSelf = false );
 
     float getRot() const;
 
@@ -153,6 +159,20 @@ namespace Sapphire::Entity
     // set the current cell
     void setCellId( Common::CellId cellId );
 
+
+    virtual World::AI::Controller::Controller* getController();
+
+    uint32_t getFollowTargetId() const;
+    void setFollowTargetId( uint32_t id );
+    void resetFollowTargetId();
+
+    void setTargetId( uint64_t targetId );
+
+    uint32_t getTargetId() const;
+    uint64_t getTargetObjectId() const;
+
+    // actrl ToggleNameHidden uses 0=hidden, 1=visible
+    virtual void toggleNameHidden( bool hidden );
   };
 
 }

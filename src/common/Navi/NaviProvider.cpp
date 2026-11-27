@@ -79,6 +79,16 @@ bool Sapphire::Common::Navi::NaviProvider::init( const std::string& naviPath )
     m_vod = dtAllocObstacleAvoidanceDebugData();
     m_vod->init( 2048 );
 
+    // standard agents
+    dtQueryFilter* defaultFilter = m_pCrowd->getEditableFilter( static_cast< uint32_t >( CrowdFilterIndex::Default ) );
+    defaultFilter->setIncludeFlags( FLAG_WALK );
+    defaultFilter->setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE ); // cannot traverse door polygons
+
+    // ignore doors and obstacles
+    dtQueryFilter* obstacleIgnoreFilter = m_pCrowd->getEditableFilter( static_cast< uint32_t >( CrowdFilterIndex::IgnoreObstacles ) );
+    obstacleIgnoreFilter->setIncludeFlags( FLAG_ALL );
+    obstacleIgnoreFilter->setExcludeFlags( 0 );
+
     initQuery();
 
     return true;
@@ -323,12 +333,15 @@ Sapphire::Common::Vector3
   filter.setIncludeFlags( 0xffff );
   filter.setExcludeFlags( 0 );
 
-  dtPolyRef startRef;
+  dtPolyRef startRef{ 0 };
 
   status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
 
-  if( dtStatusFailed( status ) )
+  if( dtStatusFailed( status ) || startRef == 0 )
   {
+    if( dtStatusFailed( status ) )
+      Logger::error( "findNearestPosition: dtStatusFailed for pos {} {}", x, z );
+
     // Key improvement 3: Try with larger search radius if first attempt fails
     polyPickExt[ 0 ] = 0.1f;
     polyPickExt[ 1 ] = 500.0f;
@@ -336,8 +349,10 @@ Sapphire::Common::Vector3
 
     status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
 
-    if( dtStatusFailed( status ) )
+    if( dtStatusFailed( status ) || startRef == 0 )
     {
+      if( dtStatusFailed( status ) )
+        Logger::error( "findNearestPosition: dtStatusFailed for pos {} {}", x, z );
       return {};
     }
   }
@@ -345,15 +360,77 @@ Sapphire::Common::Vector3
 
   if( !m_naviMesh->isValidPolyRef( startRef ) )
   {
+    Logger::error( "findNearestPosition: Invalid poly ref {} {} {}", startRef, x, z );
     return {};
   }
+
+  bool posOverPoly{ false };
+
+  status = m_naviMeshQuery->closestPointOnPoly( startRef, spos, snearest, &posOverPoly );
+
+  return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
+}
+
+Sapphire::Common::Vector3
+Sapphire::Common::Navi::NaviProvider::findNearestPosition( float x, float y, float z )
+{
+  dtStatus status;
+
+  float spos[ 3 ] = { x, y, z };
+
+  float polyPickExt[ 3 ];
+  polyPickExt[ 0 ] = 0.1f;
+  polyPickExt[ 1 ] = 0.1f;
+  polyPickExt[ 2 ] = 0.1f;
+  float snearest[ 3 ];
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
+
+  dtPolyRef startRef{ 0 };
+
+  status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+  if( dtStatusFailed( status ) || startRef == 0 )
+  {
+    if( dtStatusFailed( status ) )
+      Logger::error( "findNearestPosition: dtStatusFailed for pos {} {} {}", x, y, z );
+
+    // Key improvement 3: Try with larger search radius if first attempt fails
+    polyPickExt[ 0 ] = 10.0f;
+    polyPickExt[ 1 ] = 500.0f;
+    polyPickExt[ 2 ] = 10.0f;
+
+    status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+    if( dtStatusFailed( status ) || startRef == 0 )
+    {
+      if( dtStatusFailed( status ) )
+        Logger::error( "findNearestPosition: dtStatusFailed for pos {} {} {}", x, y, z );
+
+      return {};
+    }
+  }
+
+
+  if( !m_naviMesh->isValidPolyRef( startRef ) )
+  {
+    Logger::error( "findNearestPosition: Invalid polyref {} {} {} {}", startRef, x, y, z );
+    return {};
+  }
+
+  bool posOverPoly{ false };
+
+  status = m_naviMeshQuery->closestPointOnPoly( startRef, spos, snearest, &posOverPoly );
 
   return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
 }
 
 std::vector< Sapphire::Common::Vector3 >
   Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::Vector3& startPos,
-                                                       const Common::Vector3& endPos )
+                                                        const Common::Vector3& endPos,
+                                                        float radius )
 {
   if( !m_naviMesh || !m_naviMeshQuery )
     throw std::runtime_error( "No navimesh loaded" );
@@ -397,7 +474,7 @@ std::vector< Sapphire::Common::Vector3 >
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
     // todo: adjust these for the actor radius
-    const float STEP_SIZE = 0.5f;
+    const float STEP_SIZE = radius >= 0 ? radius / 2.f : 0.5f;
     const float SLOP = 0.15f;
 
     int32_t numSmoothPath = 0;
@@ -675,11 +752,11 @@ bool Sapphire::Common::Navi::NaviProvider::loadMesh( const std::string& path )
   return true;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision, bool passThroughObstacles )
 {
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
-  params.height = 3.f;
+  params.height = 0.1f;
   params.maxAcceleration = 40.f;
   params.maxSpeed = speed;
   params.radius = radius;
@@ -693,23 +770,55 @@ int32_t Sapphire::Common::Navi::NaviProvider::addAgent( const Common::Vector3& p
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
 
+  auto layer = ignoreAgentCollision ? CrowdAgentLayer::IgnoreAgents : CrowdAgentLayer::Default;
+  auto layerCollision = ignoreAgentCollision ? CrowdAgentLayer::None : CrowdAgentLayer::Default;
+
+  params.userData = new CrowdAgentLayerData{ static_cast< uint32_t >( layer ), static_cast< uint32_t >( layerCollision ) };
+
+  auto pLayerData = static_cast< CrowdAgentLayerData* >( params.userData );
+
+  // set these both to 0.0f since we're running our own agent collision before crowd->update
+  params.collisionQueryRange = 0.0f;
+  params.separationWeight = 0.0f;
+
+  if( ignoreAgentCollision )
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::IgnoreAgents );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::None );
+  }
+  else
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::Default );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::Default );
+  }
+
+  if( passThroughObstacles )
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::IgnoreObstacles );
+  }
+  else
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::Default );
+  }
 
   float position[] = { pos.x, pos.y, pos.z };
   return m_pCrowd->addAgent( position, &params );
 }
 
-void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed )
+void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning, float speed, bool ignoreAgentCollision, bool passThroughObstacles )
 {
   if( naviAgentId == -1 )
     return;
-  dtCrowdAgentParams params{};
-  std::memset( &params, 0, sizeof( params ) );
-  params.height = 3.f;
+
+  auto ag = m_pCrowd->getEditableAgent( naviAgentId );
+  dtCrowdAgentParams params = ag->params;
+  
+  params.height = 0.1f;
   params.maxAcceleration = 40.f;
   params.maxSpeed = speed;
   params.radius = radius;
-  params.collisionQueryRange = speed * 0.5f;
-  params.pathOptimizationRange = speed * 3.0f;
+  params.collisionQueryRange = params.radius * 10.0f;
+  params.pathOptimizationRange = params.radius * 30.0f;
   params.updateFlags = 0;
   params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS |
                     DT_CROWD_OPTIMIZE_VIS |
@@ -717,7 +826,37 @@ void Sapphire::Common::Navi::NaviProvider::updateAgentParameters( int32_t naviAg
                     DT_CROWD_OBSTACLE_AVOIDANCE;
   params.separationWeight = 2.0f;
   params.obstacleAvoidanceType = 3;
+
+  auto pLayerData = static_cast< CrowdAgentLayerData* >( params.userData );
+
+  // set these both to 0.0f since we're running our own agent collision before crowd->update
+  params.collisionQueryRange = 0.0f;
+  params.separationWeight = 0.0f;
+
+  if( ignoreAgentCollision )
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::IgnoreAgents );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::None );
+  }
+  else
+  {
+    pLayerData->m_group = static_cast< uint32_t >( CrowdAgentLayer::Default );
+    pLayerData->m_mask = static_cast< uint32_t >( CrowdAgentLayer::Default );
+  }
+
+  if( passThroughObstacles )
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::IgnoreObstacles );
+  }
+  else
+  {
+    params.queryFilterType = static_cast< uint8_t >( CrowdFilterIndex::Default );
+  }
+
   m_pCrowd->updateAgentParameters( naviAgentId, &params );
+
+  if( ag->active && ag->targetState == DT_CROWDAGENT_TARGET_VALID )
+    m_pCrowd->requestMoveTarget( naviAgentId, ag->targetRef, ag->targetPos );
 }
 
 void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
@@ -726,12 +865,96 @@ void Sapphire::Common::Navi::NaviProvider::update( float timeInSeconds )
   info.idx = -1;
   info.vod = m_vod;
 
-  m_tileCache->update( timeInSeconds, m_naviMesh );
+  bool upToDate = false;
+  while( !upToDate )
+  {
+    if( dtStatusFailed( m_tileCache->update( timeInSeconds, m_naviMesh, &upToDate ) ) )
+    {
+      Logger::error( "[Navmesh] Failed to update obstacle tiles for {}", m_internalName );
+      return;
+    }
+  }
   m_pCrowd->update( timeInSeconds, &info );
+
+  // handle agent collision by layer ids
+  // todo: probably modify recast to support this
+  const int maxAgents = m_pCrowd->getAgentCount();
+  for( int i = 0; i < maxAgents; ++i )
+  {
+    dtCrowdAgent* agA = const_cast< dtCrowdAgent* >( m_pCrowd->getAgent( i ) );
+    if( !agA || !agA->active ) continue;
+
+    auto* layerA = static_cast< CrowdAgentLayerData* >( agA->params.userData );
+    if( !layerA || layerA->m_mask == 0 ) continue;
+
+    for( int j = i + 1; j < maxAgents; ++j )
+    {
+      dtCrowdAgent* agB = const_cast< dtCrowdAgent* >( m_pCrowd->getAgent( j ) );
+      if( !agB || !agB->active ) continue;
+
+      auto* layerB = static_cast< CrowdAgentLayerData* >( agB->params.userData );
+      if( !layerB ) continue;
+
+      bool aCollidesB = ( layerA->m_mask & layerB->m_group ) != 0;
+      bool bCollidesA = ( layerB->m_mask & layerA->m_group ) != 0;
+
+      if( !aCollidesB && !bCollidesA )
+        continue;
+
+      float diff[ 3 ];
+      dtVsub( diff, agA->npos, agB->npos );
+      diff[ 1 ] = 0.0f;
+
+      float distSqr = dtVlenSqr( diff );
+      float minDist = agA->params.radius + agB->params.radius;
+
+      if( distSqr < minDist * minDist )
+      {
+        float dist = dtMathSqrtf( distSqr );
+        float overlap = minDist - dist;
+
+        float normal[ 3 ];
+        if( dist > 0.0001f )
+        {
+          dtVscale( normal, diff, 1.0f / dist );
+        }
+        else
+        {
+          normal[ 0 ] = 1.0f;
+          normal[ 1 ] = 0.0f;
+          normal[ 2 ] = 0.0f;
+        }
+
+        if( aCollidesB && bCollidesA )
+        {
+          dtVmad( agA->npos, agA->npos, normal, overlap * 0.5f );
+          dtVmad( agB->npos, agB->npos, normal, -overlap * 0.5f );
+        }
+        else if( aCollidesB )
+        {
+          dtVmad( agA->npos, agA->npos, normal, overlap );
+        }
+        else if( bCollidesA )
+        {
+          dtVmad( agB->npos, agB->npos, normal, -overlap );
+        }
+      }
+    }
+  }
 }
 
 void Sapphire::Common::Navi::NaviProvider::removeAgent( int32_t naviAgentId )
 {
+  if( naviAgentId == -1 )
+    return;
+
+  auto pAgent = m_pCrowd->getAgent( naviAgentId );
+  if( pAgent )
+  {
+    auto pUserData = static_cast< CrowdAgentLayer* >( pAgent->params.userData );
+    if( pUserData )
+      delete pUserData;
+  }
   m_pCrowd->removeAgent( naviAgentId );
 }
 
@@ -814,11 +1037,11 @@ bool Sapphire::Common::Navi::NaviProvider::hasTargetState( int32_t naviAgentId )
   return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
 }
 
-int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed )
+int32_t Sapphire::Common::Navi::NaviProvider::updateAgentPosition( int32_t naviAgentId, const Common::Vector3& pos, float radius, float speed, bool ignoreAgentCollision, bool ignoreObstacles )
 {
   resetMoveTarget( naviAgentId );
   removeAgent( naviAgentId );
-  auto newIndex = addAgent( pos, radius, speed );
+  auto newIndex = addAgent( pos, radius, speed, ignoreAgentCollision, ignoreObstacles );
   return newIndex;
 }
 
@@ -845,9 +1068,14 @@ void Sapphire::Common::Navi::NaviProvider::removeAgentUpdateFlag( int32_t naviAg
 void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef, const Common::Vector3& pos,
                                                        const Common::Vector3& halfExtents, float rot, bool enabled )
 {
+  const float cellSize = m_tileCache->getParams()->cs;
+  const float minHalfThickness = cellSize * 2.0f;
+
   float fpos[ 3 ] = { pos.x, pos.y, pos.z };
-  // Half-extents: Width, Height, Depth
-  float fhalfExtents[ 3 ] = { halfExtents.x, halfExtents.y, halfExtents.z };
+  float fhalfExtents[ 3 ] = {
+          dtMax( halfExtents.x, minHalfThickness ),
+          halfExtents.y,
+          dtMax( halfExtents.z, minHalfThickness ) };
 
   if( obstacleRef != 0 && enabled )
   {
@@ -857,7 +1085,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleBox( dtObstacleRef& obstacleRef
 
   if( enabled && obstacleRef == 0 )
   {
-    auto status = m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef );
+    auto status = m_tileCache->addBoxObstacle( fpos, fhalfExtents, rot, &obstacleRef, AREA_DOOR );
     if( dtStatusFailed( status ) )
       Logger::error( "[Navmesh] addBoxObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
                      pos.x, pos.y, pos.z );
@@ -883,7 +1111,7 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
 
   if( enabled && obstacleRef == 0 )
   {
-    auto status = m_tileCache->addObstacle( fpos, radius, height, &obstacleRef );
+    auto status = m_tileCache->addObstacle( fpos, radius, height, &obstacleRef, AREA_OBSTACLE );
     if( dtStatusFailed( status ) )
       Logger::error( "[Navmesh] addObstacle failed (request queue full?) at X:{} Y:{} Z:{}",
                      pos.x, pos.y, pos.z );
@@ -897,31 +1125,102 @@ void Sapphire::Common::Navi::NaviProvider::toggleObstacle( dtObstacleRef& obstac
   }
 }
 
-bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos )
+bool Sapphire::Common::Navi::NaviProvider::hasLineOfSight( const Common::Vector3& startPos, const Common::Vector3& endPos, bool ignoreObstacles )
 {
   if( m_naviMeshQuery == nullptr )
   {
     Logger::error( "[Navmesh] hasLineOfSight: m_naviMeshQuery is null" );
-    return true;
-  }
-
-  dtQueryFilter filter;
-  // 1. DETOUR CHECK: Is the path clear on the NavMesh?
-  dtPolyRef startRef{ 0 };
-  float nearestPt[ 3 ];
-  float extents[ 3 ] = { 2.0f, 4.0f, 2.0f };
-  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
-  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
-  m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, nearestPt );
-
-  dtRaycastHit navHit{ 0 };
-  m_naviMeshQuery->raycast( startRef, fstartPos, fendPos, &filter, 0, &navHit );
-
-  // If navHit.t < 1.0, the ray hit a NavMesh boundary (a wall or a hole)
-  if( navHit.t < 1.0f )
-  {
     return false;
   }
 
-  return true;// Both checks passed
+  dtQueryFilter filter;
+  dtPolyRef startRef{ 0 }, endRef{ 0 };
+  float startNearest[ 3 ], endNearest[ 3 ];
+  float extents[ 3 ] = { 1.0f, 10.0f, 1.0f };
+  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+
+  if( ignoreObstacles )
+  {
+    filter.setIncludeFlags( FLAG_ALL );
+    filter.setExcludeFlags( 0 );
+  }
+  else
+  {
+    filter.setIncludeFlags( FLAG_WALK );
+    filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
+  }
+
+  if( dtStatusFailed( m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest ) ) || !startRef ||
+      dtStatusFailed( m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest ) ) || !endRef )
+    return false;
+
+  if( dtVdist2DSqr( fstartPos, startNearest ) > 0.0001f )
+    return false;
+
+  dtPolyRef path[ MAX_POLYS ];
+  dtRaycastHit navHit{ 0 };
+  navHit.path = path;
+  navHit.maxPath = MAX_POLYS;
+  auto status = m_naviMeshQuery->raycast( startRef, fstartPos, fendPos, &filter, 0, &navHit );
+
+  if( dtStatusFailed( status ) || dtStatusDetail( status, DT_BUFFER_TOO_SMALL | DT_PARTIAL_RESULT ) ||
+      navHit.t <= 1.0f || navHit.pathCount == 0 )
+    return false;
+
+  float endHeight;
+  return dtStatusSucceed( m_naviMeshQuery->getPolyHeight( path[ navHit.pathCount - 1 ], fendPos, &endHeight ) ) &&
+         std::abs( endHeight - endNearest[ 1 ] ) < 0.1f;
+}
+
+bool Sapphire::Common::Navi::NaviProvider::isPointReachable( const Common::Vector3& startPos, const Common::Vector3& endPos, bool passThroughObstacles )
+{
+  if( !m_naviMeshQuery )
+  {
+    Logger::error( "[Navmesh] isPointReachable: m_naviMeshQuery is null" );
+    return false;
+  }
+
+  float fstartPos[ 3 ] = { startPos.x, startPos.y, startPos.z };
+  float fendPos[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+  dtPolyRef startRef{ 0 }, endRef{ 0 };
+  float startNearest[ 3 ], endNearest[ 3 ];
+  dtQueryFilter filter;
+  float extents[ 3 ] = { 1.0f, 10.0f, 1.0f };
+
+  if( passThroughObstacles )
+  {
+    filter.setIncludeFlags( FLAG_ALL );
+    filter.setExcludeFlags( 0 );
+  }
+  else
+  {
+    filter.setIncludeFlags( FLAG_WALK );
+    filter.setExcludeFlags( FLAG_DOOR | FLAG_OBSTACLE );
+  }
+
+  if( dtStatusFailed( m_naviMeshQuery->findNearestPoly( fstartPos, extents, &filter, &startRef, startNearest ) ) || !startRef ||
+      dtStatusFailed( m_naviMeshQuery->findNearestPoly( fendPos, extents, &filter, &endRef, endNearest ) ) || !endRef )
+    return false;
+
+  // todo: this is probably way too large but hopefully should prevent partial paths
+  std::vector< dtPolyRef > pathCorridor( MAX_SMOOTH );
+  int pathCount = 0;
+  dtStatus status = m_naviMeshQuery->findPath( startRef, endRef, fstartPos, fendPos, &filter, pathCorridor.data(), &pathCount, static_cast< int >( pathCorridor.size() ) );
+
+  if( dtStatusSucceed( status ) && pathCount > 0 )
+  {
+    // final poly matches endRef
+    if( pathCorridor[ pathCount - 1 ] == endRef )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  return false;
 }

@@ -73,17 +73,20 @@ namespace Sapphire::Network::ActorControl
     SpawnEffect = 0x25,
     ToggleInvisible = 0x26,
     DeadFadeOut = 0x27,
+    SetLevelSync = 0x28,
     SetRewardFlag = 0x29,
 
     UpdateUiExp = 0x2B,
     SetFallDamage = 0x2D,
 
     SetTarget = 0x32,
-    ToggleNameHidden = 0x36,
+    ToggleNameHidden = 0x36, // header(playerId, srcId), param0 == 0 ? hidden : visible
+
+    SetSubTarget = 0x3A,
 
     LimitbreakStart = 0x47,
     LimitbreakPartyStart = 0x48,
-    BubbleText = 0x49,
+    BubbleText = 0x49, // param0 index into Balloon exd sheet
 
     DamageEffect = 0x50,
     RaiseAnimation = 0x51,
@@ -496,6 +499,7 @@ namespace Sapphire::Network::ActorControl
       DRAWN_SWORD = 0x1,
       AUTO_ATTACK = 0x2,
       TARGET_DECIDE = 0x3,
+      TARGET_ANCHOR = 0x4,
       REQUEST_ACTION = 0x64,
       CANCEL_MOUNT = 0x65,
       COMPANION = 0x66,
