@@ -95,11 +95,11 @@ namespace Sapphire::Scripting
 
     bool onStart( World::Action::Action& action );
 
-    bool onInterrupt( World::Action::Action& action );
+    void onActionInterrupted( const World::Notifications::ActionInterrupted& event );
 
     bool onExecute( World::Action::Action& action );
 
-    bool onAfterBuildEffect( World::Action::Action& action );
+    void onActionEffectsBuilt( const World::Notifications::ActionEffectsBuilt& event );
 
     void onStatusEffectApplied( const World::Notifications::StatusEffectApplied& event );
 
@@ -107,7 +107,7 @@ namespace Sapphire::Scripting
 
     void onStatusEffectRemoving( const World::Notifications::StatusEffectRemoving& event );
 
-    bool onPlayerHit( Entity::CharaPtr& pHitChara, Sapphire::StatusEffect::StatusEffect& effect );
+    void onStatusEffectTargetHit( const World::Notifications::StatusEffectTargetHit& event );
 
     bool onZoneInit( const Territory& zone );
 
@@ -152,7 +152,7 @@ namespace Sapphire::Scripting
     bool onInstanceEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                                    uint16_t param2 );
 
-    bool onDutyComplete( QuestBattle& instance, Entity::Player& player );
+    void onQuestBattleCompleted( const World::Notifications::QuestBattleCompleted& event );
 
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 

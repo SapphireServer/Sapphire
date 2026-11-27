@@ -666,28 +666,18 @@ bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onAfterBuildEffect( World::Action::Action& action )
+void Sapphire::Scripting::ScriptMgr::onActionEffectsBuilt( const World::Notifications::ActionEffectsBuilt& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
-
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( event.action.getId() );
   if( script )
-  {
-    script->onAfterBuildEffect( action );
-    return true;
-  }
-  return false;
+    script->onAfterBuildEffect( event.action );
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInterrupt( World::Action::Action& action )
+void Sapphire::Scripting::ScriptMgr::onActionInterrupted( const World::Notifications::ActionInterrupted& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
-
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( event.action.getId() );
   if( script )
-  {
-    script->onInterrupt( action );
-    return true;
-  }
-  return false;
+    script->onInterrupt( event.action );
 }
 
 bool Sapphire::Scripting::ScriptMgr::onBeforeBootstrap( World::Action::Action& action )
@@ -759,17 +749,11 @@ void Sapphire::Scripting::ScriptMgr::onStatusEffectRemoving( const World::Notifi
   }
 }
 
-bool Sapphire::Scripting::ScriptMgr::onPlayerHit( Entity::CharaPtr& pHitChara,
-                                                  Sapphire::StatusEffect::StatusEffect& effect )
+void Sapphire::Scripting::ScriptMgr::onStatusEffectTargetHit( const World::Notifications::StatusEffectTargetHit& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( event.effect.getId() );
   if( script )
-  {
-    script->onPlayerHit( *pHitChara, effect );
-    return true;
-  }
-
-  return false;
+    script->onPlayerHit( event.target, event.effect );
 }
 
 bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
@@ -952,24 +936,24 @@ Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeS
   return *m_nativeScriptMgr;
 }
 
-bool
-Sapphire::Scripting::ScriptMgr::onDutyComplete( QuestBattle& instance, Sapphire::Entity::Player& player )
+void Sapphire::Scripting::ScriptMgr::onQuestBattleCompleted( const World::Notifications::QuestBattleCompleted& event )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
-  if( script )
-  {
-    World::Quest preQ;
-    auto questIdx = player.getQuestIndex( instance.getQuestId() );
-    auto& quest = player.getQuestByIndex( questIdx );
-    preQ = quest;
-    script->onDutyComplete( instance, player );
-    if( quest != preQ )
-      player.updateQuest( quest );
+  auto& battle = event.battle;
+  auto& player = event.player;
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( battle.getDirectorId() );
+  if( !script )
+    return;
 
-    return true;
-  }
+  const auto questId = battle.getQuestId();
+  const auto previousQuest = player.getQuest( questId );
+  script->onDutyComplete( battle, player );
 
-  return false;
+  if( !previousQuest )
+    return;
+
+  const auto quest = player.getQuest( questId );
+  if( quest && *quest != *previousQuest )
+    player.updateQuest( *quest );
 }
 
 bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t eventId,

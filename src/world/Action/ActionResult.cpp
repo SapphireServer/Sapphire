@@ -12,7 +12,7 @@
 
 #include "Network/Util/PacketUtil.h"
 
-#include "Script/ScriptMgr.h"
+#include "WorldServer.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -186,11 +186,11 @@ void ActionResult::execute()
     case CalcResultType::TypeDamageHp:
     case CalcResultType::TypeCriticalDamageHp:
     {
-      auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-      auto statusEffects( m_target->getStatusEffectMap() );
-      for( auto& status : statusEffects )
+      const auto& targetHit = Common::Service< World::WorldServer >::ref().statusEffectEvents().targetHit;
+      const auto statusEffects = m_target->getStatusEffectMap();
+      for( const auto& status : statusEffects )
       {
-        scriptMgr.onPlayerHit( m_target, *status.second );
+        targetHit.publish( { *m_target, *status.second } );
       }
 
       m_target->takeDamage( m_result.Value, false );

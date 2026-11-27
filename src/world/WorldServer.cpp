@@ -137,8 +137,14 @@ WorldServer::WorldServer( const std::string& configName ) :
 
   subscribeEvent( m_instanceEvents.stateChanged, &Sapphire::Scripting::ScriptMgr::onInstanceStateChange );
 
+  subscribeEvent( m_instanceEvents.questBattleCompleted, &Sapphire::Scripting::ScriptMgr::onQuestBattleCompleted );
+
   subscribeEvent( m_statusEffectEvents.applied, &Sapphire::Scripting::ScriptMgr::onStatusEffectApplied );
   subscribeEvent( m_statusEffectEvents.removing, &Sapphire::Scripting::ScriptMgr::onStatusEffectRemoving );
+  subscribeEvent( m_statusEffectEvents.targetHit, &Sapphire::Scripting::ScriptMgr::onStatusEffectTargetHit );
+
+  subscribeEvent( m_actionEvents.effectsBuilt, &Sapphire::Scripting::ScriptMgr::onActionEffectsBuilt );
+  subscribeEvent( m_actionEvents.interrupted, &Sapphire::Scripting::ScriptMgr::onActionInterrupted );
 }
 
 std::vector< std::string > WorldServer::getLoggedInPlayersSnapshot()
